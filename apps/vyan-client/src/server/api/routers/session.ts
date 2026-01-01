@@ -9,6 +9,117 @@ import {
 } from "@repo/database";
 
 export const sessionRouter = createTRPCRouter({
+  // Filter sessions with advanced options (category, trimester, price, sort)
+  filterSessions: publicProcedure
+    .input(
+      z.object({
+        categoryId: z.array(z.string()).optional(),
+        trimester: z.nativeEnum(Trimester).optional(),
+        minPrice: z.number().optional(),
+        maxPrice: z.number().optional(),
+        sortBy: z.enum(["price-asc", "price-desc"]).optional(),
+        status: z.nativeEnum(SessionStatus).optional(),
+      }),
+    )
+    .query(async ({ input }) => {
+      console.log("filterSessions input:", JSON.stringify(input, null, 2));
+
+      let whereCondition: Prisma.SessionWhereInput = {};
+
+      // Filter by status
+      if (input.status !== undefined) {
+        whereCondition.status = input.status;
+      }
+
+      // Filter by category IDs
+      if (input.categoryId && input.categoryId.length > 0) {
+        whereCondition.categoryId = { in: input.categoryId };
+      }
+
+      // Filter by trimester
+      if (input.trimester) {
+        whereCondition.category = {
+          trimester: input.trimester,
+        };
+      }
+
+      // Build price filter conditions
+      const priceConditions = [];
+      if (input.minPrice !== undefined) {
+        priceConditions.push({
+          price: { gte: input.minPrice },
+        });
+      }
+      if (input.maxPrice !== undefined) {
+        priceConditions.push({
+          price: { lte: input.maxPrice },
+        });
+      }
+
+      // Combine price conditions with existing where conditions if any price filters exist
+      if (priceConditions.length > 0) {
+        whereCondition = {
+          AND: [{ ...whereCondition }, ...priceConditions],
+        };
+      }
+
+      console.log("whereCondition:", JSON.stringify(whereCondition, null, 2));
+
+      // Fetch sessions
+      let sessions = await db.session.findMany({
+        where: whereCondition,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          startAt: true,
+          endAt: true,
+          price: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          categoryId: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              trimester: true,
+            },
+          },
+          registrations: {
+            select: {
+              id: true,
+              paymentStatus: true,
+              createdAt: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Sort by price if needed (convert Decimal to number for comparison)
+      if (input.sortBy === "price-asc" || input.sortBy === "price-desc") {
+        sessions.sort((a, b) => {
+          const aPrice = Number(a.price ?? 0);
+          const bPrice = Number(b.price ?? 0);
+          return input.sortBy === "price-asc"
+            ? aPrice - bPrice
+            : bPrice - aPrice;
+        });
+      }
+
+      console.log("Filtered sessions count:", sessions.length);
+
+      return { sessions };
+    }),
+
   // Get all published sessions
   getAllSessions: publicProcedure
     .input(

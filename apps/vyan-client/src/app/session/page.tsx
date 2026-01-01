@@ -4,12 +4,61 @@ import { FilterBar } from "@/components/FilterBar";
 import { SessionCard } from "@/components/SessionCard";
 import { api } from "~/trpc/server";
 import { format } from "date-fns";
+import { SessionStatus } from "@repo/database";
 
-export default async function SessionsPage() {
-  // Fetch sessions from database
-  const sessions = await api.session.getAllSessions({});
+type SessionPageProps = {
+  searchParams: {
+    categoryId?: string | string[];
+    trimester?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    sortBy?: "price-asc" | "price-desc";
+    status?: string;
+  };
+};
 
-  console.log("Fetched sessions:", sessions.length, "sessions");
+// Make the page dynamic to ensure searchParams are processed on each request
+export const dynamic = "force-dynamic";
+
+export default async function SessionsPage({ searchParams }: SessionPageProps) {
+  // Parse search params for filtering
+  const categoryId = searchParams.categoryId
+    ? Array.isArray(searchParams.categoryId)
+      ? searchParams.categoryId
+      : [searchParams.categoryId]
+    : undefined;
+
+  const minPrice = searchParams.minPrice
+    ? parseFloat(searchParams.minPrice)
+    : undefined;
+  const maxPrice = searchParams.maxPrice
+    ? parseFloat(searchParams.maxPrice)
+    : undefined;
+
+  const sortBy = searchParams.sortBy;
+  const status = searchParams.status as SessionStatus | undefined;
+  const trimester = searchParams.trimester as any;
+
+  console.log("Filter params:", {
+    categoryId,
+    trimester,
+    minPrice,
+    maxPrice,
+    sortBy,
+    status,
+  });
+
+  // Fetch sessions using the filter endpoint
+  const { sessions } = await api.session.filterSessions({
+    categoryId,
+    trimester,
+    minPrice,
+    maxPrice,
+    sortBy,
+    status,
+  });
+
+  console.log("Fetched sessions:", sessions.length, "sessions", sessions);
 
   return (
     <main className="flex w-full flex-col items-center bg-white">
@@ -68,8 +117,6 @@ export default async function SessionsPage() {
           })
         )}
       </div>
-
-      
     </main>
   );
 }
