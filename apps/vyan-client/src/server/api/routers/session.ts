@@ -19,6 +19,8 @@ export const sessionRouter = createTRPCRouter({
         maxPrice: z.number().optional(),
         sortBy: z.enum(["price-asc", "price-desc"]).optional(),
         status: z.nativeEnum(SessionStatus).optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -53,6 +55,18 @@ export const sessionRouter = createTRPCRouter({
       if (input.maxPrice !== undefined) {
         priceConditions.push({
           price: { lte: input.maxPrice },
+        });
+      }
+
+      // Build date filter conditions
+      if (input.startDate) {
+        priceConditions.push({
+          startAt: { gte: new Date(input.startDate) },
+        });
+      }
+      if (input.endDate) {
+        priceConditions.push({
+          endAt: { lte: new Date(input.endDate) },
         });
       }
 

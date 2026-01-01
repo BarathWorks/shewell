@@ -14,6 +14,8 @@ type SessionPageProps = {
     maxPrice?: string;
     sortBy?: "price-asc" | "price-desc";
     status?: string;
+    startDate?: string;
+    endDate?: string;
   };
 };
 
@@ -38,6 +40,8 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
   const sortBy = searchParams.sortBy;
   const status = searchParams.status as SessionStatus | undefined;
   const trimester = searchParams.trimester as any;
+  const startDate = searchParams.startDate;
+  const endDate = searchParams.endDate;
 
   console.log("Filter params:", {
     categoryId,
@@ -46,17 +50,26 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     maxPrice,
     sortBy,
     status,
+    startDate,
+    endDate,
   });
 
   // Fetch sessions using the filter endpoint
-  const { sessions } = await api.session.filterSessions({
+  const result = await api.session.filterSessions({
     categoryId,
     trimester,
     minPrice,
     maxPrice,
     sortBy,
     status,
+    startDate,
+    endDate,
   });
+
+  const sessions = result.sessions || [];
+
+  // Fetch categories for filter dropdown
+  const categories = await api.session.getAllCategories({});
 
   console.log("Fetched sessions:", sessions.length, "sessions", sessions);
 
@@ -76,7 +89,7 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
       </div>
 
       {/* Filter Bar */}
-      <FilterBar />
+      <FilterBar categories={categories} />
 
       {/* Sessions List */}
       <div className="mx-auto w-full max-w-7xl space-y-6 px-6 py-10">
