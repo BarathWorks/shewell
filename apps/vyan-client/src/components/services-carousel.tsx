@@ -79,8 +79,29 @@ const ServicesCarousel = () => {
     };
 
     return (
-        <section className="relative w-full min-h-screen bg-white py-12 md:py-20 overflow-hidden">
+        <section className="relative w-full min-h-screen bg-white py-12 md:py-20 overflow-hidden mt-[70px]">
+              <div className="text-center max-w-full px-0 z-10 ">
+                <motion.h1
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.8 }}
+                    className=" text-[#333333] text-2xl md:text-4xl lg:text-[56px] font-medium font-poppins text-gray-900 mb-6 leading-tight"
+                >
+                        India's Wellness Circle For Women 
+                        Who Mother With Intention
+                </motion.h1>
+
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.1, duration: 0.8 }}
+                    className="text-gray-600 text-lg md:text-xl max-w-5xl mx-auto leading-relaxed mb-[100px] font-medium font-poppins"
+                >
+                    Tap into curated care programs and ancient wisdom to raise happy moms and healthy babies with expert-led sessions and wellness products. Shewell isn’t just for India. It’s for every woman, everywhere
+                </motion.p>
+            </div>
             <div className="max-w-7xl mx-auto px-4">
+                
                 {/* Carousel Container */}
                 <div className="relative flex flex-col items-center">
                     {/* Main Image Area with Title Integrated */}
@@ -96,8 +117,8 @@ const ServicesCarousel = () => {
                                 className="relative w-full max-w-4xl h-[400px] md:h-[500px] lg:h-[600px]"
                             >
                                 <Image
-                                    src={current?.mainImage}
-                                    alt={current?.category}
+                                    src={current?.mainImage + ""}
+                                    alt={current?.category + ""}
                                     fill
                                     className="object-contain"
                                     priority
@@ -114,14 +135,21 @@ const ServicesCarousel = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
                                     transition={{ delay: 0.2 + idx * 0.1 }}
-                                    className={`absolute z-20 flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-3 bg-white rounded-full shadow-lg border border-gray-100 hover:shadow-xl hover:scale-105 transition-all cursor-pointer ${service.position}`}
+                                    className={`absolute z-20 flex flex-row items-center justify-between
+                                    w-[200px] md:w-[300px] lg:w-[380px]
+                                    h-[60px] md:h-[80px] lg:h-[100px]
+                                    px-4 md:px-5 py-3 gap-2
+                                    bg-white/20 backdrop-blur-[7px]
+                                    rounded-[18px] border border-white/30
+                                    shadow-lg hover:bg-white/30 hover:scale-105
+                                    transition-all duration-300 cursor-pointer ${service.position}`}
                                 >
-                                    <span className="text-xs md:text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                    <div className="bg-[#167D71] text-white p-2 md:p-3 rounded-full flex-shrink-0">
+                                        <ArrowUpRight size={18} className="md:w-5 md:h-5" />
+                                    </div>
+                                    <span className="text-sm md:text-base lg:text-lg font-semibold text-gray-800 whitespace-nowrap">
                                         {service.label}
                                     </span>
-                                    <div className="bg-[#167D71] text-white p-1.5 rounded-full flex-shrink-0">
-                                        <ArrowUpRight size={14} />
-                                    </div>
                                 </motion.div>
                             ))}
                         </AnimatePresence>
@@ -129,13 +157,13 @@ const ServicesCarousel = () => {
                         {/* Navigation Arrows */}
                         <button
                             onClick={prevSlide}
-                            className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full border border-gray-200 text-gray-400 z-30 hover:bg-gray-50 hover:text-gray-600 transition-all cursor-pointer"
+                            className="absolute z-30 left-0 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-600 transition-all cursor-pointer"
                         >
                             <ChevronLeft size={32} />
                         </button>
                         <button
                             onClick={nextSlide}
-                            className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full border border-gray-200 text-gray-400 z-30 hover:bg-gray-50 hover:text-gray-600 transition-all cursor-pointer"
+                            className="absolute z-30 right-0 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-600 transition-all cursor-pointer"
                         >
                             <ChevronRight size={32} />
                         </button>
