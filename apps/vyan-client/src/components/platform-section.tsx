@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { InteractiveButton } from "./ui/interactive-button";
 
 const PLATFORM_DATA = [
     {
@@ -44,13 +45,51 @@ const PLATFORM_DATA = [
         image: "/home/Group 39661.png",
         color: "bg-[#7A6451]",
     },
+    {
+        id: "6",
+        title: "Postpartum Mental Wellbeing",
+        description:
+            "Prioritize your emotional health with tools and therapy to navigate postpartum changes with strength.",
+        image: "/home/Group 39661.png",
+        color: "bg-[#7A6451]",
+    },
 ];
 
 export default function PlatformSection() {
     const [activeTab, setActiveTab] = useState(PLATFORM_DATA[0]);
+    const indexRef = useRef(0);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        intervalRef.current = setInterval(() => {
+            indexRef.current = (indexRef.current + 1) % PLATFORM_DATA.length;
+            setActiveTab(PLATFORM_DATA[indexRef.current]);
+        }, 2000); // Change every 4 seconds
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
+
+    // Reset timer when user manually selects a tab
+    const handleTabClick = (item: typeof PLATFORM_DATA[0]) => {
+        setActiveTab(item);
+        indexRef.current = PLATFORM_DATA.findIndex(p => p.id === item.id);
+        
+        // Reset the interval
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(() => {
+            indexRef.current = (indexRef.current + 1) % PLATFORM_DATA.length;
+            setActiveTab(PLATFORM_DATA[indexRef.current]);
+        }, 2000);
+    };   
 
     return (
-        <section className="w-full bg-[#F5F5F5] py-16 md:py-24  overflow-hidden">
+        <section className="w-full  py-16 md:py-24   overflow-hidden">
 
             <div className="text-center mb-16">
                         <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
@@ -61,35 +100,30 @@ export default function PlatformSection() {
                             expert-designed just for you.
                         </p>
             </div>
-            <div className="max-w-7xl mx-auto border border-gray-200 rounded-[32px] overflow-hidden flex flex-col lg:flex-row h-[650px] lg:h-[600px] shadow-sm bg-white">
+            <div className="max-w-[1720px] mx-auto   rounded-[32px] overflow-hidden flex flex-col lg:flex-row h-[650px] lg:h-[795px] shadow-sm bg-white">
                 {/* LEFT NAVIGATION */}
                 <div className="w-full lg:w-[50%] flex flex-col  bg-white z-10">
                     <div className="">
                         {PLATFORM_DATA.map((item) => (
                             <button
                                 key={item.id}
-                                onMouseEnter={() => setActiveTab(item)}
-                                onClick={() => setActiveTab(item)}
-                                className={`flex items-center justify-between w-full px-5 py-4 transition-colors duration-200 text-left group rounded-lt-[32px] h-[125px]
+                                onMouseEnter={() => handleTabClick(item)}
+                                onClick={() => handleTabClick(item)}
+                                className={`flex items-center justify-between w-full px-8 py-4 transition-colors duration-200 text-left group rounded-lt-[32px] h-[132.5px]
                             ${activeTab?.id === item.id
                                         ? "bg-[#005F5F] text-white"
-                                        : "bg-[#F5F5F5] text-gray-500 hover:bg-gray-200"
+                                        : "bg-[#F2F2F2] text-[#00000066] hover:bg-gray-200"
                                     }`}
                             >
-                                <span className="text-base md:text-lg font-medium">
+                                <span className="text-base md:text-[32px] font-medium">
                                     {item.title}
                                 </span>
 
                                 {/* Icon Circle */}
-                                <div
-                                    className={`flex items-center justify-center w-8 h-8 rounded-full transition-colors 
-                                ${activeTab?.id === item.id
-                                            ? "bg-white text-[#005F5F]"
-                                            : "bg-gray-300 text-white"
-                                        }`}
-                                >
-                                    <ArrowUpRight size={16} className={`section-icon ${activeTab?.id === item.id ? "rotate-45" : ""}`} />
-                                </div>
+                                
+                                    
+                                    <InteractiveButton color="bg-[#C1C1C1]" active={activeTab?.id === item.id} />
+                               
                             </button>
                         ))}
                     </div>
@@ -111,10 +145,10 @@ export default function PlatformSection() {
                                 <img
                                     src={activeTab?.image}
                                     alt={activeTab?.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-fit"
                                 />
                                 {/* Gradient Overlay for Text Readability */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-[#6B8E23]/90 via-[#6B8E23]/20 to-transparent" />
+                                {/* <div className="absolute inset-0 bg-gradient-to-b from-[#6B8E23]/90 via-[#6B8E23]/20 to-transparent" /> */}
                             </div>
 
                             {/* Top Text Overlay Area */}
@@ -124,9 +158,9 @@ export default function PlatformSection() {
                                 transition={{ delay: 0.1, duration: 0.4 }}
                                 className="relative z-20 w-full px-8 pt-12 md:px-12 md:pt-16"
                             >
-                                <h3 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight drop-shadow-sm max-w-2xl">
+                                {/* <h3 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight drop-shadow-sm max-w-2xl">
                                     {activeTab?.description}
-                                </h3>
+                                </h3> */}
                             </motion.div>
                         </motion.div>
                     </AnimatePresence>

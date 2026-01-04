@@ -108,7 +108,7 @@ export default function ExpertsCarousel() {
                     {/* Left Arrow */}
                     <button
                         onClick={prevSlide}
-                        className="absolute left-0 md:left-4 z-20 p-3 rounded-full border border-gray-300 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"
+                        className="absolute left-0 md:left-4 z-20 p-3 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-300 hover:text-gray-800 transition-all"
                     >
                         <ChevronLeft size={24} />
                     </button>
@@ -157,16 +157,16 @@ export default function ExpertsCarousel() {
                     {/* Right Arrow */}
                     <button
                         onClick={nextSlide}
-                        className="absolute right-0 md:right-4 z-30 p-3 rounded-full border border-gray-300 text-gray-400 z-20 hover:bg-gray-100 hover:text-gray-600 transition-all"
+                        className="absolute right-0 md:right-4 z-30 p-3 rounded-full border border-gray-300 text-gray-600 z-20 hover:bg-gray-300 hover:text-gray-800 transition-all"
                     >
                         <ChevronRight size={24} />
                     </button>
                 </div>
 
                 {/* CTA Button */}
-                <div className="mt-12 md:mt-16 flex justify-center">
+                <div className="mt-12 md:mt-16 flex justify-center w-full">
                     <button
-                        className="group flex items-center justify-between w-[290px] md:w-[350px] px-4 py-2 rounded-full bg-white border border-gray-400 text-gray-500 transition-all duration-300 ease-in-out hover:bg-primary hover:text-white"
+                        className="group flex items-center justify-between w-full  px-4 py-2 rounded-full bg-white border border-gray-400 text-gray-500 transition-all duration-300 ease-in-out hover:bg-primary hover:text-white"
                     >
                         <span className="text-sm md:text-base font-medium uppercase tracking-widest">
                             Book a Session

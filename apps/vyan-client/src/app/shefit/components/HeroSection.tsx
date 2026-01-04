@@ -33,7 +33,7 @@ export const HeroSection = (): JSX.Element => {
       </div>
 
       <div className="absolute right-[-50px] top-0 z-30 hidden h-auto w-[700px] overflow-hidden lg:block">
-        <img src="/hero.webp" alt="SheFit Hero" className="object-cover" />
+        <img src="/shefit/hero.png" alt="SheFit Hero" className="object-cover" />
       </div>
 
       <div

@@ -5,19 +5,19 @@ import { useState } from "react";
 
 const cardsData = [
   {
-    image: "./shefit1.webp",
+    image: "./shefit/why-shefit-1.png",
     title: "Trimester-Tailored Support. Always On Time",
     description:
       "Flow, stretch, and breathe in ways designed specifically for where you are in your pregnancy journey",
   },
   {
-    image: "./shefit2.webp",
+    image: "./shefit/why-shefit-2.png",
     title: "Your Personalized Wellness, On Your Schedule",
     description:
       "Flexible, private sessions that adapt to your trimester, comfort level, and wellness goals.",
   },
   {
-    image: "./shefit3.webp",
+    image: "./shefit/why-shefit-3.png",
     title: "Rooted in Breath. United in Being.",
     description:
       "Use breathwork, music, and ancient wellness techniques to bond with your baby even before birth.",

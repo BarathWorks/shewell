@@ -123,12 +123,11 @@ export const PregnancyStagesInfoSection = (): JSX.Element => {
                   <motion.div
                     className="absolute top-6 right-6 z-20"
                     animate={{
-                      rotate: isActive ? 180 : 0,
-                      scale: isActive ? 1.05 : 1,
+                     
                     }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                    <InteractiveButton />
+                    <InteractiveButton active={isActive} />
                   </motion.div>
 
                   {/* Content */}
