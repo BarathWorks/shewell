@@ -23,15 +23,15 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
       // 'group' is essential here to trigger the icon rotation on hover
       className={`
         group 
-        flex items-center justify-center 
-        w-16 h-16 
+        flex h-16 w-16 
+        items-center justify-center 
         rounded-full
         hover:bg-white
         group-hover:bg-white
         ${active ? `bg-white` : `${color}`} 
-        transition-colors duration-300 ease-in-out
-        active:scale-95 
-        outline-none focus:ring-2 focus:ring-[#00898F] focus:ring-offset-2
+        outline-none transition-colors duration-300
+        ease-in-out 
+        focus:ring-2 focus:ring-[#00898F] focus:ring-offset-2 active:scale-95
         ${className}
       `}
     >
@@ -47,11 +47,11 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
         color="currentColor"
         className={`
           text-[#E1EBED]
-          ${active ? `text-[#00898F] rotate-[30deg]` : `text-white`}
-          group-hover:text-[#00898F]
-          transition-all duration-500 ease-in-out
+          ${active ? `rotate-[30deg] text-[#00898F]` : `text-white`}
           rotate-[210deg]
+          transition-all duration-500 ease-in-out
           group-hover:rotate-[30deg]
+          group-hover:text-[#00898F]
         `}
       />
     </button>

@@ -25,7 +25,11 @@ export const MeetingLinkSection = ({
                 Click the button below to join "{sessionTitle}"
               </p>
             </div>
-            <Button asChild size="large" className="bg-teal-600 hover:bg-teal-700">
+            <Button
+              asChild
+              size="large"
+              className="bg-teal-600 hover:bg-teal-700"
+            >
               <a
                 href={meetingLink}
                 target="_blank"
