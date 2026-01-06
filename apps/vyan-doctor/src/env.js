@@ -43,7 +43,7 @@ export const env = createEnv({
     NEXT_PUBLIC_PROFESSIONAL: z.string(),
     NEXT_PUBLIC_RAZORPAY_KEY_ID: z.string(),
     NEXT_PUBLIC_AWS_URL_PREFIX: z.string(),
-    NEXT_PUBLIC_PLATFORM_FEE : z.string()
+    NEXT_PUBLIC_PLATFORM_FEE: z.string(),
   },
 
   /**
@@ -60,16 +60,12 @@ export const env = createEnv({
     NEXT_PUBLIC_PROFESSIONAL: process.env.NEXT_PUBLIC_PROFESSIONAL,
     NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
-    AWS_ACCESS_KEY_ID : process.env.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY : process.env.AWS_SECRET_ACCESS_KEY,
-    AWS_REGION : process.env.AWS_REGION,
-    AWS_BUCKET : process.env.AWS_BUCKET,
-    NEXT_PUBLIC_AWS_URL_PREFIX : process.env.NEXT_PUBLIC_AWS_URL_PREFIX,
-    NEXT_PUBLIC_PLATFORM_FEE : process.env.NEXT_PUBLIC_PLATFORM_FEE
-
-    // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
-    // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_BUCKET: process.env.AWS_BUCKET,
+    NEXT_PUBLIC_AWS_URL_PREFIX: process.env.NEXT_PUBLIC_AWS_URL_PREFIX,
+    NEXT_PUBLIC_PLATFORM_FEE: process.env.NEXT_PUBLIC_PLATFORM_FEE,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
