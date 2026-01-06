@@ -16,7 +16,7 @@ export default function BlogCategories({
   selectedCategory
 }: {
   blogCategories: IBlogCategory[];
-  selectedCategory:string
+  selectedCategory:string | undefined;
 }) {
   //   const [selected, setSelected] = useState(
   //     blogCategories.filter((i) => i.name === "PCOS")
