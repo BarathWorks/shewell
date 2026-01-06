@@ -308,7 +308,7 @@ const CounsellingFilter = ({
                       <div key={language.id}>
                         <Checkbox
                           checked={languageIdArray.includes(language.id)}
-                          onCheckedChange={(checked) =>
+                          onCheckedChange={(checked: boolean | "indeterminate") =>
                             handleLanguageChange(Boolean(checked), language.id)
                           }
                         />{" "}
