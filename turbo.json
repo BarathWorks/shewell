@@ -4,7 +4,21 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "DATABASE_URL",
+        "NEXTAUTH_URL",
+        "NEXTAUTH_SECRET",
+        "NODE_ENV",
+        "SENDGRID_API_KEY",
+        "FROM_EMAIL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "RAZORPAY_KEY_SECRET",
+        "SHIP_ROCKET_AUTH_KEY",
+        "SHIPROCKET_PASSWORD",
+        "SHIPROCKET_EMAIL"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
