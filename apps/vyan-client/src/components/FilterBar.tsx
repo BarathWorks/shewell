@@ -300,7 +300,7 @@ export const FilterBar = ({
                     type="number"
                     placeholder="Min"
                     value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinPrice(e.target.value)}
                     className="w-24"
                   />
                   <span>-</span>
@@ -308,7 +308,7 @@ export const FilterBar = ({
                     type="number"
                     placeholder="Max"
                     value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxPrice(e.target.value)}
                     className="w-24"
                   />
                 </div>
@@ -344,7 +344,7 @@ export const FilterBar = ({
                     <Input
                       type="date"
                       value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)}
                       className="w-full"
                     />
                   </div>
@@ -355,7 +355,7 @@ export const FilterBar = ({
                     <Input
                       type="date"
                       value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)}
                       className="w-full"
                     />
                   </div>
