@@ -56,9 +56,7 @@
     "@repo/database": "workspace:*",
     "@repo/shiprocket": "workspace:*",
     "@repo/mail": "workspace:*",
-    "@repo/config": "workspace:*"
-  },
-  "devDependencies": {
+    "@repo/config": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",
@@ -73,10 +71,12 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.8",
     "postcss": "^8.4.45",
-    "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.5.14"
   },
   "ct3aMetadata": {
     "initVersion": "7.30.1"
