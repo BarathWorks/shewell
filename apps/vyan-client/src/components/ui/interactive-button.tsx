@@ -8,6 +8,7 @@ interface InteractiveButtonProps {
   className?: string; // Optional: allows adding external margins
   color?: string;
   active?: Boolean;
+  as?: "button" | "span" | "div"; // Allows rendering as different elements to avoid nested buttons
 }
 
 export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
@@ -15,26 +16,30 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
   className = "",
   color = "bg-[#00898F]",
   active = false,
+  as: Component = "button",
 }) => {
+  const baseProps = {
+    onClick,
+    className: `
+      group 
+      flex h-16 w-16 
+      items-center justify-center 
+      rounded-full
+      hover:bg-white
+      group-hover:bg-white
+      ${active ? `bg-white` : `${color}`} 
+      outline-none transition-colors duration-300
+      ease-in-out 
+      ${Component === "button" ? "focus:ring-2 focus:ring-[#00898F] focus:ring-offset-2 active:scale-95" : ""}
+      ${className}
+    `,
+  };
+
+  // Add aria-label only for button elements
+  const ariaProps = Component === "button" ? { "aria-label": "Toggle direction" } : {};
+
   return (
-    <button
-      onClick={onClick}
-      aria-label="Toggle direction"
-      // 'group' is essential here to trigger the icon rotation on hover
-      className={`
-        group 
-        flex h-16 w-16 
-        items-center justify-center 
-        rounded-full
-        hover:bg-white
-        group-hover:bg-white
-        ${active ? `bg-white` : `${color}`} 
-        outline-none transition-colors duration-300
-        ease-in-out 
-        focus:ring-2 focus:ring-[#00898F] focus:ring-offset-2 active:scale-95
-        ${className}
-      `}
-    >
+    <Component {...baseProps} {...ariaProps}>
       {/* LUCIDE ICON
          - size: 24px (standard icon size)
          - strokeWidth: 2.5 (makes it bold like your design)
@@ -54,8 +59,9 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
           group-hover:text-[#00898F]
         `}
       />
-    </button>
+    </Component>
   );
 };
 
 InteractiveButton.displayName = "InteractiveButton";
+

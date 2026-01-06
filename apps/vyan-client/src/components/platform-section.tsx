@@ -122,7 +122,7 @@ export default function PlatformSection() {
                                 {/* Icon Circle */}
                                 
                                     
-                                    <InteractiveButton color="bg-[#C1C1C1]" active={activeTab?.id === item.id} />
+                                    <InteractiveButton as="span" color="bg-[#C1C1C1]" active={activeTab?.id === item.id} />
                                
                             </button>
                         ))}

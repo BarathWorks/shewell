@@ -51,7 +51,8 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "@repo/ui": "workspace:*"
   },
   "devDependencies": {
     "@repo/config": "workspace:*",
@@ -60,7 +61,6 @@
     "@repo/mail": "workspace:*",
     "@repo/shiprocket": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/ui": "workspace:*",
     "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.56.12",
     "@types/jsonwebtoken": "^9.0.6",
