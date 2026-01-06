@@ -191,7 +191,7 @@ const TimeSlots = ({ expertId }: { expertId: string }) => {
               timeDuration?.toString() ||
               minTimeDuration?.minTimeDuration?.time.toString()
             }
-            onValueChange={(selectedValue) => {
+            onValueChange={(selectedValue: string) => {
               setTimeDuration(parseInt(selectedValue));
             }}
           >

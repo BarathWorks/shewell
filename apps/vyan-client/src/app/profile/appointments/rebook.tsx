@@ -367,7 +367,7 @@ const Rebook = ({
 
                 <Select
                   value={timeDuration ? timeDuration.toString() : "30"} // Ensure the value is a string
-                  onValueChange={(selectedValue) => {
+                  onValueChange={(selectedValue: string) => {
                     setTimeDuration(parseInt(selectedValue));
                   }}
                 >

@@ -82,7 +82,7 @@ const ProductsFilter = ({ categories, name }: IProductsProps) => {
                           <div key={childCategoryIndex} className="flex items-center gap-2 px-2 py-1">
                             <Checkbox
                               checked={categoriesArray.includes(childCategory.id)}
-                              onCheckedChange={(checkedState) => {
+                              onCheckedChange={(checkedState: boolean | "indeterminate") => {
                                 toggleCategorySelection(
                                   checkedState,
                                   childCategory.id,

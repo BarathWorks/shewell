@@ -988,7 +988,7 @@ const TimeSlots = ({
               timeDuration?.toString() ||
               minTimeDurationData?.minTimeDuration?.time.toString()
             }
-            onValueChange={(selectedValue) => {
+            onValueChange={(selectedValue: string) => {
               setTimeDuration(parseInt(selectedValue));
               // onSelectDuration(
               //   parseInt(selectedValue) ||

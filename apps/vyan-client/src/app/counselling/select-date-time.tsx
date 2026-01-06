@@ -264,7 +264,7 @@ const SelectDateTime = ({
 
             <Select
               value={duration?.toString()}
-              onValueChange={(selectedValue) => {
+              onValueChange={(selectedValue: string) => {
                
                 setDuration(parseInt(selectedValue));
                 onSelectDuration(parseInt(selectedValue));

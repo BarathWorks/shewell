@@ -83,7 +83,7 @@ function ApplyCoupon({ appliedCoupon }: { appliedCoupon: string | undefined }) {
             className="w-full px-4 py-[13.5px]  outline-none placeholder:font-archivo placeholder:text-sm placeholder:tracking-[1.08px] placeholder:text-[#8f8f8f] lg:py-[18px]  lg:placeholder:text-lg lg:placeholder:tracking-[1.62px]"
             placeholder="Coupon Name"
             value={couponCode}
-            onChange={(event) => setCouponCode(event.target.value)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setCouponCode(event.target.value)}
           />
           <button
             className=" font-archivo text-sm tracking-[1.26px] text-primary lg:text-base lg:tracking-[2.16px] "

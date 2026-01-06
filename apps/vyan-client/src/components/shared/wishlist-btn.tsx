@@ -59,7 +59,7 @@ function WishlistBtn({ product }: { product: IProduct }) {
   return (
     <button
       type="button"
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent) => {
         event.stopPropagation();
         handleWishlisting({ id: product.id, slug: product.slug });
       }}
