@@ -105,11 +105,19 @@ export default function PlatformSection() {
                 <div className="w-full lg:w-[50%] flex flex-col  bg-white z-10">
                     <div className="">
                         {PLATFORM_DATA.map((item) => (
-                            <button
+                            <div
                                 key={item.id}
                                 onMouseEnter={() => handleTabClick(item)}
                                 onClick={() => handleTabClick(item)}
-                                className={`flex items-center justify-between w-full px-8 py-4 transition-colors duration-200 text-left group rounded-lt-[32px] h-[132.5px]
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleTabClick(item);
+                                    }
+                                }}
+                                className={`flex items-center justify-between w-full px-8 py-4 transition-colors duration-200 text-left group rounded-lt-[32px] h-[132.5px] cursor-pointer
                             ${activeTab?.id === item.id
                                         ? "bg-[#005F5F] text-white"
                                         : "bg-[#F2F2F2] text-[#00000066] hover:bg-gray-200"
@@ -124,7 +132,7 @@ export default function PlatformSection() {
                                     
                                     <InteractiveButton color="bg-[#C1C1C1]" active={activeTab?.id === item.id} />
                                
-                            </button>
+                            </div>
                         ))}
                     </div>
                 </div>
