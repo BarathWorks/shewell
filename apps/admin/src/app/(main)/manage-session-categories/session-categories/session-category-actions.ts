@@ -2,7 +2,7 @@
 
 import { ISessionCategory } from '@/src/_models/session-category.model';
 import { db } from '@/src/server/db';
-import { Trimester } from '@prisma/client';
+import { Trimester } from '@repo/database';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';

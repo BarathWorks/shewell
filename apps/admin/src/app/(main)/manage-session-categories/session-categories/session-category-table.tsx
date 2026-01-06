@@ -1,7 +1,7 @@
 'use client';
 
 import { ISessionCategory } from '@/src/_models/session-category.model';
-import { Trimester } from '@prisma/client';
+import { Trimester } from '@repo/database';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -120,7 +120,7 @@ const SessionCategoryTable = ({ sessionCategories }: SessionCategoryTableProps) 
 
     const deleteSessionCategoryDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" severity="text" onClick={hideDeleteSessionCategoryDialog} />
+            <Button label="No" icon="pi pi-times" severity="secondary" onClick={hideDeleteSessionCategoryDialog} />
             <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteSelectedSessionCategory} />
         </React.Fragment>
     );

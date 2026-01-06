@@ -11,15 +11,15 @@ const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
   const s3 = new S3({
     // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
     // endpoint: process.env.S3_SPACES_URL!,
-    region: env.AWS_REGION!,
+    region: env.AWS_REGION! || "blr1",
     // region: process.env.S3_UPLOAD_REGION! || "blr1",
     credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY!
+      accessKeyId: env.AWS_ACCESS_KEY_ID! || "AKIAV66644JW66644",
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY! || "AKIAV66644JW66644"
     }
   });
   const fileParams = {
-    Bucket: env.AWS_BUCKET,
+    Bucket: env.AWS_BUCKET  || "vyan-doctor"  ,
     Key: key,
     ContentType: 'text',
     // Expires: addSeconds(new Date(), 600),

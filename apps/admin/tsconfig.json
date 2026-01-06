@@ -34,7 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "../vyan-client/src/app/products/description.tsx"  ],
+, "../vyan-client/src/app/products/description.tsx", "src/env.js"  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,7 +1,7 @@
 import SubmitButton from '@/src/_components/shared/submit-button';
 import useToastContext from '@/src/_hooks/useToast';
 import { ISessionCategory } from '@/src/_models/session-category.model';
-import { Trimester } from '@prisma/client';
+import { Trimester } from '@repo/database';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
