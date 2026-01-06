@@ -96,7 +96,7 @@ const SelectFilter = ({
                     <div key={language.id}>
                       <Checkbox
                         checked={languageIdsArray.includes(language.id)}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean | "indeterminate") =>
                           handleLanguageChange(Boolean(checked), language.id)
                         }
                       />{" "}

@@ -110,7 +110,7 @@ const Filter = ({ categories }: IProductsProps) => {
                       >
                         <Checkbox
                           checked={categoriesArray.includes(childCategory.id)}
-                          onCheckedChange={(checked) =>
+                          onCheckedChange={(checked: boolean | "indeterminate") =>
                             toggleCategorySelection(checked as boolean, childCategory.id)
                           }
                         />
