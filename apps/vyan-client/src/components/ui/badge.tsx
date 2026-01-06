@@ -14,6 +14,8 @@ const badgeVariants = cva(
         destructive:
           "border-gray-200",
         outline: "border-gray-200",
+        address: "font-inter font-medium text-sm text-active py-2 px-3 rounded-md border border-[#D2D2D2]", 
+        selectedAddress: "font-inter font-medium text-sm text-white bg-secondary rounded-md py-2 px-3"
       },
     },
     defaultVariants: {
