@@ -33,37 +33,39 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
   });
 
   // If category doesn't exist, return empty array
-  const blogs = pBlogCategory ? await db.blog.findMany({
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      category: {
+  const blogs = pBlogCategory
+    ? await db.blog.findMany({
         select: {
           id: true,
-          name: true,
+          title: true,
+          slug: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          media: {
+            select: {
+              id: true,
+              fileUrl: true,
+              fileKey: true,
+            },
+          },
+          shortDescription: true,
+          createdAt: true,
+          body: true,
+          active: true,
         },
-      },
-      media: {
-        select: {
-          id: true,
-          fileUrl: true,
-          fileKey: true,
+        orderBy: {
+          createdAt: "desc",
         },
-      },
-      shortDescription: true,
-      createdAt: true,
-      body: true,
-      active: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    where: {
-      categoryId: pBlogCategory.id,
-      active: true,
-    },
-  }) : [];
+        where: {
+          categoryId: pBlogCategory.id,
+          active: true,
+        },
+      })
+    : [];
 
   const popularBlogs = await db.blog.findMany({
     select: {
