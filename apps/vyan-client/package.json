@@ -55,10 +55,10 @@
     "@repo/ui": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/shiprocket": "workspace:*",
-    "@repo/mail": "workspace:*"
+    "@repo/mail": "workspace:*",
+    "@repo/config": "workspace:*"
   },
   "devDependencies": {
-    "@repo/config": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",

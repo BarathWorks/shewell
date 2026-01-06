@@ -220,6 +220,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.0
         version: 1.2.4(@types/react@18.3.27)(react@18.2.0)
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -332,9 +335,6 @@ importers:
         specifier: ^4.5.5
         version: 4.5.7(@types/react@18.3.27)(react@18.2.0)
     devDependencies:
-      '@repo/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
