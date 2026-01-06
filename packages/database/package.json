@@ -10,7 +10,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prisma": {
-    "schema": "prisma/schema.prisma",
     "seed": "ts-node ./prisma/seed-admin.ts"
   },
   "keywords": [],
