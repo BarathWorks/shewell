@@ -54,12 +54,12 @@
     "zustand": "^4.5.5",
     "@repo/ui": "workspace:*",
     "@repo/database": "workspace:*",
-    "@repo/shiprocket": "workspace:*"
+    "@repo/shiprocket": "workspace:*",
+    "@repo/mail": "workspace:*"
   },
   "devDependencies": {
     "@repo/config": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@repo/mail": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.56.12",

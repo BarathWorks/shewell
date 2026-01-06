@@ -223,6 +223,9 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/mail':
+        specifier: workspace:*
+        version: link:../../packages/mail
       '@repo/shiprocket':
         specifier: workspace:*
         version: link:../../packages/shiprocket
@@ -335,9 +338,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@repo/mail':
-        specifier: workspace:*
-        version: link:../../packages/mail
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
