@@ -5,7 +5,7 @@ import { Label } from "@repo/ui/src/@/components/label";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import AddFormInput from "~/components/address-form-input";
-import UpdatePersonalInfo from "./personal-info-actions";
+
 import { toast, useToast } from "@repo/ui/src/@/components/use-toast";
 import {
   AlertDialog,
@@ -20,7 +20,7 @@ import {
 } from "@repo/ui/src/@/components/alert-dialog";
 // import EmailChangeForm from "./email-change-form";
 import { useState } from "react";
-import { emailChange } from "./personal-info-actions";
+import UpdatePersonalInfo, { emailChange, } from "./personal-info-actions";
 import EmailChangeForm from "./email-change-form";
 type IUser = {
   name: string;
@@ -54,9 +54,9 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
   } = useForm<z.infer<typeof infoFormSchema>>({
     resolver: zodResolver(infoFormSchema),
     defaultValues: {
-      name: user?.name!,
-      email: user?.email,
-      phoneNumber: user?.phoneNumber!,
+      name: user?.name ?? "",
+      email: user?.email ?? "",
+      phoneNumber: user?.phoneNumber ?? "",
     },
   });
 
@@ -76,7 +76,7 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
     setOpen(true);
   };
 
-  const submitInfo = (data: z.infer<typeof infoFormSchema>) => {
+  const submitInfo = (data: IUser) => {
     return UpdatePersonalInfo(data)
       .then((resp) => {
         if (resp.error) {

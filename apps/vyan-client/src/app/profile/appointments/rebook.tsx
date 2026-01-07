@@ -339,7 +339,7 @@ const Rebook = ({
 
   const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
     timeSlots,
-    data?.bookedSlots!,
+    data?.bookedSlots ?? [],
   );
 
   return (

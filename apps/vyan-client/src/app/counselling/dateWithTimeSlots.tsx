@@ -114,7 +114,7 @@ const DayNavigatorWithTimeSlots = ({
 
   const filteredTimeSlots = filterAvailableTimeSlots(
     timeSlots,
-    timeSlotsData?.bookedSlots!,
+    timeSlotsData?.bookedSlots ?? [],
   );
 
   

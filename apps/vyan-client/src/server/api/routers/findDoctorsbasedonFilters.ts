@@ -174,7 +174,7 @@ export const findDoctorRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { specialisationId, date, languageIds, time, inputSearch } = input;
-      let whereCondition: Prisma.ProfessionalUserWhereInput = {};
+      let whereCondition: any = {};
 
       // Search conditions
       if (inputSearch) {

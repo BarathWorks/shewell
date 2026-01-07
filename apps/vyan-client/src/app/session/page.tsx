@@ -38,8 +38,8 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     : undefined;
 
   const sortBy = searchParams.sortBy;
-  const status = searchParams.status as SessionStatus | undefined;
-  const trimester = searchParams.trimester as any;
+  const status = searchParams.status || undefined;
+  const trimester = searchParams.trimester || undefined;
   const startDate = searchParams.startDate;
   const endDate = searchParams.endDate;
 

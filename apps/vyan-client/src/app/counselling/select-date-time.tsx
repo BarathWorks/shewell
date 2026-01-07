@@ -207,7 +207,7 @@ const SelectDateTime = ({
     }))
   }))
   const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
-    refactoredTimeSlots, data?.bookedSlots!
+    refactoredTimeSlots, data?.bookedSlots ?? []
   )
  
   

@@ -1,17 +1,17 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { api } from "~/trpc/server";
+import { SessionProvider } from "next-auth/react";
+import Hero from "~/components/hero";
 import "~/styles/globals.css";
 import { Inter, Pacifico } from "next/font/google";
 import { Toaster } from "@repo/ui/src/@/components/toaster";
 import { Header } from "~/components/header";
 import NewFooter from "~/components/new-footer";
-import Hero from "~/components/hero";
 import { db } from "~/server/db";
 import ClientSessionProvider from "./client-session-provider";
-import { getServerSession } from "next-auth";
 import CardSheet from "~/components/card-sheet";
-import { SessionProvider } from "next-auth/react";
-import { api } from "~/trpc/server";
 import { TRPCReactProvider } from "~/trpc/react";
-import { redirect } from "next/navigation";
 
 import { Poppins } from "next/font/google";
 // import { Header as NewHeader } from "./components/header";

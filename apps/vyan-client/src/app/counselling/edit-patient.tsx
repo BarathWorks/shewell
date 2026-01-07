@@ -14,7 +14,7 @@ import UIFormInput from "@repo/ui/src/@/components/form/input";
 import UIFormLabel from "@repo/ui/src/@/components/form/label";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import AddPatientUserAction from "./edit-patient-user-action";
+import AddPatientUserAction, { IPatientProps } from "./edit-patient-user-action";
 import { useToast } from "@repo/ui/src/@/components/use-toast";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
@@ -157,16 +157,29 @@ const EditPatient = ({
   }, [data, reset]);
 
   const patientsId = patientId
-  const onSubmit = (data: z.infer<typeof schema>) => {
-   
-    AddPatientUserAction(data,{patientsId})
+  const onSubmit = (formData: z.infer<typeof schema>) => {
+    const actionData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phoneNumber: formData.phoneNumber,
+      email: formData.email,
+      message: formData.message,
+      additionalPatients: formData.additionalPatients.map((p) => ({
+        firstName: p.firstName,
+        lastName: p.lastName,
+        phoneNumber: p.phoneNumber,
+        email: p.email,
+        message: p.message,
+      })),
+    };
+
+    AddPatientUserAction(actionData, { patientsId })
       .then((resp) => {
         console.log(resp.message);
-        if(data.additionalPatients.length >0){
-          setIsCouple(true)
-        }
-        else{
-          setIsCouple(false)
+        if (formData.additionalPatients.length > 0) {
+          setIsCouple(true);
+        } else {
+          setIsCouple(false);
         }
         toast({
           description: "Successfully added the Personal-Info",

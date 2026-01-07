@@ -196,10 +196,10 @@ export const productRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      let whereCondition: Prisma.ProductWhereInput = {
+      let whereCondition: any = {
         deletedAt: null, // Add this base condition for all queries
       };
-      let orderByCondition: Prisma.ProductOrderByWithRelationInput = {};
+      let orderByCondition: any = {};
 
       // Only apply category filter if categoryId array is not empty
       if (input.categoryId && input.categoryId.length > 0) {

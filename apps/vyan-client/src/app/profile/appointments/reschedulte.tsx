@@ -282,7 +282,7 @@ const Reschedule = ({
 
   const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
     timeSlots,
-    data?.bookedSlots!,
+    data?.bookedSlots ?? [],
   );
 
   return (

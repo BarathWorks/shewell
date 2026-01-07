@@ -1,27 +1,28 @@
 "use server";
 
-import Header from "~/components/shared/header";
-import News from "./(news)/news";
-import KeyFeatures from "./(key-features)/key-features";
+{/*old ui components*/}
+// import Header from "~/components/shared/header";
+// import News from "./(news)/news";
+// import KeyFeatures from "./(key-features)/key-features";
 
-import Blogs from "./(blogs)/blogs";
-import Subscribe from "./(subscirbe)/subscribe";
-import Footer from "~/components/shared/footer";
-import Features from "./(features)/features";
-import Partners from "~/components/partners";
-import CounsellingCard from "~/components/counselling-card";
-import ExamplePopover from "~/components/exam-popover";
-import Hero from "~/components/hero";
+// import Blogs from "./(blogs)/blogs";
+// import Subscribe from "./(subscirbe)/subscribe";
+// import Footer from "~/components/shared/footer";
+// import Features from "./(features)/features";
+// import CounsellingCard from "~/components/counselling-card";
+// import ExamplePopover from "~/components/exam-popover";
 import { useSession } from "next-auth/react";
-import SectionTitle from "~/components/shared/section-title";
-import BlogSlider from "./(blogs)/blogs-slider";
-import { db } from "~/server/db";
+// import SectionTitle from "~/components/shared/section-title";
+// import BlogSlider from "./(blogs)/blogs-slider";
 import { startOfDay } from "date-fns";
-import WhySheWellCare from "./(why-shewellcare)/why-she-well-care";
-import HomePageProducts from "./(homepage-products)/homepage-products";
+// import WhySheWellCare from "./(why-shewellcare)/why-she-well-care";
+// import HomePageProducts from "./(homepage-products)/homepage-products";
+// import Testimonials from "./(testimonials)/testimonials";
+// import { Header as NewHeader } from "~/components/header";
+import Partners from "~/components/partners";
+import Hero from "~/components/hero";
+import { db } from "~/server/db";
 import { HomeBannerType } from "@repo/database";
-import Testimonials from "./(testimonials)/testimonials";
-import { Header as NewHeader } from "~/components/header";
 import WellnessCircle from "~/components/wellness-circle";
 import ServicesCarousel from "~/components/services-carousel";
 import PlatformSection from "~/components/platform-section";

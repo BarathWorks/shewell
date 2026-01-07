@@ -8,7 +8,7 @@ import { getHours, getMinutes, format } from "date-fns";
 const { formatISO } = require("date-fns");
 
 // converting the day of week which is number to enum type because in our model day is enum not number
-const dayMapping: { [key: number]: Day } = {
+const dayMapping = {
   0: Day.SUN,
   1: Day.MON,
   2: Day.TUE,
@@ -16,7 +16,7 @@ const dayMapping: { [key: number]: Day } = {
   4: Day.THU,
   5: Day.FRI,
   6: Day.SAT,
-};
+} as const;
 export const searchTimeSlotsRouter = createTRPCRouter({
   searchTimeSlots: publicProcedure
     .input(
@@ -37,7 +37,7 @@ export const searchTimeSlotsRouter = createTRPCRouter({
         },
       });
       if (!professionalUser) {
-        return;
+        return { timeSlots: [], bookedSlots: [] };
       }
 
       // finding day on which doctor is unavailable comparing the date selected by user with the date marked unavailable by expert
@@ -62,7 +62,7 @@ export const searchTimeSlotsRouter = createTRPCRouter({
       if (unavailableDay) {
         console.log("timeSlotsquery", unavailableDay);
         console.log("time slots");
-        return { timeSlots: [] };
+        return { timeSlots: [], bookedSlots: [] };
       }
       console.log("time slots on unavailable day");
 

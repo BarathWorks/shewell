@@ -4,26 +4,31 @@ import { getServerSession } from "next-auth";
 import { useRouter } from "next/navigation";
 import { db } from "~/server/db";
 
-interface IPatientProps {
+export interface IPatientProps {
   firstName: string;
-  lastName?: string | null | undefined;
+  lastName?: string | null;
   email: string;
   phoneNumber: string;
-  message?: string | null | undefined;
+  message?: string | null;
 }
 
-const EditPatientUserAction = async ({
- 
-  additionalPatients,
-  firstName,
-  lastName,
-  phoneNumber,
-  email,
-  message
-}: {additionalPatients : IPatientProps[], firstName : string, lastName? : string | null | undefined, phoneNumber : string, email : string, message? : string | null | undefined},
-{ patientsId } : {patientsId :string}
-
-
+const EditPatientUserAction = async (
+  {
+    additionalPatients,
+    firstName,
+    lastName,
+    phoneNumber,
+    email,
+    message,
+  }: {
+    additionalPatients: IPatientProps[];
+    firstName: string;
+    lastName?: string | null;
+    phoneNumber: string;
+    email: string;
+    message?: string | null;
+  },
+  { patientsId }: { patientsId: string }
 ) => {
   // const router = useRouter();
   const session = await getServerSession();
