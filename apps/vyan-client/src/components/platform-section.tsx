@@ -74,18 +74,22 @@ export default function PlatformSection() {
     }, []);
 
     // Reset timer when user manually selects a tab
-    const handleTabClick = (item: typeof PLATFORM_DATA[0]) => {
-        setActiveTab(item);
-        indexRef.current = PLATFORM_DATA.findIndex(p => p.id === item.id);
-        
-        // Reset the interval
-        if (intervalRef.current) {
+    const handleTabClick = (item: typeof PLATFORM_DATA[0] , isHover: boolean) => {
+        if(isHover){
+            
+            setActiveTab(item);
+            indexRef.current = PLATFORM_DATA.findIndex(p => p.id === item.id);
             clearInterval(intervalRef.current);
         }
-        intervalRef.current = setInterval(() => {
+        else{
+            intervalRef.current = setInterval(() => {
             indexRef.current = (indexRef.current + 1) % PLATFORM_DATA.length;
             setActiveTab(PLATFORM_DATA[indexRef.current]);
-        }, 2000);
+        }, 2000); // Change every 4 seconds
+ 
+        }
+        
+      
     };   
 
     return (
@@ -107,8 +111,9 @@ export default function PlatformSection() {
                         {PLATFORM_DATA.map((item) => (
                             <button
                                 key={item.id}
-                                onMouseEnter={() => handleTabClick(item)}
-                                onClick={() => handleTabClick(item)}
+                                onMouseEnter={() => handleTabClick(item , true)}
+                                onMouseLeave={() => handleTabClick(item , false)}
+                                onClick={() => handleTabClick(item , false )}
                                 className={`flex items-center justify-between w-full px-8 py-4 transition-colors duration-200 text-left group rounded-lt-[32px] h-[132.5px]
                             ${activeTab?.id === item.id
                                         ? "bg-[#005F5F] text-white"

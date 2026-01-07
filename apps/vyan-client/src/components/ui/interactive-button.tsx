@@ -51,9 +51,9 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
         strokeWidth={1.25}
         color="currentColor"
         className={`
-          text-[#E1EBED]
-          ${active ? `rotate-[30deg] text-[#00898F]` : `text-white`}
-          rotate-[210deg]
+          
+          ${active ? `rotate-[30deg]`  : `rotate-[210deg]`}
+          ${active ? `text-[#00898F]` : `text-[#E1EBED] `} 
           transition-all duration-500 ease-in-out
           group-hover:rotate-[30deg]
           group-hover:text-[#00898F]
