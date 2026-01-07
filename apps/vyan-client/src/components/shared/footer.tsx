@@ -37,7 +37,7 @@ const Footer = ({
             <div className=" mx-auto flex flex-col gap-4 md:mx-0">
               <Link href="/">
                 <div className="relative xs:h-[55px] h-[68px] xs:w-[200px] 2xl:w-[238px]">
-                  <Image src={"/images/vyan-logo.png"} fill={true} alt="logo" />
+                  <Image src={"/images/vyan-logo.png"} fill={true} alt="logo" sizes="(max-width: 768px) 200px, 238px" />
                 </div>
               </Link>
               <ul className="flex gap-5 2xl:gap-7">

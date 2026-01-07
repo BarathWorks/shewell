@@ -10,7 +10,7 @@ const ARTICLES_DATA = [
         title: "What to Eat During Your First Trimester",
         description:
             "Recognizing organizations as collections of human beings who are motivated by varying...",
-        image: "/images/blog/blog-1.png",
+        image: "/images/blogs/blog1.png",
     },
     {
         id: 2,
@@ -18,7 +18,7 @@ const ARTICLES_DATA = [
         title: "5 Ways to Manage Stress During Pregnancy",
         description:
             "Recognizing organizations as collections of human beings who are motivated by varying...",
-        image: "/images/blog/blog-2.png",
+        image: "/images/blogs/blog2.png",
     },
     {
         id: 3,
@@ -26,7 +26,7 @@ const ARTICLES_DATA = [
         title: "How to Prepare for Postpartum Care",
         description:
             "Recognizing organizations as collections of human beings who are motivated by varying...",
-        image: "/images/blog/blog-3.png",
+        image: "/images/blogs/blog3.png",
     },
     {
         id: 4,
@@ -34,7 +34,7 @@ const ARTICLES_DATA = [
         title: "Gentle Workouts for Expecting Mothers",
         description:
             "Recognizing organizations as collections of human beings who are motivated by varying...",
-        image: "/images/blog/blog-4.png",
+        image: "/images/blogs/blog1.png",
     },
     {
         id: 5,
@@ -42,7 +42,7 @@ const ARTICLES_DATA = [
         title: "Understanding Baby Sleep Cycles",
         description:
             "Recognizing organizations as collections of human beings who are motivated by varying...",
-        image: "/images/blog/blog-1.png",
+        image: "/images/blogs/blog2.png",
     },
 ];
 
@@ -113,7 +113,7 @@ export default function WisdomSection() {
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                                         (e.target as HTMLImageElement).src =
-                                            "https://via.placeholder.com/400x300?text=Article";
+                                            "https://placehold.co/400x300?text=Article";
                                     }}
                                 />
                             </div>

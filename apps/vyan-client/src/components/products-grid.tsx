@@ -11,7 +11,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-1.png",
+        image: "/images/product/prod-1-a.png",
     },
     {
         id: 2,
@@ -20,7 +20,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-2.png",
+        image: "/images/product/prod-1-c.png",
     },
     {
         id: 3,
@@ -29,7 +29,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-3.png",
+        image: "/images/product/prod-1-c.png",
     },
     {
         id: 4,
@@ -38,7 +38,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-4.png",
+        image: "/images/product/prod-1-d.png",
     },
     {
         id: 5,
@@ -47,7 +47,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-1.png",
+        image: "/images/product/prod-1-a.png",
     },
     {
         id: 6,
@@ -56,7 +56,7 @@ const PRODUCTS_DATA = [
         price: 1449,
         rating: 4.5,
         reviews: 56,
-        image: "/images/product/product-2.png",
+        image: "/images/product/prod-1-b.png",
     },
 ];
 
@@ -163,7 +163,7 @@ export default function ProductsGrid() {
                                     className="w-full h-full object-cover"
                                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                                         (e.target as HTMLImageElement).src =
-                                            "https://via.placeholder.com/300x200?text=Product";
+                                            "https://placehold.co/300x200?text=Product";
                                     }}
                                 />
                             </div>

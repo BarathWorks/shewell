@@ -17,20 +17,10 @@ const FundedBy = () => {
                     alt="funded image"
                     fill={true}
                     className="object-cover"
+                    sizes="(max-width: 768px) 131px, 201px"
                   />
                 </div>
               </div>
-
-              {/* <div className=" w-[201px] block group-hover:hidden ">
-                <div className="relative aspect-[201/137] w-full">
-                  <Image
-                    src="/images/fundedby/funded1-hover.png"
-                    alt="funded image"
-                    fill={true}
-                    className="object-cover"
-                  />
-                </div>
-              </div> */}
             </div>
 
             <div className="group xs:w-[131px] md:w-[201px] ">
@@ -41,6 +31,7 @@ const FundedBy = () => {
                     alt="funded image"
                     fill={true}
                     className="object-cover"
+                    sizes="(max-width: 768px) 131px, 201px"
                   />
                 </div>
               </div>

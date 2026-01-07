@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 
 const Partners = () => {
     const partners = [
-        { name: "Startup India", logo: "/home/startup-india.png" },
-        { name: "DST NIDHI", logo: "/home/dst-nidhi.png" },
+        { name: "Startup India", logo: "/images/fundedby/funded1-active.png" },
+        { name: "DST NIDHI", logo: "/images/fundedby/funded2-active.png" },
     ];
 
     const containerVariants = {
