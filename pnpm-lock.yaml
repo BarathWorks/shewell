@@ -475,6 +475,15 @@ importers:
       '@trpc/server':
         specifier: 11.0.0
         version: 11.0.0(typescript@5.9.3)
+      '@types/node':
+        specifier: ^20.16.5
+        version: 20.19.27
+      '@types/react':
+        specifier: ^18.3.5
+        version: 18.3.27
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.27)
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -554,15 +563,6 @@ importers:
       '@types/eslint':
         specifier: ^8.56.12
         version: 8.56.12
-      '@types/node':
-        specifier: ^20.16.5
-        version: 20.19.27
-      '@types/react':
-        specifier: ^18.3.5
-        version: 18.3.27
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.27)
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.18.0
         version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.9.3)
