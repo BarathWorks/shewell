@@ -55,12 +55,12 @@
     "zod": "^3.23.8",
     "@repo/ui": "workspace:*",
     "@repo/aws": "workspace:*",
-    "@repo/database": "workspace:*"
+    "@repo/database": "workspace:*",
+    "@repo/config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
   },
   "devDependencies": {
-    "@repo/config": "workspace:*",  
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.56.12",
     "@types/node": "^20.16.5",

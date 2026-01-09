@@ -439,9 +439,18 @@ importers:
       '@repo/aws':
         specifier: workspace:*
         version: link:../../packages/aws
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -539,15 +548,6 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
-      '@repo/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
