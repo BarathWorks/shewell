@@ -124,13 +124,13 @@ export default function ProductsGrid() {
                     <div className="hidden md:flex items-center gap-2">
                         <button
                             onClick={() => scroll("left")}
-                            className="p-3 rounded-full border border-gray-300 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"
+                            className="p-3 rounded-full border border-gray-300 text-gray-800 hover:bg-gray-300 hover:text-gray-800 transition-all"
                         >
                             <ChevronLeft size={24} />
                         </button>
                         <button
                             onClick={() => scroll("right")}
-                            className="p-3 rounded-full border border-gray-300 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"
+                            className="p-3 rounded-full border border-gray-300 text-gray-800 hover:bg-gray-300 hover:text-gray-800 transition-all"
                         >
                             <ChevronRight size={24} />
                         </button>
