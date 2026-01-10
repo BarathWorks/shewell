@@ -125,6 +125,7 @@ export function Header() {
 
           <Link
             href={env.NEXT_PUBLIC_PROFESSIONAL + ""}
+            target="_blank"
             className="hidden text-[#FFFFFF99] hover:text-white sm:block whitespace-nowrap"
           >
             Register as Therapist
