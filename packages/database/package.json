@@ -5,6 +5,7 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
+    "postinstall": "prisma generate",
     "db:seed": "pnpm run db:seed:admin && pnpm run db:seed:country",
     "db:seed:admin": "npx ts-node prisma/seed-admin.ts",
     "db:seed:country": "npx ts-node prisma/seed-country-state.ts",

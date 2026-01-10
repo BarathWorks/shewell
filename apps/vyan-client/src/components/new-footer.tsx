@@ -5,7 +5,7 @@ import { Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 export default function NewFooter() {
     return (
         <footer className="bg-[#1A1A1A] text-white pt-16 pb-8">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-8xl mx-auto px-20">
                 {/* Top Section */}
                 <div className="flex flex-col lg:flex-row justify-between mb-16 gap-12">
                     {/* Brand & Socials */}
