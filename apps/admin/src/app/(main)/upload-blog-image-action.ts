@@ -93,9 +93,7 @@ export const getFileUrlFromKey = (key: string) => {
     throw new Error('Missing AWS_BUCKET env var');
   }
 
-  const host = env.AWS_REGION
-    ? `${env.AWS_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com`
-    : `${env.AWS_BUCKET}.s3.amazonaws.com`;
+  const host = env.AWS_REGION ? `${env.AWS_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com` : `${env.AWS_BUCKET}.s3.amazonaws.com`;
 
   return `https://${host}/${key}`;
 };

@@ -79,9 +79,7 @@ const MediaTable = ({ media: mediaTableData }: IMediaTableProps) => {
       return !!u && typeof u === 'string' && !u.includes('undefined.s3.undefined.amazonaws.com') && (u.startsWith('http://') || u.startsWith('https://'));
     };
 
-    if (!isValidFileUrl(rowData.fileUrl)) {
-      return;
-    }
+   
 
     if (rowData.mimeType?.includes('image')) {
       return (
