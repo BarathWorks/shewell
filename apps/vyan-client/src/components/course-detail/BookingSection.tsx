@@ -44,13 +44,13 @@ export const BookingSection = ({
   const getStepImage = () => {
     switch (step) {
       case 1:
-        return "/booking.webp";
+        return "/shefit/why-shefit-1.png";
       case 2:
-        return "/booking2.webp";
+        return "/shefit/why-shefit-2.png";
       case 3:
-        return "/shefit2.webp";
+        return "/shefit/why-shefit-3.png";
       default:
-        return "/booking.webp";
+        return "/shefit/hero.png";
     }
   };
 

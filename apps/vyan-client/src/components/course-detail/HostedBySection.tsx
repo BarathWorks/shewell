@@ -9,7 +9,7 @@ export const HostedBySection = (): JSX.Element => {
 
       <div className="flex items-center justify-center px-6 py-5">
         <img
-          src="home/shewell-logo-2.png"
+          src="/home/shewell-logo-2.png"
           alt="Shewell"
           className="h-16 w-auto object-contain sm:h-20 md:h-24 lg:h-28"
         />
