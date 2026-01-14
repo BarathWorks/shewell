@@ -5,14 +5,10 @@ import { InteractiveButton } from "./ui/interactive-button";
 export default function Hero(): JSX.Element {
   return (
     <section className="relative h-[500px] w-full overflow-hidden bg-white sm:h-[600px] md:h-[700px] lg:h-[800px] xl:h-[880px]">
-      {/* Background Circle - Responsive scaling */}
+      {/* Background Circle - Always 40vw responsive */}
       <div
-        className="absolute right-[-25%] top-[50%] z-20 hidden h-[100px] w-[100px] translate-y-[-50%] rounded-full
-         bg-[#9D9D8D]
-          md:right-[-20%] md:block md:h-[600px] md:w-[600px]
-          lg:right-[-20%] lg:h-[1000px] lg:w-[1000px] 
-          xl:right-[-25%] xl:h-[1200px] xl:w-[1200px] 
-          2xl:right-[-30%] 2xl:h-[1500px] 2xl:w-[1500px]"
+        className="absolute right-[-35vw] top-[50%] z-20 hidden translate-y-[-50%] rounded-full bg-[#9D9D8D] md:block"
+        style={{ width: "80vw", height: "80vw" }}
       />
 
       <div
@@ -41,7 +37,11 @@ export default function Hero(): JSX.Element {
         </p>
       </div>
 
-      <div className="absolute right-0 top-0 z-30 hidden h-full w-[50%] md:block md:w-[30%] lg:w-[45%] xl:w-[48%] 2xl:w-[50%]">
+      {/* Hero Image - Always 40% of screen width */}
+      <div
+        className="absolute right-0 top-0 z-30 hidden h-full md:block"
+        style={{ width: "40%" }}
+      >
         <img
           src="/home/hero.png"
           alt="SheFit Hero"
