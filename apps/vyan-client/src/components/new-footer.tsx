@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 export default function NewFooter() {
   return (
@@ -23,36 +22,36 @@ export default function NewFooter() {
                 className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
               >
                 <div className="rounded-full bg-white p-2 text-black">
-                  <Twitter size={18} />
+                  <img src="/icons/twitter.svg" alt="Twitter" width={18} height={18} />
                 </div>
-                <span className="text-sm">Quick links</span>
+                <span className="text-sm">Twitter</span>
               </a>
               <a
                 href="#"
                 className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
               >
                 <div className="rounded-full bg-white p-2 text-black">
-                  <Instagram size={18} />
+                  <img src="/icons/insta.svg" alt="Instagram" width={18} height={18} />
                 </div>
-                <span className="text-sm">Quick links</span>
+                <span className="text-sm">Instagram</span>
               </a>
               <a
                 href="#"
                 className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
               >
                 <div className="rounded-full bg-white p-2 text-black">
-                  <Linkedin size={18} />
+                  <img src="/icons/linkedin.svg" alt="LinkedIn" width={18} height={18} />
                 </div>
-                <span className="text-sm">Quick links</span>
+                <span className="text-sm">LinkedIn</span>
               </a>
               <a
                 href="#"
                 className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
               >
                 <div className="rounded-full bg-white p-2 text-black">
-                  <Youtube size={18} />
+                  <img src="/icons/youtube.svg" alt="YouTube" width={18} height={18} />
                 </div>
-                <span className="text-sm">Quick links</span>
+                <span className="text-sm">YouTube</span>
               </a>
             </div>
           </div>
@@ -60,12 +59,12 @@ export default function NewFooter() {
           {/* Subscription Form */}
           <div className="lg:w-1/2">
             <h3 className="mb-8 text-2xl font-light">
-              Subscribe For the latest updates
+              Subscribe for the latest updates.
             </h3>
             <form className="space-y-4">
               <div>
                 <label className="mb-2 block text-xs text-gray-400">
-                  First name *
+                  First Name*
                 </label>
                 <input
                   type="text"
@@ -74,7 +73,7 @@ export default function NewFooter() {
               </div>
               <div>
                 <label className="mb-2 block text-xs text-gray-400">
-                  Email *
+                  Email*
                 </label>
                 <input
                   type="email"
@@ -123,7 +122,7 @@ export default function NewFooter() {
             <ul className="space-y-4 text-gray-300">
               <li>
                 <a href="#" className="transition-colors hover:text-[#167D71]">
-                  Phycology
+                  Psychology
                 </a>
               </li>
               <li>

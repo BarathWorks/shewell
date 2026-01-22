@@ -44,7 +44,7 @@ const ImageSelector = ({ onSelectedImages, imageChooser, hide }: { onSelectedIma
           <div className="grid gap-2">
             {data.data.map((img) => {
               return (
-                <div className="col card">
+                <div className="col card" key={img.id}>
                   <Image
                     width="250"
                     height="250"

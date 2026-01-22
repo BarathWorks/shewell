@@ -1,8 +1,8 @@
 import { ICurrency, IProduct, IProductForm } from '@/src/_models/product.model';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useToastContext from '@/src/_hooks/useToast';
 import { Control, Controller, FieldValues, get, useFieldArray, UseFieldArrayRemove, useForm, useFormContext, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { FileUpload, FileUploadSelectEvent, FileUploadUploadEvent } from 'primereact/fileupload';
+import { FileUpload, FileUploadSelectEvent } from 'primereact/fileupload';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
@@ -12,7 +12,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { MultiStateCheckbox } from 'primereact/multistatecheckbox';
 
 import SubmitButton from '@/src/_components/shared/submit-button';
-import { createProduct, updateProduct } from '@/src/app/(main)/manage-products/products/product-actions';
+import { createProduct, updateProduct, updateProductImages } from '@/src/app/(main)/manage-products/products/product-actions';
 import { Dialog } from 'primereact/dialog';
 import { Card } from 'primereact/card';
 import { InputNumber } from 'primereact/inputnumber';
@@ -24,6 +24,8 @@ import { IBrand } from '@/src/_models/brand.model';
 import { errorHandlingZodError, slugifyName } from '@/src/lib/utils';
 import { Calendar } from 'primereact/calendar';
 import '@/styles/global.css';
+import { Image } from 'primereact/image';
+import uploadProductImage from '@/src/app/(main)/upload-image-actions';
 
 type IProductFormProps = {
   product: IProduct;
@@ -47,9 +49,15 @@ const ProductForm = ({ product, categories, productDialog, hideDialog }: IProduc
   } = useForm<IProductForm>({
     defaultValues: {
       ...product,
+      media: product.media,
       productVariants: product.productVariants.map((pv) => ({ ...pv, priceInCents: pv.priceInCents / 100, discountInCents: pv.discountInCents && pv.discountInCents / 100 }))
     }
   });
+
+  const fileInputRef = useRef<FileUpload>(null);
+  const [images, setImages] = useState<{ mediaId: string | null; fileUrl: string | null; order: number; imageAltText: string | null; comment: string | null }[]>(
+    product.media?.map((m) => ({ mediaId: m.mediaId, fileUrl: m.media.fileUrl, order: m.order, imageAltText: m.imageAltText, comment: m.comment })) ?? []
+  );
 
   const {
     fields: productBenefitsFields,
@@ -89,8 +97,10 @@ const ProductForm = ({ product, categories, productDialog, hideDialog }: IProduc
   useEffect(() => {
     reset({
       ...product,
+      media: product.media,
       productVariants: product.productVariants.map((pv) => ({ ...pv, priceInCents: pv.priceInCents / 100, discountInCents: pv.discountInCents && pv.discountInCents / 100 }))
     });
+    setImages(product.media?.map((m) => ({ mediaId: m.mediaId, fileUrl: m.media.fileUrl, order: m.order, imageAltText: m.imageAltText, comment: m.comment })) ?? []);
   }, [product]);
 
   const callServerAction = (data: IProductForm) => {
@@ -102,24 +112,38 @@ const ProductForm = ({ product, categories, productDialog, hideDialog }: IProduc
     }
   };
 
-  const submitForm = (data: IProductForm) => {
-    console.log('data', data);
-    return callServerAction(data)
-      .then((resp) => {
-        if (resp.error) {
-          let message = errorHandlingZodError(resp.error);
-          showToast('error', 'Error', message);
-        }
-        if (resp.message) {
-          showToast('success', 'Successful', resp.message);
-          hideDialog();
-        }
-      })
-      .catch((err) => {
-        let message = errorHandlingZodError(err.message);
+  const submitForm = async (data: IProductForm) => {
+    try {
+      const resp = await callServerAction(data);
+
+      if (resp.error) {
+        const message = errorHandlingZodError(resp.error);
         showToast('error', 'Error', message);
-      })
-      .finally(() => {});
+        return;
+      }
+
+      if (resp.message) {
+        // Persist media associations on update (create path handled separately once product id is available)
+        if (product?.id && images.length) {
+          await updateProductImages(
+            images.map((img) => ({
+              mediaId: img.mediaId,
+              order: img.order,
+              imageAltText: img.imageAltText,
+              comment: img.comment,
+              productId: product.id
+            })),
+            product.id
+          );
+        }
+
+        showToast('success', 'Successful', resp.message);
+        hideDialog();
+      }
+    } catch (err: any) {
+      const message = errorHandlingZodError(err.message);
+      showToast('error', 'Error', message);
+    }
   };
   const errorHandler = (e: any) => {
     console.log(e);
@@ -130,10 +154,69 @@ const ProductForm = ({ product, categories, productDialog, hideDialog }: IProduc
   useEffect(() => {
     setValue('slug', slug);
   }, [watchedName]);
+
+  const onSelectImage = async (event: FileUploadSelectEvent) => {
+    if (!event.files.length) return;
+
+    const nextImages = [...images];
+
+    for (const file of event.files) {
+      try {
+        const response = await uploadProductImage(file.name, file.type);
+        console.log('Upload Response:', response);
+        
+        const { id, fileUrl, presignedUrl } = response;
+        console.log('Extracted:', { id, fileUrl, presignedUrl });
+
+        const requestOptions = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type
+          },
+          body: file
+        };
+
+        const res = await fetch(presignedUrl!, requestOptions);
+        console.log('S3 Response:', res.status, res.statusText);
+
+        if (res.ok) {
+          const order = nextImages.length;
+          nextImages.push({ mediaId: id, fileUrl, order, imageAltText: null, comment: null });
+          console.log('Image added to preview');
+        } else {
+          console.error('S3 upload failed:', res.status, res.statusText);
+        }
+      } catch (e) {
+        console.error('Image upload failed:', e);
+      }
+    }
+
+    setImages(nextImages);
+    setValue(
+      'media',
+      nextImages.map((img) => ({
+        mediaId: img.mediaId,
+        order: img.order,
+        imageAltText: img.imageAltText,
+        comment: img.comment,
+        productId: product?.id || ''
+      })) as IProductForm['media']
+    );
+
+    fileInputRef.current?.clear();
+  };
   return (
     <Dialog maximizable={true} visible={productDialog} style={{ width: '50vw' }} header="Product Details" modal className="p-fluid" onHide={hideDialog}>
       <form onSubmit={handleSubmit(submitForm, errorHandler)} noValidate={true}>
         <input type="hidden" name="id" value={product?.id} />
+        <div className="flex flex-wrap gap-2 mb-3">
+          {images.map((img) => (
+            <Image key={img.mediaId} src={img.fileUrl || ''} alt="Product image" width="120" height="auto" className="mr-2 mb-2" preview />
+          ))}
+        </div>
+        <div className="field mb-3">
+          <FileUpload ref={fileInputRef} mode="basic" accept="image/*" multiple maxFileSize={1_000_000} onSelect={onSelectImage} />
+        </div>
         {/* <div className="field">
           <label htmlFor="brandId">Brand (Required*)</label>
           <Controller

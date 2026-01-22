@@ -18,6 +18,7 @@ import { ICategory } from '@/src/_models/category.model';
 import { confirmDialog } from 'primereact/confirmdialog';
 import useToastContext from '@/src/_hooks/useToast';
 import { deleteProduct } from './product-actions';
+import { Image } from 'primereact/image';
 
 type IProductsTable = {
   products: IProduct[];
@@ -196,6 +197,23 @@ const ProductsTable = ({ products, selectCategories, mediaOnProducts }: IProduct
     );
   };
 
+  const mediaBodyTemplate = (rowData: IProduct) => {
+    const firstImage = rowData.media?.[0];
+    if (!firstImage?.media?.fileUrl) {
+      return <span className="text-gray-400">No image</span>;
+    }
+    return (
+      <Image
+        src={firstImage.media.fileUrl}
+        alt="Product thumbnail"
+        width="50"
+        height="50"
+        imageStyle={{ objectFit: 'cover', borderRadius: '4px' }}
+        preview
+      />
+    );
+  };
+
   const rowExpansionTemplate = (data: IProduct) => {
     return (
       <div className="pl-6">
@@ -252,6 +270,7 @@ const ProductsTable = ({ products, selectCategories, mediaOnProducts }: IProduct
             <Column field="slug" header="Slug" sortable headerStyle={{ minWidth: '15rem' }}></Column>
             <Column field="active" header="Active" sortable body={activeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column field="bestseller" header="Bestseller" sortable body={bestsellerBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+            <Column header="Image" body={mediaBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
             <Column header="Actions" body={actionBodyTemplate} headerStyle={{ minWidth: '15rem' }} frozen alignFrozen="right"></Column>
           </DataTable>
 

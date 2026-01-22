@@ -161,7 +161,11 @@ export const createProduct = async (data: IProductForm) => {
 
   revalidatePath('/manage-products/products');
   return {
-    message: 'Product created successfully'
+    message: 'Product created successfully',
+    id: await db.product.findFirst({
+      select: { id: true },
+      where: { slug: slug.toLowerCase() }
+    }).then(p => p?.id)
   };
 };
 
@@ -377,10 +381,10 @@ export const updateProductImages = async (data: IMediaOnProducts[], id: string) 
     db.$transaction(async (tx) => {
       await tx.mediaOnProducts.deleteMany({
         where: {
-          productId: id
-          // mediaId: {
-          //   notIn: data.map((d) => d.mediaId)
-          // }
+          productId: id,
+          mediaId: {
+            notIn: data.map((d) => d.mediaId)
+          }
         }
       });
 
