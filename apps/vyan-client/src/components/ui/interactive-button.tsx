@@ -43,22 +43,16 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
 
   return (
     <Component {...baseProps} {...ariaProps}>
-      {/* LUCIDE ICON
-         - size: 24px (standard icon size)
-         - strokeWidth: 2.5 (makes it bold like your design)
-         - color: #00898F (Teal)
-         - Rotation Logic: Starts at 30deg -> Rotates to 210deg on hover
-      */}
       <ArrowUp
         size={64}
         strokeWidth={1.25}
         color="currentColor"
         className={`
           
-          ${active ? `rotate-[30deg]`  : `rotate-[210deg]`}
+          ${active ? `rotate-[45deg]`  : `rotate-[225deg]`}
           ${active ? `text-[#00898F]` : `text-[#E1EBED] `} 
           transition-all duration-500 ease-in-out
-          group-hover:rotate-[30deg]
+          group-hover:rotate-[45deg]
           group-hover:text-[#00898F]
         `}
       />

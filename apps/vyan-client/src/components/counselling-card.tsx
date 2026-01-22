@@ -40,12 +40,20 @@ const CounsellingCard = ({
               <div className="z-10 flex w-full flex-row gap-2 rounded-[10px] border border-primary from-[#00686C] to-[#6CDD37] pr-6 transition-transform hover:bg-gradient-to-b">
                 <div className="max-h-[262px]">
                   <div className="relative aspect-[130/262] w-[130px]">
-                    <Image
-                      src={item.media.fileUrl || ""}
-                      alt=""
-                      fill={true}
-                      className="relative z-0 rounded-l-[10px] object-cover"
-                    />
+                    {item.media.fileUrl ? (
+                      <Image
+                        src={item.media.fileUrl}
+                        alt={item.name}
+                        width={130}
+                        height={262}
+                        className="rounded-l-[10px] object-cover"
+                        priority
+                      />
+                    ) : (
+                      <div className="flex h-[262px] w-[130px] items-center justify-center rounded-l-[10px] bg-gray-300">
+                        <span className="text-gray-500">No Image</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

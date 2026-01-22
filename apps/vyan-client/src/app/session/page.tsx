@@ -1,4 +1,3 @@
-import { FooterSection } from "@/components/FooterSection";
 import { NavigationHeaderSection } from "@/components/NavigationHeaderSection";
 import { FilterBar } from "@/components/FilterBar";
 import { SessionCard } from "@/components/SessionCard";

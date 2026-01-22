@@ -22,7 +22,7 @@ export default function Hero(): JSX.Element {
           leading-tight text-[#114668] sm:text-[44px] md:text-[48px]
           lg:text-[56px] xl:text-[72px] 2xl:text-[88px]"
         >
-          Empowering <span className="text-[#51AF5A]">Women</span>, <br />
+          Empowering <span className="text-[#51AF5A] font-epicgant">Women</span>, <br />
           Nurturing Families
         </h1>
 
@@ -57,7 +57,7 @@ export default function Hero(): JSX.Element {
         opacity-20 sm:left-8 sm:text-[120px] md:text-[160px]
         lg:left-[50px] lg:text-[200px] xl:left-[60px] xl:text-[280px] 2xl:text-[320px]"
       >
-        #sheWell
+        #shewell
       </div>
 
       {/* CTA Buttons - Responsive positioning */}

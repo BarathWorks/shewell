@@ -85,7 +85,7 @@ const ServicesCarousel = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
-          className=" mb-6 font-poppins text-2xl font-medium leading-tight text-[#333333] md:text-4xl lg:text-[56px]"
+          className=" mb-6 font-poppins text-xl font-medium leading-tight text-[#333333] md:text-2xl lg:text-5xl"
         >
           India's Wellness Circle For Women Who Mother With Intention
         </motion.h1>

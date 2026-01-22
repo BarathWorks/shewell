@@ -6,7 +6,7 @@ export default function NewFooter() {
     <footer className="bg-[#1A1A1A] pb-8 pt-16 text-white">
       <div className="max-w-8xl mx-auto px-20">
         {/* Top Section */}
-        <div className="mb-16 flex flex-col justify-between gap-12 lg:flex-row">
+        <div className="mb-16 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           {/* Brand & Socials */}
           <div className="lg:w-1/3">
             <div className="relative mb-8 h-16 w-48">
@@ -16,13 +16,13 @@ export default function NewFooter() {
                 className="h-full w-full object-contain brightness-0 invert"
               />
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex gap-4">
               <a
                 href="#"
                 className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
               >
                 <div className="rounded-full bg-white p-2 text-black">
-                  <img src="/icons/twitter.svg" alt="Twitter" width={18} height={18} />
+                  <img src="/icons/x.svg" alt="Twitter" width={18} height={18} />
                 </div>
                 <span className="text-sm">Twitter</span>
               </a>
@@ -56,7 +56,44 @@ export default function NewFooter() {
             </div>
           </div>
 
-          {/* Subscription Form */}
+          {/* Links & Contact aligned horizontally */}
+          <div className="flex flex-col gap-10 lg:w-2/3 lg:flex-row lg:justify-end lg:gap-16">
+            <div>
+              <h4 className="mb-6 text-2xl font-light">Quick links</h4>
+              <ul className="flex flex-col gap-4 text-gray-300">
+                <li>
+                  <a href="#" className="transition-colors hover:text-[#167D71]">
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="transition-colors hover:text-[#167D71]">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="transition-colors hover:text-[#167D71]">
+                    Recipe
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="transition-colors hover:text-[#167D71]">
+                    Reviews
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-6 text-2xl font-light">Contact</h4>
+              <ul className="space-y-4 text-gray-300">
+                <li>123 colony Gurgram, Haryana- 122001</li>
+                <li>abcdvyan@gmail.com</li>
+                <li>+91-1234567890</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Subscription Form
           <div className="lg:w-1/2">
             <h3 className="mb-8 text-2xl font-light">
               Subscribe for the latest updates.
@@ -64,8 +101,10 @@ export default function NewFooter() {
             <form className="space-y-4">
               <div>
                 <label className="mb-2 block text-xs text-gray-400">
-                  First Name*
+                  First Name 
+                  <span className="text-[#FC3903]"> *</span>
                 </label>
+                
                 <input
                   type="text"
                   className="w-full rounded-md border border-gray-700 bg-[#2A2A2A] px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#167D71]"
@@ -73,7 +112,8 @@ export default function NewFooter() {
               </div>
               <div>
                 <label className="mb-2 block text-xs text-gray-400">
-                  Email*
+                  Email 
+                  <span className="text-[#FC3903]"> *</span>
                 </label>
                 <input
                   type="email"
@@ -84,39 +124,15 @@ export default function NewFooter() {
                 Subscribe
               </button>
             </form>
-          </div>
+          </div> */}
         </div>
 
-        {/* Links Grid */}
-        <div className="mb-16 grid grid-cols-2 gap-8 border-t border-gray-800 pt-16 md:grid-cols-4">
-          {/* Quick Links */}
-          <div>
-            <h4 className="mb-6 text-2xl font-light">Quick links</h4>
-            <ul className="space-y-4 text-gray-300">
-              <li>
-                <a href="#" className="transition-colors hover:text-[#167D71]">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-[#167D71]">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-[#167D71]">
-                  Recipe
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-[#167D71]">
-                  Reviews
-                </a>
-              </li>
-            </ul>
-          </div>
+        {/* Links Grid
+        <div className="mb-16 grid grid-cols-2 gap-8 pt-16 md:grid-cols-4">
+          {/* Quick Links */
+          
 
-          {/* Counselling */}
+          /* Counselling
           <div>
             <h4 className="mb-6 text-2xl font-light">Counselling</h4>
             <ul className="space-y-4 text-gray-300">
@@ -143,7 +159,7 @@ export default function NewFooter() {
             </ul>
           </div>
 
-          {/* Service */}
+          Service
           <div>
             <h4 className="mb-6 text-2xl font-light">Service</h4>
             <ul className="space-y-4 text-gray-300">
@@ -170,28 +186,19 @@ export default function NewFooter() {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="mb-6 text-2xl font-light">Contact</h4>
-            <ul className="space-y-4 text-gray-300">
-              <li>123 colony Gurgram, Haryana- 122001</li>
-              <li>abcdvyan@gmail.com</li>
-              <li>+91-1234567890</li>
-            </ul>
-          </div>
-        </div>
+          </div> */}
 
         {/* Bottom Bar */}
-        <div className="flex flex-col items-center justify-between border-t border-gray-800 pt-8 text-xs text-gray-500 md:flex-row">
+        <div className="flex flex-col items-center justify-between pt-8 text-xs text-gray-500 md:flex-row">
           <div className="mb-4 flex gap-8 md:mb-0">
             <a href="#" className="hover:text-white">
               Terms & Conditions
             </a>
             <a href="#" className="hover:text-white">
-              Privacy Polices
+              Privacy Policy
             </a>
           </div>
-          <div className="mb-4 md:mb-0">2023, All Rights Reserved</div>
+          <div className="mb-4 md:mb-0">2025 &copy; All Rights Reserved</div>
         </div>
       </div>
     </footer>

@@ -4,7 +4,7 @@ import { api } from "~/trpc/server";
 import { SessionProvider } from "next-auth/react";
 import Hero from "~/components/hero";
 import "~/styles/globals.css";
-import { Inter, Pacifico } from "next/font/google";
+import { Inter, Pacifico, Playfair_Display } from "next/font/google";
 import { Toaster } from "@repo/ui/src/@/components/toaster";
 import { Header } from "~/components/header";
 import NewFooter from "~/components/new-footer";
@@ -24,6 +24,10 @@ const pacifico = Pacifico({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-pacifico",
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
 });
 const poppins = Poppins({
   subsets: ["latin"],
@@ -138,7 +142,7 @@ export default async function RootLayout({
   return (
     <html className="scroll-smooth" lang="en">
       <body
-        className={`relative font-sans ${inter.variable} ${pacifico.variable} ${poppins.variable}`}
+        className={`relative font-sans ${poppins.variable} ${inter.variable} ${pacifico.variable} ${playfair.variable}`}
       >
         <div className="sticky top-0 z-40">
           <ClientSessionProvider session={session} verifiedAt={verifiedAt!}>

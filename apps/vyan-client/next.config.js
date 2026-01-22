@@ -28,6 +28,10 @@ const config = {
         protocol: "https",
         hostname: "shewellcare-dev.s3.ap-south-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "shewell-temporary.s3.ap-south-1.amazonaws.com",
+      }
     ],
   },
 };

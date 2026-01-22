@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { NavigationHeaderSection } from "@/components/NavigationHeaderSection";
-import { FooterSection } from "@/components/FooterSection";
 import { CourseDetailHeaderSection } from "@/components/course-detail/CourseDetailHeaderSection";
 import { SessionOverviewSection } from "@/components/course-detail/SessionOverviewSection";
 import { CourseInfoSection } from "@/components/course-detail/CourseInfoSection";

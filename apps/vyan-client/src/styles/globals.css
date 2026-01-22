@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Epicgant';
+  src: url('/font/Epicgant Personal Use.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .gradient {
   /* background: linear-gradient(144deg, #00898F -5.33%, #B7FF95 127.69%); */
   /* background-color: black; */

@@ -93,7 +93,7 @@ export default function PlatformSection() {
   return (
     <section className="w-full  overflow-hidden py-16   md:py-24">
       <div className="mb-16 text-center">
-        <h3 className="mb-3 text-2xl font-bold text-gray-900 md:mb-4 md:text-3xl lg:text-4xl">
+        <h3 className="mb-3 text-2xl font-medium text-gray-900 md:mb-4 md:text-3xl lg:text-4xl">
           Courses That Support You - Every Step of the Way
         </h3>
         <p className="mx-auto max-w-2xl text-sm text-gray-500 md:text-base lg:text-lg">
