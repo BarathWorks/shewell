@@ -1,4 +1,4 @@
-'use server';
+export const revalidate = 0;
 
 import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';

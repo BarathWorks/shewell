@@ -1,4 +1,4 @@
-'use server';
+export const revalidate = 0; // Revalidate on every request but with caching strategy
 
 import { db } from '@/src/server/db';
 import BlogCategoriesTable from '@/src/app/(main)/manage-blogs/blog-categories/blog-categories-table';
