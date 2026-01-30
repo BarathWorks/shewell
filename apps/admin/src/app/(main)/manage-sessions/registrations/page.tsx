@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { db } from '@/src/server/db';
 import RegistrationTable from './registration-table';
 import { Card } from 'primereact/card';

@@ -1,4 +1,5 @@
-'use server';
+export const revalidate = 0;
+
 import React, { Suspense } from 'react';
 import { db } from '@/src/server/db';
 import ProductsTable from '@/src/app/(main)/manage-products/products/products-table';

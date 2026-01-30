@@ -4,7 +4,7 @@ import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';
 import { Suspense } from 'react';
 import InventoryTable from './inventory-table';
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const InventoryPage = async () => {
   const inventoryData = await db.productVariant.findMany({

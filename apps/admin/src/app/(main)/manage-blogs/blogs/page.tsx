@@ -1,4 +1,4 @@
-'use server';
+export const revalidate = 0;
 
 import { db } from '@/src/server/db';
 import BlogsTable from '@/src/app/(main)/manage-blogs/blogs/blogs-table';
