@@ -111,10 +111,10 @@ export default function NewFooter() {
         {/* Bottom Bar - Responsive */}
         <div className="flex flex-col items-center justify-between gap-4 pt-4 text-xs text-gray-500 sm:gap-6 sm:pt-6 md:pt-8 md:flex-row md:gap-0">
           <div className="flex flex-wrap justify-center gap-4 md:justify-start sm:gap-6 md:gap-8">
-            <a href="#" className="transition-colors hover:text-white">
+            <a href="/terms" className="transition-colors hover:text-white">
               Terms & Conditions
             </a>
-            <a href="#" className="transition-colors hover:text-white">
+            <a href="/privacy-policy" className="transition-colors hover:text-white">
               Privacy Policy
             </a>
           </div>
