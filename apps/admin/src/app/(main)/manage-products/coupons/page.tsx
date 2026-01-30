@@ -4,7 +4,7 @@ import { Skeleton } from 'primereact/skeleton';
 import { Suspense } from 'react';
 import CouponsTable from './coupons-table';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const Coupons = async () => {
   const coupons = await db.coupon.findMany({

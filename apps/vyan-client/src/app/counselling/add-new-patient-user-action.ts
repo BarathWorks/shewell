@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { useRouter } from "next/navigation";
 import { db } from "~/server/db";
@@ -59,6 +60,8 @@ const AddNewPatientUserAction = async ({
         userId : user?.id
       }
     })
+    
+    revalidatePath("/counselling");
     
     return {
       message: "Patient has been added",

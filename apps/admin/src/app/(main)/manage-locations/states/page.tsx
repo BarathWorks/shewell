@@ -4,7 +4,7 @@ import { db } from '@/src/server/db';
 // import StatesTable from './states-table';
 import { Skeleton } from 'primereact/skeleton';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const StatesPage = async () => {
   const states = await db.state.findMany({

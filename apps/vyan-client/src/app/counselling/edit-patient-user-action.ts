@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { useRouter } from "next/navigation";
 import { db } from "~/server/db";
@@ -76,6 +77,9 @@ const EditPatientUserAction = async (
         patientId :patientsId
       }))
     })
+    
+    revalidatePath("/counselling");
+    
     return {
       message: "Patient has been added",
     };
