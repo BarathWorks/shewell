@@ -9,8 +9,8 @@ import { revalidatePath } from "next/cache";
 interface IBookAppointmentDetailsProps {
   serviceMode: {
     serviceType: AppointmentType;
-    taxedAmount : number;
-    totalPriceInCents : number;
+    taxedAmount: number;
+    totalPriceInCents: number;
     priceInCents: number;
     description: string;
     planName: string;
@@ -40,7 +40,6 @@ async function CheckoutAction({
   startingTime,
   endingTime,
 }: IBookAppointmentDetailsProps) {
-  
   return db.$transaction(
     async (tx) => {
       var instance = new Razorpay({
@@ -93,8 +92,8 @@ async function CheckoutAction({
             description: serviceMode.description,
             planName: serviceMode.description,
             priceInCents: serviceMode.priceInCents,
-            taxedAmount :serviceMode.taxedAmount,
-            totalPriceInCents : serviceMode.totalPriceInCents,
+            taxedAmount: serviceMode.taxedAmount,
+            totalPriceInCents: serviceMode.totalPriceInCents,
             serviceType: serviceMode.serviceType,
             // patientId: patientInfo?.id,
             patientId: patient.id,
@@ -109,7 +108,7 @@ async function CheckoutAction({
             id: bookAppointment.id,
           },
         });
-       
+
         //  create order on Razorpay
         const appointmentInstance = await instance.orders.create({
           amount: appointment?.totalPriceInCents!,
@@ -119,7 +118,6 @@ async function CheckoutAction({
           //   bookAppointmentId: bookAppointment.id,
           // },
         });
-      
 
         //  applying try-catch block so that even if the create event cannot be created for any reason , our appointment must be booked inspite when event cannot be created
         try {
@@ -139,11 +137,6 @@ async function CheckoutAction({
               id: bookAppointment.id,
             },
           });
-         
-          revalidatePath("/profile/appointments");
-          return {
-            message: "Event has been created",
-          };
         } catch (error) {
           console.log("error while creating event", error);
         }
@@ -157,7 +150,7 @@ async function CheckoutAction({
             id: bookAppointment.id,
           },
         });
-     
+
         revalidatePath("/profile/appointments");
         return {
           message: "Appointment has booked",
