@@ -13,7 +13,6 @@ import CompleteDoctorProfileSkeleton from "./complete-doctor-profile-skeleton";
 import SkeletonLoader from "~/components/shared/skeleton-loader";
 import dynamic from "next/dynamic";
 
-
 const Counselling = () => {
   function toUTCDate(date: Date) {
     return new Date(
@@ -95,20 +94,25 @@ const Counselling = () => {
                 Array.from({ length: 2 }).map((_, index) => (
                   <CompleteDoctorProfileSkeleton key={index} />
                 ))}
-              {filteredDoctors?.professionalUsers.map((item, index) => {
-                const updatedItem = {
-                  ...item,
-                  avgRating: item.avgRating?.toString(),
-                };
-                return (
-                  <CompleteDoctorProfile
-                    isCouple={false}
-                    key={index}
-                    doctorProfile={updatedItem}
-                    specialization={item.ProfessionalSpecializations}
-                  />
-                );
-              })}
+              {filteredDoctors &&
+                filteredDoctors?.professionalUsers.map((item, index) => {
+                  const updatedItem = {
+                    ...item,
+                    avgRating: item.avgRating?.toString(),
+                  };
+
+                  return (
+                    <CompleteDoctorProfile
+                      isCouple={false}
+                      key={index}
+                      doctorProfile={updatedItem}
+                      specialization={item.ProfessionalSpecializations}
+                    />
+                  );
+                })}
+              {filteredDoctors?.professionalUsers.length === 0 && (
+                <div>No Doctors Found</div>
+              )}
             </div>
           </div>
         </section>

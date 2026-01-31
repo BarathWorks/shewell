@@ -111,10 +111,10 @@ const AddUnavailability = ({
     <>
       <div>
         <Dialog open={close} onOpenChange={setClose}>
-          <DialogTrigger className="w-full  rounded-md   border px-[18px] py-2 font-inter text-base font-semibold text-primary md:px-[18px] ">
-            + Add your Unavailability
+          <DialogTrigger className="rounded-xl bg-white/90 px-[18px] py-2.5 font-poppins text-sm font-semibold text-[#0E3A47] shadow-md transition-all duration-300 hover:bg-[#A5F3FC] hover:shadow-lg md:px-5 md:text-base">
+            + Unavailability
           </DialogTrigger>
-          <DialogContent className="flex flex-col gap-5 border-y-[1px] border-primary bg-white p-0 py-5 xs:max-w-[300px] sm:max-w-[590px]">
+          <DialogContent className="flex flex-col gap-5 rounded-2xl border border-[#00898F]/20 bg-white p-0 py-5 shadow-xl xs:max-w-[300px] sm:max-w-[590px]">
             <form onSubmit={handleSubmit(onSubmit, errorHandler)}>
               <div>
                 <Controller
@@ -135,18 +135,18 @@ const AddUnavailability = ({
               <div>
                 
               </div>
-              <div className="flex justify-center gap-[80px] pt-5">
+              <div className="flex justify-center gap-4 pt-5 px-4">
                 <Button
                   type="button"
                   onClick={() => setClose(false)}
-                  className=" rounded-md border border-inactive bg-white py-3 font-inter text-base font-medium text-inactive  hover:bg-white"
+                  className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-poppins text-sm font-semibold text-gray-600 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md"
                 >
                   Cancel
                 </Button>
 
                 <Button
                   type="submit"
-                  className="rounded-md border bg-primary py-3 font-inter text-base font-medium text-white hover:bg-secondary"
+                  className="rounded-xl bg-[#00898F] px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#007a80] hover:shadow-lg"
                 >
                   Create
                 </Button>
