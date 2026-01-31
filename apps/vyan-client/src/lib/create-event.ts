@@ -113,12 +113,17 @@ export async function getAccessToken(professionalUserId: string) {
       refreshTokenRecord.email,
     );
 
-    const response = await axios.post(tokenUrl, null, {
-      params: {
-        grant_type: "refresh_token",
-        client_secret: env.GOOGLE_CLIENT_SECRET,
-        refresh_token: refreshTokenRecord.googleRefreshToken,
-        client_id: env.GOOGLE_CLIENT_ID,
+    // Google OAuth2 requires credentials in the POST body, NOT as URL params
+    const tokenData = new URLSearchParams({
+      grant_type: "refresh_token",
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      refresh_token: refreshTokenRecord.googleRefreshToken,
+      client_id: env.GOOGLE_CLIENT_ID,
+    });
+
+    const response = await axios.post(tokenUrl, tokenData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     });
 
