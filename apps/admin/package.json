@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3004",
-    "build": "next build",
+    "build": "pnpx prisma@5.22.0 generate --schema=../../packages/database/prisma/schema.prisma && next build",
     "start": "next start -p 6003",
     "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
     "lint": "next lint",
-    "postinstall": "pnpx prisma@5.22.0 generate --schema=../../packages/database/prisma/schema.prisma",
     "prisma:generate": "pnpx prisma@5.22.0 generate --schema=../../packages/database/prisma/schema.prisma"
   },
   "dependencies": {
