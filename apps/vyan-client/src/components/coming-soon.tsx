@@ -4,7 +4,7 @@ export function ComingSoon() {
   return (
 
    <div>
-    <img src="apps/vyan-client/public/Group.svg " alt="" />
+    <img src="Group.svg " alt="" />
 
    </div>
     
