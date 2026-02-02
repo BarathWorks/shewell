@@ -1,10 +1,10 @@
-// import { Megaphone } from "lucide-react";
+import { Megaphone } from "lucide-react";
 
 export function ComingSoon() {
   return (
 
-   <div className=" flex justify-center " >
-    <img src="Group.svg " alt="" width={800}  />
+   <div>
+    <img src="apps/vyan-client/public/Group.svg " alt="" />
 
    </div>
     
