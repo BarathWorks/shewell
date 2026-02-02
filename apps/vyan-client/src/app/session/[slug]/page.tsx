@@ -110,7 +110,7 @@ export default async function SessionDetailPage({
   ];
 
   return (
-    <main className="relative flex w-full flex-col items-center bg-white">
+    <main className="relative flex w-full flex-col items-center bg-white min-h-screen">
       <CourseDetailHeaderSection
         title={session.title}
         instructor="Expert Instructor"
@@ -144,6 +144,7 @@ export default async function SessionDetailPage({
         isRegistered={userRegistration !== undefined}
         meetingLink={session.meetingLink}
       />
+      
       <FooterInfoSection terms={terms} />
 
       <SupportContactSection

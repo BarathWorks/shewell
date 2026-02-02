@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import {
   Popover,
@@ -25,19 +25,14 @@ interface FilterBarProps {
 }
 
 export const FilterBar = ({
-  onlyOnlineCourses = false,
-  freeSessions = false,
   categories = [],
 }: FilterBarProps): JSX.Element => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [isOnlineCourses, setIsOnlineCourses] = useState(onlyOnlineCourses);
-  const [isFreeSessions, setIsFreeSessions] = useState(freeSessions);
+  const [isFreeSessions, setIsFreeSessions] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-
-  // Dropdown states
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedTrimester, setSelectedTrimester] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
@@ -45,443 +40,217 @@ export const FilterBar = ({
   const [sortBy, setSortBy] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Update URL params helper
   const updateURLParams = useCallback(
     (updates: Record<string, string | string[] | null>) => {
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(updates).forEach(([key, value]) => {
-        if (value === null || value === "") {
-          params.delete(key);
-        } else if (Array.isArray(value)) {
-          value.length ? params.set(key, value.join(",")) : params.delete(key);
-        } else {
-          params.set(key, value);
-        }
+        if (value === null || value === "") params.delete(key);
+        else if (Array.isArray(value)) value.length ? params.set(key, value.join(",")) : params.delete(key);
+        else params.set(key, value);
       });
       router.push(`${pathname}?${params.toString()}`);
     },
-    [pathname, searchParams, router],
+    [pathname, searchParams, router]
   );
 
-  // Initialize filters from URL params
   useEffect(() => {
     const filters: string[] = [];
-    const categoryIds =
-      searchParams.get("categoryId")?.split(",").filter(Boolean) || [];
+    const categoryIds = searchParams.get("categoryId")?.split(",").filter(Boolean) || [];
     const trimester = searchParams.get("trimester") || "";
     const min = searchParams.get("minPrice") || "";
     const max = searchParams.get("maxPrice") || "";
     const sort = searchParams.get("sortBy") || "";
-    const start = searchParams.get("startDate") || "";
-    const end = searchParams.get("endDate") || "";
 
     setSelectedCategories(categoryIds);
     setSelectedTrimester(trimester);
     setMinPrice(min);
     setMaxPrice(max);
     setSortBy(sort);
-    setStartDate(start);
-    setEndDate(end);
 
-    if (categoryIds.length > 0) {
-      filters.push(`Categories: ${categoryIds.length} selected`);
-    }
-    if (trimester) {
-      filters.push(`Trimester: ${trimester}`);
-    }
-    if (min) {
-      filters.push(`Min Price: $${min}`);
-    }
-    if (max && max !== "0") {
-      filters.push(`Max Price: $${max}`);
-    }
-    if (sort) {
-      filters.push(`Sort: ${sort.replace("-", " ")}`);
-    }
-    if (start) {
-      filters.push(`From: ${new Date(start).toLocaleDateString()}`);
-    }
-    if (end) {
-      filters.push(`To: ${new Date(end).toLocaleDateString()}`);
-    }
+    if (categoryIds.length > 0) filters.push(`Categories: ${categoryIds.length}`);
+    if (trimester) filters.push(`Tri: ${trimester}`);
+    if (min || max) filters.push(`Price Range`);
+    if (sort) filters.push(`Sorted`);
+    
     setSelectedFilters(filters);
-
-    // Set free sessions toggle based on price filter
-    if (max === "0") {
-      setIsFreeSessions(true);
-    } else {
-      setIsFreeSessions(false);
-    }
+    setIsFreeSessions(max === "0");
   }, [searchParams]);
 
-  const handleRemoveFilter = (index: number) => {
-    const filterToRemove = selectedFilters[index];
-    const newFilters = selectedFilters.filter((_, i) => i !== index);
-    setSelectedFilters(newFilters);
-
-    // Update URL params
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (filterToRemove?.startsWith("Categories:")) {
-      console.log("Removing category filter");
-      params.delete("categoryId");
-    } else if (filterToRemove?.startsWith("Trimester:")) {
-      console.log("Removing trimester filter");
-      params.delete("trimester");
-    } else if (filterToRemove?.startsWith("Min Price:")) {
-      params.delete("minPrice");
-    } else if (filterToRemove?.startsWith("Max Price:")) {
-      params.delete("maxPrice");
-    } else if (filterToRemove?.startsWith("Sort:")) {
-      params.delete("sortBy");
-    } else if (filterToRemove?.startsWith("From:")) {
-      params.delete("startDate");
-    } else if (filterToRemove?.startsWith("To:")) {
-      params.delete("endDate");
-    }
-    router.push(`/session?${params.toString()}`);
-  };
-
-  const handleFreeSessionsToggle = () => {
-    const newValue = !isFreeSessions;
-    setIsFreeSessions(newValue);
-
-    const params = new URLSearchParams(searchParams.toString());
-    if (newValue) {
-      params.set("maxPrice", "0");
-      params.delete("minPrice");
-    } else {
-      params.delete("maxPrice");
-      params.delete("minPrice");
-    }
-    router.push(`/session?${params.toString()}`);
-  };
-
-  const handleSortByPrice = (direction: "asc" | "desc") => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sortBy", `price-${direction}`);
-    router.push(`/session?${params.toString()}`);
-  };
-
-  // Toggle category selection
-  const toggleCategory = (categoryId: string) => {
-    const newCategories = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter((id) => id !== categoryId)
-      : [...selectedCategories, categoryId];
-    setSelectedCategories(newCategories);
-    updateURLParams({ categoryId: newCategories });
-  };
-
-  // Handle trimester selection
-  const handleTrimesterChange = (value: string) => {
-    setSelectedTrimester(value);
-    updateURLParams({ trimester: value || null });
-  };
-
-  // Handle price range
-  const handlePriceChange = () => {
-    if (minPrice > maxPrice && maxPrice !== "") {
-      setErrorMessage("Min price cannot be greater than max price.");
-      return;
-    }
-    setErrorMessage("");
-
-    updateURLParams({
-      minPrice: minPrice || null,
-      maxPrice: maxPrice || null,
-    });
-  };
-
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-    updateURLParams({ sortBy: value || null });
-  };
-
-  // Handle date range
-  const handleDateChange = () => {
-    updateURLParams({
-      startDate: startDate || null,
-      endDate: endDate || null,
-    });
-  };
-
-  // Clear all filters
   const handleClearFilters = () => {
-    setSelectedCategories([]);
-    setSelectedTrimester("");
-    setMinPrice("");
-    setMaxPrice("");
-    setSortBy("");
-    setStartDate("");
-    setEndDate("");
-    setIsFreeSessions(false);
     router.push(pathname);
   };
 
-  function handleOnlyOnlineCoursesToggle(): import("react").SetStateAction<boolean> {
-    const newValue = !isOnlineCourses;
-    const params = new URLSearchParams(searchParams.toString());
-    if (newValue) {
-      params.set("isOnlyOnline", "true");
-    } else {
-      params.delete("isOnlyOnline");
-    }
-    router.push(`/session?${params.toString()}`);
-    return newValue;
-  }
-
   return (
-    <div className="w-full space-y-3 font-inter">
-      {/* CENTERED FILTER BAR */}
-      <div className="mx-auto w-full max-w-7xl px-6">
-        <div className="flex sm:inline-flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-0 rounded-full bg-[#EEEEEE] px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm w-full sm:w-auto">
-          {/* <FilterToggle
-            label="Only Online Courses"
-            enabled={isOnlineCourses}
-            onClick={() => setIsOnlineCourses(handleOnlyOnlineCoursesToggle())}
-          />
-
-          <Divider /> */}
-
+    <div className="w-full space-y-4 font-inter">
+      {/* Breakpoints strategy:
+          - Default: mobile stack
+          - min-[425px]: 2-column grid layout
+          - lg (1024px): Single line horizontal bar
+          - 2xl (1440px+): Wider padding and capped width
+      */}
+      <div className="flex justify-center w-full px-4">
+        <div className="
+          w-full max-w-full lg:max-w-fit
+          bg-[#EEEEEE] 
+          rounded-2xl lg:rounded-full 
+          px-4 py-4 lg:px-8 lg:py-3 
+          grid grid-cols-2 min-[425px]:grid-cols-3 lg:flex lg:items-center 
+          gap-4 lg:gap-0 
+          shadow-sm
+        ">
+          
           {/* Category Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-0.5 sm:gap-1 text-black hover:text-gray-600 text-xs sm:text-sm">
-                Category{" "}
-                {selectedCategories.length > 0 &&
-                  `(${selectedCategories.length})`}
-                <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 bg-white">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Select Categories</div>
-                {categories.map((category) => (
-                  <div key={category.id} className="flex items-center gap-2">
-                    <Checkbox
-                      checked={selectedCategories.includes(category.id)}
-                      onCheckedChange={() => toggleCategory(category.id)}
-                    />
-                    <span className="text-sm">{category.name}</span>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+          <div className="flex justify-center lg:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-xs sm:text-sm font-medium text-black hover:text-gray-600">
+                  Category {selectedCategories.length > 0 && `(${selectedCategories.length})`}
+                  <ChevronDown size={14} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 bg-white p-4">
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {categories.map((category) => (
+                    <div key={category.id} className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedCategories.includes(category.id)}
+                        onCheckedChange={() => {
+                          const next = selectedCategories.includes(category.id)
+                            ? selectedCategories.filter(id => id !== category.id)
+                            : [...selectedCategories, category.id];
+                          updateURLParams({ categoryId: next });
+                        }}
+                      />
+                      <span className="text-sm">{category.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Divider />
+          <Divider className="hidden lg:block" />
 
           {/* Trimester Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-0.5 sm:gap-1 text-black hover:text-gray-600 text-xs sm:text-sm">
-                Trimester {selectedTrimester && `(${selectedTrimester})`}
-                <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 bg-white">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Select Trimester</div>
+          <div className="flex justify-center lg:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-xs sm:text-sm font-medium text-black hover:text-gray-600">
+                  Trimester
+                  <ChevronDown size={14} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 bg-white p-2">
                 {["FIRST", "SECOND", "THIRD"].map((tri) => (
-                  <div
-                    key={tri}
-                    className="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-gray-100"
-                    onClick={() =>
-                      handleTrimesterChange(
-                        tri === selectedTrimester ? "" : tri,
-                      )
-                    }
+                  <div 
+                    key={tri} 
+                    className="flex items-center gap-2 p-2 hover:bg-gray-50 cursor-pointer"
+                    onClick={() => updateURLParams({ trimester: tri === selectedTrimester ? null : tri })}
                   >
                     <Checkbox checked={selectedTrimester === tri} />
                     <span className="text-sm">{tri}</span>
                   </div>
                 ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Divider />
+          <Divider className="hidden lg:block" />
 
-          {/* Price Range Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-0.5 sm:gap-1 text-black hover:text-gray-600 text-xs sm:text-sm">
-                Price {(minPrice || maxPrice) && "(Set)"}
-                <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 bg-white">
-              <div className="space-y-3">
-                <div className="text-sm font-medium">Price Range</div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    placeholder="Min"
-                    value={minPrice}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setMinPrice(e.target.value)
-                    }
-                    className="w-24"
-                  />
-                  <span>-</span>
-                  <Input
-                    type="number"
-                    placeholder="Max"
-                    value={maxPrice}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setMaxPrice(e.target.value)
-                    }
-                    className="w-24"
-                  />
+          {/* Price Range */}
+          <div className="flex justify-center lg:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-xs sm:text-sm font-medium text-black hover:text-gray-600">
+                  Price
+                  <ChevronDown size={14} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 bg-white p-4">
+                <div className="flex gap-2 mb-4">
+                  <Input placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                  <Input placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
                 </div>
-                {errorMessage && (
-                  <div className="text-xs text-red-500">{errorMessage}</div>
-                )}
-                <Button
-                  onClick={handlePriceChange}
-                  size="small"
-                  className="w-full"
-                >
-                  Apply
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+                <Button className="w-full" onClick={() => updateURLParams({ minPrice, maxPrice })}>Apply</Button>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Divider />
+          <Divider className="hidden lg:block" />
 
-          {/* Date Range Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-0.5 sm:gap-1 text-black hover:text-gray-600 text-xs sm:text-sm">
-                Date {(startDate || endDate) && "(Set)"}
-                <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 bg-white">
-              <div className="space-y-3">
-                <div className="text-sm font-medium">Date Range</div>
-                <div className="space-y-2">
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-600">
-                      From
-                    </label>
-                    <Input
-                      type="date"
-                      value={startDate}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setStartDate(e.target.value)
-                      }
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-600">
-                      To
-                    </label>
-                    <Input
-                      type="date"
-                      value={endDate}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setEndDate(e.target.value)
-                      }
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleDateChange}
-                  size="small"
-                  className="w-full"
-                >
-                  Apply
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {/* Date Range */}
+          <div className="flex justify-center lg:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-xs sm:text-sm font-medium text-black hover:text-gray-600">
+                  Date
+                  <ChevronDown size={14} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 bg-white p-4 space-y-3">
+                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                <Button className="w-full" onClick={() => updateURLParams({ startDate, endDate })}>Apply</Button>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Divider />
+          <Divider className="hidden lg:block" />
 
-          {/* Sort By Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-0.5 sm:gap-1 text-black hover:text-gray-600 text-xs sm:text-sm">
-                Sort {sortBy && "(Set)"}
-                <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 bg-white">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Sort By</div>
-                {[
-                  { value: "price-asc", label: "Price: Low to High" },
-                  { value: "price-desc", label: "Price: High to Low" },
-                ].map((option) => (
-                  <div
-                    key={option.value}
-                    className="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-gray-100"
-                    onClick={() =>
-                      handleSortChange(
-                        option.value === sortBy ? "" : option.value,
-                      )
-                    }
+          {/* Sort By */}
+          <div className="flex justify-center lg:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-xs sm:text-sm font-medium text-black hover:text-gray-600">
+                  Sort
+                  <ChevronDown size={14} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 bg-white p-2">
+                {[{v: "price-asc", l: "Low to High"}, {v: "price-desc", l: "High to Low"}].map((opt) => (
+                  <div 
+                    key={opt.v} 
+                    className="flex items-center gap-2 p-2 hover:bg-gray-50 cursor-pointer text-sm"
+                    onClick={() => updateURLParams({ sortBy: opt.v })}
                   >
-                    <Checkbox checked={sortBy === option.value} />
-                    <span className="text-sm">{option.label}</span>
+                    <Checkbox checked={sortBy === opt.v} />
+                    {opt.l}
                   </div>
                 ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Divider />
+          <Divider className="hidden lg:block" />
 
-          <FilterToggle
-            label="Free sessions"
-            enabled={isFreeSessions}
-            onClick={handleFreeSessionsToggle}
-          />
+          {/* Free Sessions Toggle */}
+          <div className="flex justify-center lg:block col-span-full min-[425px]:col-auto mt-2 min-[425px]:mt-0">
+            <FilterToggle
+              label="Free"
+              enabled={isFreeSessions}
+              onClick={() => updateURLParams({ maxPrice: isFreeSessions ? null : "0", minPrice: null })}
+            />
+          </div>
         </div>
       </div>
 
-      {/* FILTERS APPLIED */}
+      {/* FILTERS APPLIED SECTION */}
       {selectedFilters.length > 0 && (
-        <div className="mx-auto w-full max-w-7xl px-6">
-          <div className="rounded-xl border bg-white px-6 py-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-sm font-medium text-black">
-                Filters Applied
-              </div>
-              <Button
-                variant="outline"
-                size="small"
-                onClick={handleClearFilters}
-              >
-                Clear All
-              </Button>
-            </div>
-
-            <div className="flex items-start justify-between gap-4">
+        <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-12">
+          <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex flex-wrap gap-2">
                 {selectedFilters.map((filter, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="rounded-md px-3 py-1 text-sm text-black"
-                  >
+                  <Badge key={index} variant="secondary" className="px-3 py-1 text-xs flex items-center gap-1 bg-gray-50 text-gray-700 border-none">
                     {filter}
-                    <button
-                      onClick={() => handleRemoveFilter(index)}
-                      className="ml-2 text-black hover:text-gray-600"
-                    >
-                      ×
-                    </button>
+                    <X size={12} className="cursor-pointer hover:text-black" />
                   </Badge>
                 ))}
               </div>
+              <Button variant="ghost" size="small" onClick={handleClearFilters} className="text-red-500 hover:text-red-700 hover:bg-red-50 w-fit">
+                Clear All
+              </Button>
             </div>
           </div>
         </div>
@@ -490,42 +259,18 @@ export const FilterBar = ({
   );
 };
 
-/* ------------------ Helpers ------------------ */
-
-const Divider = () => <span className="hidden sm:inline-block mx-2 sm:mx-4 h-4 sm:h-6 w-px bg-gray-300" />;
-
-const FilterItem = ({ label }: { label: string }) => (
-  <button
-    className="flex items-center gap-1 text-black  hover:text-gray-600"
-    onClick={() => {}}
-  >
-    {label}
-    <ChevronDown size={14} />
-  </button>
+const Divider = ({ className }: { className?: string }) => (
+  <span className={`mx-4 h-6 w-px bg-gray-300 ${className}`} />
 );
 
-const FilterToggle = ({
-  label,
-  enabled,
-  onClick,
-}: {
-  label: string;
-  enabled: boolean;
-  onClick: () => void;
-}) => (
-  <div className="flex items-center gap-2 sm:gap-3">
-    <span className="text-black text-xs sm:text-sm">{label}</span>
+const FilterToggle = ({ label, enabled, onClick }: { label: string; enabled: boolean; onClick: () => void }) => (
+  <div className="flex items-center gap-2">
+    <span className="text-xs sm:text-sm font-medium text-black">{label}</span>
     <button
       onClick={onClick}
-      className={`relative h-4 sm:h-5 w-8 sm:w-9 rounded-full transition ${
-        enabled ? "bg-green-600" : "bg-gray-600"
-      }`}
+      className={`relative h-5 w-9 rounded-full transition-colors ${enabled ? "bg-green-600" : "bg-gray-400"}`}
     >
-      <span
-        className={`absolute top-0.5 h-3 sm:h-4 w-3 sm:w-4 rounded-full bg-white transition ${
-          enabled ? "left-4 sm:left-4" : "left-0.5 sm:left-1"
-        }`}
-      />
+      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${enabled ? "left-4" : "left-1"}`} />
     </button>
   </div>
 );

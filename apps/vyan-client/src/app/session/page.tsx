@@ -90,7 +90,7 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
           Courses That Support You Every Step of the Way
         </h1>
         <p className="mt-3 font-inter text-base text-gray-500">
-          From fertility to first steps. Evidence based, heart led,
+          From fertility to first steps. evidence based, heart led,
           expert-designed just for you.
         </p>
       </div>

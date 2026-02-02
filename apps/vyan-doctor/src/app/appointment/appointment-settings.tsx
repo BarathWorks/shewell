@@ -353,82 +353,97 @@ const AppointmentSettings = ({
             </clipPath>
           </defs>
         </svg> */}
-        <div className="w-full  rounded-md   border px-[18px] py-2 font-inter text-base font-semibold text-primary md:px-[18px] ">
+        <div className="rounded-xl bg-white px-[18px] py-2.5 font-poppins text-sm font-semibold text-[#0E3A47] shadow-md transition-all duration-300 hover:bg-[#A5F3FC] hover:shadow-lg md:px-5 md:text-base">
           Add your slots
         </div>
       </SheetTrigger>
-      <SheetContent side="signup" className="h-full overflow-y-auto bg-white max-w-[587px] pt-0">
+      <SheetContent side="signup" className="h-full overflow-y-auto bg-gradient-to-b from-white to-[#F8FFFE] max-w-[587px] p-0">
         <form onSubmit={handleSubmit(onSubmit, errorHandler)}>
-          <div className="flex justify-between border-b border-[#43434380] pt-6 pb-3" >
-            <div className="font-poppins text-[24px]  lg:text-[28px] font-bold leading-[45px] text-active">
-              Weekly Hours
-              <div className="text-sm">(These timings will be repeated for every week)</div>
-            </div>
-            <SheetClose>
-              <div className="">
+          {/* Header with gradient */}
+          <div className="sticky top-0 z-10 bg-[#00898F] px-6 py-5 shadow-md">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-poppins text-xl font-bold text-white lg:text-2xl">
+                  Weekly Hours
+                </h2>
+                <p className="mt-1 font-poppins text-sm text-white/70">
+                  These timings will repeat every week
+                </p>
+              </div>
+              <SheetClose className="rounded-full bg-white/10 p-2 transition-all duration-300 hover:bg-white/20">
                 <svg
-                  width="33"
-                  height="33"
-                  viewBox="0 0 33 33"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M26.9948 24.438C27.2766 24.7198 27.4349 25.102 27.4349 25.5005C27.4349 25.899 27.2766 26.2812 26.9948 26.563C26.713 26.8448 26.3308 27.0031 25.9323 27.0031C25.5338 27.0031 25.1516 26.8448 24.8698 26.563L16.9335 18.6242L8.99479 26.5605C8.713 26.8423 8.3308 27.0006 7.93229 27.0006C7.53377 27.0006 7.15158 26.8423 6.86979 26.5605C6.588 26.2787 6.42969 25.8965 6.42969 25.498C6.42969 25.0995 6.588 24.7173 6.86979 24.4355L14.8085 16.4992L6.87229 8.56049C6.5905 8.2787 6.43219 7.89651 6.43219 7.49799C6.43219 7.09948 6.5905 6.71728 6.87229 6.43549C7.15408 6.1537 7.53627 5.99539 7.93479 5.99539C8.3333 5.99539 8.7155 6.1537 8.99729 6.43549L16.9335 14.3742L24.8723 6.43424C25.1541 6.15245 25.5363 5.99414 25.9348 5.99414C26.3333 5.99414 26.7155 6.15245 26.9973 6.43424C27.2791 6.71603 27.4374 7.09823 27.4374 7.49674C27.4374 7.89526 27.2791 8.27745 26.9973 8.55924L19.0585 16.4992L26.9948 24.438Z"
-                    fill="black"
-                    fill-opacity="0.4"
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
-              </div>
-            </SheetClose>
+              </SheetClose>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3 mt-3">
+          <div className="flex flex-col gap-3 px-6 py-5">
             {fields.map((dayField, dayIndex) => (
-              <div key={dayField.id} className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
+              <div 
+                key={dayField.id} 
+                className="rounded-xl border border-[#00898F]/10 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F]/30 hover:shadow-md"
+              >
+                <div className="flex items-center gap-3">
                   <Controller
                     name={`availability.${dayIndex}.available`}
                     control={control}
                     render={({ field }) => (
-                      <input
-                        className="accent-primary"
-                        type="checkbox"
-                        checked={field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                      />
+                      <label className="relative inline-flex cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="peer sr-only"
+                        />
+                        <div className="h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#00898F] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+                      </label>
                     )}
                   />
-                  <div className="font-inter text-[14px] lg:text-base font-semibold leading-[32px]">
+                  <div className="font-poppins text-base font-semibold text-[#0E3A47]">
                     {dayField.day}
                   </div>
+                  {!watch(`availability.${dayIndex}.available`) && (
+                    <span className="rounded-full bg-gray-100 px-3 py-1 font-poppins text-xs font-medium text-gray-500">
+                      Unavailable
+                    </span>
+                  )}
                 </div>
-                {watch(`availability.${dayIndex}.available`) ? (
-                  <AvailabilityTimings
-                    control={control}
-                    index={dayIndex}
-                    getValues={getValues}
-                    setValue={setValue}
-                    watch={watch}
-                    // errors={formState.errors}
-                    // errors={formState.errors.availability?.[dayIndex]?.availableTimings || []}
-                  />
-                ) : (
-                  <div className="font-inter text-lg font-medium text-inactive">
-                    Unavailable
+                {watch(`availability.${dayIndex}.available`) && (
+                  <div className="mt-4 border-t border-gray-100 pt-4">
+                    <AvailabilityTimings
+                      control={control}
+                      index={dayIndex}
+                      getValues={getValues}
+                      setValue={setValue}
+                      watch={watch}
+                    />
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          <Button
-            // onClick={() => reset()}
-            type="submit"
-            className="mt-5 w-full text-lg bg-primary text-white hover:bg-secondary"
-          >
-            Save
-          </Button>
+          <div className="sticky bottom-0 border-t border-gray-100 bg-white/90 px-6 py-4 backdrop-blur-sm">
+            <Button
+              type="submit"
+              className="w-full rounded-xl bg-[#00898F] py-3 font-poppins text-base font-semibold text-white shadow-lg transition-all duration-300 hover:bg-[#007a80] hover:shadow-xl"
+            >
+              Save Weekly Schedule
+            </Button>
+          </div>
         </form>
       </SheetContent>
     </Sheet>

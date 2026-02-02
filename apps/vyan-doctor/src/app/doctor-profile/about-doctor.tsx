@@ -8,10 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/src/@/components/table";
+import { Briefcase, GraduationCap, User } from "lucide-react";
 
 interface IExperienceProps {
-  startingYear : string;
-  endingYear : string;
+  startingYear: string;
+  endingYear: string;
   department: string;
   position: string;
   location: string;
@@ -35,30 +36,37 @@ const AboutDoctor = ({
     <>
       <div className="flex flex-col gap-[18px] md:gap-[30px] xl:gap-[40px]">
         {/* about-me */}
-        <div className="flex flex-col gap-2 md:gap-5 xl:gap-6 2xl:gap-7">
-          <h3 className="  border-b-[2px] border-secondary pb-1 font-inter text-base font-semibold text-active md:text-[20px] md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]">
-            About me:
-          </h3>
-          <div className="text-justify font-inter text-xs font-normal text-inactive md:text-base pl-4">
+        <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
+            <User className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
+            <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
+              About me:
+            </h3>
+          </div>
+          <div className="pl-4 text-justify font-inter text-sm font-normal leading-relaxed text-[#666666] md:text-base">
             {aboutYou}
           </div>
         </div>
+
         {/* education */}
-        <div className="flex flex-col gap-2 md:gap-5 xl:gap-6 2xl:gap-7">
-          <h3 className=" border-b-[2px] border-secondary pb-1 font-inter text-base font-semibold text-active md:text-[20px] md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]">
-            Education:
-          </h3>
+        <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
+            <GraduationCap className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
+            <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
+              Education:
+            </h3>
+          </div>
           {aboutEducation && (
-            <div className="text-justify font-inter text-xs font-normal text-inactive md:text-base pl-4">
+            <div className="pl-4 text-justify font-inter text-sm font-normal leading-relaxed text-[#666666] md:text-base">
               {aboutEducation}
             </div>
           )}
           {/* education-table */}
-          <div>
+          <div className="mt-2 overflow-hidden rounded-xl border border-gray-100">
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px] rounded-t-lg bg-[#94CED0] py-2 pl-4 font-inter text-base font-semibold text-active">
+              <TableHeader className="bg-[#00898F]/5">
+                <TableRow className="border-b-gray-100 hover:bg-[#00898F]/5">
+                  <TableHead className="w-[100px] py-3 pl-6 font-inter text-base font-semibold text-[#00898F]">
                     Degree
                   </TableHead>
                 </TableRow>
@@ -66,8 +74,11 @@ const AboutDoctor = ({
               <TableBody>
                 {degrees &&
                   degrees.map((item) => (
-                    <TableRow key={item.degree}>
-                      <TableCell className="py-2 pl-4 font-inter text-xs md:text-base font-normal text-inactive hover:bg-[#Dff0f1] hover:text-active ">
+                    <TableRow
+                      key={item.degree}
+                      className="border-b-gray-50 hover:bg-gray-50"
+                    >
+                      <TableCell className="py-3 pl-6 font-inter text-sm font-medium text-[#333333] md:text-base">
                         {item.degree}
                       </TableCell>
                     </TableRow>
@@ -76,51 +87,57 @@ const AboutDoctor = ({
             </Table>
           </div>
         </div>
-        {/* experience */}
-        <div className="flex flex-col gap-2 md:gap-5 xl:gap-6 2xl:gap-7">
-          <h3 className=" border-b-[2px] border-secondary pb-1 font-inter text-base font-semibold text-active md:text-[20px] md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]">
-            Experience:
-          </h3>
 
-          <Table>
-            <TableHeader className=" bg-[#94CED0]">
-              <TableRow className="rounded-t-lg">
-                <TableHead className="w-[100px]  py-2 pl-4 font-inter text-base font-semibold text-active">
-                  Year
-                </TableHead>
-                <TableHead className="w-[100px]  py-2 pl-4 font-inter text-base font-semibold text-active">
-                  Department
-                </TableHead>
-                <TableHead className="w-[100px]  py-2 pl-4 font-inter text-base font-semibold text-active">
-                  Position
-                </TableHead>
-                <TableHead className="w-[100px]  py-2 pl-4 font-inter text-base font-semibold text-active">
-                  Location
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {experience.map((item) => (
-                <TableRow
-                  className="hover:bg-[#Dff0f1] hover:text-active "
-                  key={item.startingYear}
-                >
-                  <TableCell className="py-2 pl-4 font-inter text-base font-normal text-inactive ">
-                    {item.startingYear}-{item.endingYear}
-                  </TableCell>
-                  <TableCell className="py-2 pl-4 font-inter text-base font-normal text-inactive ">
-                    {item.department}
-                  </TableCell>
-                  <TableCell className="py-2 pl-4 font-inter text-base font-normal text-inactive">
-                    {item.position}
-                  </TableCell>
-                  <TableCell className="py-2 pl-4 font-inter text-base font-normal text-inactive ">
-                    {item.location}
-                  </TableCell>
+        {/* experience */}
+        <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
+            <Briefcase className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
+            <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
+              Experience:
+            </h3>
+          </div>
+
+          <div className="mt-2 overflow-hidden rounded-xl border border-gray-100">
+            <Table>
+              <TableHeader className="bg-[#00898F]/5">
+                <TableRow className="border-b-gray-100 hover:bg-[#00898F]/5">
+                  <TableHead className="w-[100px] py-3 pl-6 font-inter text-base font-semibold text-[#00898F]">
+                    Year
+                  </TableHead>
+                  <TableHead className="w-[150px] py-3 pl-4 font-inter text-base font-semibold text-[#00898F]">
+                    Department
+                  </TableHead>
+                  <TableHead className="w-[150px] py-3 pl-4 font-inter text-base font-semibold text-[#00898F]">
+                    Position
+                  </TableHead>
+                  <TableHead className="w-[150px] py-3 pl-4 font-inter text-base font-semibold text-[#00898F]">
+                    Location
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {experience.map((item) => (
+                  <TableRow
+                    className="border-b-gray-50 hover:bg-gray-50"
+                    key={item.startingYear}
+                  >
+                    <TableCell className="py-3 pl-6 font-inter text-sm font-medium text-[#333333] md:text-base">
+                      {item.startingYear}-{item.endingYear}
+                    </TableCell>
+                    <TableCell className="py-3 pl-4 font-inter text-sm font-normal text-[#666666] md:text-base">
+                      {item.department}
+                    </TableCell>
+                    <TableCell className="py-3 pl-4 font-inter text-sm font-normal text-[#666666] md:text-base">
+                      {item.position}
+                    </TableCell>
+                    <TableCell className="py-3 pl-4 font-inter text-sm font-normal text-[#666666] md:text-base">
+                      {item.location}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
     </>

@@ -59,14 +59,14 @@ export function Header() {
               <div className="absolute left-0 top-full z-10 mt-1">
                 <div className="w-48 rounded-md bg-white shadow-lg">
                   <Link
-                    href="/"
+                    href="/shefit"
                     className="block rounded-t-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
                     onClick={() => setIsMoreOpen(false)}
                   >
                     SheFit
                   </Link>
                   <Link
-                    href="/"
+                    href="/products"
                     className="block rounded-b-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
                     onClick={() => setIsMoreOpen(false)}
                   >
@@ -172,7 +172,7 @@ export function Header() {
             {isMoreOpen && (
               <div className="flex flex-col gap-2 border-t border-[#1A8191] pt-2 pl-4 sm:pt-3 sm:pl-6">
                 <Link
-                  href="/"
+                  href="/shefit"
                   className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:text-white hover:bg-[#1A8191] sm:px-4 sm:py-3 sm:text-base"
                   onClick={() => {
                     setIsMoreOpen(false);
@@ -182,7 +182,7 @@ export function Header() {
                   SheFit
                 </Link>
                 <Link
-                  href="/"
+                  href="/products"
                   className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:text-white hover:bg-[#1A8191] sm:px-4 sm:py-3 sm:text-base"
                   onClick={() => {
                     setIsMoreOpen(false);
