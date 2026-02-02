@@ -39,12 +39,16 @@ const ProfileImageText = ({
         {/* doctor-image and text */}
         <div className=" lg:self-center ">
           {doctorProfile && (
-            <div className="flex flex-col items-center  gap-4 lg:flex-row lg:gap-6  2xl:gap-8">
+            <div className="flex flex-col items-center justify-center  gap-4 lg:flex-row lg:gap-6  2xl:gap-8">
               {/* image */}
 
-              <div className=" flex items-center justify-center self-center aspect-square w-[225px]  bg-[url('/images/bg.png')] bg-no-repeat bg-center">
-                {" "}
-                <div className="flex items-center justify-center  ">{cardImage}</div>
+              <div className="relative flex aspect-square items-center justify-center xs:w-[150px] sm:w-[225px]">
+                {/* Decorative ring */}
+                <div className="absolute inset-0 rounded-full border-2 border-[#00898F]/10 bg-[#F8FFFE] p-2">
+                  <div className=" flex items-center justify-center relative h-full w-full overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white">
+                    {cardImage}
+                  </div>
+                </div>
               </div>
 
               {/* text */}
@@ -114,35 +118,12 @@ const ProfileImageText = ({
               {specialization &&
                 specialization.map((item, index) => {
                   return (
-                    <>
-                      <div
-                        className="font-inter text-sm font-normal text-active 2xl:text-base"
-                        key={index}
-                      >
-                        <svg
-                          className="mr-[2px] inline"
-                          width="16"
-                          height="17"
-                          viewBox="0 0 16 17"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M12.0002 4.25L4.66683 11.5833L1.3335 8.25"
-                            stroke="#008F4E"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M14.6665 6.91602L9.6665 11.916L8.6665 10.916"
-                            stroke="#008F4E"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                        {item.specialization}
-                      </div>
-                    </>
+                    <div
+                      className="rounded-full border border-[#00898F]/20 bg-[#F8FFFE] px-4 py-1.5 font-poppins text-xs font-medium text-[#00898F] shadow-sm"
+                      key={index}
+                    >
+                      {item.specialization}
+                    </div>
                   );
                 })}
             </div>

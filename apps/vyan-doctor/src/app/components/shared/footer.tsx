@@ -252,12 +252,7 @@ const Footer = ({
             </div>
             <div>
               {" "}
-              <div className="mt-[18px] font-inter text-base font-normal text-white 2xl:text-lg  ">
-                Developed By{" "}
-                <Link className="font-medium text-primary 2xl:text-lg" href="#">
-                  NEXTFLY TECHNOLOGIES{" "}
-                </Link>{" "}
-              </div>{" "}
+            
             </div>{" "}
           </div>{" "}
         </div>{" "}

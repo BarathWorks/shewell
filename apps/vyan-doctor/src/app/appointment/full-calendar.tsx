@@ -187,9 +187,9 @@ const FullCalendarPage = ({
     <>
       <div className="pb-10 pt-8 md:py-[45px] xl:py-[50px] 2xl:py-[65px]">
         {/* heading */}
-        <div className="flex  flex-row justify-between items-center flex-wrap gap-y-5">
+        <div className="flex flex-row justify-between items-center flex-wrap gap-y-5 rounded-2xl bg-[#00898F] p-4 md:p-6 shadow-lg">
           {/* div-date */}
-          <div className="flex w-fit items-center gap-2 rounded border px-4 py-2">
+          <div className="flex w-fit items-center gap-2 rounded-xl bg-white/15 backdrop-blur-sm px-4 py-2 border border-white/20">
             <div>
               <svg
                 width="18"
@@ -202,39 +202,37 @@ const FullCalendarPage = ({
                   fill-rule="evenodd"
                   clip-rule="evenodd"
                   d="M3.75 3.75C3.33579 3.75 3 4.08579 3 4.5V15C3 15.4142 3.33579 15.75 3.75 15.75H14.25C14.6642 15.75 15 15.4142 15 15V4.5C15 4.08579 14.6642 3.75 14.25 3.75H3.75ZM1.5 4.5C1.5 3.25736 2.50736 2.25 3.75 2.25H14.25C15.4926 2.25 16.5 3.25736 16.5 4.5V15C16.5 16.2426 15.4926 17.25 14.25 17.25H3.75C2.50736 17.25 1.5 16.2426 1.5 15V4.5Z"
-                  fill="#4D4D4D"
+                  fill="#A5F3FC"
                 />
                 <path
                   fill-rule="evenodd"
                   clip-rule="evenodd"
                   d="M12 0.75C12.4142 0.75 12.75 1.08579 12.75 1.5V4.5C12.75 4.91421 12.4142 5.25 12 5.25C11.5858 5.25 11.25 4.91421 11.25 4.5V1.5C11.25 1.08579 11.5858 0.75 12 0.75Z"
-                  fill="#4D4D4D"
+                  fill="#A5F3FC"
                 />
                 <path
                   fill-rule="evenodd"
                   clip-rule="evenodd"
                   d="M6 0.75C6.41421 0.75 6.75 1.08579 6.75 1.5V4.5C6.75 4.91421 6.41421 5.25 6 5.25C5.58579 5.25 5.25 4.91421 5.25 4.5V1.5C5.25 1.08579 5.58579 0.75 6 0.75Z"
-                  fill="#4D4D4D"
+                  fill="#A5F3FC"
                 />
                 <path
                   fill-rule="evenodd"
                   clip-rule="evenodd"
                   d="M1.5 7.5C1.5 7.08579 1.83579 6.75 2.25 6.75H15.75C16.1642 6.75 16.5 7.08579 16.5 7.5C16.5 7.91422 16.1642 8.25 15.75 8.25H2.25C1.83579 8.25 1.5 7.91422 1.5 7.5Z"
-                  fill="#4D4D4D"
+                  fill="#A5F3FC"
                 />
               </svg>
             </div>{" "}
-            <div className="font-inter text-xs font-medium text-inactive xl:rounded-md xl:text-sm 2xl:text-[18px] 2xl:leading-[29px]">
+            <div className="font-poppins text-xs font-medium text-white/90 xl:rounded-md xl:text-sm 2xl:text-[18px] 2xl:leading-[29px]">
               {" "}
               {getDate && format(getDate!, "LLL dd',' y")} - Present
             </div>
           </div>
-          <div className=" font-poppins text-[18px] sm:text-[22px] font-semibold leading-8 text-active md:text-[30px] md:leading-[48px] xl:text-[36px] 2xl:text-[40px] 2xl:leading-[52px]">
+          <div className="font-poppins text-[18px] sm:text-[22px] font-bold leading-8 text-white md:text-[30px] md:leading-[48px] xl:text-[36px] 2xl:text-[40px] 2xl:leading-[52px]">
               Appointment Calendar
             </div>
-            <div className="cursor-pointer flex gap-2 flex-wrap">
-
-             
+            <div className="cursor-pointer flex gap-3 flex-wrap">
               <AppointmentSettings availabilities={availabilities} />
                 {/* edit-unavailability */}
           <EditAvailablity unavailableDays={unavailableDays} />
@@ -244,7 +242,7 @@ const FullCalendarPage = ({
       </div>
 
       {/* calendar */}
-      <div>
+      <div className="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -274,14 +272,22 @@ const FullCalendarPage = ({
         open={openDeleteUnvailableDialog}
         onOpenChange={setOpenDeleteUnavailableDialog}
       >
-        <DialogContent className="pt-[50px]">
+        <DialogContent className="rounded-2xl border-0 bg-white pt-[50px] shadow-xl">
           <DialogHeader>
-            <DialogTitle className="mb-5">
+            <DialogTitle className="mb-5 font-poppins text-lg font-bold text-[#0E3A47]">
               Do you want to delete the unavailable day?
             </DialogTitle>
-            <DialogDescription className="flex items-center gap-4 ">
-              <Button onClick={handleDeleteUnavailableDay}>Yes</Button>
-              <Button onClick={() => setOpenDeleteUnavailableDialog(false)}>
+            <DialogDescription className="flex items-center gap-4">
+              <Button 
+                onClick={handleDeleteUnavailableDay}
+                className="rounded-xl bg-[#00898F] px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#007a80] hover:shadow-lg"
+              >
+                Yes
+              </Button>
+              <Button 
+                onClick={() => setOpenDeleteUnavailableDialog(false)}
+                className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-poppins text-sm font-semibold text-gray-600 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md"
+              >
                 No
               </Button>
             </DialogDescription>

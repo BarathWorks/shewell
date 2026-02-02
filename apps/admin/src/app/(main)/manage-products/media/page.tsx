@@ -1,4 +1,5 @@
-'use server';
+export const revalidate = 0;
+
 import React, { Suspense } from 'react';
 import { db } from '@/src/server/db';
 import MediaTable from './media-table';

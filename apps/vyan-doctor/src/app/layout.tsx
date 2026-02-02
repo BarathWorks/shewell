@@ -58,16 +58,18 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>
-        {/* <Header /> */}
-        <TRPCReactProvider>
-          <ClientSessionProvider session={session}>
-            <DoctorHeader />
-            {children}
-            <Footer specializationParentCategories={specialisationParentCategories} specializations={specializations}/>
-            <Toaster />
-          </ClientSessionProvider>
-        </TRPCReactProvider>
+      <body className={`relative font-sans ${inter.variable}`}>
+        <div className="sticky top-0 z-40">
+          {/* <Header /> */}
+          <TRPCReactProvider>
+            <ClientSessionProvider session={session}>
+              <DoctorHeader />
+              {children}
+              <Footer specializationParentCategories={specialisationParentCategories} specializations={specializations}/>
+              <Toaster />
+            </ClientSessionProvider>
+          </TRPCReactProvider>
+        </div>
       </body>
     </html>
   );

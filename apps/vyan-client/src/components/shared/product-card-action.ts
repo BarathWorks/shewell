@@ -41,6 +41,7 @@ if(!(alreadyWishlisted?.wishlistedProducts.length! > 0)){
     })
 
     revalidatePath(`/product/${slug}`)
+    revalidatePath(`/wishlist`)
     return{
         message: "Added to Wishlist"
     }
@@ -58,7 +59,8 @@ else{
             }
         }
     })
-    revalidatePath(`product/${slug}`)
+    revalidatePath(`/product/${slug}`)
+    revalidatePath(`/wishlist`)
     return{
         message: "Removed from wishlist"
     }

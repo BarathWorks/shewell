@@ -1,6 +1,8 @@
 import { db } from "../../db";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { revalidatePath } from "next/cache";
+
 export const proffessionalUpdateRouter = createTRPCRouter({
   proffessionalUpdate: publicProcedure
     .input(
@@ -19,5 +21,9 @@ export const proffessionalUpdateRouter = createTRPCRouter({
                 isapproved: isapproved
             }
         });
+        
+        // Invalidate cache for doctor-related pages
+        revalidatePath("/view-doctors/doctors");
+        revalidatePath("/view-doctors");
     })
 });

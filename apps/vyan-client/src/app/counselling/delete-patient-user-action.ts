@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
 
@@ -25,6 +26,9 @@ const DeletePatient = async ({ patientId }: { patientId: string }) => {
         userId: user.id!,
       },
     });
+    
+    revalidatePath("/counselling");
+    
     return {
       message: "Patient Info has been deleted",
     };
