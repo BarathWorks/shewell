@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Search, User, Menu, X, LayoutDashboard, Calendar, BookOpen, LogOut, RefreshCw, UserCheck } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -22,16 +22,34 @@ const DoctorHeader = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   
   const session = useSession();
   const router = useRouter();
   const pathname = usePathname();
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const { data: searchResults, isLoading } = api.findDoctorsBasedOnSearch.findDoctorsBasedOnSearch.useQuery(
-    { inputSearch: searchTerm },
-    { enabled: searchTerm.length > 0 }
+    { inputSearch: debouncedSearchTerm },
+    { enabled: debouncedSearchTerm.length > 0 }
   );
+
+  // Close search when mobile menu opens
+  useEffect(() => {
+    if (isMobileMenuOpen && isSearchOpen) {
+      setIsSearchOpen(false);
+      setSearchTerm("");
+    }
+  }, [isMobileMenuOpen, isSearchOpen]);
 
   return (
     <header className="relative sticky top-0 z-50 w-full bg-gradient-to-r from-[#0E3A47] to-[#13647A] shadow-md">
@@ -76,41 +94,6 @@ const DoctorHeader = () => {
             Appointments
           </Link>
 
-          {/* More Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setIsMoreOpen(true)}
-            onMouseLeave={() => setIsMoreOpen(false)}
-          >
-            <button
-              className={`flex items-center gap-1 text-sm font-medium transition-colors lg:text-base ${
-                pathname === "/blogs" ? "text-[#A5F3FC]" : "text-white hover:text-[#A5F3FC]"
-              }`}
-              onClick={() => setIsMoreOpen(!isMoreOpen)}
-            >
-              More
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  isMoreOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {isMoreOpen && (
-              <div className="absolute left-0 top-full z-10 mt-1">
-                <div className="w-48 rounded-md bg-white shadow-lg">
-                  <Link
-                    href="/blogs"
-                    className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
-                    onClick={() => setIsMoreOpen(false)}
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    Blogs
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Right Side - Icons and Mobile Menu */}
@@ -159,9 +142,9 @@ const DoctorHeader = () => {
 
                 {/* Autocomplete Dropdown */}
                 {showDropdown && searchTerm && (
-                  <div className="absolute top-full right-0 mt-2 w-64 rounded-xl border border-gray-100 bg-white shadow-xl z-50 overflow-hidden">
-                    {isLoading ? (
-                      <div className="p-4 text-center text-sm text-gray-500">Loading...</div>
+                  <div className="absolute top-full left-0 sm:right-0 sm:left-auto mt-2 w-64 sm:w-72 rounded-xl border border-gray-100 bg-white shadow-xl z-50 overflow-hidden">
+                    {isLoading || searchTerm !== debouncedSearchTerm ? (
+                      <div className="p-4 text-center text-sm text-gray-500">Searching...</div>
                     ) : searchResults?.doctors && searchResults.doctors.length > 0 ? (
                       <div className="max-h-60 overflow-y-auto">
                         {searchResults.doctors.map((doctor) => (
@@ -172,6 +155,7 @@ const DoctorHeader = () => {
                             onClick={() => {
                               setIsSearchOpen(false);
                               setSearchTerm("");
+                              setShowDropdown(false);
                             }}
                           >
                             <span className="text-sm font-semibold text-[#0E3A47]">
