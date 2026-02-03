@@ -97,7 +97,7 @@ export default function NewFooter() {
                 </li>
                 <li>
                   <a href="tel:+911234567890" className="transition-colors hover:text-[#167D71]">
-                    +91-1234567890
+                    +91 7397 380 900
                   </a>
                 </li>
               </ul>

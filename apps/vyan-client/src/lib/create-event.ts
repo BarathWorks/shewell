@@ -140,14 +140,23 @@ export async function createEvent({
   appointmentId,
   startTime,
   endTime,
+  patientName,
+  patientEmail,
+  planName,
+  description,
 }: {
   professionalUserId: string;
   appointmentId: string;
   startTime: Date;
   endTime: Date;
+  patientName: string;
+  patientEmail: string;
+  planName: string;
+  description: string;
 }) {
   console.log("📅 createEvent: FUNCTION CALLED", {
     professionalUserId,
+    appointmentId,
     startTime: startTime.toISOString(),
     endTime: endTime.toISOString(),
   });
@@ -159,11 +168,10 @@ export async function createEvent({
 
     const calendarUrl =
       "https://www.googleapis.com/calendar/v3/calendars/primary/events";
-    const calendar = getGoogleCalendarClient(access_token!);
 
     const event = {
-      summary: "Google Meet Meeting",
-      description: "A sample meeting with a Google Meet link",
+      summary: `Consultation: ${patientName}`,
+      description: `${planName}\n\n${description}\n\nPatient: ${patientName}\nEmail: ${patientEmail}`,
       start: {
         dateTime: formatISO(startTime),
         timeZone: "Asia/Kolkata",
@@ -172,11 +180,21 @@ export async function createEvent({
         dateTime: formatISO(endTime),
         timeZone: "Asia/Kolkata",
       },
+      attendees: [
+        { email: patientEmail, displayName: patientName },
+      ],
       conferenceData: {
         createRequest: {
-          requestId: `meet-${Date.now()}`, // Use unique request ID
+          requestId: `appointment-${appointmentId}-${Date.now()}`,
           conferenceSolutionKey: { type: "hangoutsMeet" },
         },
+      },
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: "email", minutes: 60 },
+          { method: "popup", minutes: 30 },
+        ],
       },
     };
 
@@ -194,6 +212,7 @@ export async function createEvent({
       },
       params: {
         conferenceDataVersion: 1,
+        sendUpdates: "all",
       },
     });
 
@@ -201,6 +220,17 @@ export async function createEvent({
       eventId: response.data.id,
       meetLink: response.data.hangoutLink,
       htmlLink: response.data.htmlLink,
+    });
+
+    // Store the meeting link in the appointment
+    await db.bookAppointment.update({
+      where: { id: appointmentId },
+      data: {
+        meeting: {
+          meetLink: response.data.hangoutLink,
+          eventId: response.data.id,
+        },
+      },
     });
 
     return response.data;
@@ -222,79 +252,120 @@ export async function createEvent({
 }
 export async function updateEvent({
   professionalUserId,
-  startTime,
-  endTime,
   eventId,
+  newStartTime,
+  newEndTime,
+  patientName,
+  patientEmail,
+  planName,
+  description,
 }: {
   professionalUserId: string;
-  appointmentId: string;
-  startTime: Date;
-  endTime: Date;
   eventId: string;
+  newStartTime: Date;
+  newEndTime: Date;
+  patientName: string;
+  patientEmail: string;
+  planName: string;
+  description: string;
 }) {
-  const accessTokenRecord = await db.professionalUser.findFirst({
-    select: {
-      googleAccessToken: true,
-    },
-    where: {
-      id: professionalUserId,
-    },
+  console.log("📅 updateEvent: FUNCTION CALLED", {
+    professionalUserId,
+    eventId,
+    newStartTime: newStartTime.toISOString(),
+    newEndTime: newEndTime.toISOString(),
   });
 
-  const access_token = accessTokenRecord?.googleAccessToken;
-  console.log("access_token", access_token, professionalUserId, eventId);
-  const calendarUrl =
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events";
-  const calendar = getGoogleCalendarClient(access_token!);
-
-  const event = {
-    summary: "Google Meet Meeting",
-    description: "A sample meeting with a Google Meet link",
-    start: {
-      dateTime: formatISO(startTime),
-      timeZone: "America/Los_Angeles",
-    },
-    end: {
-      dateTime: formatISO(endTime),
-      timeZone: "America/Los_Angeles",
-    },
-    conferenceData: {
-      createRequest: {
-        requestId: "randomString",
-        conferenceSolutionKey: { type: "hangoutsMeet" },
-      },
-    },
-  };
-
   try {
-    // const response =  await calendar.events.insert({
-    //   calendarId: "primary",
+    console.log("📅 updateEvent: Getting access token...");
+    const access_token = await getAccessToken(professionalUserId);
+    console.log("✅ updateEvent: Access token retrieved");
 
-    //     resource: event,
-    //   conferenceDataVersion: 1, // Necessary to create Google Meet links
-    // });
+    const calendarUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`;
 
-    // console.log("create-google-event")
-    // return {
-    //   message : "Event has been generated"
-    // }
+    const updatedEvent = {
+      summary: `Consultation: ${patientName}`,
+      description: `${planName}\n\n${description}\n\nPatient: ${patientName}\nEmail: ${patientEmail}`,
+      start: {
+        dateTime: formatISO(newStartTime),
+        timeZone: "Asia/Kolkata",
+      },
+      end: {
+        dateTime: formatISO(newEndTime),
+        timeZone: "Asia/Kolkata",
+      },
+      attendees: [
+        {
+          email: patientEmail,
+          displayName: patientName,
+        },
+      ],
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: "email", minutes: 60 },
+          { method: "popup", minutes: 30 },
+        ],
+      },
+    };
 
-    const response = await axios.patch(`${calendarUrl}/${eventId}`, event, {
+    console.log("📅 updateEvent: Sending PATCH request to Google Calendar", {
+      eventId,
+      summary: updatedEvent.summary,
+      newStartTime: updatedEvent.start.dateTime,
+      newEndTime: updatedEvent.end.dateTime,
+      timezone: updatedEvent.start.timeZone,
+    });
+
+    const response = await axios.patch(calendarUrl, updatedEvent, {
       headers: {
         Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
       },
       params: {
-        conferenceDataVersion: 1,
+        sendUpdates: "all",
       },
     });
 
-    console.log(" responseDataUpdateEvent", response.data);
+    console.log("✅ updateEvent: Event updated successfully!", {
+      eventId: response.data.id,
+      meetLink: response.data.hangoutLink,
+      htmlLink: response.data.htmlLink,
+      updatedTime: response.data.updated,
+    });
 
     return response.data;
   } catch (error) {
-    console.log("update-event-error", error);
-    throw new Error("Event cannot be generated");
+    if (axios.isAxiosError(error)) {
+      console.error("❌ updateEvent: Google Calendar API error", {
+        eventId,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    } else {
+      console.error("❌ updateEvent: Unexpected error", error);
+    }
+    throw new Error(
+      `Event update failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
+export async function deleteEvent(
+      console.error("❌ updateEvent: Google Calendar API error", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    } else {
+      console.error("❌ updateEvent: Unexpected error", error);
+    }
+    throw new Error(
+      `Event cannot be updated: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 }
 

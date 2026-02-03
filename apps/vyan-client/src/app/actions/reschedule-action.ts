@@ -45,45 +45,89 @@ const RescheduleAction = async ({
       error: "Invalid data",
     };
   }
-  try {
-    try {
-      const response = await updateEvent({
-        appointmentId: appointmentId,
-        endTime: endingTime,
-        eventId: eventId!,
-        professionalUserId: professionalUserId!,
-        startTime: startingTime,
-      });
 
-      await db.bookAppointment.update({
-        data: {
-          meeting: response,
+  console.log("🔄 Reschedule Action: Starting reschedule", {
+    appointmentId,
+    eventId,
+    professionalUserId,
+    startingTime,
+    endingTime,
+  });
+
+  try {
+    // First get appointment details
+    const appointment = await db.bookAppointment.findUnique({
+      where: { id: appointmentId },
+      select: {
+        patient: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
         },
-        where: {
-          id: appointmentId,
-        },
-      });
-      revalidatePath("/profile/appointments");
-    } catch (error) {
-      console.log("Error Update Event", error);
+        planName: true,
+        description: true,
+      },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
     }
+
+    // Update the database
     await db.bookAppointment.update({
       data: {
         startingTime: startingTime,
         endingTime: endingTime,
-        id: appointmentId,
-        
       },
       where: {
         id: appointmentId,
       },
     });
+    console.log("✅ Reschedule Action: Database updated");
+
+    // Then try to update Google Calendar event
+    if (eventId && professionalUserId) {
+      try {
+        console.log("🔄 Reschedule Action: Updating Google Calendar event");
+        const patientName = `${appointment.patient.firstName} ${appointment.patient.lastName || ""}`.trim();
+        const response = await updateEvent({
+          professionalUserId,
+          eventId,
+          newStartTime: startingTime,
+          newEndTime: endingTime,
+          patientName,
+          patientEmail: appointment.patient.email,
+          planName: appointment.planName,
+          description: appointment.description || "",
+        });
+
+        // Update meeting details in database
+        await db.bookAppointment.update({
+          data: {
+            meeting: response,
+          },
+          where: {
+            id: appointmentId,
+          },
+        });
+        console.log("✅ Reschedule Action: Google Calendar event updated");
+      } catch (calendarError) {
+        console.error("❌ Reschedule Action: Calendar update failed", calendarError);
+        // Don't fail the reschedule if calendar update fails - database is already updated
+        // But we should probably notify the user
+      }
+    } else {
+      console.log("⚠️ Reschedule Action: No eventId or professionalUserId - skipping calendar update");
+    }
+
     revalidatePath("/profile/appointments");
     return {
       message: "Appointment has been rescheduled",
     };
   } catch (error) {
-    console.log("rescheduleError", error);
+    console.error("❌ Reschedule Action: Failed", error);
     throw new Error("Appointment cannot be rescheduled");
   }
 };
