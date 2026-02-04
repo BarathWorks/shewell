@@ -6,6 +6,7 @@ import { InteractiveButton } from "@/components/ui/interactive-button";
 import { ChevronDown, Calendar, Check } from "lucide-react";
 import Image from "next/image";
 import { Media } from "@/types/media";
+import { toast } from "@repo/ui/src/@/components/use-toast";
 
 interface BookingSectionProps {
   price: number;
@@ -46,6 +47,62 @@ export const BookingSection = ({
     exit: { opacity: 0, x: -20 },
   };
 
+  const validateStep = (currentStep: number): boolean => {
+    setError(null);
+
+    if (currentStep === 1) {
+      if (!formData.name.trim()) {
+        setError("Please enter your name");
+        return false;
+      }
+      if (!formData.email.trim()) {
+        setError("Please enter your email");
+        return false;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError("Please enter a valid email address");
+        return false;
+      }
+      if (!formData.mobile.trim()) {
+        setError("Please enter your mobile number");
+        return false;
+      }
+      const mobileRegex = /^[0-9]{10}$/;
+      if (!mobileRegex.test(formData.mobile.replace(/\D/g, ""))) {
+        setError("Please enter a valid 10-digit mobile number");
+        return false;
+      }
+    }
+
+    if (currentStep === 2) {
+      if (isPregnant) {
+        if (!formData.trimester) {
+          setError("Please select your trimester");
+          return false;
+        }
+        if (!formData.dueDate) {
+          setError("Please enter your expected due date");
+          return false;
+        }
+      }
+      if (isNewMom) {
+        if (!formData.babyDob) {
+          setError("Please enter your baby's date of birth");
+          return false;
+        }
+      }
+      // If neither is selected, it's valid to proceed (assuming optional if not applicable)
+      // or if business logic requires at least one, we can add that check here.
+      // For now, assuming if user doesn't toggle either, they might be just exploring or booking for someone else?
+      // Re-reading requirements: "Moms in their third trimester...", "New mothers...".
+      // It implies users should likely be one of these.
+      // However, to avoid blocking valid edge cases (e.g. support person), I will strictly validate only if toggles are on.
+    }
+
+    return true;
+  };
+
   const getStepImage = () => {
     switch (step) {
       case 1:
@@ -70,6 +127,8 @@ export const BookingSection = ({
   };
 
   const handleBooking = async () => {
+    if (!validateStep(2)) return;
+
     setIsProcessing(true);
     setError(null);
 
@@ -125,7 +184,7 @@ export const BookingSection = ({
             });
 
             if (verifyResponse.success) {
-              alert("Payment successful! Your session is booked.");
+              toast.success("Payment successful! Your session is booked.");
               window.location.reload();
             } else {
               setError(verifyResponse.message || "Payment verification failed");
@@ -265,7 +324,11 @@ export const BookingSection = ({
                                 step >= s ? "#00898F" : "#E5E7EB",
                               color: step >= s ? "#FFFFFF" : "#4B5563",
                             }}
-                            onClick={() => setStep(s as 1 | 2 | 3)}
+                            onClick={() => {
+                              if (s < step) {
+                                setStep(s as 1 | 2 | 3);
+                              }
+                            }}
                             className={`relative z-10 flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 cursor-pointer items-center justify-center rounded-full text-xs sm:text-xs md:text-sm font-bold transition-transform hover:scale-110`}
                           >
                             {step > s ? <Check size={12} className="sm:w-4 sm:h-4" /> : s}
@@ -316,12 +379,13 @@ export const BookingSection = ({
                                 placeholder="Enter your full name"
                                 className="h-9 sm:h-10 md:h-11 lg:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm border-none bg-[#F3F7F8] focus-visible:ring-1 focus-visible:ring-[#00898F]"
                                 value={formData.name}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  setError(null);
                                   setFormData({
                                     ...formData,
                                     name: e.target.value,
-                                  })
-                                }
+                                  });
+                                }}
                               />
                             </div>
                             <div className="space-y-1 sm:space-y-1.5">
@@ -333,12 +397,13 @@ export const BookingSection = ({
                                 type="email"
                                 className="h-9 sm:h-10 md:h-11 lg:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm border-none bg-[#F3F7F8] focus-visible:ring-1 focus-visible:ring-[#00898F]"
                                 value={formData.email}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  setError(null);
                                   setFormData({
                                     ...formData,
                                     email: e.target.value,
-                                  })
-                                }
+                                  });
+                                }}
                               />
                             </div>
                             <div className="space-y-1 sm:space-y-1.5">
@@ -349,12 +414,13 @@ export const BookingSection = ({
                                 placeholder="Enter contact number"
                                 className="h-9 sm:h-10 md:h-11 lg:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm border-none bg-[#F3F7F8] focus-visible:ring-1 focus-visible:ring-[#00898F]"
                                 value={formData.mobile}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  setError(null);
                                   setFormData({
                                     ...formData,
                                     mobile: e.target.value,
-                                  })
-                                }
+                                  });
+                                }}
                               />
                             </div>
                           </>
@@ -371,7 +437,15 @@ export const BookingSection = ({
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => setIsPregnant(!isPregnant)}
+                                  onClick={() => {
+                                    const newValue = !isPregnant;
+                                    setIsPregnant(newValue);
+                                    if (newValue) {
+                                      setIsNewMom(false);
+                                      // Clear new mom related data if needed, or just let validation handle active fields
+                                      // Optional: setFormData({...formData, babyDob: ''}) 
+                                    }
+                                  }}
                                   className={`h-4 w-9 sm:h-5 sm:w-11 md:h-6 md:w-12 rounded-full p-0.5 transition-colors duration-300 ${isPregnant ? "bg-[#00898F]" : "bg-gray-300"}`}
                                 >
                                   <motion.div
@@ -388,12 +462,13 @@ export const BookingSection = ({
                                   <select
                                     disabled={!isPregnant}
                                     value={formData.trimester}
-                                    onChange={(e) =>
+                                    onChange={(e) => {
+                                      setError(null);
                                       setFormData({
                                         ...formData,
                                         trimester: e.target.value,
-                                      })
-                                    }
+                                      });
+                                    }}
                                     className="h-9 sm:h-10 md:h-11 w-full appearance-none rounded-lg sm:rounded-lg md:rounded-xl border-none bg-white px-3 pr-8 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00898F]"
                                   >
                                     <option value="">Select Trimester</option>
@@ -414,12 +489,13 @@ export const BookingSection = ({
                                     type="date"
                                     disabled={!isPregnant}
                                     value={formData.dueDate}
-                                    onChange={(e) =>
+                                    onChange={(e) => {
+                                      setError(null);
                                       setFormData({
                                         ...formData,
                                         dueDate: e.target.value,
-                                      })
-                                    }
+                                      });
+                                    }}
                                     placeholder="Expected Due Date"
                                     className="h-9 sm:h-10 md:h-11 w-full rounded-lg sm:rounded-lg md:rounded-xl border-none bg-white px-3 pr-8 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00898F]"
                                   />
@@ -435,7 +511,13 @@ export const BookingSection = ({
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => setIsNewMom(!isNewMom)}
+                                  onClick={() => {
+                                    const newValue = !isNewMom;
+                                    setIsNewMom(newValue);
+                                    if (newValue) {
+                                      setIsPregnant(false);
+                                    }
+                                  }}
                                   className={`h-4 w-9 sm:h-5 sm:w-11 md:h-6 md:w-12 rounded-full p-0.5 transition-colors duration-300 ${isNewMom ? "bg-[#00898F]" : "bg-gray-300"}`}
                                 >
                                   <motion.div
@@ -453,12 +535,13 @@ export const BookingSection = ({
                                     type="date"
                                     disabled={!isNewMom}
                                     value={formData.babyDob}
-                                    onChange={(e) =>
+                                    onChange={(e) => {
+                                      setError(null);
                                       setFormData({
                                         ...formData,
                                         babyDob: e.target.value,
-                                      })
-                                    }
+                                      });
+                                    }}
                                     placeholder="Baby's Date of Birth"
                                     className="h-9 sm:h-10 md:h-11 w-full rounded-lg sm:rounded-lg md:rounded-xl border-none bg-white px-3 pr-8 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00898F]"
                                   />
@@ -468,97 +551,8 @@ export const BookingSection = ({
                           </div>
                         )}
 
-                        {/* STEP 3 */}
-                        {/* {step === 3 && (
-                      <div className="space-y-6">
-                        <div className="space-y-3">
-                          <label className="ml-2 text-xs font-semibold text-gray-500">
-                            PREFERRED LANGUAGE
-                          </label>
-                          <div className="flex flex-wrap gap-2">
-                            {[
-                              "Tamil",
-                              "English",
-                              "Hindi",
-                              "Telugu",
-                              "Kannada",
-                              "Malayalam",
-                            ].map((lang) => (
-                              <button
-                                key={lang}
-                                type="button"
-                                onClick={() => {
-                                  if (formData.languages.includes(lang)) {
-                                    setFormData({
-                                      ...formData,
-                                      languages: formData.languages.filter(
-                                        (l) => l !== lang,
-                                      ),
-                                    });
-                                  } else {
-                                    setFormData({
-                                      ...formData,
-                                      languages: [...formData.languages, lang],
-                                    });
-                                  }
-                                }}
-                                className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                                  formData.languages.includes(lang)
-                                    ? "bg-[#00898F] text-white"
-                                    : "bg-[#F3F7F8] text-gray-600 hover:bg-[#e6eff1]"
-                                }`}
-                              >
-                                {lang}
-                              </button>
-                            ))}
-                          </div>
-                          {formData.languages.length > 0 && (
-                            <p className="ml-2 text-xs text-[#00898F]">
-                              Selected: {formData.languages.join(", ")}
-                            </p>
-                          )}
-                        </div>
+                        {/* STEP 3 Logic was here, skipping as originally commented out */}
 
-                        <div className="space-y-2 sm:space-y-3">
-                          <label className="ml-2 text-[10px] font-semibold text-gray-500 sm:text-xs">
-                            TIME SLOT
-                          </label>
-                          <div className="relative">
-                            <select
-                              value={formData.timeSlot}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  timeSlot: e.target.value,
-                                })
-                              }
-                              className="h-10 w-full appearance-none rounded-xl border-none bg-[#F3F7F8] px-3 pr-8 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00898F] sm:h-12 sm:px-4 sm:pr-10 sm:text-sm md:rounded-2xl"
-                            >
-                              <option value="">Select Time Slot</option>
-                              <option value="09:00-10:00">
-                                09:00 AM - 10:00 AM
-                              </option>
-                              <option value="10:00-11:00">
-                                10:00 AM - 11:00 AM
-                              </option>
-                              <option value="11:00-12:00">
-                                11:00 AM - 12:00 PM
-                              </option>
-                              <option value="14:00-15:00">
-                                02:00 PM - 03:00 PM
-                              </option>
-                              <option value="15:00-16:00">
-                                03:00 PM - 04:00 PM
-                              </option>
-                              <option value="16:00-17:00">
-                                04:00 PM - 05:00 PM
-                              </option>
-                            </select>
-                            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-[#00898F] sm:right-3 sm:h-4 sm:w-4" />
-                          </div>
-                        </div>
-                      </div> */}
-                        {/* )} */}
                       </motion.div>
                     </AnimatePresence>
                   </div>
@@ -577,12 +571,15 @@ export const BookingSection = ({
                   <div
                     onClick={() => {
                       if (isProcessing) return;
-                      if (step === 2) {
+
+                      // Validate Step 1
+                      if (step === 1) {
+                        if (!validateStep(1)) return;
+                        setStep(2);
+                      }
+                      // Validate Step 2 and Submit
+                      else if (step === 2) {
                         handleBooking();
-                      } else {
-                        setStep((prev) =>
-                          prev < 2 ? ((prev + 1) as any) : prev,
-                        );
                       }
                     }}
                     className="order-0 group flex w-full cursor-pointer items-center justify-between gap-2 sm:gap-2.5 rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl bg-[#F2F2F2] px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 lg:px-6 lg:py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] hover:text-white"
