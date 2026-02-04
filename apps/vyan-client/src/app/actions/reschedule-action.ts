@@ -59,6 +59,8 @@ const RescheduleAction = async ({
     const appointment = await db.bookAppointment.findUnique({
       where: { id: appointmentId },
       select: {
+        startingTime: true, // Fetch original starting time
+        endingTime: true,   // Fetch original ending time
         patient: {
           select: {
             firstName: true,
@@ -123,6 +125,72 @@ const RescheduleAction = async ({
     }
 
     revalidatePath("/profile/appointments");
+
+    // Send reschedule notification emails
+    try {
+      const { sendEmail } = await import("@repo/mail");
+      const { getAppointmentRescheduleEmailTemplate } = await import("~/lib/email-templates");
+      const { format } = await import("date-fns");
+
+      // Get the updated appointment with full details
+      const updatedAppointment = await db.bookAppointment.findUnique({
+        where: { id: appointmentId },
+        include: {
+          patient: {
+            select: {
+              firstName: true,
+              email: true,
+            },
+          },
+          professionalUser: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      if (updatedAppointment) {
+        const oldTime = `${format(appointment.startingTime!, "hh:mm a")} - ${format(appointment.endingTime!, "hh:mm a")}`;
+        const newTime = `${format(startingTime, "hh:mm a")} - ${format(endingTime, "hh:mm a")}`;
+        const doctorName = `${updatedAppointment.professionalUser.firstName} ${updatedAppointment.professionalUser.lastName || ""}`.trim();
+
+        // Email to patient
+        const patientEmailTemplate = getAppointmentRescheduleEmailTemplate({
+          userName: updatedAppointment.patient.firstName,
+          userEmail: updatedAppointment.patient.email!,
+          doctorName: doctorName,
+          oldDate: appointment.startingTime!,
+          newDate: startingTime,
+          oldTime: oldTime,
+          newTime: newTime,
+          planName: updatedAppointment.planName || "Appointment",
+        });
+
+        await sendEmail({
+          from: process.env.FROM_EMAIL!,
+          to: [updatedAppointment.patient.email!],
+          subject: patientEmailTemplate.subject,
+          html: patientEmailTemplate.html,
+        });
+
+        // Email to doctor
+        if (updatedAppointment.professionalUser.email) {
+          await sendEmail({
+            from: process.env.FROM_EMAIL!,
+            to: [updatedAppointment.professionalUser.email],
+            subject: `📅 Appointment Rescheduled - ${updatedAppointment.patient.firstName}`,
+            html: patientEmailTemplate.html.replace(updatedAppointment.patient.firstName, doctorName),
+          });
+        }
+      }
+    } catch (emailError) {
+      console.error("Failed to send reschedule emails:", emailError);
+      // Don't fail the reschedule if email fails
+    }
+
     return {
       message: "Appointment has been rescheduled",
     };

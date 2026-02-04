@@ -17,12 +17,12 @@ async function CancelAppointment({
   eventId: string;
   professionalUserId: string;
 }) {
- 
+
   return db.$transaction(
     async (tx) => {
       const session = await getServerSession();
 
-      if(!session){
+      if (!session) {
         throw new Error("Please login ")
       }
 
@@ -46,38 +46,93 @@ async function CancelAppointment({
 
           await db.bookAppointment.update({
             data: {
-           
+
               meeting: response,
             },
             where: {
               id: appointmentId,
             },
           });
-        
+
           revalidatePath("/profile/appointments");
           return {
             message: "Meeting response has been updated",
           };
-          
+
         } catch (error) {
           console.log("error at delete event", error);
         }
 
-       
+
         if (Math.abs(differenceInTime) < 120) {
           // if time is less than 120 minutes, then cancel appointment without refund
           try {
-            await db.bookAppointment.update({
+            const cancelledAppointment = await db.bookAppointment.update({
               data: {
                 status: BookAppointmentStatus.CANCELLED,
-               
+
               },
               where: {
                 id: appointmentId,
                 // userId: user?.id,
               },
+              include: {
+                patient: {
+                  select: {
+                    firstName: true,
+                    email: true,
+                  },
+                },
+                professionalUser: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  },
+                },
+              },
             });
             revalidatePath("/profile/appointments");
+
+            // Send cancellation email
+            try {
+              const { sendEmail } = await import("@repo/mail");
+              const { getAppointmentCancelEmailTemplate } = await import("~/lib/email-templates");
+              const { format } = await import("date-fns");
+
+              const appointmentTime = `${format(cancelledAppointment.startingTime!, "hh:mm a")} - ${format(cancelledAppointment.endingTime!, "hh:mm a")}`;
+              const doctorName = `${cancelledAppointment.professionalUser.firstName} ${cancelledAppointment.professionalUser.lastName || ""}`.trim();
+
+              const emailTemplate = getAppointmentCancelEmailTemplate({
+                userName: cancelledAppointment.patient.firstName,
+                userEmail: cancelledAppointment.patient.email!,
+                doctorName: doctorName,
+                appointmentDate: cancelledAppointment.startingTime!,
+                appointmentTime: appointmentTime,
+                planName: cancelledAppointment.planName || "Appointment",
+                hasRefund: false,
+              });
+
+              await sendEmail({
+                from: process.env.FROM_EMAIL!,
+                to: [cancelledAppointment.patient.email!],
+                subject: emailTemplate.subject,
+                html: emailTemplate.html,
+              });
+
+              // Send email to doctor
+              if (cancelledAppointment.professionalUser.email) {
+                await sendEmail({
+                  from: process.env.FROM_EMAIL!,
+                  to: [cancelledAppointment.professionalUser.email],
+                  subject: `❌ Appointment Cancelled - ${cancelledAppointment.patient.firstName}`,
+                  html: emailTemplate.html.replace(cancelledAppointment.patient.firstName, doctorName), // Reusing template but replacing greeting for doctor context, strictly speaking should have separate template but this matches reschedule pattern
+                });
+              }
+            } catch (emailError) {
+              console.error("Failed to send cancellation email:", emailError);
+            }
+
             return {
               message: "Appointment has been cancelled without refund",
             };
@@ -89,20 +144,65 @@ async function CancelAppointment({
         else {
           const refundAmount = appointment?.priceInCents;
 
-          await processRefund( appointment?.razorpayPaymentId!, refundAmount!, appointmentId);
+          await processRefund(appointment?.razorpayPaymentId!, refundAmount!, appointmentId);
           try {
-            await tx.bookAppointment.update({
+            const cancelledAppointment = await tx.bookAppointment.update({
               data: {
                 status: BookAppointmentStatus.CANCELLED_WITH_REFUND,
-               
+
               },
               where: {
                 id: appointmentId,
                 // userId: user?.id,
               },
+              include: {
+                patient: {
+                  select: {
+                    firstName: true,
+                    email: true,
+                  },
+                },
+                professionalUser: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  },
+                },
+              },
             });
             revalidatePath("/profile/appointments");
-        
+
+            // Send cancellation with refund email
+            try {
+              const { sendEmail } = await import("@repo/mail");
+              const { getAppointmentCancelEmailTemplate } = await import("~/lib/email-templates");
+              const { format } = await import("date-fns");
+
+              const appointmentTime = `${format(cancelledAppointment.startingTime!, "hh:mm a")} - ${format(cancelledAppointment.endingTime!, "hh:mm a")}`;
+              const doctorName = `${cancelledAppointment.professionalUser.firstName} ${cancelledAppointment.professionalUser.lastName || ""}`.trim();
+
+              const emailTemplate = getAppointmentCancelEmailTemplate({
+                userName: cancelledAppointment.patient.firstName,
+                userEmail: cancelledAppointment.patient.email!,
+                doctorName: doctorName,
+                appointmentDate: cancelledAppointment.startingTime!,
+                appointmentTime: appointmentTime,
+                planName: cancelledAppointment.planName || "Appointment",
+                refundAmount: refundAmount,
+                hasRefund: true,
+              });
+
+              await sendEmail({
+                from: process.env.FROM_EMAIL!,
+                to: [cancelledAppointment.patient.email!],
+                subject: emailTemplate.subject,
+                html: emailTemplate.html,
+              });
+            } catch (emailError) {
+              console.error("Failed to send cancellation email:", emailError);
+            }
+
             return {
               message: "Appointment has been canelled with refund",
             };

@@ -353,22 +353,6 @@ export async function updateEvent({
   }
 }
 
-export async function deleteEvent(
-      console.error("❌ updateEvent: Google Calendar API error", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
-    } else {
-      console.error("❌ updateEvent: Unexpected error", error);
-    }
-    throw new Error(
-      `Event cannot be updated: ${error instanceof Error ? error.message : "Unknown error"}`,
-    );
-  }
-}
-
 export async function deleteEvent({
   professionalUserId,
   eventId,

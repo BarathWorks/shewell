@@ -463,6 +463,32 @@ export const verifySessionPayment = async ({
 
     if (sessionReg?.session) {
       revalidatePath(`/session/${sessionReg.session.slug}`);
+      
+      // Send confirmation email
+      try {
+        const { sendEmail } = await import("@repo/mail");
+        const { getSessionBookingEmailTemplate } = await import("./email-templates");
+        
+        const emailTemplate = getSessionBookingEmailTemplate({
+          userName: user.name || "User",
+          userEmail: user.email!,
+          sessionTitle: sessionReg.session.title,
+          sessionDate: sessionReg.session.startAt,
+          sessionTime: `${sessionReg.session.startAt.toLocaleTimeString()} - ${sessionReg.session.endAt.toLocaleTimeString()}`,
+          amountPaid: orderDetails.amount_paid,
+          paymentId: razorpay_payment_id,
+        });
+        
+        await sendEmail({
+          from: process.env.FROM_EMAIL!,
+          to: [user.email!],
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+        });
+      } catch (emailError) {
+        console.error("Failed to send session booking email:", emailError);
+        // Don't fail the payment verification if email fails
+      }
     }
 
     return {
