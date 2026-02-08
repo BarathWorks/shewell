@@ -5,6 +5,12 @@ import { getServerSession } from "next-auth";
 import Razorpay from "razorpay";
 import RazorpayClient from "razorpay";
 import { db } from "~/server/db";
+import { createEvent } from "~/lib/create-event";
+
+import { sendEmail } from "@repo/mail";
+import { getAppointmentBookingEmailTemplate, getDoctorAppointmentBookingEmailTemplate } from "~/lib/email-templates";
+import { format } from "date-fns";
+
 interface IRazorPayDetails {
   razorpay_payment_id: string;
   razorpay_signature: string;
@@ -33,7 +39,7 @@ const VerifyPayment = async (
     });
     const orderDetails = razorpayInstance.orders.fetch(order_id);
     if ((await orderDetails).amount_paid) {
-     
+
       try {
         await db.bookAppointment.updateMany({
           data: {

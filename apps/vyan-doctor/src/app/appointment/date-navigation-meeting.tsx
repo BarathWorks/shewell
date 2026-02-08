@@ -63,44 +63,59 @@ const DateNavigationMeeting = ({
     <>
       <div className="flex flex-col gap-5 md:gap-[37px] xl:gap-10">
         {/* upper-content */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:pl-[150px] lg:pl-[273px] xl:pl-[420px] 2xl:pl-[600px]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
           {/* date-navigator */}
           <div className="flex flex-col">
-            <div className="mt-4 flex items-center justify-center gap-6">
+            <div className="mt-4 flex items-center justify-center gap-3">
+              {/* Previous Button - More refined */}
               <Button
-                className="bg-[#ECECEC] hover:bg-[#ECECEC]"
+                className="group flex h-11 w-11 items-center justify-center rounded-full bg-[#00898F] text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#007a80] hover:shadow-xl active:scale-95"
                 onClick={handlePrevious}
               >
                 <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
+                  width="10"
+                  height="16"
+                  viewBox="0 0 10 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  className="transition-transform duration-200 group-hover:-translate-x-0.5"
                 >
                   <path
-                    d="M11.6923 15.3595C11.5357 15.3595 11.3792 15.3073 11.2749 15.1769L5.37921 9.17689C5.14443 8.9421 5.14443 8.57689 5.37921 8.3421L11.2749 2.3421C11.5096 2.10732 11.8749 2.10732 12.1096 2.3421C12.3444 2.57689 12.3444 2.9421 12.1096 3.17689L6.63139 8.7595L12.1357 14.3421C12.3705 14.5769 12.3705 14.9421 12.1357 15.1769C11.9792 15.2812 11.8488 15.3595 11.6923 15.3595Z"
-                    fill="#121212"
+                    d="M8.5 1L1.5 8L8.5 15"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </Button>
-              <span className="font-inter sm:text-[20px] xs:font-semibold xs:text-[15px] sm:font-bold leading-[30px] text-active">
-                {formatDate(currentDate)}
-              </span>
+              
+              {/* Date Display - Enhanced pill */}
+              <div className="rounded-full bg-[#00898F] px-8 py-3.5 shadow-lg ring-4 ring-[#00898F]/20">
+                <span className="font-poppins text-base font-semibold tracking-wide text-white sm:text-lg md:text-xl">
+                  {formatDate(currentDate)}
+                </span>
+              </div>
+              
+              {/* Next Button - More refined */}
               <Button
-                className="bg-[#ECECEC] hover:bg-[#ECECEC]"
+                className="group flex h-11 w-11 items-center justify-center rounded-full bg-[#00898F] text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#007a80] hover:shadow-xl active:scale-95"
                 onClick={handleNext}
               >
                 <svg
-                  width="8"
-                  height="14"
-                  viewBox="0 0 8 14"
+                  width="10"
+                  height="16"
+                  viewBox="0 0 10 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
                 >
                   <path
-                    d="M0.796603 13.3595C0.640082 13.3595 0.509647 13.3073 0.379212 13.203C0.144429 12.9682 0.144429 12.603 0.379212 12.3682L5.85747 6.75949L0.379212 1.17689C0.144429 0.942103 0.144429 0.576885 0.379212 0.342103C0.613995 0.10732 0.979212 0.10732 1.21399 0.342103L7.10965 6.3421C7.34443 6.57688 7.34443 6.9421 7.10965 7.17688L1.21399 13.1769C1.10965 13.2812 0.953125 13.3595 0.796603 13.3595Z"
-                    fill="#121212"
+                    d="M1.5 1L8.5 8L1.5 15"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </Button>
@@ -117,66 +132,59 @@ const DateNavigationMeeting = ({
                   <>
                     <div
                       key={index}
-                      className="rounded-[14px] border border-secondary bg-[#F2FFF9] px-3 py-3 md:p-5 xl:p-8 "
+                      className="group rounded-2xl border border-[#00898F]/20 bg-[#F0FDFD] px-4 py-4 shadow-sm transition-all duration-300 hover:border-[#00898F]/40 hover:shadow-md md:px-6 md:py-5"
                     >
                       {/* outer-div */}
                       <div className="flex items-center justify-between">
                         {/* left-div */}
-                        <div className="flex flex-col gap-3 xl:gap-4">
-                          <div className="flex items-center xs:gap-1 sm:gap-4 ">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-3">
+                            {/* Green dot indicator */}
+                            <div className="h-2.5 w-2.5 rounded-full bg-[#00898F] shadow-[0_0_8px_rgba(0,137,143,0.4)]"></div>
+                            
+                            <div className="font-poppins text-lg font-bold text-[#0E3A47] md:text-xl">
+                              Meeting with {meeting.patient.firstName || "User"}
+                            </div>
+                            
+                            {BookAppointmentStatus.COMPLETED === meeting.status && (
+                              <div className="rounded-full bg-[#00898F]/10 px-2.5 py-0.5 font-poppins text-xs font-medium text-[#00898F]">
+                                Completed
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-2 pl-5.5">
                             <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 12 12"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
+                              className="opacity-60"
                             >
-                              <circle
-                                cx="5.88267"
-                                cy="5.97447"
-                                r="5.88267"
-                                fill="#03781D"
+                              <path
+                                d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
+                                stroke="#0E3A47"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M8 3.5V8L11 9.5"
+                                stroke="#0E3A47"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                             </svg>
-                            <div className="font-inter xs:text-sm sm:text-base font-medium text-active xl:text-[20px] xl:leading-[30px]">
-                              Meeting with {meeting.patient.firstName}
-                            </div>
-                            {BookAppointmentStatus.COMPLETED ===
-                              meeting.status && <div className = "xs:text-sm sm:text-base">Completed</div>}
-                          </div>
-                          <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-2">
-                              <svg
-                                width="19"
-                                height="20"
-                                viewBox="0 0 19 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M17.2574 9.97637C17.2574 14.306 13.7435 17.8199 9.41387 17.8199C5.08423 17.8199 1.57031 14.306 1.57031 9.97637C1.57031 5.64673 5.08423 2.13281 9.41387 2.13281C13.7435 2.13281 17.2574 5.64673 17.2574 9.97637Z"
-                                  stroke="#7E7E7E"
-                                  stroke-width="1.7648"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M12.3174 12.4672L9.88586 11.0161C9.4623 10.7651 9.11719 10.1612 9.11719 9.66703V6.45117"
-                                  stroke="#7E7E7E"
-                                  stroke-width="1.7648"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                              </svg>
-                              <div className="font-inter text-sm font-medium text-[#7E7E7E] xl:text-base">
-                                {format(meeting.startingTime, "h':'mm a")}-{" "}
-                                {format(meeting.endingTime, "h':'mm a")}
-                              </div>
+                            <div className="font-poppins text-sm font-medium text-[#0E3A47]/60">
+                              {format(meeting.startingTime, "h:mm a")} - {format(meeting.endingTime, "h:mm a")}
                             </div>
                           </div>
                         </div>
-                        {/* right-div */}
-                        <div>
+                        
+                        {/* right-div - Menu Button */}
+                        <div className="rounded-full bg-white p-2 shadow-sm transition-all duration-300 group-hover:bg-[#00898F] group-hover:text-white group-hover:shadow-md">
                           <MeetingCard meetingInfo={meeting as any} />
                         </div>
                       </div>
@@ -184,7 +192,24 @@ const DateNavigationMeeting = ({
                   </>
                 );
               })
-            : "No meetings aligned"}
+            : (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#00898F]/30 bg-gradient-to-br from-[#F8FFFE] to-[#F0F9FF] py-16 px-8">
+                <div className="mb-4 rounded-full bg-[#00898F]/10 p-6">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 2V6" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 2V6" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 10H21" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 14L12 18" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10 16H14" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <h3 className="font-poppins text-lg font-semibold text-[#0E3A47]">No Appointments Today</h3>
+                <p className="mt-2 max-w-sm text-center font-poppins text-sm text-[#0E3A47]/60">
+                  You don't have any meetings scheduled for this day. Use the navigation to browse other dates.
+                </p>
+              </div>
+            )}
         </div>
       </div>
     </>

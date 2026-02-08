@@ -76,6 +76,21 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     return dateA - dateB;
   });
 
+  // Group sessions by month
+  const groups = new Map<string, typeof sessions>();
+  sessions.forEach((session) => {
+    const month = format(new Date(session.startAt), "MMMM");
+    if (!groups.has(month)) groups.set(month, []);
+    groups.get(month)!.push(session);
+  });
+
+  const cassifiedSessions = Array.from(groups.entries()).map(([month, sessions]) => ({
+    month,
+    sessions,
+  }));
+  console.log("grouped sessions:", groups);
+
+
   // Fetch categories for filter dropdown
   const categories = await api.session.getAllCategories({});
 
@@ -90,7 +105,7 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
           Courses That Support You Every Step of the Way
         </h1>
         <p className="mt-3 font-inter text-base text-gray-500">
-          From fertility to first steps. Evidence based, heart led,
+          From fertility to first steps. evidence based, heart led,
           expert-designed just for you.
         </p>
       </div>
@@ -111,31 +126,40 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
             </p>
           </div>
         ) : (
-          sessions.map((session: any) => {
-            const sessionDate = format(
-              new Date(session.startAt),
-              "dd MMM yyyy",
-            );
-            const sessionTime = `${format(new Date(session.startAt), "h:mm a")} to ${format(new Date(session.endAt), "h:mm a")} IST`;
+          cassifiedSessions.map((group) => (
+            <div key={group.month} className="mb-8">
+              <h2 className="mb-4 font-inter text-2xl font-medium text-[#333333]">
+                {group.month}
+              </h2>
+              <div className="space-y-6">
+                {group.sessions.map((session: any) => {
+                  const sessionDate = format(
+                    new Date(session.startAt),
+                    "dd MMM yyyy",
+                  );
+                  const sessionTime = `${format(new Date(session.startAt), "h:mm a")} to ${format(new Date(session.endAt), "h:mm a")} IST`;
 
-            return (
-              <SessionCard
-                key={session.id}
-                imageUrl={session.thumbnailMedia?.fileUrl ?? undefined}
-                language={session.language || "English"}
-                isOnline={session.type === "ONLINE"}
-                hasRecording={session.type === "RECORDING"}
-                sessionDate={sessionDate}
-                sessionTime={sessionTime}
-                title={session.title}
-                description={"Session"}
-                date={sessionDate}
-                price={Number(session.price)}
-                timeSlot={sessionTime}
-                detailPath={`/session/${session.slug}`}
-              />
-            );
-          })
+                  return (
+                    <SessionCard
+                      key={session.id}
+                      imageUrl={session.thumbnailMedia?.fileUrl ?? undefined}
+                      language={session.language || "English"}
+                      isOnline={session.type === "ONLINE"}
+                      hasRecording={session.type === "RECORDING"}
+                      sessionDate={sessionDate}
+                      sessionTime={sessionTime}
+                      title={session.title}
+                      description={"Session"}
+                      date={sessionDate}
+                      price={Number(session.price)}
+                      timeSlot={sessionTime}
+                      detailPath={`/session/${session.slug}`}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))
         )}
       </div>
     </main>

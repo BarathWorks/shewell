@@ -30,74 +30,91 @@ export const SessionCard: React.FC<SessionCardProps> = ({
   sessionTime,
   title,
   description,
-  date,
   price,
   timeSlot,
   detailPath,
 }) => {
-  
+  const dateObj = new Date(sessionDate);
+  const month = dateObj.toLocaleString("default", { month: "short" });
+  const day = dateObj.getDate();
+
   return (
-    <div className="group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-4 rounded-xl px-4 sm:px-6 py-4 shadow-md transition-all duration-300 ease-in-out hover:outline hover:outline-2 hover:outline-[#00898F]">
-      {/* Date Box - Left */}
-      <div className="flex sm:flex-shrink-0 flex-row sm:flex-col items-center justify-center rounded-lg bg-gradient-to-b from-[#00898F] to-[#006B70] px-4 sm:px-3 py-2 sm:py-4 text-white sm:min-w-[70px] gap-2 sm:gap-0">
-        <div className="text-xs sm:text-xs uppercase font-semibold order-2 sm:order-1">{new Date(sessionDate).toLocaleString('default', { month: 'short' })}</div>
-        <div className="text-2xl sm:text-2xl font-bold order-1 sm:order-2">{new Date(sessionDate).getDate()}</div>
+    <div className="group relative flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-6 rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl hover:border-[#00898F] max-w-full lg:max-w-[1440px] 2xl:max-w-[1920px] mx-auto w-full">
+      
+      {/* Date Box - Top on Mobile, Left on Desktop */}
+      <div className="flex lg:flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 lg:h-24 lg:w-20 text-white flex-shrink-0 shadow-md">
+        <div className="text-xs lg:text-sm uppercase font-bold tracking-wider opacity-90 mr-2 lg:mr-0">
+          {month}
+        </div>
+        <div className="text-xl lg:text-3xl font-black">
+          {day}
+        </div>
       </div>
 
-      {/* Image Thumbnail */}
-      <div className="hidden sm:block h-32 w-64 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200">
+      {/* Image Thumbnail - Responsive Sizing */}
+      <div className="relative h-48 sm:h-64 lg:h-32 w-full lg:w-48 2xl:w-64 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={title}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full bg-gray-300" />
+          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
+            <Calendar size={32} />
+          </div>
         )}
+        {/* Mobile-only Price Badge overlay */}
+        <div className="absolute top-2 right-2 lg:hidden">
+            <Badge className="bg-white/90 text-[#00898F] backdrop-blur-sm">
+                ₹{price}
+            </Badge>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1">
-        {/* <p className="max-w-2xl text-sm leading-relaxed text-gray-600">
-            {description}
-        </p> */}
-
-        <div className="my-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
-          <Badge className="bg-[#E1EBED] text-[#00898F]"> {language} </Badge>
+      {/* Main Content Area */}
+      <div className="flex-1 space-y-2 lg:space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="bg-[#E1EBED] text-[#00898F] font-medium border-none px-2.5 py-0.5">
+            {language}
+          </Badge>
 
           {isOnline && (
-              <Badge className="bg-green-50 text-green-700">
-                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-green-500" />
-                Online
-              </Badge>
+            <Badge className="bg-green-50 text-green-700 border-green-100 px-2.5 py-0.5">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              Online
+            </Badge>
           )}
 
           {hasRecording && (
-              <Badge className="bg-gray-50 text-gray-700">
-                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-red-500" />
-                Recording
-              </Badge>
+            <Badge className="bg-orange-50 text-orange-700 border-orange-100 px-2.5 py-0.5">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-orange-500" />
+              Recording
+            </Badge>
           )}
-
         </div>
 
-        <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-1">{title}</h2>
+        <h2 className="text-lg lg:text-xl 2xl:text-2xl font-extrabold text-gray-900 line-clamp-2">
+          {title}
+        </h2>
 
-        <p className="max-w-2xl text-sm leading-relaxed text-gray-600"> {description} </p>
+        <p className="text-sm lg:text-base text-gray-600 line-clamp-2 lg:line-clamp-3 max-w-3xl leading-relaxed">
+          {description}
+        </p>
 
-        <div className="mt-1 flex flex-wrap gap-2">
-          <InfoChip icon={<IndianRupee />} label={`${price}`} />
-          <InfoChip icon={<Clock />} label={timeSlot} />
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="hidden lg:block">
+            <InfoChip icon={<IndianRupee size={16} />} label={`${price}`} />
+          </div>
+          <InfoChip icon={<Clock size={16} />} label={timeSlot} />
         </div>
-
       </div>
 
-      {/* Action Button & Registration Text - Right */}
-      <div className="flex flex-shrink-0 flex-row sm:flex-col items-center justify-center sm:justify-start gap-2">
+      {/* Action Button - Full width on mobile, Auto on desktop */}
+      <div className="flex flex-col items-center lg:items-end justify-center pt-4 lg:pt-0 border-t lg:border-none border-gray-100">
         {detailPath && (
-          <Link href={detailPath} aria-label="Register for Session">
-            <InteractiveButton className="shadow-lg hover:bg-[#E1EBED]" />
+          <Link href={detailPath} className="w-full lg:w-auto">
+            <InteractiveButton />
           </Link>
         )}
       </div>
@@ -112,8 +129,8 @@ const InfoChip = ({
   icon: React.ReactNode;
   label: string;
 }) => (
-  <div className="flex items-center gap-2 rounded-md bg-gray-50 px-2 py-2 text-sm text-gray-700">
-    <span className="text-teal-600">{icon}</span>
+  <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-xs lg:text-sm font-semibold text-gray-700 border border-gray-100">
+    <span className="text-[#00898F]">{icon}</span>
     {label}
   </div>
-)
+);

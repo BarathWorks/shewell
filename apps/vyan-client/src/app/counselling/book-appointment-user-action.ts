@@ -60,7 +60,7 @@ const BookAppointmentUserAction = async ({
     ) {
       throw new Error("Incomplete data for booking appointment");
     }
-    await db.bookAppointment.create({
+    const appointment = await db.bookAppointment.create({
       data: {
         endingTime: endingTime,
         startingTime: startingTime,
