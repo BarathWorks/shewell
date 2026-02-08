@@ -272,6 +272,18 @@ model ProfessionalUser {
   googleRefreshToken                String?
   deletedAt                         DateTime?
   isapproved                         Boolean                          @default(false)
+  notifications                     ProfessionalNotification[]
+}
+
+model ProfessionalNotification {
+  id                 String           @id @default(cuid())
+  title              String
+  description        String
+  time               DateTime         @default(now())
+  professionalUser   ProfessionalUser @relation(fields: [professionalUserId], references: [id])
+  professionalUserId String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model ProfessionalSpecializationParentCategory {

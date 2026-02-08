@@ -25,12 +25,12 @@ import { api } from "~/trpc/react";
 import Link from "next/link";
 import { env } from "~/env";
 
-const startingDate = new Date(2024, 11, 1);
-const endingDate = new Date(2024, 11, 7);
+const startingDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+const endingDate = new Date();
 
 interface IDateRange {
-  from: Date ;
-  to: Date ;
+  from: Date;
+  to: Date;
 }
 const DashboardContent = () => {
   const [selectedDates, setSelectedDates] = useState<IDateRange>({
@@ -38,7 +38,7 @@ const DashboardContent = () => {
     to: endingDate,
   });
 
-  const handleDatesFromDateRange = (data: IDateRange ) => {
+  const handleDatesFromDateRange = (data: IDateRange) => {
     setSelectedDates(data);
     console.log(
       "dateInDashboardWhileSelecting",
@@ -90,7 +90,7 @@ const DashboardContent = () => {
   const changeInNoOfSatisfiedPatients =
     data &&
     data.noOfSatisfiedPatientsForDateRange.length -
-      data.totalNoOfSatisfiedPatients.length;
+    data.totalNoOfSatisfiedPatients.length;
 
   const changeInPercentageInNoOfSatisfiedPatients =
     changeInNoOfSatisfiedPatients &&
@@ -99,12 +99,12 @@ const DashboardContent = () => {
   const percentageOfNoOfSatisfiedPatients =
     data &&
     data.noOfSatisfiedPatientsForDateRange.length /
-      data.totalNoOfSatisfiedPatients.length;
+    data.totalNoOfSatisfiedPatients.length;
 
   const changeInProfit =
     data &&
     data.profitForDateRange._sum.priceInCents! / 100 -
-      data.totalProfit._sum.priceInCents! / 100;
+    data.totalProfit._sum.priceInCents! / 100;
 
   const changeInPercentageInProfit =
     changeInProfit &&
@@ -114,7 +114,7 @@ const DashboardContent = () => {
   const percentageOfProfit =
     data &&
     data.profitForDateRange._sum.priceInCents! /
-      data.totalProfit._sum.priceInCents!;
+    data.totalProfit._sum.priceInCents!;
 
   const cards = [
     {
@@ -165,13 +165,13 @@ const DashboardContent = () => {
       change:
         (changeInPercentageInProfit && changeInPercentageInProfit * 100) || 0,
       number: (data && data.profitForDateRange._sum.priceInCents! / 100)! - (
-        parseInt(env.NEXT_PUBLIC_PLATFORM_FEE)/100
-      )*data?.profitForDateRange._sum.priceInCents! || 0,
+        parseInt(env.NEXT_PUBLIC_PLATFORM_FEE) / 100
+      ) * data?.profitForDateRange._sum.priceInCents! || 0,
       percentage: (percentageOfProfit && percentageOfProfit * 100) || 0,
     },
   ];
 
-  const totalAppointments =data && data.totalAppointmentsWithoutAnyStatus && data.totalAppointmentsWithoutAnyStatus.length.toString()
+  const totalAppointments = data && data.totalAppointmentsWithoutAnyStatus && data.totalAppointmentsWithoutAnyStatus.length.toString()
   const onlineAppointments = data && data.totalAppointmentsWithoutAnyStatus && data.totalAppointmentsWithoutAnyStatus.length.toString()
   const completedAppointments = data && data.totalOnlineAppointments.length.toString()
   const appointments = [
@@ -179,31 +179,31 @@ const DashboardContent = () => {
       title: "Total Appointments",
       noOfAppointments: totalAppointments,
       value: 100,
-      color : "#F59E0B",
+      color: "#F59E0B",
       mainColor: "bg-[#F59E0B]",
       backgroundColor: "bg-[#FEF3C7]",
     },
     {
       title: "Offline Appointments",
       noOfAppointments: "0",
-      value:0 ,
-      color : "#2563EB",
+      value: 0,
+      color: "#2563EB",
       mainColor: "bg-[#2563EB]",
       backgroundColor: "bg-[#BFDBFE]",
     },
     {
       title: "Online Appointments",
       noOfAppointments: onlineAppointments,
-      value: (( parseInt(totalAppointments!) - 0)/parseInt(totalAppointments!))*100,
-      color : "#059669",
+      value: ((parseInt(totalAppointments!) - 0) / parseInt(totalAppointments!)) * 100,
+      color: "#059669",
       mainColor: "bg-[#059669]",
       backgroundColor: "bg-[#A7F3D0]",
     },
     {
       title: "Completed Appointments",
       noOfAppointments: data && data.totalOnlineAppointments && data.totalOnlineAppointments.length.toString(),
-      value: (parseInt(completedAppointments!)/parseInt(totalAppointments!))*100,
-      color : "#4338CA",
+      value: (parseInt(completedAppointments!) / parseInt(totalAppointments!)) * 100,
+      color: "#4338CA",
       mainColor: "bg-[#4338CA]",
       backgroundColor: "bg-[#E0E7FF]",
     },
@@ -214,7 +214,7 @@ const DashboardContent = () => {
     <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-4 sm:py-6 md:py-8 lg:py-10">
       {/* buttons */}
       <div className="flex justify-center gap-2 sm:justify-end sm:gap-3 md:gap-4 lg:gap-6">
-        <ShewellButton 
+        <ShewellButton
           variant="medium"
           href="/doctor-profile"
           className="bg-white text-gray-700 hover:bg-gray-100"
@@ -251,33 +251,33 @@ const DashboardContent = () => {
           </svg>
           Preview
         </ShewellButton>
-        <ShewellButton 
+        <ShewellButton
           variant="medium"
           href="/edit-profile/personal-info"
         >
-            <svg
-              className="mr-1 inline w-5 h-5"
-              width="22"
-              height="22"
-              viewBox="0 0 22 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M11.0938 18.2725H19.2756H11.0938Z" fill="white" />
-              <path
-                d="M11.0938 18.2725H19.2756"
-                stroke="white"
-                stroke-width="1.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M15.1868 3.27284C15.5484 2.91119 16.039 2.70801 16.5504 2.70801C16.8037 2.70801 17.0544 2.75789 17.2884 2.8548C17.5224 2.95172 17.735 3.09377 17.9141 3.27284C18.0931 3.45192 18.2352 3.66451 18.3321 3.89849C18.429 4.13246 18.4789 4.38323 18.4789 4.63648C18.4789 4.88973 18.429 5.1405 18.3321 5.37448C18.2352 5.60845 18.0931 5.82104 17.9141 6.00012L6.55043 17.3638L2.91406 18.2728L3.82315 14.6365L15.1868 3.27284Z"
-                stroke="white"
-                stroke-width="1.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+          <svg
+            className="mr-1 inline w-5 h-5"
+            width="22"
+            height="22"
+            viewBox="0 0 22 22"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M11.0938 18.2725H19.2756H11.0938Z" fill="white" />
+            <path
+              d="M11.0938 18.2725H19.2756"
+              stroke="white"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M15.1868 3.27284C15.5484 2.91119 16.039 2.70801 16.5504 2.70801C16.8037 2.70801 17.0544 2.75789 17.2884 2.8548C17.5224 2.95172 17.735 3.09377 17.9141 3.27284C18.0931 3.45192 18.2352 3.66451 18.3321 3.89849C18.429 4.13246 18.4789 4.38323 18.4789 4.63648C18.4789 4.88973 18.429 5.1405 18.3321 5.37448C18.2352 5.60845 18.0931 5.82104 17.9141 6.00012L6.55043 17.3638L2.91406 18.2728L3.82315 14.6365L15.1868 3.27284Z"
+              stroke="white"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           Edit Profile
         </ShewellButton>
@@ -324,7 +324,7 @@ const DashboardContent = () => {
               change={item.change}
               number={item.number}
               percentage={item.percentage}
-              // incrementInOnlineAppointment={item.incrementInOnlineAppointment}
+            // incrementInOnlineAppointment={item.incrementInOnlineAppointment}
             />
           );
         })}
@@ -339,13 +339,13 @@ const DashboardContent = () => {
       {/* Secondary Stats Grid */}
       <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
         <Appointment appointments={appointments} />
-        <Balance balance={data?.totalBalance._sum.priceInCents || 0} />
-        <DashboardNotification />
+        <Balance balance={data?.totalProfit._sum.priceInCents || 0} />
+        <DashboardNotification notifications={data?.notifications} />
       </div>
 
       {/* Appointments Table */}
       <div className="mb-6 sm:mb-8 md:mb-10">
-       {tableValues &&  <DashboardDataTable tableValue={tableValues} />}
+        {tableValues && <DashboardDataTable tableValue={tableValues} />}
       </div>
     </div>
   );
