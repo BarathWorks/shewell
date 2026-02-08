@@ -17,6 +17,7 @@ import DashboardPieChart from "./visitor-analytics";
 import VisitorAnalytics from "./visitor-analytics";
 import Appointment from "./appointment";
 import Balance from "./balance";
+import PayoutHistory from "./payout-history";
 import DashboardDataTable from "./dashboard-data-table";
 import DashboardNotification from "./dashboard-notifications";
 // import { DateRange } from "react-day-picker";
@@ -338,8 +339,9 @@ const DashboardContent = () => {
 
       {/* Secondary Stats Grid */}
       <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-        <Appointment appointments={appointments} />
-        <Balance balance={data?.totalProfit._sum.priceInCents || 0} />
+         {/* <Appointment appointments={appointments} /> */}
+        <PayoutHistory />
+        <Balance />
         <DashboardNotification notifications={data?.notifications} />
       </div>
 

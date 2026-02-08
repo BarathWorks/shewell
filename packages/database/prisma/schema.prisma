@@ -360,6 +360,9 @@ model BookAppointment {
   professionalRating ProfessionalUserRating?
   meeting            Json?
   // professionalRatingId String?
+  
+  /// Doctor Payout System
+  appointmentPayment AppointmentPayment?
 }
 
 model Comment {
@@ -949,4 +952,74 @@ model SessionRegistration {
   createdAt     DateTime @default(now())
 
   @@unique([sessionId, userId])
+}
+
+// ============================================
+// DOCTOR EARNING & PAYOUT SYSTEM
+// ============================================
+
+enum DoctorPaymentStatus {
+  PENDING
+  COMPLETED
+}
+
+enum PayoutStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model AppointmentPayment {
+  id                     String              @id @default(cuid())
+  appointmentId          String              @unique
+  doctorId               String
+
+  totalAmountInCents     Int
+  doctorShareInCents     Int
+  platformShareInCents   Int
+
+  paymentStatus          DoctorPaymentStatus @default(PENDING)
+
+  createdAt              DateTime            @default(now())
+
+  /// Relations
+  appointment            BookAppointment     @relation(fields: [appointmentId], references: [id])
+  payoutLinks            AppointmentPaymentPayout[]
+
+  @@index([doctorId])
+  @@index([paymentStatus])
+}
+
+model PayoutRequest {
+  id                     String       @id @default(cuid())
+  doctorId               String
+
+  requestedAmountInCents Int
+  status                 PayoutStatus @default(REQUESTED)
+
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  /// Relations
+  payoutLinks            AppointmentPaymentPayout[]
+
+  @@index([doctorId])
+  @@index([status])
+}
+
+model AppointmentPaymentPayout {
+  id                     String   @id @default(cuid())
+
+  appointmentPaymentId   String
+  payoutRequestId        String
+
+  amountUsedInCents      Int
+
+  /// Relations
+  appointmentPayment     AppointmentPayment @relation(fields: [appointmentPaymentId], references: [id])
+  payoutRequest          PayoutRequest      @relation(fields: [payoutRequestId], references: [id])
+
+  @@unique([appointmentPaymentId, payoutRequestId])
+  @@index([payoutRequestId])
 }

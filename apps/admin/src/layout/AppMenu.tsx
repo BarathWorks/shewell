@@ -242,6 +242,16 @@ const AppMenu = () => {
           to: '/view-doctors/appointments'
         }
       ]
+    },
+    {
+      label: 'Manage Payouts',
+      items: [
+        {
+          label: 'Payout Requests',
+          icon: 'pi pi-wallet',
+          to: '/manage-payouts'
+        }
+      ]
     }
     // {
     // label: 'UI Components',

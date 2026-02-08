@@ -8,7 +8,10 @@ import { db } from "~/server/db";
 import { createEvent } from "~/lib/create-event";
 
 import { sendEmail } from "@repo/mail";
-import { getAppointmentBookingEmailTemplate, getDoctorAppointmentBookingEmailTemplate } from "~/lib/email-templates";
+import {
+  getAppointmentBookingEmailTemplate,
+  getDoctorAppointmentBookingEmailTemplate,
+} from "~/lib/email-templates";
 import { format } from "date-fns";
 
 interface IRazorPayDetails {
@@ -39,7 +42,6 @@ const VerifyPayment = async (
     });
     const orderDetails = razorpayInstance.orders.fetch(order_id);
     if ((await orderDetails).amount_paid) {
-
       try {
         await db.bookAppointment.updateMany({
           data: {
@@ -59,6 +61,8 @@ const VerifyPayment = async (
           select: {
             id: true,
             professionalUserId: true,
+            priceInCents: true,
+            totalPriceInCents: true,
             professionalUser: {
               select: {
                 googleAccessToken: true,
@@ -82,6 +86,35 @@ const VerifyPayment = async (
             description: true,
           },
         });
+
+        // Create AppointmentPayment record for doctor earnings tracking
+        if (appointment) {
+          try {
+            const totalAmount =
+              appointment.totalPriceInCents ?? appointment.priceInCents;
+            // Revenue split: 80% to doctor, 20% to platform
+            const doctorShareInCents = Math.floor(totalAmount * 0.8);
+            const platformShareInCents = totalAmount - doctorShareInCents;
+
+            await db.appointmentPayment.create({
+              data: {
+                appointmentId: appointment.id,
+                doctorId: appointment.professionalUserId,
+                totalAmountInCents: totalAmount,
+                doctorShareInCents,
+                platformShareInCents,
+                paymentStatus: "COMPLETED",
+              },
+            });
+            console.log("✅ AppointmentPayment created for earnings tracking");
+          } catch (paymentError) {
+            console.error(
+              "❌ Failed to create AppointmentPayment:",
+              paymentError,
+            );
+            // Don't fail the payment verification if earnings record creation fails
+          }
+        }
 
         // Create Notification for the Professional
         await db.professionalNotification.create({
@@ -107,7 +140,8 @@ const VerifyPayment = async (
             appointment.professionalUser.googleRefreshToken)
         ) {
           try {
-            const patientName = `${appointment.patient.firstName} ${appointment.patient.lastName || ""}`.trim();
+            const patientName =
+              `${appointment.patient.firstName} ${appointment.patient.lastName || ""}`.trim();
             const eventResult = await createEvent({
               professionalUserId: appointment.professionalUserId,
               appointmentId: appointment.id,
@@ -205,7 +239,6 @@ const VerifyPayment = async (
             );
           }
         }
-
       } catch (error) {
         console.log(error);
       }
