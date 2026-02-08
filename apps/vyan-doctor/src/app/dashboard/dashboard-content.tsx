@@ -130,11 +130,11 @@ const DashboardContent = () => {
       percentage: 100,
     },
     {
-      title: "Offline Appointments",
+      title: "Pending Appointments",
       bgColor: "#FFF3ED",
       borderColor: "#FFEDD5",
-      change: 0,
-      number: 0,
+      change:   (0),
+      number: tableValues?.length || 0,
       percentage: 0,
     },
     {
@@ -214,7 +214,7 @@ const DashboardContent = () => {
   return (
     <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-4 sm:py-6 md:py-8 lg:py-10">
       {/* buttons */}
-      <div className="flex justify-center gap-2 sm:justify-end sm:gap-3 md:gap-4 lg:gap-6">
+      {/* <div className="flex justify-center gap-2 sm:justify-end sm:gap-3 md:gap-4 lg:gap-6">
         <ShewellButton
           variant="medium"
           href="/doctor-profile"
@@ -282,7 +282,7 @@ const DashboardContent = () => {
           </svg>
           Edit Profile
         </ShewellButton>
-      </div>
+      </div> */}
 
       {/* add-availability , date-picker and drop-down */}
       <div className="my-6 flex flex-wrap xs:gap-[20px] md:my-9 md:justify-between lg:my-10">

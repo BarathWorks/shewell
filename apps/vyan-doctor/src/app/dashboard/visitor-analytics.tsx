@@ -18,7 +18,7 @@ const VisitorAnalytics = (
    
 ) => {
   return (
-    <div className="rounded-[9.37px] border border-[#DFE7EF] p-4 sm:p-6 xl:p-5 2xl:p-[26px]">
+    <div className="rounded-2xl border border-gray-100 p-4 sm:p-6 xl:p-5 2xl:p-[26px] shadow-sm hover:shadow-md transition-shadow">
       {/* visitor-analytics and dropdown */}
       <div className="flex gap-[18px] sm:items-center sm:justify-between flex-wrap">
         {/* visitor-analytics */}

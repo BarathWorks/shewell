@@ -62,7 +62,7 @@ const VacantAndBookedSlots = () => {
   console.log("selected year and selected month", selectedYear, selectedMonth , data);
 
   return (
-    <div className="rounded-[9.37px] border border-[#DFE7EF] p-4 sm:p-6 xl:p-5 2xl:p-[26px]">
+    <div className="rounded-2xl border border-gray-100 p-4 sm:p-6 xl:p-5 2xl:p-[26px] shadow-sm hover:shadow-md transition-shadow">
       {/* vacantAndBookedSlots and dropdown */}
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between ">
         {/* vacantAndBookedSlots */}
