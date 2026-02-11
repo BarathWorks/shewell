@@ -34,6 +34,20 @@ model User {
   sessionRegistrations  SessionRegistration[]
 }
 
+/// Temporary storage for user registration data until OTP is verified
+model PendingUser {
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  passwordHash     String
+  phoneNumber      String
+  ageGreaterThan18 Boolean  @default(false)
+  otp              String
+  otpExpiresAt     DateTime // OTP expires after this time
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 model Notification {
   id          String    @id @default(cuid())
   title       String

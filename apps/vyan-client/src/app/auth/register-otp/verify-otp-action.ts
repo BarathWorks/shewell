@@ -1,65 +1,68 @@
 "use server";
-import { getServerSession } from "next-auth";
-import { signIn } from "next-auth/react";
 import { db } from "~/server/db";
+import { hash } from "bcrypt";
 
 const verifyOtpAction = async ({
   otp,
-  // email,
+  email,
 }: {
   otp: string;
-  // email: string;
+  email: string;
 }) => {
+  if (!email) {
+    throw new Error("Email is required for verification");
+  }
+
   try {
-    const session = await getServerSession();
-    if (!session) {
-      return;
-    }
-    const user = await db.user.findFirst({
-      where: {
-        email: session.user.email!,
-      },
+    // Find the pending user
+    const pendingUser = await db.pendingUser.findUnique({
+      where: { email: email },
     });
-    if (!user) {
-      return;
+
+    if (!pendingUser) {
+      throw new Error("Registration not found. Please register again.");
     }
 
-    const email = session.user.email;
-    const currentTime = new Date();
-    const savedOTP = await db.user.findFirst({
-      select: {
-        otp: true,
-      },
-      where: {
-        email: email!,
-      },
-    });
-    if (!savedOTP) {
-      return;
+    // Check if OTP has expired
+    if (new Date() > pendingUser.otpExpiresAt) {
+      throw new Error("OTP has expired. Please request a new one.");
     }
 
-    // console.log("savedOTP", savedOTP, "otp", otp);
-    if (savedOTP.otp !== otp) {
-      // console.log("invalid otp")
+    // Verify OTP
+    if (pendingUser.otp !== otp) {
       throw new Error("Invalid OTP");
     }
 
-    await db.user.update({
+    // Create the actual user from pending user data
+    const newUser = await db.user.create({
       data: {
-        verifiedAt: currentTime,
-      },
-      where: {
-        email: email!,
+        name: pendingUser.name,
+        email: pendingUser.email,
+        passwordHash: pendingUser.passwordHash,
+        phoneNumber: pendingUser.phoneNumber,
+        ageGreaterThan18: pendingUser.ageGreaterThan18,
+        otp: pendingUser.otp,
+        verifiedAt: new Date(),
       },
     });
 
-    console.log("Account verification successfully");
+    // Delete the pending user record
+    await db.pendingUser.delete({
+      where: { email: email },
+    });
+
+    console.log("Account verification successfully, User created:", newUser.id);
     return {
       message: "Your account has been verified",
+      email: newUser.email,
     };
   } catch (error) {
-    console.log("verificaiton-error", error);
+    console.log("verification-error", error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("Your account has not been verified");
   }
 };
+
 export default verifyOtpAction;
