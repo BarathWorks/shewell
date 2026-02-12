@@ -1,9 +1,7 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { api } from "~/trpc/react";
-import RequestPayoutModal from "./request-payout-modal";
 
 // Sample chart data for visual display
 const chartData = [
@@ -17,10 +15,9 @@ const chartData = [
 ];
 
 const Balance = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch real earnings data
-  const { data: earningsData, isLoading, refetch } = api.earnings.getBalance.useQuery();
+  const { data: earningsData, isLoading } = api.earnings.getBalance.useQuery();
 
   const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -32,8 +29,6 @@ const Balance = () => {
   };
 
   const availableBalance = earningsData?.availableBalanceInCents ?? 0;
-  const totalEarnings = earningsData?.totalEarningsInCents ?? 0;
-  const totalPayouts = earningsData?.totalPayoutsInCents ?? 0;
 
   return (
     <>
@@ -41,7 +36,7 @@ const Balance = () => {
         {/* Header */}
         <div className="mb-3 flex justify-between items-center 2xl:mb-4">
           <div className="font-inter text-sm font-medium text-active lg:text-lg 2xl:text-2xl">
-            Earnings
+            Balance
           </div>
           <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -78,49 +73,9 @@ const Balance = () => {
               Available for withdrawal
             </div>
 
-            {/* Earnings breakdown */}
-            <div className="w-full border-t border-gray-100 pt-3 mt-2">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-500">Total Earned</span>
-                <span className="font-medium text-gray-700">
-                  {isLoading ? "..." : formatCurrency(totalEarnings)}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Paid Out</span>
-                <span className="font-medium text-gray-700">
-                  {isLoading ? "..." : formatCurrency(totalPayouts)}
-                </span>
-              </div>
-            </div>
-
-            {/* Request Payout Button */}
-            <button
-              onClick={() => setIsModalOpen(true)}
-              disabled={availableBalance < 100 || isLoading}
-              className="mt-4 w-full bg-[#2AA852] hover:bg-[#238F46] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
-            >
-              Request Payout
-            </button>
-            {availableBalance < 100 && !isLoading && (
-              <p className="text-xs text-gray-400 mt-1 text-center">
-                Minimum ₹1 required for payout
-              </p>
-            )}
           </div>
         </div>
       </div>
-
-      {/* Request Payout Modal */}
-      <RequestPayoutModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        availableBalance={availableBalance}
-        onSuccess={() => {
-          refetch();
-          setIsModalOpen(false);
-        }}
-      />
     </>
   );
 };

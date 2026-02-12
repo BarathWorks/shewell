@@ -62,7 +62,7 @@ const PayoutHistory = () => {
               <div key={payout.id} className="flex items-center justify-between py-3">
                 <div className="flex flex-col">
                   <span className="font-inter text-sm font-medium text-gray-900">
-                    {formatCurrency(payout.requestedAmountInCents)}
+                    {formatCurrency(payout.amountInCents)}
                   </span>
                   <span className="font-inter text-xs text-gray-500">
                     {formatDate(payout.createdAt)}

@@ -174,6 +174,31 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         },
       });
 
+      // Doctor's actual profit (after platform fee) from AppointmentPayment
+      const doctorProfitForDateRange = await db.appointmentPayment.aggregate({
+        _sum: {
+          doctorShareInCents: true,
+        },
+        where: {
+          doctorId: professionalUser.id,
+          paymentStatus: 'COMPLETED',
+          appointment: {
+            startingTime: { gte: updatedStartDate },
+            endingTime: { lte: updatedEndDate },
+          },
+        },
+      });
+
+      const doctorTotalProfit = await db.appointmentPayment.aggregate({
+        _sum: {
+          doctorShareInCents: true,
+        },
+        where: {
+          doctorId: professionalUser.id,
+          paymentStatus: 'COMPLETED',
+        },
+      });
+
       const totalBalance = await db.bookAppointment.aggregate({
         _sum: {
           priceInCents: true,
@@ -378,6 +403,8 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         totalNoOfSatisfiedPatients,
         profitForDateRange,
         totalProfit,
+        doctorProfitForDateRange,
+        doctorTotalProfit,
         totalAppointmentsWithoutAnyStatus,
         notifications,
         upcomingAppointments,

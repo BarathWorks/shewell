@@ -24,7 +24,6 @@ import DashboardNotification from "./dashboard-notifications";
 import { api } from "~/trpc/react";
 
 import Link from "next/link";
-import { env } from "~/env";
 
 const startingDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 const endingDate = new Date();
@@ -102,20 +101,16 @@ const DashboardContent = () => {
     data.noOfSatisfiedPatientsForDateRange.length /
     data.totalNoOfSatisfiedPatients.length;
 
-  const changeInProfit =
-    data &&
-    data.profitForDateRange._sum.priceInCents! / 100 -
-    data.totalProfit._sum.priceInCents! / 100;
+  const doctorProfitDateRange = data?.doctorProfitForDateRange._sum.doctorShareInCents ?? 0;
+  const doctorProfitTotal = data?.doctorTotalProfit._sum.doctorShareInCents ?? 0;
+
+  const changeInProfit = doctorProfitDateRange / 100 - doctorProfitTotal / 100;
 
   const changeInPercentageInProfit =
-    changeInProfit &&
-    changeInProfit / (data.totalProfit._sum.priceInCents! / 100);
-  console.log("satisfied Patients", data?.noOfSatisfiedPatientsForDateRange);
+    doctorProfitTotal > 0 ? (changeInProfit / (doctorProfitTotal / 100)) : 0;
 
   const percentageOfProfit =
-    data &&
-    data.profitForDateRange._sum.priceInCents! /
-    data.totalProfit._sum.priceInCents!;
+    doctorProfitTotal > 0 ? (doctorProfitDateRange / doctorProfitTotal) : 0;
 
   const cards = [
     {
@@ -165,9 +160,7 @@ const DashboardContent = () => {
       borderColor: "#E0F2FE",
       change:
         (changeInPercentageInProfit && changeInPercentageInProfit * 100) || 0,
-      number: (data && data.profitForDateRange._sum.priceInCents! / 100)! - (
-        parseInt(env.NEXT_PUBLIC_PLATFORM_FEE) / 100
-      ) * data?.profitForDateRange._sum.priceInCents! || 0,
+      number: Math.round(doctorProfitTotal / 100),
       percentage: (percentageOfProfit && percentageOfProfit * 100) || 0,
     },
   ];

@@ -103,7 +103,7 @@ const VerifyPayment = async (
                 totalAmountInCents: totalAmount,
                 doctorShareInCents,
                 platformShareInCents,
-                paymentStatus: "COMPLETED",
+                paymentStatus: "PENDING",
               },
             });
             console.log("✅ AppointmentPayment created for earnings tracking");
