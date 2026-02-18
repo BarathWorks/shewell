@@ -87,7 +87,7 @@ const BankDetailsForm = ({
   }
 
   useEffect(() => {
-    params.set("step", "5");
+    params.set("step", "6");
     window.history.pushState(null, "", `${pathname}?${params.toString()}`);
   }, []);
 

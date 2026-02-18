@@ -126,7 +126,7 @@ const UploadForm = ({
 
   console.log("url", pathname)
   useEffect(() => {
-    params.set("step", "4");
+    params.set("step", "5");
     window.history.pushState(null,"", `${pathname}?${params.toString()}` )
   }, []);
 
@@ -145,8 +145,7 @@ const UploadForm = ({
           title: "Successfully saved uploads",
           variant: "default",
         });
-        params.set("step", "5");
-        router.push(`/auth/register/bank-details/?${params.toString()}`);
+        router.push(`/auth/register/bank-details/?step=6`);
       })
       .catch((err) => {
         setLoadingState(false);

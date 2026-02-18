@@ -11,12 +11,10 @@ interface ILanguageProps {
 }
 interface IQualificationProps {
   degree: string;
-  // cityId: string;
-  city: string;
-  stateId: string;
+  collegeName: string;
+  completionDate: string;
   languages: ILanguageProps[];
   gender: string;
-  // years: string;
   department: string;
   position: string;
   location: string;
@@ -26,11 +24,10 @@ interface IQualificationProps {
 }
 async function QualificationUserAction({
   degree,
-  city,
-  stateId,
+  collegeName,
+  completionDate,
   languages,
   gender,
-  // years,
   department,
   position,
   location,
@@ -74,6 +71,8 @@ async function QualificationUserAction({
         await tx.professionalDegree.createMany({
           data: {
             degree: degree,
+            collegeName: collegeName,
+            completionDate: new Date(completionDate),
             professionalUserId: professionalUser?.id!,
           },
         });
@@ -86,19 +85,6 @@ async function QualificationUserAction({
           },
         });
 
-        await tx.professionalQualifications.deleteMany({
-          where: {
-            professionalUserId: professionalUser.id!,
-          },
-        });
-
-        await tx.professionalQualifications.create({
-          data: {
-            professionalUserId: professionalUser.id,
-            city: city,
-            stateId: stateId,
-          },
-        });
         await tx.professionalExperience.deleteMany({
           where: {
             professionalUserId: professionalUser.id!,
