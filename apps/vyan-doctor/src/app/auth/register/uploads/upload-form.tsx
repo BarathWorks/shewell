@@ -54,8 +54,8 @@ const uploadSchema = z.object({
     required_error: "Please write about yourself",
     invalid_type_error: "Please write about yourself",
   }),
-  aadharCard: z.string({ required_error: "Please enter your aadhar card" }),
-  panCard: z.string({ required_error: "Please enter your pan card" }),
+  aadharCard: z.string().optional(),
+  panCard: z.string().optional(),
   documents: z.array(
     z.object({
       documentId: z.string({
@@ -101,8 +101,8 @@ const UploadForm = ({
           documentId: "",
         },
       ],
-      aadharCard: aadharCard?.id,
-      panCard: panCard?.id,
+      aadharCard: aadharCard?.id || "",
+      panCard: panCard?.id || "",
     },
     resolver: zodResolver(uploadSchema),
   });
@@ -133,11 +133,13 @@ const UploadForm = ({
   const onSubmit = (data: z.infer<typeof uploadSchema>) => {
     setLoadingState(true);
     console.log(data);
-    UploadsUserAction(data as {  aboutYou: string;
-  mediaId: string;
-  documents: {
-    documentId: string;
-  }[];})
+    UploadsUserAction({
+      aboutYou: data.aboutYou,
+      mediaId: data.mediaId,
+      documents: data.documents.filter(doc => doc.documentId), // Filter out empty documentIds
+      aadharCard: data.aadharCard,
+      panCard: data.panCard,
+    })
       .then((resp) => {
         setLoadingState(false);
         console.log("Uploads", resp?.message);
