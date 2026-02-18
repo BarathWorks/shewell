@@ -8,6 +8,15 @@
   - Added the required column `payoutId` to the `AppointmentPaymentPayout` table without a default value. This is not possible if the table is not empty.
 
 */
+-- AlterEnum
+BEGIN;
+CREATE TYPE "PayoutStatus_new" AS ENUM ('INITIATED', 'PROCESSING', 'PAID', 'FAILED');
+ALTER TABLE "PayoutRequest" ALTER COLUMN "status" DROP DEFAULT;
+ALTER TABLE "Payout" ALTER COLUMN "status" TYPE "PayoutStatus_new" USING ("status"::text::"PayoutStatus_new");
+ALTER TYPE "PayoutStatus" RENAME TO "PayoutStatus_old";
+ALTER TYPE "PayoutStatus_new" RENAME TO "PayoutStatus";
+DROP TYPE "PayoutStatus_old";
+COMMIT;
 
 -- DropForeignKey
 ALTER TABLE "AppointmentPaymentPayout" DROP CONSTRAINT "AppointmentPaymentPayout_payoutRequestId_fkey";
@@ -22,18 +31,10 @@ DROP INDEX "AppointmentPaymentPayout_payoutRequestId_idx";
 ALTER TABLE "AppointmentPaymentPayout" DROP COLUMN "payoutRequestId",
 ADD COLUMN     "payoutId" TEXT NOT NULL;
 
--- DropTable (removes the only consumer of the old PayoutStatus enum)
+-- DropTable
 DROP TABLE "PayoutRequest";
 
--- AlterEnum (safe now that no table references PayoutStatus)
-BEGIN;
-CREATE TYPE "PayoutStatus_new" AS ENUM ('INITIATED', 'PROCESSING', 'PAID', 'FAILED');
-ALTER TYPE "PayoutStatus" RENAME TO "PayoutStatus_old";
-ALTER TYPE "PayoutStatus_new" RENAME TO "PayoutStatus";
-DROP TYPE "PayoutStatus_old";
-COMMIT;
-
--- CreateTable (now uses the new PayoutStatus enum which contains INITIATED)
+-- CreateTable
 CREATE TABLE "Payout" (
     "id" TEXT NOT NULL,
     "doctorId" TEXT NOT NULL,

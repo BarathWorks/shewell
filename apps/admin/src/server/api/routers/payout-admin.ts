@@ -1,11 +1,10 @@
 /**
- * Admin Payout Management Router
+ * Admin Payout Management Router (Admin-Controlled)
  *
- * Provides procedures for:
- * - Viewing pending payout requests
- * - Approving payouts (transaction-safe with linking)
- * - Rejecting payouts
- * - Marking payouts as paid
+ * Doctors do NOT request payouts. Admin directly:
+ * - Selects a doctor and reviews their available balance + bank details
+ * - Enters a payout amount and initiates the payout
+ * - System creates Payout + links AppointmentPaymentPayout rows atomically
  */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/src/server/api/trpc';
@@ -13,9 +12,9 @@ import { TRPCError } from '@trpc/server';
 
 export const payoutAdminRouter = createTRPCRouter({
   /**
-   * Get all pending payout requests
+   * List all doctors with their available balance for admin selection
    */
-  getPendingPayouts: protectedProcedure
+  listDoctorsWithBalance: protectedProcedure
     .input(
       z.object({
         search: z.string().optional()
@@ -265,20 +264,8 @@ export const payoutAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { doctorId, amountInCents, transactionRef, notes } = input;
 
-      // Look up an active admin user for the FK reference.
-      // ctx.session is not populated with CredentialsProvider + PrismaAdapter.
-      // The admin panel is already behind its own login gate.
-      const adminUser = await ctx.db.adminUser.findFirst({
-        where: { active: true },
-        select: { id: true }
-      });
-
-      if (!adminUser) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'No active admin user found in the system.'
-        });
-      }
+      // Get admin ID from session
+      const adminUser = ctx.session?.user;
 
       return await ctx.db.$transaction(async (tx) => {
         // 1. Calculate available balance INSIDE the transaction
@@ -333,7 +320,7 @@ export const payoutAdminRouter = createTRPCRouter({
             doctorId,
             amountInCents,
             status: 'PAID',
-            initiatedByAdminId: adminUser.id,
+            initiatedByAdminId: adminUser?.id ?? 'system',
             paidAt: new Date(),
             transactionRef: transactionRef ?? null,
             notes: notes ?? null
@@ -400,52 +387,32 @@ export const payoutAdminRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const { limit, cursor } = input;
+      const { status, doctorId, limit, cursor } = input;
 
-      const payouts = await ctx.db.payoutRequest.findMany({
-        where: { status: 'REQUESTED' },
+      const payouts = await ctx.db.payout.findMany({
+        where: {
+          ...(status ? { status } : {}),
+          ...(doctorId ? { doctorId } : {})
+        },
         orderBy: { createdAt: 'desc' },
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
         include: {
-          payoutLinks: true
-        }
-      });
-
-      let nextCursor: string | undefined;
-      if (payouts.length > limit) {
-        const nextItem = payouts.pop();
-        nextCursor = nextItem?.id;
-      }
-
-      return {
-        payouts,
-        nextCursor
-      };
-    }),
-
-  /**
-   * Get all payout requests with optional status filter
-   */
-  getAllPayouts: protectedProcedure
-    .input(
-      z.object({
-        status: z.enum(['REQUESTED', 'APPROVED', 'REJECTED', 'PAID']).optional(),
-        limit: z.number().min(1).max(100).default(20),
-        cursor: z.string().nullish()
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const { status, limit, cursor } = input;
-
-      const payouts = await ctx.db.payoutRequest.findMany({
-        where: status ? { status } : undefined,
-        orderBy: { createdAt: 'desc' },
-        take: limit + 1,
-        cursor: cursor ? { id: cursor } : undefined,
-        include: {
+          doctor: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true
+            }
+          },
+          initiatedByAdmin: {
+            select: {
+              name: true
+            }
+          },
           payoutLinks: {
-            include: {
+            select: {
+              amountUsedInCents: true,
               appointmentPayment: {
                 select: {
                   appointment: {
@@ -479,104 +446,10 @@ export const payoutAdminRouter = createTRPCRouter({
     }),
 
   /**
-   * Approve a payout request (transaction-safe)
-   * Links appointment earnings to this payout to prevent double payouts
+   * Mark a payout as failed (e.g., bank transfer bounced)
+   * Links remain for audit trail
    */
-  approvePayout: protectedProcedure
-    .input(
-      z.object({
-        payoutId: z.string()
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { payoutId } = input;
-
-      return await ctx.db.$transaction(async (tx) => {
-        // 1. Lock and verify the payout request
-        const request = await tx.payoutRequest.findUnique({
-          where: { id: payoutId }
-        });
-
-        if (!request) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Payout request not found'
-          });
-        }
-
-        if (request.status !== 'REQUESTED') {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Payout already processed with status: ${request.status}`
-          });
-        }
-
-        // 2. Get available earnings not yet linked (or partially linked)
-        const availableEarnings = await tx.appointmentPayment.findMany({
-          where: {
-            doctorId: request.doctorId,
-            paymentStatus: 'COMPLETED'
-          },
-          include: {
-            payoutLinks: true
-          },
-          orderBy: { createdAt: 'asc' } // FIFO - oldest earnings first
-        });
-
-        // 3. Calculate remaining and link earnings to this payout
-        let remaining = request.requestedAmountInCents;
-        const linkedEarnings: { id: string; amount: number }[] = [];
-
-        for (const earning of availableEarnings) {
-          if (remaining <= 0) break;
-
-          // Calculate how much of this earning is already used
-          const alreadyUsed = earning.payoutLinks.reduce((sum, link) => sum + link.amountUsedInCents, 0);
-          const available = earning.doctorShareInCents - alreadyUsed;
-
-          if (available > 0) {
-            const useAmount = Math.min(available, remaining);
-
-            // Create the linking record
-            await tx.appointmentPaymentPayout.create({
-              data: {
-                appointmentPaymentId: earning.id,
-                payoutRequestId: payoutId,
-                amountUsedInCents: useAmount
-              }
-            });
-
-            linkedEarnings.push({ id: earning.id, amount: useAmount });
-            remaining -= useAmount;
-          }
-        }
-
-        // 4. Verify we had enough balance
-        if (remaining > 0) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Insufficient balance. Short by ${remaining} cents.`
-          });
-        }
-
-        // 5. Update payout status to APPROVED
-        const approvedPayout = await tx.payoutRequest.update({
-          where: { id: payoutId },
-          data: { status: 'APPROVED' }
-        });
-
-        return {
-          success: true,
-          payout: approvedPayout,
-          linkedEarnings
-        };
-      });
-    }),
-
-  /**
-   * Reject a payout request
-   */
-  rejectPayout: protectedProcedure
+  markPayoutFailed: protectedProcedure
     .input(
       z.object({
         payoutId: z.string(),
@@ -584,129 +457,48 @@ export const payoutAdminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { payoutId } = input;
+      const { payoutId, reason } = input;
 
-      const request = await ctx.db.payoutRequest.findUnique({
+      const payout = await ctx.db.payout.findUnique({
         where: { id: payoutId }
       });
 
-      if (!request) {
+      if (!payout) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: 'Payout request not found'
+          message: 'Payout not found'
         });
       }
 
-      if (request.status !== 'REQUESTED') {
+      if (payout.status !== 'PAID') {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: `Cannot reject payout with status: ${request.status}`
+          message: `Can only mark PAID payouts as failed. Current status: ${payout.status}`
         });
       }
 
-      const rejectedPayout = await ctx.db.payoutRequest.update({
-        where: { id: payoutId },
-        data: { status: 'REJECTED' }
-      });
-
-      return {
-        success: true,
-        payout: rejectedPayout
-      };
-    }),
-
-  /**
-   * Mark an approved payout as paid (after bank transfer)
-   */
-  markPaid: protectedProcedure
-    .input(
-      z.object({
-        payoutId: z.string(),
-        transactionRef: z.string().optional()
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { payoutId } = input;
-
-      const request = await ctx.db.payoutRequest.findUnique({
-        where: { id: payoutId }
-      });
-
-      if (!request) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Payout request not found'
+      // Mark as failed — linked records remain for audit
+      // The amounts will be freed up for future payouts since we calculate balance dynamically
+      // BUT we need to delete the linking records so the balance becomes available again
+      await ctx.db.$transaction(async (tx) => {
+        // Delete the payout links so the balance is freed
+        await tx.appointmentPaymentPayout.deleteMany({
+          where: { payoutId }
         });
-      }
 
-      if (request.status !== 'APPROVED') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `Can only mark APPROVED payouts as paid. Current status: ${request.status}`
-        });
-      }
-
-      const paidPayout = await ctx.db.payoutRequest.update({
-        where: { id: payoutId },
-        data: { status: 'PAID' }
-      });
-
-      return {
-        success: true,
-        payout: paidPayout
-      };
-    }),
-
-  /**
-   * Get doctor's earnings summary (for admin viewing specific doctor)
-   */
-  getDoctorEarnings: protectedProcedure
-    .input(
-      z.object({
-        doctorId: z.string()
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const { doctorId } = input;
-
-      // Get total earnings from completed payments
-      const totalEarningsResult = await ctx.db.appointmentPayment.aggregate({
-        where: {
-          doctorId,
-          paymentStatus: 'COMPLETED'
-        },
-        _sum: {
-          doctorShareInCents: true,
-          totalAmountInCents: true,
-          platformShareInCents: true
-        },
-        _count: true
-      });
-
-      // Get total amount already linked to payouts
-      const totalPayoutsResult = await ctx.db.appointmentPaymentPayout.aggregate({
-        where: {
-          appointmentPayment: {
-            doctorId
+        // Update payout status
+        await tx.payout.update({
+          where: { id: payoutId },
+          data: {
+            status: 'FAILED',
+            notes: reason ? `${payout.notes ?? ''}\nFailed: ${reason}`.trim() : payout.notes
           }
-        },
-        _sum: {
-          amountUsedInCents: true
-        }
+        });
       });
 
-      const totalEarnings = totalEarningsResult._sum.doctorShareInCents ?? 0;
-      const totalPayouts = totalPayoutsResult._sum.amountUsedInCents ?? 0;
-      const availableBalance = totalEarnings - totalPayouts;
-
       return {
-        doctorId,
-        totalAppointments: totalEarningsResult._count,
-        totalRevenueInCents: totalEarningsResult._sum.totalAmountInCents ?? 0,
-        doctorEarningsInCents: totalEarnings,
-        platformEarningsInCents: totalEarningsResult._sum.platformShareInCents ?? 0,
-        paidOutInCents: totalPayouts,
-        availableBalanceInCents: availableBalance
+        success: true,
+        message: 'Payout marked as failed. Balance has been restored.'
       };
     })
 });

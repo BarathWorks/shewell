@@ -287,6 +287,17 @@ model ProfessionalUser {
   deletedAt                         DateTime?
   isapproved                         Boolean                          @default(false)
   notifications                     ProfessionalNotification[]
+
+  /// Bank Details
+  bankAccountHolderName             String?
+  bankAccountNumber                 String?
+  bankName                          String?
+  bankBranch                        String?
+  bankIfscCode                      String?
+  bankUpiId                         String?
+
+  /// Payouts (admin-controlled)
+  payouts                           Payout[]
 }
 
 model ProfessionalNotification {
@@ -769,6 +780,7 @@ model AdminUser {
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
   productVariantInventoryUpdates ProductVariantInventoryUpdate[]
+  initiatedPayouts               Payout[]
 }
 
 model MediaOnProducts {
@@ -978,62 +990,70 @@ enum DoctorPaymentStatus {
 }
 
 enum PayoutStatus {
-  REQUESTED
-  APPROVED
-  REJECTED
+  INITIATED
+  PROCESSING
   PAID
+  FAILED
 }
 
 model AppointmentPayment {
-  id                     String              @id @default(cuid())
-  appointmentId          String              @unique
-  doctorId               String
+  id                   String              @id @default(cuid())
+  appointmentId        String              @unique
+  doctorId             String
 
-  totalAmountInCents     Int
-  doctorShareInCents     Int
-  platformShareInCents   Int
+  totalAmountInCents   Int
+  doctorShareInCents   Int
+  platformShareInCents Int
 
-  paymentStatus          DoctorPaymentStatus @default(PENDING)
+  paymentStatus        DoctorPaymentStatus @default(PENDING)
 
-  createdAt              DateTime            @default(now())
+  createdAt            DateTime            @default(now())
 
   /// Relations
-  appointment            BookAppointment     @relation(fields: [appointmentId], references: [id])
-  payoutLinks            AppointmentPaymentPayout[]
+  appointment          BookAppointment     @relation(fields: [appointmentId], references: [id])
+  payoutLinks          AppointmentPaymentPayout[]
 
   @@index([doctorId])
   @@index([paymentStatus])
 }
 
-model PayoutRequest {
-  id                     String       @id @default(cuid())
-  doctorId               String
+/// Admin-controlled payout — doctors do NOT request payouts.
+/// Admin selects doctor, enters amount, system creates payout atomically.
+model Payout {
+  id                 String       @id @default(cuid())
+  doctorId           String
+  amountInCents      Int
+  status             PayoutStatus @default(INITIATED)
+  initiatedByAdminId String
+  paidAt             DateTime?
+  transactionRef     String?
+  notes              String?
 
-  requestedAmountInCents Int
-  status                 PayoutStatus @default(REQUESTED)
-
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
   /// Relations
-  payoutLinks            AppointmentPaymentPayout[]
+  doctor             ProfessionalUser @relation(fields: [doctorId], references: [id])
+  initiatedByAdmin   AdminUser        @relation(fields: [initiatedByAdminId], references: [id])
+  payoutLinks        AppointmentPaymentPayout[]
 
   @@index([doctorId])
   @@index([status])
+  @@index([initiatedByAdminId])
 }
 
 model AppointmentPaymentPayout {
-  id                     String   @id @default(cuid())
+  id                   String   @id @default(cuid())
 
-  appointmentPaymentId   String
-  payoutRequestId        String
+  appointmentPaymentId String
+  payoutId             String
 
-  amountUsedInCents      Int
+  amountUsedInCents    Int
 
   /// Relations
-  appointmentPayment     AppointmentPayment @relation(fields: [appointmentPaymentId], references: [id])
-  payoutRequest          PayoutRequest      @relation(fields: [payoutRequestId], references: [id])
+  appointmentPayment   AppointmentPayment @relation(fields: [appointmentPaymentId], references: [id])
+  payout               Payout             @relation(fields: [payoutId], references: [id])
 
-  @@unique([appointmentPaymentId, payoutRequestId])
-  @@index([payoutRequestId])
+  @@unique([appointmentPaymentId, payoutId])
+  @@index([payoutId])
 }

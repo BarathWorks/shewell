@@ -8,7 +8,11 @@ const razorpayInstance = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-export const processRefund = async (paymentId: string, amount: number, appointmentId : string) => {
+export const processRefund = async (
+  paymentId: string,
+  amount: number,
+  appointmentId: string,
+) => {
   try {
     const refund = await razorpayInstance.payments.refund(paymentId, {
       amount: amount.toString(),
@@ -37,7 +41,7 @@ export const processRefund = async (paymentId: string, amount: number, appointme
     // if (!appointment) {
     //   return;
     // }
-   
+
     await db.bookAppointment.update({
       data: {
         razorpayRefundId: refund.id,
@@ -47,6 +51,22 @@ export const processRefund = async (paymentId: string, amount: number, appointme
         // razorpayPaymentId: paymentId,
       },
     });
+
+    // Mark the AppointmentPayment as PENDING so this earning
+    // is excluded from future available balance calculations
+    try {
+      await db.appointmentPayment.updateMany({
+        where: { appointmentId },
+        data: { paymentStatus: "PENDING" },
+      });
+    } catch (apError) {
+      console.error(
+        "Failed to update AppointmentPayment status on refund:",
+        apError,
+      );
+      // Don't fail the refund if this fails — the refund itself was already processed
+    }
+
     return {
       refund,
     };

@@ -20,7 +20,8 @@ const steps = [
  { title : 'Personal Information'},
   {title : 'Qualifications'},
   {title : 'Modes'},
-  {title : 'Uploads'}
+  {title : 'Uploads'},
+  {title : 'Bank Details'}
 ]
 const RegisterLayout = ({ children }: { children: React.ReactNode }) => {
  const [step, setStep] = useState<number>(1)
