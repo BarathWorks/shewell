@@ -5,42 +5,51 @@ import { motion } from "framer-motion";
 const STAGES_DATA = [
     {
         id: "pre-pregnancy",
-        prefix: "PRE",
-        title: "PREGNANCY",
+        prefix: "",
+        title: "Women’s health",
         bgColor: "bg-[#C8B8D9]",
         textColor: "text-[#6B5B7A]",
+        carouselIndex: 0, // Woman Wellbeing
     },
     {
         id: "1st-trimester",
-        prefix: "1ST",
-        title: "TRIMESTER",
+        prefix: "",
+        title: "Pregnancy Planning",
         bgColor: "bg-[#C5E1C0]",
         textColor: "text-[#4A5B4A]",
+        carouselIndex: 3, // PCOS
     },
     {
         id: "2nd-trimester",
-        prefix: "2ND",
-        title: "TRIMESTER",
+        prefix: "",
+        title: "Prenatal Care",
         bgColor: "bg-[#B5E5E0]",
         textColor: "text-[#4A6B68]",
+        carouselIndex: 1, // Prenatal Care
     },
     {
         id: "3rd-trimester",
-        prefix: "3RD",
-        title: "TRIMESTER",
+        prefix: "",
+        title: "Postnatal Care",
         bgColor: "bg-[#A8D8D5]",
         textColor: "text-[#4A6B68]",
+        carouselIndex: 2, // Postnatal Care
     },
     {
         id: "post-partum",
-        prefix: "POST",
-        title: "PARTUM",
+        prefix: "",
+        title: "Child Health care",
         bgColor: "bg-[#B8C4E8]",
         textColor: "text-[#5B6B8A]",
+        carouselIndex: 4, // Child Healthcare
     },
 ];
 
-export default function PregnancyStages() {
+interface PregnancyStagesProps {
+    onStageHover?: (carouselIndex: number) => void;
+}
+
+export default function PregnancyStages({ onStageHover }: PregnancyStagesProps) {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
 
     return (
@@ -57,6 +66,11 @@ export default function PregnancyStages() {
                             key={stage.id}
                             whileHover={{ scale: 1.05 }}
                             transition={{ duration: 0.3 }}
+                            onMouseEnter={() => {
+                                setHoveredId(stage.id);
+                                onStageHover?.(stage.carouselIndex);
+                            }}
+                            onMouseLeave={() => setHoveredId(null)}
                             className={`relative flex h-24 sm:h-28 md:h-32 lg:h-36 w-full items-center justify-center overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-[30px] ${stage.bgColor} p-3 sm:p-4 md:p-5 lg:p-6 font-sans shadow-lg cursor-pointer group ${isMobileLastItem ? 'col-span-2 sm:col-span-1 sm:col-auto' : ''}`}
                         >
                             {/* The large Gradient Text */}

@@ -174,6 +174,31 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         },
       });
 
+      // Doctor's actual profit (after platform fee) from AppointmentPayment
+      const doctorProfitForDateRange = await db.appointmentPayment.aggregate({
+        _sum: {
+          doctorShareInCents: true,
+        },
+        where: {
+          doctorId: professionalUser.id,
+          paymentStatus: 'COMPLETED',
+          appointment: {
+            startingTime: { gte: updatedStartDate },
+            endingTime: { lte: updatedEndDate },
+          },
+        },
+      });
+
+      const doctorTotalProfit = await db.appointmentPayment.aggregate({
+        _sum: {
+          doctorShareInCents: true,
+        },
+        where: {
+          doctorId: professionalUser.id,
+          paymentStatus: 'COMPLETED',
+        },
+      });
+
       const totalBalance = await db.bookAppointment.aggregate({
         _sum: {
           priceInCents: true,
@@ -240,10 +265,10 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
             },
           },
         },
-        where:{
-          appointments : {
-            some : {
-              status : BookAppointmentStatus.COMPLETED,
+        where: {
+          appointments: {
+            some: {
+              status: BookAppointmentStatus.COMPLETED,
               startingTime: {
                 gte: updatedStartDate,
               },
@@ -252,7 +277,7 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
               },
             }
           },
-          
+
         }
       });
       const parentCategories =
@@ -312,6 +337,53 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         },
       );
 
+      const notifications = await db.professionalNotification.findMany({
+        where: {
+          professionalUserId: professionalUser.id,
+        },
+        orderBy: {
+          time: "desc",
+        },
+        take: 5,
+      });
+
+      const upcomingAppointments = await db.bookAppointment.findMany({
+        select: {
+          id: true,
+          patient: {
+            select: {
+              firstName: true,
+              email: true,
+            },
+          },
+          professionalUser: {
+            select: {
+              displayQualification: {
+                select: {
+                  specialization: true,
+                },
+              },
+            },
+          },
+          startingTime: true,
+          endingTime: true,
+          planName: true,
+        },
+        where: {
+          startingTime: {
+            gte: new Date(),
+          },
+          status: {
+            not: BookAppointmentStatus.CANCELLED,
+          },
+          professionalUserId: professionalUser.id,
+        },
+        orderBy: {
+          startingTime: "asc",
+        },
+        take: 5,
+      });
+
       console.log(
         "dateInServer",
         noOfSatisfiedPatientsForDateRange,
@@ -331,7 +403,11 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         totalNoOfSatisfiedPatients,
         profitForDateRange,
         totalProfit,
+        doctorProfitForDateRange,
+        doctorTotalProfit,
         totalAppointmentsWithoutAnyStatus,
+        notifications,
+        upcomingAppointments,
       };
     }),
 });

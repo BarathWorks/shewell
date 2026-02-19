@@ -1,9 +1,13 @@
 import React from 'react'
 import DashboardContent from './dashboard-content'
 
-const Dashboard =() =>{
+const Dashboard = () => {
   return (
-    <div><DashboardContent/></div>
+    <div className="w-full">
+      <div className="container mx-auto max-w-full">
+        <DashboardContent />
+      </div>
+    </div>
   )
 }
 

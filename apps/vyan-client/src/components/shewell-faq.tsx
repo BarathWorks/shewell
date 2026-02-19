@@ -41,7 +41,7 @@ const ShewellFAQ = () => {
                         Something on Your Mind? Let's Talk.
                     </h2>
                     <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-[24px] text-[#33333399]">
-                        Whether you're unsure, overwhelmed, or just curious ask away we're listening.
+                        No Matter where are - question , doubts (or) curiosity - wire here to listen and help 
                     </p>
                 </div>
 

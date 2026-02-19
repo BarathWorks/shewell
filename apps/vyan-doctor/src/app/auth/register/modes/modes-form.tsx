@@ -79,7 +79,7 @@ const ModesForm = ({
 
   useEffect(() => {
 
-    params.set("step", "3")
+    params.set("step", "4")
     window.history.pushState(null,"", `${pathname}?${params.toString()}` )
   },[])
   
@@ -95,7 +95,7 @@ const ModesForm = ({
           description: "Successfull Added the modes",
           variant: "default",
         });
-        router.push(`/auth/register/uploads/?${params.toString()}`);
+        router.push(`/auth/register/uploads/?step=5`);
       })
       .catch((err) => {
         setLoadingState(false);

@@ -9,6 +9,7 @@ import { searchCommentsRouter } from "./routers/findComments";
 import { noOfOnlineAppointmentsRouter } from "./routers/no-of-online-appointments";
 import { noOfVacantAndBookesSlotsRouter } from "./routers/no-of-vacant-and-booked-slots";
 import { findDoctorsBasedOnSearchRouter } from "./routers/findDoctorsBasedOnSearch";
+import { earningsRouter } from "./routers/earnings";
 
 /**
  * This is the primary router for your server.
@@ -25,7 +26,8 @@ export const appRouter = createTRPCRouter({
   searchComments : searchCommentsRouter,
   noOfOnlineAppointments : noOfOnlineAppointmentsRouter,
   noOfVacantAndBookedSlots : noOfVacantAndBookesSlotsRouter,
-  findDoctorsBasedOnSearch : findDoctorsBasedOnSearchRouter
+  findDoctorsBasedOnSearch : findDoctorsBasedOnSearchRouter,
+  earnings: earningsRouter,
 });
 
 // export type definition of API

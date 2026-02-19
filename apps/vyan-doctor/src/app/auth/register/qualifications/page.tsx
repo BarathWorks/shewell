@@ -5,19 +5,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 const Qualification = async () => {
-  const states = await db.state.findMany({
-    select: {
-      id: true,
-      name: true,
-      // cities: true,
-    },
-    where :{
-      country : {
-        active : true
-      }
-    },
-  });
-
   const specialisations = await db.professionalSpecializations.findMany({
     select: {
       id: true,
@@ -79,16 +66,7 @@ const Qualification = async () => {
       language: true,
     }
   })
-  const stateandCityId = await db.professionalQualifications.findFirst({
-    select: {
-      city: true,
-      stateId: true,
-      cityId: true,
-    },
-    where: {
-      professionalUserId: professionalUser?.id,
-    },
-  });
+  
   console.log("languages", languages)
   const formattedDefaultLanguages = languages.map((item) => ({
     id: item.id,
@@ -100,12 +78,6 @@ const Qualification = async () => {
     name: item.language
   }))
 
-  console.log("cityId", stateandCityId?.cityId);
-  const formattedStates = states.map((item) => ({
-    id : item.id,
-    name : item.name
-  }))
-  console.log("states", formattedStates)
   return (
     <>
       <QualificationForm
@@ -113,13 +85,8 @@ const Qualification = async () => {
           value: a.id,
           label: a.specialization,
         }))}
-        states={formattedStates}
         defaultLanguages={formattedDefaultLanguages}
         degree={degree?.degree!}
-        defaultStateId={stateandCityId?.stateId!}
-        stateId={stateandCityId?.stateId!}
-        city={stateandCityId?.city!}
-        defaultCity={stateandCityId?.city!}
         gender={professionalUser?.gender!}
         startingYear={experience?.startingYear!}
         endingYear={experience?.endingYear!}

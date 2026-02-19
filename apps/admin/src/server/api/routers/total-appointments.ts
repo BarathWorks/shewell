@@ -20,13 +20,56 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       select: {
         id: true,
         firstName: true,
+        lastName: true,
         email: true,
         phoneNumber: true,
         userName: true,
         isapproved: true,
+        gender: true,
         displayQualification: {
           select: {
             specialization: true
+          }
+        },
+        address: {
+          select: {
+            country: {
+              select: {
+                name: true
+              }
+            },
+            state: {
+              select: {
+                name: true
+              }
+            },
+            city: true,
+            completeAddress: true,
+            pincode: true
+          }
+        },
+        identity: {
+          select: {
+            panNumber: true,
+            aadhaarNumber: true,
+            licenseNumber: true,
+            isVerified: true
+          }
+        },
+        degrees: {
+          select: {
+            degree: true,
+            collegeName: true,
+            completionDate: true
+          }
+        },
+        experiences: {
+          select: {
+            startingYear: true,
+            endingYear: true,
+            department: true,
+            position: true,
+            location: true
           }
         },
         createdAt: true

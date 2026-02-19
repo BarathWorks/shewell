@@ -4,28 +4,20 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "~/server/db";
 interface IUploadsProps {
-  // image: string;
-  // document: string;
   aboutYou: string;
   mediaId: string;
   documents: {
-    documentId: string;
+    documentId?: string;
   }[];
-  // fileKey: string;
-  // fileUrl: string;
-  // comments: string;
-  // mimeType: string;
+  aadharCard?: string;
+  panCard?: string;
 }
 const UploadsUserAction = async ({
-  // image,
-  // document,
   aboutYou,
   mediaId,
   documents,
-  // fileKey,
-  // fileUrl,
-  // comments,
-  // mimeType,
+  aadharCard,
+  panCard,
 }: IUploadsProps) => {
   const session = await getServerSession();
   if (!session?.user) {
@@ -42,15 +34,19 @@ const UploadsUserAction = async ({
     mediaId: z.string(),
     documents: z.array(
       z.object({
-        documentId: z.string(),
+        documentId: z.string().optional(),
       }),
     ),
+    aadharCard: z.string().optional(),
+    panCard: z.string().optional(),
   });
 
   const isValidData = formData.parse({
     aboutYou: aboutYou,
     mediaId: mediaId,
     documents: documents,
+    aadharCard: aadharCard,
+    panCard: panCard,
   });
 
   if (!isValidData) return { error: "Please enter the valid data" };

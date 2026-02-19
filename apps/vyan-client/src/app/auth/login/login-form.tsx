@@ -78,6 +78,8 @@ const LoginForm = () => {
       redirect: false,
     });
 
+    console.log("signInData", signInData);
+    
     if (signInData?.ok) {
       toast({
         title: "login Successfully",
@@ -88,7 +90,7 @@ const LoginForm = () => {
       });
     } else {
       toast({
-        title: "something went wrong",
+        title: signInData?.error,
         variant: "destructive",
       });
     }

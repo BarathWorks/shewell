@@ -1,48 +1,58 @@
-'use server'
-import { sendEmail } from "@repo/mail";
-import { getServerSession } from "next-auth";
-import { generateOtp } from "~/lib/utils";
+"use server";
 import { db } from "~/server/db";
+import { generateOtp } from "~/lib/utils";
+import { sendEmail } from "@repo/mail";
 
-const resendOTP = async () => {
-    const session = await getServerSession();
+const resendOTP = async (email: string) => {
+    if (!email) {
+        throw new Error("Email is required");
+    }
+
     try {
-        const user = await db.user.findFirst({
-            where: {
-                email: session?.user.email!,
-            },
+        // Find the pending user
+        const pendingUser = await db.pendingUser.findUnique({
+            where: { email: email },
         });
-        if (!user) {
-            return
+
+        if (!pendingUser) {
+            throw new Error("Registration not found. Please register again.");
         }
-        const otp = generateOtp();
-        await db.user.update({
+
+        // Generate new OTP
+        const newOtp = generateOtp();
+        const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
+
+        // Update the pending user with new OTP
+        await db.pendingUser.update({
+            where: { email: email },
             data: {
-                otp: otp,
-            },
-            where: {
-                email: user?.email!,
+                otp: newOtp,
+                otpExpiresAt: otpExpiresAt,
             },
         });
+
+        // Send email
         const emailBodySendGrid = {
             from: process.env.FROM_EMAIL!,
             subject: "Verification OTP",
-            to: [user.email],
-            html: `<p>Hi,<strong> ${user.name} <br/> </strong/></p>
-        <span>This is your verification OTP ${otp}<span/>
-        `,
-
+            to: [email],
+            html: `<p>Hi,<strong> ${pendingUser.name} <br/> </strong/></p>
+      <span>This is your verification OTP ${newOtp}<span/>
+      `,
         };
 
         await sendEmail(emailBodySendGrid);
 
         return {
-            message: "OTP has been sent to your registered mail"
+            message: "OTP resent successfully",
+        };
+    } catch (error) {
+        console.log("resend-otp-error:", error);
+        if (error instanceof Error) {
+            throw error;
         }
-    }
-    catch (error) {
-        console.log("resend-otp", error);
-        throw new Error("OTP cannot be resend")
+        throw new Error("Failed to resend OTP");
     }
 };
+
 export default resendOTP;

@@ -38,6 +38,17 @@ const CompleteAppointment = async ({
       },
     });
 
+    // Mark the AppointmentPayment as COMPLETED now that the consultation is done
+    await db.appointmentPayment.updateMany({
+      data: {
+        paymentStatus: "COMPLETED",
+      },
+      where: {
+        appointmentId: appointmentId,
+        paymentStatus: "PENDING",
+      },
+    });
+
     const consultations = await db.bookAppointment.aggregate({
       _count: {
         status: true,

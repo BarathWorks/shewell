@@ -31,6 +31,83 @@ const AppMenu = () => {
       ]
     },
     {
+      label: 'Manage Sessions',
+      items: [
+        {
+          label: 'Session Categories',
+          icon: 'pi pi-tags',
+          to: '/manage-session-categories/session-categories'
+        },
+        {
+          label: 'Sessions',
+          icon: 'pi pi-calendar',
+          to: '/manage-sessions/sessions'
+        },
+        {
+          label: 'Registrations',
+          icon: 'pi pi-users',
+          to: '/manage-sessions/registrations'
+        }
+      ]
+    },
+    {
+      label: 'Professional Specializations and Languages',
+      // icon: 'pi pi-location',
+      items: [
+        // {
+        //   label: 'Countries',
+        //   icon: 'pi pi-map',
+        //   to: '/manage-locations/countries'
+        // },
+        {
+          label: 'Specialization Category',
+          icon: 'pi pi-user',
+          to: '/manage-specialization-languages/specialization-parent-category'
+        },
+        {
+          label: 'Specializations',
+          icon: 'pi pi-briefcase',
+          to: '/manage-specialization-languages/specializations'
+        },
+        {
+          label: 'Languages',
+          icon: 'pi pi-language',
+          to: '/manage-specialization-languages/languages'
+        }
+      ]
+    },
+    {
+      label: 'View Doctors And Appointments',
+      // icon: 'pi pi-location',
+      items: [
+        // {
+        //   label: 'Countries',
+        //   icon: 'pi pi-map',
+        //   to: '/manage-locations/countries'
+        // },
+        {
+          label: 'Doctors',
+          icon: 'pi pi-users',
+          to: '/view-doctors/doctors'
+        },
+        {
+          label: 'Appointments',
+          icon: 'pi pi-book',
+          to: '/view-doctors/appointments'
+        }
+      ]
+    },
+    {
+      label: 'Manage Payouts',
+      items: [
+        {
+          label: 'Payout Requests',
+          icon: 'pi pi-wallet',
+          to: '/manage-payouts'
+        }
+      ]
+    },
+    {
       label: 'Manage Product / Orders',
       items: [
         // {
@@ -150,26 +227,7 @@ const AppMenu = () => {
         }
       ]
     },
-    {
-      label: 'Manage Sessions',
-      items: [
-        {
-          label: 'Session Categories',
-          icon: 'pi pi-tags',
-          to: '/manage-session-categories/session-categories'
-        },
-        {
-          label: 'Sessions',
-          icon: 'pi pi-calendar',
-          to: '/manage-sessions/sessions'
-        },
-        {
-          label: 'Registrations',
-          icon: 'pi pi-users',
-          to: '/manage-sessions/registrations'
-        }
-      ]
-    },
+    
     // {
     //   label: 'Location Management',
     //   // icon: 'pi pi-location',
@@ -196,53 +254,7 @@ const AppMenu = () => {
     //     }
     //   ]
     // },
-    {
-      label: 'Professional Specializations and Languages',
-      // icon: 'pi pi-location',
-      items: [
-        // {
-        //   label: 'Countries',
-        //   icon: 'pi pi-map',
-        //   to: '/manage-locations/countries'
-        // },
-        {
-          label: 'Specialization Category',
-          icon: 'pi pi-user',
-          to: '/manage-specialization-languages/specialization-parent-category'
-        },
-        {
-          label: 'Specializations',
-          icon: 'pi pi-briefcase',
-          to: '/manage-specialization-languages/specializations'
-        },
-        {
-          label: 'Languages',
-          icon: 'pi pi-language',
-          to: '/manage-specialization-languages/languages'
-        }
-      ]
-    },
-    {
-      label: 'View Doctors And Appointments',
-      // icon: 'pi pi-location',
-      items: [
-        // {
-        //   label: 'Countries',
-        //   icon: 'pi pi-map',
-        //   to: '/manage-locations/countries'
-        // },
-        {
-          label: 'Doctors',
-          icon: 'pi pi-users',
-          to: '/view-doctors/doctors'
-        },
-        {
-          label: 'Appointments',
-          icon: 'pi pi-book',
-          to: '/view-doctors/appointments'
-        }
-      ]
-    }
+    
     // {
     // label: 'UI Components',
     // items: [
