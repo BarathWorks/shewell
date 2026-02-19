@@ -8,33 +8,39 @@
   - Added the required column `payoutId` to the `AppointmentPaymentPayout` table without a default value. This is not possible if the table is not empty.
 
 */
--- AlterEnum
-BEGIN;
-CREATE TYPE "PayoutStatus_new" AS ENUM ('INITIATED', 'PROCESSING', 'PAID', 'FAILED');
-ALTER TABLE "PayoutRequest" ALTER COLUMN "status" DROP DEFAULT;
-ALTER TABLE "Payout" ALTER COLUMN "status" TYPE "PayoutStatus_new" USING ("status"::text::"PayoutStatus_new");
-ALTER TYPE "PayoutStatus" RENAME TO "PayoutStatus_old";
-ALTER TYPE "PayoutStatus_new" RENAME TO "PayoutStatus";
-DROP TYPE "PayoutStatus_old";
-COMMIT;
 
--- DropForeignKey
+BEGIN;
+
+-- Drop foreign keys referencing PayoutRequest
 ALTER TABLE "AppointmentPaymentPayout" DROP CONSTRAINT "AppointmentPaymentPayout_payoutRequestId_fkey";
 
--- DropIndex
+-- Drop indexes related to PayoutRequest
 DROP INDEX "AppointmentPaymentPayout_appointmentPaymentId_payoutRequest_key";
-
--- DropIndex
 DROP INDEX "AppointmentPaymentPayout_payoutRequestId_idx";
 
--- AlterTable
-ALTER TABLE "AppointmentPaymentPayout" DROP COLUMN "payoutRequestId",
-ADD COLUMN     "payoutId" TEXT NOT NULL;
+-- Alter AppointmentPaymentPayout to remove payoutRequestId
+ALTER TABLE "AppointmentPaymentPayout" DROP COLUMN "payoutRequestId";
 
--- DropTable
+-- Drop the PayoutRequest table BEFORE handling Enums (to remove dependency on PayoutStatus)
 DROP TABLE "PayoutRequest";
 
--- CreateTable
+-- Handle Enum changes
+-- 1. Create new Enum
+CREATE TYPE "PayoutStatus_new" AS ENUM ('INITIATED', 'PROCESSING', 'PAID', 'FAILED');
+
+-- 2. Rename old Enum (it is now unused as PayoutRequest is dropped)
+ALTER TYPE "PayoutStatus" RENAME TO "PayoutStatus_old";
+
+-- 3. Rename new Enum to correct name
+ALTER TYPE "PayoutStatus_new" RENAME TO "PayoutStatus";
+
+-- 4. Drop old Enum
+DROP TYPE "PayoutStatus_old";
+
+-- Add payoutId column to AppointmentPaymentPayout
+ALTER TABLE "AppointmentPaymentPayout" ADD COLUMN "payoutId" TEXT NOT NULL;
+
+-- Create the new Payout table
 CREATE TABLE "Payout" (
     "id" TEXT NOT NULL,
     "doctorId" TEXT NOT NULL,
@@ -50,26 +56,20 @@ CREATE TABLE "Payout" (
     CONSTRAINT "Payout_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
+-- Create Indexes for Payout
 CREATE INDEX "Payout_doctorId_idx" ON "Payout"("doctorId");
-
--- CreateIndex
 CREATE INDEX "Payout_status_idx" ON "Payout"("status");
-
--- CreateIndex
 CREATE INDEX "Payout_initiatedByAdminId_idx" ON "Payout"("initiatedByAdminId");
 
--- CreateIndex
+-- Create Indexes for AppointmentPaymentPayout
 CREATE INDEX "AppointmentPaymentPayout_payoutId_idx" ON "AppointmentPaymentPayout"("payoutId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "AppointmentPaymentPayout_appointmentPaymentId_payoutId_key" ON "AppointmentPaymentPayout"("appointmentPaymentId", "payoutId");
 
--- AddForeignKey
+-- Add Foreign Keys
 ALTER TABLE "Payout" ADD CONSTRAINT "Payout_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "ProfessionalUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "Payout" ADD CONSTRAINT "Payout_initiatedByAdminId_fkey" FOREIGN KEY ("initiatedByAdminId") REFERENCES "AdminUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "AppointmentPaymentPayout" ADD CONSTRAINT "AppointmentPaymentPayout_payoutId_fkey" FOREIGN KEY ("payoutId") REFERENCES "Payout"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+COMMIT;
