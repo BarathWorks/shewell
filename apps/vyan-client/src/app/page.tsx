@@ -65,8 +65,8 @@ const HomePage = async () => {
         <Hero />
         <WellnessCircle />
         <ServicesCarousel />
-        <PlatformSection />
-        <PregnancyStages />
+        {/* <PlatformSection /> */}
+        
         <ExpertsCarousel />
         <ProductsGrid />
         <Partners />

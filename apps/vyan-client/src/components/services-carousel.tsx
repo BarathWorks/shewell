@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import { InteractiveButton } from "./ui/interactive-button";
+import PregnancyStages from "./pregnancy-stages";
 
 const COURSES_DATA = [
   {
@@ -104,11 +105,12 @@ const ServicesCarousel = () => {
           Shewell isn’t just for India. It’s for every woman, everywhere
         </motion.p>
       </div>
+      <PregnancyStages onStageHover={setCurrentIndex} />
       <div className=" w-full px-0">
         {/* Carousel Container */}
         <div className="relative flex flex-col items-center">
           {/* Main Image Area with Title Integrated */}
-          <div className="relative mb-8 sm:mb-12 flex w-full items-center justify-center md:mb-16">
+          <div className="relative mb-6 sm:mb-8 md:mb-10 flex w-full items-center justify-center">
             {/* Main Image */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -117,7 +119,7 @@ const ServicesCarousel = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] w-full max-w-4xl"
+                className="relative h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-full max-w-5xl"
               >
                 <Image
                   src={current?.mainImage + ""}
