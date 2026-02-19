@@ -4,7 +4,7 @@ import React from "react";
 export default function NewFooter() {
   return (
     <footer className="bg-[#1A1A1A] pb-6 pt-8 text-white sm:pb-8 sm:pt-10 md:pb-10 md:pt-12">
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 md:px-10 lg:px-12 xl:px-16">
+      <div className=" px-6 sm:px-8 md:px-10 lg:px-12 xl:px-16">
         {/* Top Section */}
         <div className="mb-8 flex flex-col gap-8 sm:mb-10 sm:gap-10 md:mb-12 lg:mb-14 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
           {/* Brand & Socials */}
@@ -17,7 +17,8 @@ export default function NewFooter() {
               />
             </div>
             <p className="mb-6 text-sm text-gray-400 sm:text-base md:mb-8 md:text-base lg:pr-8">
-              Empowering motherhood with care, expertise, and support every step of the way.
+              Empowering motherhood with care, expertise, and support every step
+              of the way.
             </p>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <a
@@ -28,7 +29,13 @@ export default function NewFooter() {
                 aria-label="X (Twitter)"
               >
                 <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img src="/icons/x.svg" alt="X" width={16} height={16} className="sm:h-5 sm:w-5" />
+                  <img
+                    src="/icons/x.svg"
+                    alt="X"
+                    width={16}
+                    height={16}
+                    className="sm:h-5 sm:w-5"
+                  />
                 </div>
               </a>
               <a
@@ -39,7 +46,13 @@ export default function NewFooter() {
                 aria-label="Instagram"
               >
                 <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img src="/icons/insta.svg" alt="Instagram" width={16} height={16} className="sm:h-5 sm:w-5" />
+                  <img
+                    src="/icons/insta.svg"
+                    alt="Instagram"
+                    width={16}
+                    height={16}
+                    className="sm:h-5 sm:w-5"
+                  />
                 </div>
               </a>
               <a
@@ -50,7 +63,13 @@ export default function NewFooter() {
                 aria-label="Facebook"
               >
                 <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img src="/icons/facebook.svg" alt="Facebook" width={16} height={16} className="sm:h-5 sm:w-5" />
+                  <img
+                    src="/icons/facebook.svg"
+                    alt="Facebook"
+                    width={16}
+                    height={16}
+                    className="sm:h-5 sm:w-5"
+                  />
                 </div>
               </a>
               <a
@@ -61,7 +80,13 @@ export default function NewFooter() {
                 aria-label="YouTube"
               >
                 <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img src="/icons/youtube.svg" alt="YouTube" width={16} height={16} className="sm:h-5 sm:w-5" />
+                  <img
+                    src="/icons/youtube.svg"
+                    alt="YouTube"
+                    width={16}
+                    height={16}
+                    className="sm:h-5 sm:w-5"
+                  />
                 </div>
               </a>
             </div>
@@ -70,46 +95,90 @@ export default function NewFooter() {
           {/* Links & Contact - Responsive Grid */}
           <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 md:gap-12 lg:w-[50%] lg:gap-12">
             <div>
-              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">Quick Links</h4>
+              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">
+                Quick Links
+              </h4>
               <ul className="flex flex-col gap-3 text-sm text-gray-300 sm:gap-3.5 sm:text-base">
                 <li>
-                  <a href="#" className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]">
+                  <a
+                    href="#"
+                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                  >
                     About Us
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]">
+                  <a
+                    href="#"
+                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                  >
                     Recipe
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]">
+                  <a
+                    href="#"
+                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                  >
                     Reviews
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">Contact Us</h4>
+              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">
+                Contact Us
+              </h4>
               <ul className="space-y-3.5 text-sm text-gray-300 sm:space-y-4 sm:text-base">
                 <li className="leading-relaxed">
                   <span className="block text-gray-400">
-                    NO.1274, CHARUKESI APARTMENTS,<br className="hidden sm:block" /> 17TH STREET, POOMPUHAR NAGAR,<br className="hidden sm:block" /> KOLATHUR, CHENNAI,<br className="hidden sm:block" /> Tamil Nadu, India - 600099
+                    NO.1274, CHARUKESI APARTMENTS,
+                    <br className="hidden sm:block" /> 17TH STREET, POOMPUHAR
+                    NAGAR,
+                    <br className="hidden sm:block" /> KOLATHUR, CHENNAI,
+                    <br className="hidden sm:block" /> Tamil Nadu, India -
+                    600099
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <svg className="h-4 w-4 flex-shrink-0 text-[#167D71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
-                  <a href="mailto:abcdvyan@gmail.com" className="transition-colors hover:text-[#167D71]">
-                    abcdvyan@gmail.com
+                  <a
+                    href="mailto:info@shewellofficial.com"
+                    className="transition-colors hover:text-[#167D71]"
+                  >
+                    info@shewellofficial.com
                   </a>
                 </li>
                 <li className="flex items-center gap-2">
-                  <svg className="h-4 w-4 flex-shrink-0 text-[#167D71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  <svg
+                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
                   </svg>
-                  <a href="tel:+917397380900" className="transition-colors hover:text-[#167D71]">
+                  <a
+                    href="tel:+917397380900"
+                    className="transition-colors hover:text-[#167D71]"
+                  >
                     +91 7397 380 900
                   </a>
                 </li>
@@ -119,7 +188,7 @@ export default function NewFooter() {
         </div>
 
         {/* Divider */}
-        <hr className="border-gray-700/50 my-6 sm:my-8 md:my-10" />
+        <hr className="my-6 border-gray-700/50 sm:my-8 md:my-10" />
 
         {/* Bottom Bar - Responsive */}
         <div className="flex flex-col items-center justify-between gap-5 text-sm text-gray-400 sm:flex-row sm:gap-6 md:text-base">
@@ -128,12 +197,17 @@ export default function NewFooter() {
               Terms & Conditions
             </a>
             <span className="hidden text-gray-600 sm:inline">•</span>
-            <a href="/privacy-policy" className="transition-all hover:text-[#167D71]">
+            <a
+              href="/privacy-policy"
+              className="transition-all hover:text-[#167D71]"
+            >
               Privacy Policy
             </a>
           </div>
           <div className="text-center sm:text-right">
-            <span className="text-gray-500">2025 © Shewell. All Rights Reserved</span>
+            <span className="text-gray-500">
+              2025 © Shewell. All Rights Reserved
+            </span>
           </div>
         </div>
       </div>
