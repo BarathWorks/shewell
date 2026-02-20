@@ -7,7 +7,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
 import { env } from '~/env';
 
-const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
+const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType: string = 'application/octet-stream') => {
   const s3 = new S3({
     // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
     // endpoint: process.env.S3_SPACES_URL!,
@@ -21,9 +21,8 @@ const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
   const fileParams = {
     Bucket: env.AWS_BUCKET  || "vyan-doctor"  ,
     Key: key,
-    ContentType: 'text',
+    ContentType: contentType,
     // Expires: addSeconds(new Date(), 600),
-    ACL: isPublic ? ObjectCannedACL.public_read : ObjectCannedACL.private
   };
   const command = new PutObjectCommand(fileParams);
   return await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
@@ -64,7 +63,7 @@ const uploadProfessionalUserImage = async (professionalUserId : string,fileKey: 
   //  }
     });
     console.log("before uploading")
-    const url = await getUploadPresignedUrl(key, true);
+    const url = await getUploadPresignedUrl(key, true, mimeType);
     console.log("after uploading", url)
     // revalidatePath("/auth/register/uploads")
     // revalidatePath('/admin/media');
