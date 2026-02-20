@@ -90,14 +90,14 @@ export default function ExpertsCarousel() {
   }, [handleNext, isHovered]);
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 sm:px-6 md:px-12 lg:px-[100px] py-6 sm:py-8 md:py-12">
+    <section className="w-full overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:px-[100px]">
       <div className="max-w-8xl mx-auto px-0">
         {/* Section Header */}
-        <div className="mb-6 sm:mb-8 text-center md:mb-12">
-          <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium text-gray-900 leading-tight">
+        <div className="mb-6 text-center sm:mb-8 md:mb-12">
+          <h2 className="mb-3 text-lg font-medium leading-tight text-gray-900 sm:mb-4 sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
             You're Not Alone We're Just a Click Away
           </h2>
-          <p className="mx-auto max-w-2xl text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#33333399] leading-relaxed">
+          <p className="mx-auto max-w-2xl text-xs leading-relaxed text-[#33333399] sm:text-sm md:text-base lg:text-lg xl:text-xl">
             Consult with empathetic, qualified specialists who listen, guide,
             and support your health decisions.
           </p>
@@ -105,16 +105,19 @@ export default function ExpertsCarousel() {
 
         {/* Experts Carousel */}
         <div
-          className="relative flex h-[180px] sm:h-[220px] md:h-[280px] lg:h-[350px] items-center justify-center px-8 sm:px-10 md:px-12"
+          className="relative flex h-[180px] items-center justify-center px-8 sm:h-[220px] sm:px-10 md:h-[280px] md:px-12 lg:h-[350px]"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <button
             onClick={handlePrev}
-            className="absolute left-2 sm:left-4 z-30 rounded-full border border-gray-300 bg-white p-1.5 sm:p-2 md:p-3 transition-colors hover:bg-gray-100 md:left-10"
+            className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-10 md:p-3"
             aria-label="Previous expert"
           >
-            <ChevronLeft size={18} className="text-gray-600 sm:size-5 md:size-6" />
+            <ChevronLeft
+              size={18}
+              className="text-gray-600 sm:size-5 md:size-6"
+            />
           </button>
 
           <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 lg:gap-10">
@@ -169,7 +172,7 @@ export default function ExpertsCarousel() {
                         animate={{ opacity: isCenter ? 1 : 0.6 }}
                         className={`absolute  ${isCenter ? "bottom-3 sm:bottom-5 md:bottom-6 lg:bottom-8" : "bottom-1.5 sm:bottom-2"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:px-2`}
                       >
-                        <span className="h-0.5 w-0.5 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 rounded-full bg-white"></span>
+                        <span className="h-0.5 w-0.5 rounded-full bg-white sm:h-1 sm:w-1 md:h-1.5 md:w-1.5"></span>
                         <span
                           className={`${isCenter ? "text-[8px] sm:text-xs md:text-sm lg:text-base" : "text-[7px] sm:text-[10px] md:text-xs"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out`}
                         >
@@ -185,22 +188,25 @@ export default function ExpertsCarousel() {
 
           <button
             onClick={handleNext}
-            className="absolute right-2 sm:right-4 z-30 rounded-full border border-gray-300 bg-white p-1.5 sm:p-2 md:p-3 transition-colors hover:bg-gray-100 md:right-10"
+            className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-10 md:p-3"
             aria-label="Next expert"
           >
-            <ChevronRight size={18} className="text-gray-600 sm:size-5 md:size-6" />
+            <ChevronRight
+              size={18}
+              className="text-gray-600 sm:size-5 md:size-6"
+            />
           </button>
         </div>
 
         {/* CTA Button */}
         <div
-          className="mt-8 sm:mt-10 md:mt-12 lg:mt-16 flex w-full justify-center"
-          onClick={() => window.location.href = "/counselling"}
+          className="mt-8 flex w-full justify-center sm:mt-10 md:mt-12 lg:mt-16"
+          onClick={() => (window.location.href = "/counselling")}
         >
-          <div className="order-0 group flex h-11 sm:h-14 md:h-16 lg:h-20 w-full max-w-2xl cursor-pointer items-center justify-between gap-2 sm:gap-3 rounded-lg sm:rounded-xl md:rounded-2xl bg-[#F2F2F2] px-4 sm:px-5 md:px-6 lg:px-8 py-2 sm:py-3 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5]">
+          <div className="order-0 group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3 md:h-16 md:rounded-2xl md:px-6 lg:h-20 lg:px-8">
             <div className="flex flex-1 justify-center">
-              <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-[#00000066] text-center">
-                Book a Session
+              <span className="text-center text-xs font-semibold text-[#00000066] sm:text-sm md:text-base lg:text-lg xl:text-xl">
+                Book a Session with our experts
               </span>
             </div>
             <InteractiveButton />

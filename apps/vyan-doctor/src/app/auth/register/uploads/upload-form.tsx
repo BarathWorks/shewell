@@ -46,7 +46,7 @@ import React from "react";
 import uploadAadharAction from "~/(main)/upload-aadhar-action";
 import uploadAadharPanAction from "~/(main)/upload-aadhar-action";
 import uploadPanAction from "~/(main)/upload-pan-action";
-import { Checkbox } from "@repo/ui/src/@/components/checkbox";
+
 
 const uploadSchema = z.object({
   mediaId: z.string({ required_error: "Please Select the Image" }),
@@ -54,17 +54,14 @@ const uploadSchema = z.object({
     required_error: "Please write about yourself",
     invalid_type_error: "Please write about yourself",
   }),
-  aadharCard: z.string({ required_error: "Please enter your aadhar card" }),
-  panCard: z.string({ required_error: "Please enter your pan card" }),
+  aadharCard: z.string().optional(),
+  panCard: z.string().optional(),
   documents: z.array(
     z.object({
       documentId: z.string({
       }),
     }),
   ),
-  termsAndConditions: z.literal(true, {
-    errorMap: () => ({ message: "You must read terms and conditions before submitting the details" }),
-  }),
 });
 interface IDocuments {
   id: string;
@@ -104,8 +101,8 @@ const UploadForm = ({
           documentId: "",
         },
       ],
-      aadharCard: aadharCard?.id,
-      panCard: panCard?.id,
+      aadharCard: aadharCard?.id || "",
+      panCard: panCard?.id || "",
     },
     resolver: zodResolver(uploadSchema),
   });
@@ -129,38 +126,50 @@ const UploadForm = ({
 
   console.log("url", pathname)
   useEffect(() => {
-    params.set("step", "4");
+    params.set("step", "5");
     window.history.pushState(null,"", `${pathname}?${params.toString()}` )
   }, []);
 
   const onSubmit = (data: z.infer<typeof uploadSchema>) => {
     setLoadingState(true);
     console.log(data);
-    UploadsUserAction(data as {  aboutYou: string;
-  mediaId: string;
-  documents: {
-    documentId: string;
-  }[];})
+    UploadsUserAction({
+      aboutYou: data.aboutYou,
+      mediaId: data.mediaId,
+      documents: data.documents.filter(doc => doc.documentId), // Filter out empty documentIds
+      aadharCard: data.aadharCard,
+      panCard: data.panCard,
+    })
       .then((resp) => {
         setLoadingState(false);
         console.log("Uploads", resp?.message);
         toast({
-          title: "Successfully Registered",
+          title: "Successfully saved uploads",
           variant: "default",
         });
-        router.push("/doctor-profile");
+        router.push(`/auth/register/bank-details/?step=6`);
       })
       .catch((err) => {
         setLoadingState(false);
         console.log(err);
         toast({
-          title: "Can not register",
+          title: "Can not save uploads",
           variant: "destructive",
         });
       });
   };
   const errorHandler = (e: any) => {
-    console.log(e);
+    console.log("Form validation errors:", e);
+    // Show the first validation error as a toast
+    const firstErrorKey = Object.keys(e)[0];
+    if (firstErrorKey) {
+      const errorMessage = e[firstErrorKey]?.message || e[firstErrorKey]?.root?.message || `Please fill in the ${firstErrorKey} field`;
+      toast({
+        title: "Validation Error",
+        description: String(errorMessage),
+        variant: "destructive",
+      });
+    }
   };
   const router = useRouter();
   const session = useSession();
@@ -717,30 +726,7 @@ const UploadForm = ({
             />
           </div>
 
-          <div>
-          <Controller
-            name="termsAndConditions"
-            control={control}
-            render={({ field }) => {
-              return (
-                <>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                    <div className="font-poppins font-normal text-base text-black-300">
-                     Have you read <Link href="/terms" className="underline">Terms and Conditions</Link> ?
-                    </div>
-                  </div>
-                  {errors && errors.termsAndConditions && (
-                    <p className="text-red-500">{errors.termsAndConditions.message}</p>
-                  )}
-                </>
-              );
-            }}
-          />
-          </div>
+
 
           <div className="flex flex-col items-center justify-center gap-4 ">
             <Button
@@ -753,7 +739,7 @@ const UploadForm = ({
               }}
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Register"}
+              {loadingState ? "Loading..." : " Next"}
             </Button>
             <div className=" font-inter text-base font-normal">
               Already have a account?{" "}

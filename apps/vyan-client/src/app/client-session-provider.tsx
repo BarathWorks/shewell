@@ -3,7 +3,7 @@
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 import { Session } from "next-auth";
-import { redirect, usePathname,useSearchParams} from "next/navigation";
+import { redirect, usePathname, useSearchParams } from "next/navigation";
 
 const ClientSessionProvider = ({
   session,
@@ -12,7 +12,7 @@ const ClientSessionProvider = ({
 }: {
   session: Session | null;
   children: ReactNode;
-  verifiedAt : Date | null
+  verifiedAt: Date | null
 }) => {
 
   const pathname = usePathname()

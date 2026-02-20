@@ -80,6 +80,10 @@ export async function GET(request: Request) {
       },
     });
 
+    if (!professionalUser) {
+      return NextResponse.redirect("/auth/login");
+    }
+
     await db.professionalUser.update({
       where: {
         id: professionalUser?.id,

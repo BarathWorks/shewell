@@ -10,28 +10,42 @@ datasource db {
 }
 
 model User {
-  id                 String            @id @default(cuid())
-  email              String            @unique
-  name               String
-  passwordHash       String
-  phoneNumber        String
-  otp                String
-  otpCreatedAt       DateTime?
-  coupon             Coupon[]
-  notification       Notification[]
-  verifiedAt         DateTime?
-  ageGreaterThan18   Boolean
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  reviews            Review[]
-  wishlistedProducts Product[]
-  addresses          Address[]
-  Order              Order[]
-  patient            Patient[]
-  appointments          BookAppointment[]
-  deletedAt             DateTime?
-  AuthSession           AuthSession[]
-  sessionRegistrations  SessionRegistration[]
+  id                   String                @id @default(cuid())
+  email                String                @unique
+  name                 String
+  passwordHash         String
+  phoneNumber          String
+  otp                  String
+  otpCreatedAt         DateTime?
+  coupon               Coupon[]
+  notification         Notification[]
+  verifiedAt           DateTime?
+  ageGreaterThan18     Boolean
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  reviews              Review[]
+  wishlistedProducts   Product[]
+  addresses            Address[]
+  Order                Order[]
+  patient              Patient[]
+  appointments         BookAppointment[]
+  deletedAt            DateTime?
+  AuthSession          AuthSession[]
+  sessionRegistrations SessionRegistration[]
+}
+
+/// Temporary storage for user registration data until OTP is verified
+model PendingUser {
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  passwordHash     String
+  phoneNumber      String
+  ageGreaterThan18 Boolean  @default(false)
+  otp              String
+  otpExpiresAt     DateTime // OTP expires after this time
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Notification {
@@ -196,26 +210,27 @@ model LineItem {
 }
 
 model Country {
-  id             String    @id @default(cuid())
-  name           String
-  iso3           String
-  iso2           String
-  phoneCode      String
-  currency       String
-  currencyName   String
-  currencySymbol String
-  region         String?
-  regionId       String?
-  subRegion      String?
-  subregionId    String?
-  nationality    String?
-  timezones      Json?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  states         State[]
-  cities         City[]
-  addresses      Address[]
-  active         Boolean   @default(false)
+  id                    String                @id @default(cuid())
+  name                  String
+  iso3                  String
+  iso2                  String
+  phoneCode             String
+  currency              String
+  currencyName          String
+  currencySymbol        String
+  region                String?
+  regionId              String?
+  subRegion             String?
+  subregionId           String?
+  nationality           String?
+  timezones             Json?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  states                State[]
+  cities                City[]
+  addresses             Address[]
+  professionalAddresses ProfessionalAddress[]
+  active                Boolean               @default(false)
 }
 
 model AvailablePincodes {
@@ -271,7 +286,34 @@ model ProfessionalUser {
   googleAccessToken                 String?
   googleRefreshToken                String?
   deletedAt                         DateTime?
-  isapproved                         Boolean                          @default(false)
+  isapproved                        Boolean                            @default(false)
+  notifications                     ProfessionalNotification[]
+
+  /// Bank Details
+  bankAccountHolderName String?
+  bankAccountNumber     String?
+  bankName              String?
+  bankBranch            String?
+  bankIfscCode          String?
+  bankUpiId             String?
+
+  /// Payouts (admin-controlled)
+  payouts Payout[]
+
+  /// Address & Identity
+  address  ProfessionalAddress?
+  identity ProfessionalIdentity?
+}
+
+model ProfessionalNotification {
+  id                 String           @id @default(cuid())
+  title              String
+  description        String
+  time               DateTime         @default(now())
+  professionalUser   ProfessionalUser @relation(fields: [professionalUserId], references: [id])
+  professionalUserId String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model ProfessionalSpecializationParentCategory {
@@ -348,6 +390,9 @@ model BookAppointment {
   professionalRating ProfessionalUserRating?
   meeting            Json?
   // professionalRatingId String?
+
+  /// Doctor Payout System
+  appointmentPayment AppointmentPayment?
 }
 
 model Comment {
@@ -447,6 +492,8 @@ model UnAvailableDay {
 model ProfessionalDegree {
   id                 String           @id @default(cuid())
   degree             String
+  collegeName        String?
+  completionDate     DateTime?
   professionalUser   ProfessionalUser @relation(fields: [professionalUserId], references: [id])
   professionalUserId String
 }
@@ -510,18 +557,19 @@ model ProfessionalLanguages {
 }
 
 model State {
-  id                String                       @id @default(cuid())
-  name              String
-  createdAt         DateTime                     @default(now())
-  updatedAt         DateTime                     @updatedAt
-  deletedAt         DateTime?
-  qualifications    ProfessionalQualifications[]
-  cities            City[]
-  stateCode         String
-  addresses         Address[]
-  country           Country                      @relation(fields: [countryId], references: [id])
-  countryId         String
-  AvailablePincodes AvailablePincodes[]
+  id                    String                       @id @default(cuid())
+  name                  String
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  deletedAt             DateTime?
+  qualifications        ProfessionalQualifications[]
+  cities                City[]
+  stateCode             String
+  addresses             Address[]
+  professionalAddresses ProfessionalAddress[]
+  country               Country                      @relation(fields: [countryId], references: [id])
+  countryId             String
+  AvailablePincodes     AvailablePincodes[]
 }
 
 model City {
@@ -740,6 +788,7 @@ model AdminUser {
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
   productVariantInventoryUpdates ProductVariantInventoryUpdate[]
+  initiatedPayouts               Payout[]
 }
 
 model MediaOnProducts {
@@ -861,80 +910,195 @@ model SessionCategory {
   slug      String    @unique
   trimester Trimester
 
-  sessions  Session[]
+  sessions Session[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Session {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
+  id    String @id @default(cuid())
+  title String
+  slug  String @unique
 
-  startAt     DateTime
-  endAt       DateTime
+  startAt DateTime
+  endAt   DateTime
 
-  price       Decimal  @db.Decimal(10, 2)
-  status      SessionStatus @default(DRAFT)
+  price  Decimal       @db.Decimal(10, 2)
+  status SessionStatus @default(DRAFT)
 
   // Media fields
   // Media fields
-  thumbnailMediaId  String?
-  thumbnailMedia    Media?   @relation("SessionThumbnail", fields: [thumbnailMediaId], references: [id])
-  
-  banners           SessionBanner[]
-  
+  thumbnailMediaId String?
+  thumbnailMedia   Media?  @relation("SessionThumbnail", fields: [thumbnailMediaId], references: [id])
+
+  banners SessionBanner[]
+
   // Content fields
-  overview          String?  @db.Text
-  
-  // Delivery metadata
-  meetingLink       String?
-  language          String   @default("English")
-  type              SessionType @default(ONLINE)
+  overview String? @db.Text
 
-  categoryId  String
-  category    SessionCategory @relation(fields: [categoryId], references: [id])
+  // Delivery metadata
+  meetingLink String?
+  language    String      @default("English")
+  type        SessionType @default(ONLINE)
+
+  categoryId String
+  category   SessionCategory @relation(fields: [categoryId], references: [id])
 
   registrations SessionRegistration[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SessionBanner {
-  id        String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   sessionId String
-  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
-  mediaId   String
-  media     Media    @relation(fields: [mediaId], references: [id])
-  
-  order     Int      @default(0)
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  mediaId String
+  media   Media  @relation(fields: [mediaId], references: [id])
+
+  order Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model SessionRegistration {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  sessionId     String
-  session       Session  @relation(fields: [sessionId], references: [id])
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id])
 
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   paymentStatus PaymentStatus @default(PENDING)
-  
-  // Payment details
-  amountPaid          Decimal? @db.Decimal(10, 2)
-  razorpayOrderId     String?
-  razorpayPaymentId   String?
-  razorpaySignature   String?
 
-  createdAt     DateTime @default(now())
+  // Payment details
+  amountPaid        Decimal? @db.Decimal(10, 2)
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+
+  createdAt DateTime @default(now())
 
   @@unique([sessionId, userId])
+}
+
+// ============================================
+// DOCTOR EARNING & PAYOUT SYSTEM
+// ============================================
+
+enum DoctorPaymentStatus {
+  PENDING
+  COMPLETED
+}
+
+enum PayoutStatus {
+  INITIATED
+  PROCESSING
+  PAID
+  FAILED
+}
+
+model AppointmentPayment {
+  id            String @id @default(cuid())
+  appointmentId String @unique
+  doctorId      String
+
+  totalAmountInCents   Int
+  doctorShareInCents   Int
+  platformShareInCents Int
+
+  paymentStatus DoctorPaymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  /// Relations
+  appointment BookAppointment            @relation(fields: [appointmentId], references: [id])
+  payoutLinks AppointmentPaymentPayout[]
+
+  @@index([doctorId])
+  @@index([paymentStatus])
+}
+
+/// Admin-controlled payout — doctors do NOT request payouts.
+/// Admin selects doctor, enters amount, system creates payout atomically.
+model Payout {
+  id                 String       @id @default(cuid())
+  doctorId           String
+  amountInCents      Int
+  status             PayoutStatus @default(INITIATED)
+  initiatedByAdminId String
+  paidAt             DateTime?
+  transactionRef     String?
+  notes              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Relations
+  doctor           ProfessionalUser           @relation(fields: [doctorId], references: [id])
+  initiatedByAdmin AdminUser                  @relation(fields: [initiatedByAdminId], references: [id])
+  payoutLinks      AppointmentPaymentPayout[]
+
+  @@index([doctorId])
+  @@index([status])
+  @@index([initiatedByAdminId])
+}
+
+model AppointmentPaymentPayout {
+  id String @id @default(cuid())
+
+  appointmentPaymentId String
+  payoutId             String
+
+  amountUsedInCents Int
+
+  /// Relations
+  appointmentPayment AppointmentPayment @relation(fields: [appointmentPaymentId], references: [id])
+  payout             Payout             @relation(fields: [payoutId], references: [id])
+
+  @@unique([appointmentPaymentId, payoutId])
+  @@index([payoutId])
+}
+
+// ============================================
+// PROFESSIONAL USER - ADDRESS & IDENTITY
+// ============================================
+
+model ProfessionalAddress {
+  id                 String           @id @default(cuid())
+  professionalUser   ProfessionalUser @relation(fields: [professionalUserId], references: [id])
+  professionalUserId String           @unique
+
+  country         Country @relation(fields: [countryId], references: [id])
+  countryId       String
+  state           State   @relation(fields: [stateId], references: [id])
+  stateId         String
+  city            String
+  completeAddress String
+  pincode         String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model ProfessionalIdentity {
+  id                 String           @id @default(cuid())
+  professionalUser   ProfessionalUser @relation(fields: [professionalUserId], references: [id])
+  professionalUserId String           @unique
+
+  panNumber     String?
+  aadhaarNumber String?
+  licenseNumber String?
+  isVerified    Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }

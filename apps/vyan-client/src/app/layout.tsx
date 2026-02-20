@@ -49,7 +49,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
-  let verifiedAt: Date | null | undefined = undefined;
+  let verifiedAt: Date | undefined = undefined;
   if (session) {
     const user = await db.user.findFirst({
       select: {

@@ -118,7 +118,7 @@ const RegisterForm = () => {
         });
         console.log(resp?.message);
 
-        router.push(`/auth/register/qualifications/?${params.toString()}`);
+        router.push(`/auth/register/address-identity/?step=2`);
         
       })
       .catch((err) => {

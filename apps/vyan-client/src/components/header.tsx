@@ -119,7 +119,7 @@ export function Header() {
             target="_blank"
             className="hidden px-2 py-1 text-xs text-[#FFFFFF99] transition-colors hover:text-white sm:px-3 sm:py-2 sm:block sm:text-sm md:whitespace-nowrap lg:text-base"
           >
-            Therapist
+            Register as Therapist
           </Link>
 
           {/* Mobile Menu Toggle */}

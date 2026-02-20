@@ -73,24 +73,13 @@ const RegisterForm = () => {
   const submitForm = async (data: z.infer<typeof zodValidation>) => {
     RegisterUserAction(data as ISignUpFields)
       .then(async (resp) => {
-        const params = new URLSearchParams(searchParams);
-        params.set("email", data.email);
-        const loginResult = await signIn("CrendentialsVyanClient", {
-          redirect: false,
-          email: data.email,
-          password: data.password,
-        });
-        if (!loginResult!.ok) {
-          throw new Error("Failed to log in User");
-        }
         toast({
           title: resp?.message,
           variant: "default",
         });
 
-        router.push(`/auth/register-otp`);
-
-        setOpenOTPDialog(true);
+        // Redirect to OTP page with email - do NOT sign in yet, user doesn't exist in DB
+        router.push(`/auth/register-otp?email=${encodeURIComponent(data.email)}`);
       })
       .catch((err) => {
         toast({

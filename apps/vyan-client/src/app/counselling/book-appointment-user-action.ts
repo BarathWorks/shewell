@@ -86,6 +86,16 @@ const BookAppointmentUserAction = async ({
       },
     });
 
+    // Create Notification for the Professional
+    await db.professionalNotification.create({
+      data: {
+        title: "New Appointment Booked",
+        description: `You have a new ${serviceMode.serviceType} appointment with ${patient.firstName} on ${startingTime.toLocaleDateString()} at ${startingTime.toLocaleTimeString()}.`,
+        professionalUserId: professionalUser.professionalUserId,
+        time: new Date(),
+      },
+    });
+
     // Send confirmation emails
     try {
       const { sendEmail } = await import("@repo/mail");

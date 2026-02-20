@@ -40,9 +40,9 @@ const Partners = () => {
                 {/* Logo Container - Infinite Scroll Wrapper */}
                 <div className="relative w-full overflow-hidden mb-12 sm:mb-16 md:mb-[65px]" >
 
-                    <div className="absolute left-0 top-0 h-full w-6 sm:w-8 md:w-[400px] lg:md:w-[800px] bg-gradient-to-r from-white via-white/80 to-transparent z-20 pointer-events-none" />
+                    <div className="absolute left-0 top-0 h-full w-12 sm:w-16 md:w-24 lg:w-32 xl:w-40 bg-gradient-to-r from-white via-white/80 to-transparent z-20 pointer-events-none" />
 
-                    <div className="absolute right-0 top-0 h-full w-6 sm:w-8 md:w-[400px] lg:md:w-[800px] bg-gradient-to-l from-white via-white/80 to-transparent z-20 pointer-events-none" />
+                    <div className="absolute right-0 top-0 h-full w-12 sm:w-16 md:w-24 lg:w-32 xl:w-40 bg-gradient-to-l from-white via-white/80 to-transparent z-20 pointer-events-none" />
 
 
                     {/* The Moving Track */}
@@ -51,7 +51,7 @@ const Partners = () => {
                         animate={{ x: ["20%", "-50%"] }}
                         transition={{
                             ease: "easeInOut", 
-                            duration: 10,      
+                            duration: 20,      
                             repeat: Infinity,
                             repeatType: "reverse",
                         }}

@@ -13,6 +13,7 @@ import { db } from "./db";
 import { ReceiptText } from "lucide-react";
 import Email from "next-auth/providers/email";
 import { compare } from "bcrypt";
+import router from "next/router";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -81,6 +82,7 @@ export const authOptions: NextAuthOptions = {
           type: "password",
           placeholder: "Enter your password",
         },
+
       },
 
       async authorize(credentials) {
@@ -107,12 +109,22 @@ export const authOptions: NextAuthOptions = {
             email: true,
             phoneNumber: true,
             passwordHash: true,
+            verifiedAt: true,
             name: true,
           },
           where: {
             email: credentials.email,
+            verifiedAt: {
+              not: null,
+            },
           },
         });
+
+        if(!user){
+          throw new Error(
+            "User not found"
+          );
+        }
 
         if (!user?.passwordHash) {
           return null;
@@ -128,8 +140,10 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           phoneNumber: user.phoneNumber,
+          verifiedAt: user.verifiedAt,
         };
       },
+
     }),
   ],
 };

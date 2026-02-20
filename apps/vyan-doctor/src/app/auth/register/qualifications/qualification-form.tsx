@@ -41,8 +41,8 @@ interface ILanguageProps {
 const qualificationSchema = z
   .object({
     degree: z.string({ required_error: "Please enter the degree" }),
-    stateId: z.string({ required_error: "Please Select the State" }),
-    city: z.string({ required_error: "Please select the City" }),
+    collegeName: z.string({ required_error: "Please enter the college name" }),
+    completionDate: z.string({ required_error: "Please enter the completion date" }),
     languages: z
       .array(
         z.object({ id: z.string(), name: z.string() }),
@@ -94,59 +94,40 @@ interface IQualificationsInputs {
 }
 interface IQualifications {
   degree: string;
-  // language: string[];
+  collegeName: string;
+  completionDate: string;
   languages: ILanguageProps[];
   gender: string;
-  // expInYears: string;
-  // expInMonths: string;
   startingYear: string;
   endingYear: string;
   department: string;
   position: string;
   location: string;
   displayedQualificationId: string;
-  city: string;
-  // state: string;
-  stateId: string;
-  // cityId: string;
 }
 const QualificationForm = ({
-  states,
   languagesOptions,
   specialisations,
   degree,
-  stateId,
-  city,
-  // cityId,
   gender,
-  // years,
   department,
   position,
   location,
   displayQualificationId,
-  defaultStateId,
-  defaultCity,
   startingYear,
   endingYear,
   defaultLanguages,
 }: {
-  states: { id: string; name: string }[];
   languagesOptions: { id: string; name: string }[];
   specialisations: ISpecialization[];
   degree: string;
-  stateId: string;
-  // cityId: string;
-  city: string;
   gender: string;
-  // years : string,
   department: string;
   position: string;
   location: string;
   displayQualificationId: string;
   startingYear: string;
   endingYear: string;
-  defaultCity: string;
-  defaultStateId: string;
   defaultLanguages: { id: string; name: string }[];
 }) => {
   const {
@@ -157,17 +138,10 @@ const QualificationForm = ({
   } = useForm<z.infer<typeof qualificationSchema>>({
     defaultValues: {
       degree: degree,
-      city: defaultCity,
-      stateId: defaultStateId,
-      // city: city,
+      collegeName: "",
+      completionDate: "",
       gender: gender,
-      // degrees: [],
-      // languages: [{
-      //   id: "",
-      //   name : ""
-      // }],
       languages: defaultLanguages,
-      // years : years,
       department: department,
       position: position,
       location: location,
@@ -177,17 +151,7 @@ const QualificationForm = ({
     },
     resolver: zodResolver(qualificationSchema),
   });
-  const [selectedState, setSelectedState] = useState("");
   const [loadingState, setLoadingState] = useState<boolean>(false);
-  const [cities, setCities] = useState<
-    | null
-    | undefined
-    | {
-        id: string;
-        name: string;
-        stateId: string;
-      }[]
-  >([]);
 
 
 
@@ -217,7 +181,7 @@ const QualificationForm = ({
 
   useEffect(() => {
 
-    params.set("step", "2")
+    params.set("step", "3")
     window.history.pushState(null,"", `${pathname}?${params.toString()}` )
   },[])
 
@@ -234,7 +198,7 @@ const QualificationForm = ({
           description: resp?.message,
           variant: "default",
         });
-        router.push(`/auth/register/modes/?${params.toString()}`);
+        router.push(`/auth/register/modes/?step=4`);
       })
       .catch((err) => {
         setLoadingState(false);
@@ -285,42 +249,21 @@ const QualificationForm = ({
 
           <div className="flex flex-col gap-4 lg:flex-row xl:gap-6 ">
             <div className="w-full">
-              <UIFormLabel>Select State</UIFormLabel>
+              <UIFormLabel>College/University Name</UIFormLabel>
               <Controller
+                name="collegeName"
                 control={control}
-                name="stateId"
                 render={({ field }) => {
                   return (
                     <>
-                      <Select
+                      <UIFormInput
+                        className="placeholder:text-black"
+                        placeholder="Enter college or university name"
                         value={field.value}
-                        onValueChange={(e) => {
-                          field.onChange(e);
-                          setSelectedState(e);
-                        }}
-                        // defaultValue={field.value}
-                      >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9]  py-3 pl-4 font-inter  text-sm font-normal ">
-                          <SelectValue placeholder="Enter your State" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectGroup>
-                            {states.length &&
-                              states.map((state) => {
-                                return (
-                                  <SelectItem value={state.id} key={state.id}>
-                                    {state.name}
-                                  </SelectItem>
-                                );
-                              })}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      {errors && errors.stateId && (
-                        <p className="text-red-500 text-sm">
-                          {" "}
-                          {errors.stateId.message}
-                        </p>
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                      {errors && errors.collegeName && (
+                        <p className="text-red-500 text-sm"> {errors.collegeName.message}</p>
                       )}
                     </>
                   );
@@ -329,71 +272,30 @@ const QualificationForm = ({
             </div>
 
             <div className="w-full">
-              <UIFormLabel>Select City</UIFormLabel>
-              {/* <Controller
+              <UIFormLabel>Completion Date</UIFormLabel>
+              <Controller
+                name="completionDate"
                 control={control}
-                name="cityId"
                 render={({ field }) => {
                   return (
                     <>
-                      <Select
+                      <UIFormInput
+                        type="date"
+                        className="placeholder:text-black"
                         value={field.value}
-                        onValueChange={field.onChange}
-                        // defaultValue={field.value}
-                      >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9]  py-3 pl-4 font-inter  text-sm font-normal ">
-                          <SelectValue placeholder="Enter your City" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectGroup>
-                            {cities &&
-                              cities.map((city) => {
-                                return (
-                                  <SelectItem value={city.id} key={city.id}>
-                                    {city.name}
-                                  </SelectItem>
-                                );
-                              })}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      {errors && errors.cityId && (
-                        <p className="text-red-500"> {errors.cityId.message}</p>
+                        onChange={(e) => field.onChange(e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                      {errors && errors.completionDate && (
+                        <p className="text-red-500 text-sm"> {errors.completionDate.message}</p>
                       )}
                     </>
                   );
                 }}
-              /> */}
-                <Controller
-              name="city"
-              control={control}
-              render={({ field }) => {
-                // const handleDegreeChange = (newValue: string | string[]) => {
-                //   const newDegree = Array.isArray(newValue)
-                //     ? newValue
-                //     : [newValue];
-                //   field.onChange(newDegree);
-                // };
-
-                return (
-                  <>
-                    <UIFormInput
-                      className="placeholder:text-black font-normal text-sm font-inter"
-                      placeholder="Enter your City"
-                      // value={field.value}
-                      // onChange={(e) => handleDegreeChange(e.target.value)}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                    {errors && errors.city && (
-                      <p className="text-red-500 text-sm"> {errors.city.message}</p>
-                    )}
-                  </>
-                );
-              }}
-            />
+              />
             </div>
           </div>
+
           {
             <div>
               <UIFormLabel>Language</UIFormLabel>
