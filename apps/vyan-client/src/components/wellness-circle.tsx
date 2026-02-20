@@ -15,7 +15,7 @@ const overallVariant = {
 
 const WellnessCircle = () => {
   return (
-    <div className="flex w-full flex-col items-center overflow-hidden bg-white px-4 py-6 sm:py-8 sm:px-6 md:px-8 md:py-12">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-12">
       {/* 1. Illustration Area */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -29,6 +29,10 @@ const WellnessCircle = () => {
           alt="Mother and baby illustration"
           className="mx-auto mb-8 h-auto w-full cursor-pointer object-cover opacity-20 transition-opacity ease-in-out hover:opacity-100"
         />
+        {/* Shewell Title */}
+        <h1 className="mx-auto cursor-pointer text-center font-amatic-sc text-4xl font-bold tracking-wide text-primary opacity-40 transition-opacity duration-500 ease-in-out hover:opacity-100 sm:text-5xl md:text-6xl lg:text-7xl">
+          Shewell
+        </h1>
       </motion.div>
 
       {/* 2. Cursive Script Heading */}
@@ -38,7 +42,7 @@ const WellnessCircle = () => {
         animate="visible"
         className="mb-0 px-2 text-center"
       >
-        <h2 className="flex flex-wrap justify-center gap-2 sm:gap-3 font-amatic-sc text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold tracking-wide text-primary md:gap-6 lg:text-7xl xl:text-8xl">
+        <h2 className="flex flex-wrap justify-center gap-2 font-amatic-sc text-2xl font-bold tracking-wide text-primary sm:gap-3 sm:text-3xl md:gap-6 md:text-4xl lg:text-5xl lg:text-7xl xl:text-6xl xl:text-8xl 2xl:text-7xl">
           <span className="cursor-default text-primary opacity-50 transition-opacity duration-500 ease-in-out hover:opacity-100">
             For her body,{" "}
           </span>

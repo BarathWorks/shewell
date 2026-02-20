@@ -132,7 +132,7 @@ export default function ExpertsCarousel() {
                     layout
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{
-                      opacity: 1,
+                      opacity: isCenter ? 1 : isSide ? 0.85 : 0.7,
                       scale: isCenter ? 1.5 : isSide ? 1.4 : 1.1,
                       zIndex: isCenter ? 20 : 10,
                       marginLeft:
@@ -157,8 +157,9 @@ export default function ExpertsCarousel() {
                     className="relative"
                   >
                     <div
-                      className={`relative overflow-hidden rounded-full border-2 border-white shadow-lg
-                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-28 lg:w-28"}`}
+                      className={`relative overflow-hidden rounded-full shadow-lg
+                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-28 lg:w-28"}
+                        ${!isCenter ? "grayscale-[30%]" : ""}`}
                     >
                       <img
                         src={expert.image}
@@ -166,15 +167,15 @@ export default function ExpertsCarousel() {
                         className="h-full w-full object-cover"
                       />
                       {/* overlay */}
-                      <div className="absolute inset-0 top-[60%] bg-black/25   shadow-lg blur-[3px] " />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                       {/* Role Badge */}
                       <motion.div
                         animate={{ opacity: isCenter ? 1 : 0.6 }}
-                        className={`absolute  ${isCenter ? "bottom-3 sm:bottom-5 md:bottom-6 lg:bottom-8" : "bottom-1.5 sm:bottom-2"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:px-2`}
+                        className={`absolute  ${isCenter ? "bottom-2 sm:bottom-4 md:bottom-6 lg:bottom-6" : "bottom-1 sm:bottom-2 md:bottom-3"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:gap-1 sm:px-2`}
                       >
-                        <span className="h-0.5 w-0.5 rounded-full bg-white sm:h-1 sm:w-1 md:h-1.5 md:w-1.5"></span>
+                        <span className="h-1 w-1 rounded-full bg-white sm:h-1.5 sm:w-1.5 md:h-2 md:w-2"></span>
                         <span
-                          className={`${isCenter ? "text-[8px] sm:text-xs md:text-sm lg:text-base" : "text-[7px] sm:text-[10px] md:text-xs"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out`}
+                          className={`${isCenter ? "text-[8px] sm:text-[8px] md:text-[10px] lg:text-[12px]" : "text-[8px] sm:text-[8px] md:text-[8px] lg:text-[8px]"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out `}
                         >
                           {expert.role}
                         </span>
