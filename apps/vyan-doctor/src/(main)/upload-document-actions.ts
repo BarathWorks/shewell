@@ -6,7 +6,7 @@ import { ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
 import { DocumentType } from '@repo/database';
-const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
+const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType: string = 'application/octet-stream') => {
   const s3 = new S3({
     // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
     // endpoint: process.env.S3_SPACES_URL!,
@@ -20,9 +20,8 @@ const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
   const fileParams = {
     Bucket: process.env.AWS_BUCKET,
     Key: key,
-    ContentType: 'text',
+    ContentType: contentType,
     // Expires: addSeconds(new Date(), 600),
-    ACL: isPublic ? ObjectCannedACL.public_read : ObjectCannedACL.private
   };
   const command = new PutObjectCommand(fileParams);
   return await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
@@ -51,7 +50,7 @@ const uploadProfessionalUserDocument = async (professionalUserId : string,fileKe
       type : type
     }
   });
-  const url = await getUploadPresignedUrl(key, false);
+  const url = await getUploadPresignedUrl(key, false, mimeType);
   revalidatePath("/auth/register/uploads")
   // revalidatePath('/admin/media');
 

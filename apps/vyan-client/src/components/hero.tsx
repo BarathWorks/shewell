@@ -24,7 +24,7 @@ export default function Hero(): JSX.Element {
           leading-relaxed text-[#7b7b7b] sm:text-base md:text-lg lg:text-xl
           xl:text-[22px] xl:leading-[1.4] 2xl:text-[26px]"
         >
-          A trusted digital companion for women's health, motherhood, mental
+          A trusted digital companion for women's health, motherhood, Emotional
           wellbeing, and mindful living curated by experts and designed for
           every stage of womanhood.
         </p>

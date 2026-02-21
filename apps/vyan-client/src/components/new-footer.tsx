@@ -104,7 +104,7 @@ export default function NewFooter() {
                     href="#"
                     className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
                   >
-                    About Us
+                    Home{" "}
                   </a>
                 </li>
                 <li>
@@ -112,7 +112,7 @@ export default function NewFooter() {
                     href="#"
                     className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
                   >
-                    Recipe
+                    Sessions
                   </a>
                 </li>
                 <li>
@@ -120,7 +120,7 @@ export default function NewFooter() {
                     href="#"
                     className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
                   >
-                    Reviews
+                    Counselling
                   </a>
                 </li>
               </ul>

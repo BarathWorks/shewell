@@ -20,6 +20,16 @@ const COURSES_DATA = [
   },
   {
     id: 2,
+    category: "Pregency Planning",
+    mainImage: "/home/Pregnancy-Planning.webp",
+    services: [
+      { label: "Fertility diet", position: "top-[25%] left-[20%]" },
+      { label: "Fertility couple mindset", position: "top-[25%] right-[20%]" },
+      { label: "Fertility fitness", position: "bottom-[10%] left-[20%]" },
+    ],
+  },
+  {
+    id: 3,
     category: "Prenatal Care",
     mainImage: "/home/Prenatal Care.webp",
     services: [
@@ -31,7 +41,7 @@ const COURSES_DATA = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     category: "Postnatal Care",
     mainImage: "/home/service-postnatal.webp",
     services: [
@@ -41,16 +51,7 @@ const COURSES_DATA = [
       { label: "Moms fitness", position: "bottom-[20%] right-[20%]" },
     ],
   },
-  {
-    id: 4,
-    category: "Pregency Planning",
-    mainImage: "/home/Pregnancy-Planning.webp",
-    services: [
-      { label: "Fertility diet", position: "top-[25%] left-[20%]" },
-      { label: "Fertility couple mindset", position: "top-[25%] right-[20%]" },
-      { label: "Fertility fitness", position: "bottom-[10%] left-[20%]" },
-    ],
-  },
+
   {
     id: 5,
     category: "Child Healthcare",
