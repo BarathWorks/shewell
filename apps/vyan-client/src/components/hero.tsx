@@ -49,17 +49,25 @@ export default function Hero(): JSX.Element {
       </div>
 
       <div className="z-40 mt-6 flex w-full flex-col flex-wrap items-stretch gap-3 sm:mt-8 sm:w-[50%] sm:flex-row sm:items-center sm:gap-4 md:mt-10">
-        <Link href="/counselling" className="w-full sm:w-auto sm:flex-1" prefetch={false}>
-          <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
-            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl">
+        <Link
+          href="/counselling"
+          className="w-full sm:w-auto sm:flex-1"
+          prefetch={false}
+        >
+          <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
+            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white">
               Book Your Consultation
             </span>
             <InteractiveButton />
           </div>
         </Link>
-        <Link href="/session" className="w-full sm:w-auto sm:flex-1" prefetch={false}>
-          <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
-            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl">
+        <Link
+          href="/session"
+          className="w-full sm:w-auto sm:flex-1"
+          prefetch={false}
+        >
+          <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
+            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white">
               Explore Our Sessions
             </span>
             <InteractiveButton />
@@ -67,7 +75,7 @@ export default function Hero(): JSX.Element {
         </Link>
       </div>
       {/* Background Circle with Hero Image - Responsive */}
-      <div className="absolute hidden md:block right-[-50vw] top-[60%] z-20 h-[100vw] w-[100vw] translate-y-[-50%] rounded-full bg-[#9D9D8D] md:right-[-45vw] md:top-[65%] md:h-[90vw] md:w-[90vw] lg:right-[-40vw] lg:h-[80vw] lg:w-[80vw] xl:right-[-35vw]">
+      <div className="absolute right-[-50vw] top-[60%] z-20 hidden h-[100vw] w-[100vw] translate-y-[-50%] rounded-full bg-[#9D9D8D] md:right-[-45vw] md:top-[65%] md:block md:h-[90vw] md:w-[90vw] lg:right-[-40vw] lg:h-[80vw] lg:w-[80vw] xl:right-[-35vw]">
         {/* Hero Image Container */}
         <div className="absolute bottom-[25%] right-[40%] z-40 h-[120%] w-[40%] max-[1366px]:bottom-[24%] max-[1366px]:h-[100%] max-[1366px]:w-[52%] md:bottom-[28%] md:right-[42%] md:h-[110%] md:w-[20%] lg:bottom-[26%] lg:right-[43%] lg:h-[100%] lg:w-[48%]">
           <Image

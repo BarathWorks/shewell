@@ -9,17 +9,19 @@ export default function NewFooter() {
         <div className="mb-8 flex flex-col gap-8 sm:mb-10 sm:gap-10 md:mb-12 lg:mb-14 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
           {/* Brand & Socials */}
           <div className="w-full lg:w-[50%]">
-            <div className="relative mb-6 h-14 w-28 sm:mb-8 sm:h-16 sm:w-32 md:h-20 md:w-40 lg:h-24 lg:w-48">
-              <img
-                src="/home/Logo.png"
-                alt="Shewell"
-                className="h-full w-full object-contain brightness-0 invert"
-              />
+            <div className="flex flex-col gap-0">
+              <div className="relative h-14 w-28 sm:h-16 sm:w-32 md:h-20 md:w-40 lg:h-24 lg:w-48">
+                <img
+                  src="/home/Logo.png"
+                  alt="Shewell"
+                  className="h-full w-full object-contain brightness-0 invert"
+                />
+              </div>
+              <p className="mb-12 text-sm text-gray-400 sm:text-base md:mb-16 md:text-base lg:pr-8">
+                Empowering motherhood with care, expertise, and support every
+                step of the way.
+              </p>
             </div>
-            <p className="mb-6 text-sm text-gray-400 sm:text-base md:mb-8 md:text-base lg:pr-8">
-              Empowering motherhood with care, expertise, and support every step
-              of the way.
-            </p>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <a
                 href="https://x.com/shewellcare"
@@ -34,7 +36,7 @@ export default function NewFooter() {
                     alt="X"
                     width={16}
                     height={16}
-                    className="sm:h-5 sm:w-5"
+                    className="group-hover:invert sm:h-5 sm:w-5"
                   />
                 </div>
               </a>
@@ -51,7 +53,7 @@ export default function NewFooter() {
                     alt="Instagram"
                     width={16}
                     height={16}
-                    className="sm:h-5 sm:w-5"
+                    className="group-hover:invert sm:h-5 sm:w-5"
                   />
                 </div>
               </a>
@@ -68,7 +70,7 @@ export default function NewFooter() {
                     alt="Facebook"
                     width={16}
                     height={16}
-                    className="sm:h-5 sm:w-5"
+                    className="group-hover:invert sm:h-5 sm:w-5"
                   />
                 </div>
               </a>
@@ -85,7 +87,7 @@ export default function NewFooter() {
                     alt="YouTube"
                     width={16}
                     height={16}
-                    className="sm:h-5 sm:w-5"
+                    className="group-hover:invert sm:h-5 sm:w-5"
                   />
                 </div>
               </a>
@@ -130,15 +132,39 @@ export default function NewFooter() {
                 Contact Us
               </h4>
               <ul className="space-y-3.5 text-sm text-gray-300 sm:space-y-4 sm:text-base">
-                <li className="leading-relaxed">
-                  <span className="block text-gray-400">
+                <li className="flex items-start gap-2">
+                  <svg
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <a
+                    href="https://maps.google.com/?q=NO.1274,+CHARUKESI+APARTMENTS,+17TH+STREET,+POOMPUHAR+NAGAR,+KOLATHUR,+CHENNAI,+Tamil+Nadu,+India+600099"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="leading-relaxed transition-colors hover:text-[#167D71]"
+                  >
                     NO.1274, CHARUKESI APARTMENTS,
                     <br className="hidden sm:block" /> 17TH STREET, POOMPUHAR
                     NAGAR,
                     <br className="hidden sm:block" /> KOLATHUR, CHENNAI,
                     <br className="hidden sm:block" /> Tamil Nadu, India -
                     600099
-                  </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-2">
                   <svg

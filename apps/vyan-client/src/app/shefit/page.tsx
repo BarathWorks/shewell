@@ -25,7 +25,10 @@ import { ComingSoon } from "~/components/coming-soon";
 
 export const shefit= () => {
 return (
-  <ComingSoon />
+  <div className="flex h-screen w-full flex-col items-center justify-center mb-10">
+
+    <ComingSoon />
+  </div>
 )
 }
 ;

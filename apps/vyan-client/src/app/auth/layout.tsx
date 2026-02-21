@@ -20,14 +20,14 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <div className="w-full">
-        <div className="mb-[50px]">{/* <Header /> */}</div>
+        <div className="">{/* <Header /> */}</div>
         <div className="container mx-auto max-w-full ">
           {/* 1-s */}
 
           {/* 2-s */}
-          <div className=" xl:gap[60px] mt-5 flex flex-col gap-5 md:gap-[53px]  lg:flex-row 2xl:gap-[198px]">
+          <div className=" xl:gap[60px] mt-5 flex flex-col gap-5 md:gap-[53px]  lg:flex-row 2xl:gap-[198px] min-h-[85vh]">
             {/* form */}
-            <div className="lg:basis-1/2 lg:self-center">
+            <div className="">
               <Suspense> {children}</Suspense>
             </div>
 

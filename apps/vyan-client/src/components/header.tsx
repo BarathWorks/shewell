@@ -14,7 +14,10 @@ export function Header() {
     <header className="relative sticky top-0 z-50 w-full bg-gradient-to-r from-[#0E3A47] to-[#13647A] shadow-md">
       <nav className="mx-auto flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4 md:px-6">
         {/* Logo */}
-        <Link href="/" className="relative h-8 w-24 shrink-0 sm:h-10 sm:w-28 md:w-32">
+        <Link
+          href="/"
+          className="relative h-8 w-24 shrink-0 sm:h-10 sm:w-28 md:w-32"
+        >
           <img
             src="/home/Logo.png"
             alt="Shewell"
@@ -33,7 +36,7 @@ export function Header() {
 
           <Link
             href="/counselling"
-            className="text-sm font-medium text-white transition-colors hover:text-[#A5F3FC] whitespace-nowrap lg:text-base"
+            className="whitespace-nowrap text-sm font-medium text-white transition-colors hover:text-[#A5F3FC] lg:text-base"
           >
             Book Experts
           </Link>
@@ -56,7 +59,7 @@ export function Header() {
             </button>
 
             {isMoreOpen && (
-              <div className="absolute left-0 top-full z-10 mt-1">
+              <div className="absolute left-0 top-full z-10 pt-2">
                 <div className="w-48 rounded-md bg-white shadow-lg">
                   <Link
                     href="/shefit"
@@ -79,7 +82,7 @@ export function Header() {
         </div>
 
         {/* Right Side - Icons and Mobile Menu */}
-        <div className="flex items-center gap-2 shrink-0 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {/* Search */}
           <div className="relative">
             {!isSearchOpen ? (
@@ -91,7 +94,7 @@ export function Header() {
                 <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             ) : (
-              <div className="absolute right-0 top-[-16px] sm:top-[-18px] flex items-center gap-2 rounded-full bg-[#1A8191] px-3 py-2 sm:px-4 sm:py-2">
+              <div className="absolute right-0 top-[-16px] flex items-center gap-2 rounded-full bg-[#1A8191] px-3 py-2 sm:top-[-18px] sm:px-4 sm:py-2">
                 <Search className="h-4 w-4 text-white sm:h-5 sm:w-5" />
                 <input
                   type="text"
@@ -117,7 +120,7 @@ export function Header() {
           <Link
             href={env.NEXT_PUBLIC_PROFESSIONAL + ""}
             target="_blank"
-            className="hidden px-2 py-1 text-xs text-[#FFFFFF99] transition-colors hover:text-white sm:px-3 sm:py-2 sm:block sm:text-sm md:whitespace-nowrap lg:text-base"
+            className="hidden px-2 py-1 text-xs text-[#FFFFFF99] transition-colors hover:text-white sm:block sm:px-3 sm:py-2 sm:text-sm md:whitespace-nowrap lg:text-base"
           >
             Register as Therapist
           </Link>
@@ -170,10 +173,10 @@ export function Header() {
             </button>
 
             {isMoreOpen && (
-              <div className="flex flex-col gap-2 border-t border-[#1A8191] pt-2 pl-4 sm:pt-3 sm:pl-6">
+              <div className="flex flex-col gap-2 border-t border-[#1A8191] pl-4 pt-2 sm:pl-6 sm:pt-3">
                 <Link
                   href="/shefit"
-                  className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:text-white hover:bg-[#1A8191] sm:px-4 sm:py-3 sm:text-base"
+                  className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-[#1A8191] hover:text-white sm:px-4 sm:py-3 sm:text-base"
                   onClick={() => {
                     setIsMoreOpen(false);
                     setIsMobileMenuOpen(false);
@@ -183,7 +186,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/products"
-                  className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:text-white hover:bg-[#1A8191] sm:px-4 sm:py-3 sm:text-base"
+                  className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-[#1A8191] hover:text-white sm:px-4 sm:py-3 sm:text-base"
                   onClick={() => {
                     setIsMoreOpen(false);
                     setIsMobileMenuOpen(false);
