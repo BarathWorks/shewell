@@ -79,7 +79,7 @@ const LoginForm = () => {
     });
 
     console.log("signInData", signInData);
-    
+
     if (signInData?.ok) {
       toast({
         title: "login Successfully",
@@ -106,7 +106,7 @@ const LoginForm = () => {
     setOpenDialog(true);
   };
   return (
-    <>
+    <div className="flex flex-col justify-center h-full">
       {errorMessage && (
         <div
           className="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
@@ -231,29 +231,8 @@ const LoginForm = () => {
             Privacy Policy
           </Link>
         </div>
-        <div className="flex items-center gap-6">
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href={""}
-          >
-            Help
-          </Link>
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href={""}
-          >
-            Privacy
-          </Link>
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href="/terms"
-            target="_blank"
-          >
-            Terms
-          </Link>
-        </div>
       </div>
-    </>
+    </ div>
   );
 };
 

@@ -79,7 +79,7 @@ export default function PregnancyStages({
                   onStageHover?.(stage.carouselIndex);
                 }}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg sm:h-28 sm:rounded-xl md:h-32 md:rounded-2xl lg:h-36 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6 ${isMobileLastItem ? "col-span-2 sm:col-auto sm:col-span-1" : ""} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
+                className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg sm:h-24 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6 ${isMobileLastItem ? "col-span-2 sm:col-auto sm:col-span-1" : ""} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
               >
                 {/* The large Gradient Text */}
                 <h1 className="absolute -top-2 left-2 select-none text-3xl font-black leading-none tracking-tighter opacity-70 sm:text-5xl md:text-6xl lg:text-[80px]">
@@ -91,7 +91,7 @@ export default function PregnancyStages({
                 </h1>
 
                 {/* The Title Text */}
-                <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] text-right text-xs font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] sm:text-sm md:text-base lg:text-lg">
+                <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-right text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] sm:text-base md:text-lg lg:text-lg">
                   {stage.title}
                 </h2>
               </motion.div>

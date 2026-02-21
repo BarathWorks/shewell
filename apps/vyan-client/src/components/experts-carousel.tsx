@@ -90,14 +90,14 @@ export default function ExpertsCarousel() {
   }, [handleNext, isHovered]);
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:px-[100px]">
+    <section className="w-full overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-16 md:py-14 lg:px-[100px]">
       <div className="max-w-8xl mx-auto px-0">
         {/* Section Header */}
         <div className="mb-6 text-center sm:mb-8 md:mb-12">
-          <h2 className="mb-3 text-lg font-medium leading-tight text-gray-900 sm:mb-4 sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
+          <h2 className="mb-3 text-lg font-medium leading-tight text-gray-900 sm:mb-4 sm:text-xl md:mb-5 md:text-3xl lg:text-3xl xl:text-4xl">
             You're Not Alone We're Just a Click Away
           </h2>
-          <p className="mx-auto max-w-2xl text-xs leading-relaxed text-[#33333399] sm:text-sm md:text-base lg:text-lg xl:text-xl">
+          <p className="mx-auto max-w-2xl text-xs leading-relaxed text-[#33333399] sm:text-sm md:text-[15px] lg:text-lg xl:text-xl">
             Consult with empathetic, qualified specialists who listen, guide,
             and support your health decisions.
           </p>
@@ -105,13 +105,13 @@ export default function ExpertsCarousel() {
 
         {/* Experts Carousel */}
         <div
-          className="relative flex h-[180px] items-center justify-center px-8 sm:h-[220px] sm:px-10 md:h-[280px] md:px-12 lg:h-[350px]"
+          className="relative flex h-[180px] items-center justify-center px-8 sm:h-[220px] sm:px-10 md:h-[320px] md:px-14 lg:h-[350px]"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <button
             onClick={handlePrev}
-            className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-10 md:p-3"
+            className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-6 md:p-3"
             aria-label="Previous expert"
           >
             <ChevronLeft
@@ -120,7 +120,7 @@ export default function ExpertsCarousel() {
             />
           </button>
 
-          <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 lg:gap-10">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             <AnimatePresence mode="popLayout" initial={false}>
               {items.slice(0, 5).map((expert, index) => {
                 const isCenter = index === 2;
@@ -158,7 +158,7 @@ export default function ExpertsCarousel() {
                   >
                     <div
                       className={`relative overflow-hidden rounded-full shadow-lg
-                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-28 lg:w-28"}
+                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-32 md:w-32 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-24 md:w-24 lg:h-28 lg:w-28"}
                         ${!isCenter ? "grayscale-[30%]" : ""}`}
                     >
                       <img
@@ -171,11 +171,11 @@ export default function ExpertsCarousel() {
                       {/* Role Badge */}
                       <motion.div
                         animate={{ opacity: isCenter ? 1 : 0.6 }}
-                        className={`absolute  ${isCenter ? "bottom-2 sm:bottom-4 md:bottom-6 lg:bottom-6" : "bottom-1 sm:bottom-2 md:bottom-3"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:gap-1 sm:px-2`}
+                        className={`absolute  ${isCenter ? "bottom-2 sm:bottom-4 md:bottom-8 lg:bottom-6" : "bottom-1 sm:bottom-2 md:bottom-4"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:gap-1 sm:px-2`}
                       >
-                        <span className="h-1 w-1 rounded-full bg-white sm:h-1.5 sm:w-1.5 md:h-2 md:w-2"></span>
+                        <span className={`${isCenter ? "h-1 w-1 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 lg:w-1.5 lg:h-1.5" : "h-0.5 w-0.5 sm:h-0.5 sm:w-0.5 md:h-1 md:w-1"} rounded-full bg-white`}></span>
                         <span
-                          className={`${isCenter ? "text-[8px] sm:text-[8px] md:text-[10px] lg:text-[12px]" : "text-[8px] sm:text-[8px] md:text-[8px] lg:text-[8px]"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out `}
+                          className={`${isCenter ? "text-[8px] sm:text-[8px] md:text-[11px] lg:text-[12px]" : "text-[8px] sm:text-[8px] md:text-[9px] lg:text-[8px]"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out `}
                         >
                           {expert.role}
                         </span>
@@ -189,7 +189,7 @@ export default function ExpertsCarousel() {
 
           <button
             onClick={handleNext}
-            className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-10 md:p-3"
+            className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-6 md:p-3"
             aria-label="Next expert"
           >
             <ChevronRight
@@ -201,13 +201,13 @@ export default function ExpertsCarousel() {
 
         {/* CTA Button */}
         <div
-          className="mt-8 flex w-full justify-center sm:mt-10 md:mt-12 lg:mt-16"
+          className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
           onClick={() => (window.location.href = "/counselling")}
         >
-          <div className="order-0 group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3 md:h-16 md:rounded-2xl md:px-6 lg:h-20 lg:px-8">
+          <div className="order-0 group flex h-24 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-12 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8">
             <div className="flex flex-1 justify-center">
-              <span className="text-center text-xs font-semibold text-[#00000066] sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                Book a Session with our experts
+              <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px]">
+                BOOK A SESSION WITH OUR EXPERTS
               </span>
             </div>
             <InteractiveButton />

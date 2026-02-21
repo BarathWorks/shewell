@@ -194,7 +194,10 @@
 import { ComingSoon } from "~/components/coming-soon";
 
 const Products = () => {
-  return <ComingSoon />;
+  return <div className="flex h-screen w-full flex-col items-center justify-center mb-10">
+
+    <ComingSoon />
+  </div>;
 };
 
 export default Products;
