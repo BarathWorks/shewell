@@ -77,8 +77,8 @@ const HomePage = async () => {
         <ServicesCarousel />
         {/* <PlatformSection /> */}
 
-        <ExpertsCarousel />
         <UpcomingSessions />
+        <ExpertsCarousel />
         {/* <ProductsGrid /> */}
         <Partners />
         <WhyShewell />

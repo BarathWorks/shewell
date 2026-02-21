@@ -14,12 +14,12 @@ export default function UpcomingSessions() {
 
   if (isLoading) {
     return (
-      <section className="w-full bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-        <div className="mb-8">
-          <h2 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
-            Upcoming Sessions
+      <section className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
+        <div className="mb-8 text-center">
+          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px] font-medium text-gray-900">
+            Upcoming Wellness Sessions
           </h2>
-          <div className="h-4 w-1/3 animate-pulse rounded bg-gray-200"></div>
+          <div className="mx-auto h-4 w-1/3 animate-pulse rounded bg-gray-200"></div>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
@@ -34,29 +34,53 @@ export default function UpcomingSessions() {
   }
 
   if (!sessions || sessions.length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="w-full bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end md:items-center">
-        <div>
-          <h2 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
-            Upcoming Sessions
+    return (
+      <section className="w-full h-[80vh] bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px] flex flex-col">
+        <div className="mb-8 text-center">
+          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px] font-medium text-gray-900">
+            Upcoming Wellness Sessions
           </h2>
-          <p className="text-gray-500">
+          <p className="text-xs sm:text-sm md:text-lg lg:text-lg xl:text-[24px] text-[#33333399]">
             Join our expert-led sessions for your pregnancy journey
           </p>
         </div>
-        <Link
-          href="/session"
-          className="group flex items-center gap-3 rounded-lg bg-gray-50 px-5 py-2 transition-all hover:bg-[#00898F] "
-        >
-          <span className="font-semibold text-gray-900 group-hover:text-white">
-            Explore All Sessions
-          </span>
-          <InteractiveButton />
-        </Link>
+
+        {/* Empty state */}
+        <div className="flex justify-center items-center flex-1">
+          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-12 sm:p-16 md:p-20 shadow-sm">
+            {/* Image area */}
+            <div className="flex w-full items-center justify-center mb-6">
+              <img
+                src="/session-calender.png"
+                alt="No upcoming sessions"
+                className="h-40 w-40 sm:h-48 sm:w-48 md:h-56 md:w-56 object-contain"
+              />
+            </div>
+
+            {/* Content area */}
+            <div className="flex flex-col items-center text-center">
+              <h3 className="mb-4 text-xl font-bold text-gray-900 sm:text-2xl md:text-3xl">
+                New Sessions Coming Soon
+              </h3>
+              <p className="max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed text-gray-600">
+                We're currently scheduling our next round of expert-led pregnancy and health workshops.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="w-full min-h-[85vh] bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
+      <div className="mb-8 text-center">
+        <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px] font-medium text-gray-900">
+          Upcoming Wellness Sessions
+        </h2>
+        <p className="text-xs sm:text-sm md:text-lg lg:text-lg xl:text-[24px] text-[#33333399]">
+          Join our expert-led sessions for your pregnancy journey
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -157,19 +181,21 @@ export default function UpcomingSessions() {
           );
         })}
       </div>
-      {/* <div
-                className="mt-8 flex w-full justify-center sm:mt-10 md:mt-12 lg:mt-16"
-                onClick={() => (window.location.href = "/counselling")}
-              >
-                <div className="order-0 group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-3 md:h-16 md:rounded-2xl md:px-6 lg:h-20 lg:px-8">
-                  <div className="flex flex-1 justify-center">
-                    <span className="text-center text-xs font-semibold text-[#00000066] sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                      Explore All Sessions with our experts
-                    </span>
-                  </div>
-                  <InteractiveButton />
-                </div>
-              </div> */}
+
+      {/* CTA Button */}
+      <div
+        className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
+        onClick={() => (window.location.href = "/session")}
+      >
+        <div className="order-0 group flex h-24 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-12 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8">
+          <div className="flex flex-1 justify-center">
+            <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px]">
+              EXPLORE ALL SESSIONS
+            </span>
+          </div>
+          <InteractiveButton />
+        </div>
+      </div>
     </section>
   );
 }

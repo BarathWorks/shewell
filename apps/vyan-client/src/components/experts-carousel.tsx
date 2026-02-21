@@ -94,10 +94,10 @@ export default function ExpertsCarousel() {
       <div className="max-w-8xl mx-auto px-0">
         {/* Section Header */}
         <div className="mb-6 text-center sm:mb-8 md:mb-12">
-          <h2 className="mb-3 text-lg font-medium leading-tight text-gray-900 sm:mb-4 sm:text-xl md:mb-5 md:text-3xl lg:text-3xl xl:text-4xl">
+          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px] font-medium text-gray-900">
             You're Not Alone We're Just a Click Away
           </h2>
-          <p className="mx-auto max-w-2xl text-xs leading-relaxed text-[#33333399] sm:text-sm md:text-[15px] lg:text-lg xl:text-xl">
+          <p className="text-xs sm:text-sm md:text-lg lg:text-lg xl:text-[24px] text-[#33333399]">
             Consult with empathetic, qualified specialists who listen, guide,
             and support your health decisions.
           </p>
