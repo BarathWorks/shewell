@@ -124,8 +124,9 @@ const PatientInformation = ({
   useEffect(() => {
     if (data?.patient?.length === 1) {
       const singlePatient = data.patient[0];
-      setSelectPatient(singlePatient!); // Set the single patient as selected
-      onSelectPatient(singlePatient!); // Notify parent about the selected patient
+      setSelectPatient(singlePatient!);
+      onSelectPatient(singlePatient!);
+      handleFinalPriceOnSelectingCouple(singlePatient!); // ← fix: also update couple flag & price
     }
   }, [data?.patient, onSelectPatient]);
 

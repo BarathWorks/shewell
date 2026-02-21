@@ -11,7 +11,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="relative sticky top-0 z-50 w-full bg-gradient-to-r from-[#0E3A47] to-[#13647A] shadow-md">
+    <header className="relative sticky top-0 z-50 w-full bg-gradient-to-r from-[#172F5B] to-[#00898F]  shadow-md">
       <nav className="mx-auto flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4 md:px-6">
         {/* Logo */}
         <Link
@@ -142,7 +142,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="border-t border-[#13647A] bg-gradient-to-r from-[#0E3A47] to-[#13647A] px-3 py-4 sm:px-4 sm:py-6 lg:hidden">
+        <div className="border-t border-[#172F5B] bg-gradient-to-r from-[#00898F] to-[#172F5B] px-3 py-4 sm:px-4 sm:py-6 lg:hidden">
           <div className="flex flex-col gap-3 sm:gap-4">
             <Link
               href="/session"

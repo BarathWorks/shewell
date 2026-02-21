@@ -28,6 +28,8 @@ export const BookingSection = ({
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isPregnant, setIsPregnant] = useState(false);
   const [isNewMom, setIsNewMom] = useState(false);
+  const [isPlanning, setIsPlanning] = useState(false);
+  const [isOther, setIsOther] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,6 +80,10 @@ export const BookingSection = ({
     }
 
     if (currentStep === 2) {
+      if (!isPlanning && !isOther && !isPregnant && !isNewMom) {
+        setError("Please select at least one option to continue");
+        return false;
+      }
       if (isPregnant) {
         if (!formData.trimester) {
           setError("Please select your trimester");
@@ -94,12 +100,6 @@ export const BookingSection = ({
           return false;
         }
       }
-      // If neither is selected, it's valid to proceed (assuming optional if not applicable)
-      // or if business logic requires at least one, we can add that check here.
-      // For now, assuming if user doesn't toggle either, they might be just exploring or booking for someone else?
-      // Re-reading requirements: "Moms in their third trimester...", "New mothers...".
-      // It implies users should likely be one of these.
-      // However, to avoid blocking valid edge cases (e.g. support person), I will strictly validate only if toggles are on.
     }
 
     return true;
@@ -224,9 +224,11 @@ export const BookingSection = ({
   return (
     <section className="w-full overflow-hidden bg-white px-4 py-8 sm:px-6 sm:py-10 md:px-10 md:py-12 lg:px-12 lg:py-16 xl:px-16 2xl:px-20 2xl:py-20">
       <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
-        <div className="relative flex min-h-[600px] flex-col items-center overflow-hidden rounded-2xl border border-gray-100 bg-[#F8FAFB] shadow-xl sm:min-h-[640px] sm:rounded-3xl md:min-h-[700px] lg:min-h-[720px] lg:flex-row lg:rounded-[40px] xl:min-h-[800px] 2xl:min-h-[900px]">
-          {/* LEFT IMAGE SECTION */}
-          <div className="absolute inset-0 hidden h-full w-full lg:block lg:w-[50%]">
+        <div className="relative flex h-[85vh] max-h-[700px] flex-col items-center overflow-hidden rounded-2xl border border-gray-100 bg-[#F8FAFB] shadow-xl sm:rounded-3xl lg:flex-row lg:rounded-[40px]">
+          {/* LEFT IMAGE SECTION - hidden for registered users */}
+          <div
+            className={`absolute inset-0 h-full w-full lg:w-[50%] ${isRegistered ? "hidden" : "hidden lg:block"}`}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -254,16 +256,22 @@ export const BookingSection = ({
           </div>
 
           {/* RIGHT BOOKING CARD */}
-          <div className="relative z-0 flex w-full justify-center px-3 py-6 sm:px-4 sm:py-8 md:py-10 lg:justify-end lg:pl-[50%] lg:pr-6 xl:pr-8 2xl:pr-12">
+          <div
+            className={`relative z-0 flex w-full justify-center px-3 py-6 sm:px-4 sm:py-8 md:py-10 ${
+              isRegistered
+                ? ""
+                : "lg:justify-end lg:pl-[50%] lg:pr-6 xl:pr-8 2xl:pr-12"
+            }`}
+          >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative flex min-h-[520px] w-full max-w-[480px] flex-col p-4 sm:min-h-[560px] sm:max-w-[500px] sm:p-5 md:min-h-[600px] md:max-w-[520px] md:p-6 lg:min-h-[640px] lg:max-w-[520px] lg:p-8 xl:min-h-[700px] xl:max-w-[580px] xl:p-10 2xl:min-h-[800px] 2xl:max-w-[640px] 2xl:p-12"
+              className="relative flex h-full w-full max-w-[480px] flex-col p-4 sm:max-w-[500px] sm:p-5 md:max-w-[520px] md:p-6 lg:max-w-[520px] lg:p-8 xl:max-w-[580px] xl:p-10 2xl:max-w-[640px] 2xl:p-12"
             >
               {/* PRICE PILL */}
               {!isRegistered && (
-                <div className="mb-4 flex justify-center sm:mb-6 md:mb-8 lg:mb-10">
+                <div className="mb-3 flex justify-center sm:mb-4">
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -281,45 +289,42 @@ export const BookingSection = ({
 
               {/* REGISTERED STATE */}
               {isRegistered ? (
-                <div className="flex flex-1 flex-col items-center justify-center text-center">
-                  <div className="md:h-18 md:w-18 mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#00898F]/10 text-[#00898F] sm:mb-4 sm:h-16 sm:w-16 md:mb-5 lg:mb-6 lg:h-20 lg:w-20">
-                    <Check
-                      size={24}
-                      className="sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9"
-                    />
+                <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00898F]/10 text-[#00898F] sm:h-20 sm:w-20">
+                    <Check size={28} className="sm:h-8 sm:w-8" />
                   </div>
-                  <h3 className="mb-2 font-poppins text-base font-bold text-gray-900 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
-                    You're Registered!
-                  </h3>
-                  <p className="mb-4 text-xs text-gray-600 sm:mb-6 sm:text-sm md:mb-8 md:text-base lg:text-lg">
-                    You have successfully booked your seat for this session.
-                    Click below to join the meeting when it's time.
-                  </p>
+                  <div>
+                    <h3 className="mb-1 font-poppins text-lg font-bold text-gray-900 sm:text-xl md:text-2xl">
+                      You're Registered!
+                    </h3>
+                    <p className="text-sm text-gray-500 sm:text-base">
+                      You have successfully booked your seat.
+                    </p>
+                  </div>
                   {meetingLink ? (
                     <a
                       href={meetingLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex w-full items-center justify-between gap-2 rounded-lg bg-[#00898F] px-3 py-2.5 text-white transition-all duration-300 ease-in-out hover:bg-teal-700 sm:rounded-lg sm:px-4 sm:py-3 md:rounded-lg md:px-5 md:py-3.5 lg:rounded-xl lg:px-6 lg:py-4"
+                      className="group flex w-full max-w-xs items-center justify-between gap-2 rounded-xl bg-[#00898F] px-4 py-3 text-white transition-all duration-300 hover:bg-teal-700"
                     >
-                      <span className="text-xs font-medium sm:text-sm md:text-base lg:text-lg">
+                      <span className="text-sm font-medium">
                         Join Meeting Now
                       </span>
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform group-hover:translate-x-1 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform group-hover:translate-x-1">
                         <InteractiveButton />
                       </div>
                     </a>
                   ) : (
-                    <div className="w-full rounded-lg bg-amber-50 p-2.5 text-xs text-amber-700 sm:rounded-lg sm:p-3 sm:text-sm md:rounded-lg md:p-4 md:text-base lg:rounded-xl">
-                      The meeting link will be shared here closer to the session
-                      start time.
+                    <div className="w-full max-w-xs rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                      The meeting link will be shared closer to the session.
                     </div>
                   )}
                 </div>
               ) : (
                 <>
                   {/* STEPPER */}
-                  <div className="mb-5 flex items-center justify-center sm:mb-6 md:mb-8 lg:mb-10">
+                  <div className="mb-4 flex items-center justify-center">
                     {[1, 2].map((s, i) => (
                       <div key={s} className="flex items-center">
                         <div className="relative flex flex-col items-center">
@@ -366,7 +371,7 @@ export const BookingSection = ({
                   </div>
 
                   {/* FORM BODY */}
-                  <div className="flex-1 overflow-hidden">
+                  <div className="flex-1 overflow-y-auto pr-0.5">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={step}
@@ -382,7 +387,7 @@ export const BookingSection = ({
                           <>
                             <div className="space-y-1 sm:space-y-1.5">
                               <label className="ml-2 text-[9px] font-semibold text-gray-500 sm:text-[10px] md:text-xs">
-                                MOM NAME
+                                NAME
                               </label>
                               <Input
                                 placeholder="Enter your full name"
@@ -437,29 +442,103 @@ export const BookingSection = ({
 
                         {/* STEP 2 */}
                         {step === 2 && (
-                          <div className="space-y-3 sm:space-y-4 md:space-y-5">
-                            {/* Pregnant Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] p-3 sm:rounded-xl sm:p-4 md:rounded-2xl md:p-5">
-                              <div className="mb-2 flex items-center justify-between sm:mb-2.5 md:mb-3">
+                          <div className="space-y-2 py-1">
+                            {/* Planning Toggle */}
+                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                              <div className="flex items-center justify-between">
+                                <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
+                                  Are you planning to get pregnant?
+                                </span>
+                                <button
+                                  type="button"
+                                  role="switch"
+                                  aria-checked={isPlanning}
+                                  onClick={() => {
+                                    const newValue = !isPlanning;
+                                    setIsPlanning(newValue);
+                                    if (newValue) {
+                                      setIsPregnant(false);
+                                      setIsNewMom(false);
+                                      setIsOther(false);
+                                    }
+                                  }}
+                                  className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
+                                    isPlanning ? "bg-[#00898F]" : "bg-gray-200"
+                                  }`}
+                                >
+                                  <span
+                                    className={`block h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-300 sm:h-5 sm:w-5 ${
+                                      isPlanning
+                                        ? "translate-x-4 sm:translate-x-5"
+                                        : "translate-x-0"
+                                    }`}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Other Toggle */}
+                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                              <div className="flex items-center justify-between">
+                                <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
+                                  Other
+                                </span>
+                                <button
+                                  type="button"
+                                  role="switch"
+                                  aria-checked={isOther}
+                                  onClick={() => {
+                                    const newValue = !isOther;
+                                    setIsOther(newValue);
+                                    if (newValue) {
+                                      setIsPregnant(false);
+                                      setIsNewMom(false);
+                                      setIsPlanning(false);
+                                    }
+                                  }}
+                                  className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
+                                    isOther ? "bg-[#00898F]" : "bg-gray-200"
+                                  }`}
+                                >
+                                  <span
+                                    className={`block h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-300 sm:h-5 sm:w-5 ${
+                                      isOther
+                                        ? "translate-x-4 sm:translate-x-5"
+                                        : "translate-x-0"
+                                    }`}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                            {/* Currently Pregnant Toggle */}
+                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                              <div className="mb-1.5 flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Currently pregnant?
                                 </span>
                                 <button
                                   type="button"
+                                  role="switch"
+                                  aria-checked={isPregnant}
                                   onClick={() => {
                                     const newValue = !isPregnant;
                                     setIsPregnant(newValue);
                                     if (newValue) {
                                       setIsNewMom(false);
-                                      // Clear new mom related data if needed, or just let validation handle active fields
-                                      // Optional: setFormData({...formData, babyDob: ''})
+                                      setIsPlanning(false);
+                                      setIsOther(false);
                                     }
                                   }}
-                                  className={`h-4 w-9 rounded-full p-0.5 transition-colors duration-300 sm:h-5 sm:w-11 md:h-6 md:w-12 ${isPregnant ? "bg-[#00898F]" : "bg-gray-300"}`}
+                                  className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
+                                    isPregnant ? "bg-[#00898F]" : "bg-gray-200"
+                                  }`}
                                 >
-                                  <motion.div
-                                    animate={{ x: isPregnant ? 16 : 0 }}
-                                    className="h-3 w-3 rounded-full bg-white shadow-sm sm:h-3.5 sm:w-3.5 md:h-4 md:w-4"
+                                  <span
+                                    className={`block h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-300 sm:h-5 sm:w-5 ${
+                                      isPregnant
+                                        ? "translate-x-4 sm:translate-x-5"
+                                        : "translate-x-0"
+                                    }`}
                                   />
                                 </button>
                               </div>
@@ -513,25 +592,34 @@ export const BookingSection = ({
                             </div>
 
                             {/* New Mom Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] p-3 sm:rounded-xl sm:p-4 md:rounded-2xl md:p-5">
-                              <div className="mb-2 flex items-center justify-between sm:mb-2.5 md:mb-3">
+                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                              <div className="mb-1.5 flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Are you a new mom?
                                 </span>
                                 <button
                                   type="button"
+                                  role="switch"
+                                  aria-checked={isNewMom}
                                   onClick={() => {
                                     const newValue = !isNewMom;
                                     setIsNewMom(newValue);
                                     if (newValue) {
                                       setIsPregnant(false);
+                                      setIsPlanning(false);
+                                      setIsOther(false);
                                     }
                                   }}
-                                  className={`h-4 w-9 rounded-full p-0.5 transition-colors duration-300 sm:h-5 sm:w-11 md:h-6 md:w-12 ${isNewMom ? "bg-[#00898F]" : "bg-gray-300"}`}
+                                  className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
+                                    isNewMom ? "bg-[#00898F]" : "bg-gray-200"
+                                  }`}
                                 >
-                                  <motion.div
-                                    animate={{ x: isNewMom ? 16 : 0 }}
-                                    className="h-3 w-3 rounded-full bg-white shadow-sm sm:h-3.5 sm:w-3.5 md:h-4 md:w-4"
+                                  <span
+                                    className={`block h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-300 sm:h-5 sm:w-5 ${
+                                      isNewMom
+                                        ? "translate-x-4 sm:translate-x-5"
+                                        : "translate-x-0"
+                                    }`}
                                   />
                                 </button>
                               </div>
@@ -585,7 +673,13 @@ export const BookingSection = ({
                   )}
 
                   {/* WHITE SEPARATOR WITH BLUR */}
-                  <div className="my-3 h-[1.5px] bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:my-4 md:my-5 lg:my-6" />
+                  <div className="my-3 flex items-center gap-2">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00898F]/40 to-[#00898F]/40" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/50" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/30" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/50" />
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[#00898F]/40 to-[#00898F]/40" />
+                  </div>
 
                   {/* CONTINUE BUTTON */}
                   <div
