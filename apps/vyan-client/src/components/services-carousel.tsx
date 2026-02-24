@@ -86,13 +86,13 @@ const ServicesCarousel = () => {
   };
 
   return (
-    <section className="relative flex min-h-screen w-full flex-col justify-center bg-white px-4 py-6 sm:px-6 md:px-12 lg:px-[100px]">
+    <section className="relative flex min-h-fit w-full flex-col justify-center bg-white px-4 py-4 sm:min-h-screen sm:px-6 sm:py-6 md:px-12 lg:px-[100px]">
       <div className="z-10 max-w-full px-0 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
-          className="mb-4 font-poppins text-base font-medium leading-tight text-[#333333] sm:mb-6 sm:text-lg md:text-2xl lg:text-4xl xl:text-[54px]"
+          className="mb-4 font-poppins text-base font-medium leading-tight text-[#333333] sm:mb-6 sm:text-lg md:text-2xl lg:text-4xl xl:text-[54px] xs:text-[22px]"
         >
           India's Wellness Circle For Women Who Mother With Intention
         </motion.h1>
@@ -116,7 +116,7 @@ const ServicesCarousel = () => {
         {/* Carousel Container */}
         <div className="relative flex flex-col items-center">
           {/* Main Image Area with Title Integrated */}
-          <div className="relative mb-6 flex w-full items-center justify-center sm:mb-8 md:mb-10">
+          <div className="relative mb-2 flex w-full items-center justify-center sm:mb-8 md:mb-10">
             {/* Main Image */}
             <AnimatePresence mode="wait">
               <motion.div

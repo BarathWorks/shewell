@@ -57,14 +57,22 @@ export default function PregnancyStages({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 pb-8 pt-4 sm:px-6 md:px-12 md:pb-12 md:pt-6 lg:px-[100px]">
+    <section className="w-full overflow-hidden bg-white px-4 pb-4 pt-2 sm:px-6 sm:pb-8 sm:pt-4 md:px-12 md:pb-12 md:pt-6 lg:px-[100px]">
       <div className="mx-auto px-0">
         {/* Stages Cards */}
-        <div className="grid w-full grid-cols-2 gap-2 opacity-80 sm:grid-cols-3 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
+        <div className="grid w-full grid-cols-6 gap-2 opacity-80 sm:grid-cols-3 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
           {STAGES_DATA.map((stage, index) => {
-            const isMobileLastItem =
-              STAGES_DATA.length % 2 === 1 && index === STAGES_DATA.length - 1;
             const isActive = activeIndex === stage.carouselIndex;
+
+            // Positioning for 3-2 centered layout on mobile (grid-cols-6)
+            // Top row: items 0, 1, 2 take 2 columns each (total 6)
+            // Bottom row: item 3 starts at col 2, item 4 follows.
+            const responsiveColClasses =
+              index < 3
+                ? "col-span-2 sm:col-auto"
+                : index === 3
+                  ? "col-start-2 col-span-2 sm:col-start-auto sm:col-auto"
+                  : "col-span-2 sm:col-auto";
 
             return (
               <motion.div
@@ -79,10 +87,10 @@ export default function PregnancyStages({
                   onStageHover?.(stage.carouselIndex);
                 }}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg sm:h-24 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6 ${isMobileLastItem ? "col-span-2 sm:col-auto sm:col-span-1" : ""} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
+                className={`relative flex h-10 w-full items-center justify-center overflow-hidden rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6  ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
               >
                 {/* The large Gradient Text */}
-                <h1 className="absolute -top-2 left-2 select-none text-3xl font-black leading-none tracking-tighter opacity-70 sm:text-5xl md:text-6xl lg:text-[80px]">
+                <h1 className="absolute -top-2 left-2 select-none text-3xl font-black leading-none tracking-tighter opacity-70 xs:hidden sm:text-5xl md:block md:text-6xl lg:text-[80px]">
                   <span
                     className={`bg-gradient-to-b from-black/40 to-black/10 bg-clip-text text-transparent`}
                   >
@@ -91,7 +99,7 @@ export default function PregnancyStages({
                 </h1>
 
                 {/* The Title Text */}
-                <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-right text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] sm:text-base md:text-lg lg:text-lg">
+                <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-right text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-lg lg:text-lg xs:text-[12px] xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
                   {stage.title}
                 </h2>
               </motion.div>

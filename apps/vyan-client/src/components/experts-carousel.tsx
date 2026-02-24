@@ -90,14 +90,14 @@ export default function ExpertsCarousel() {
   }, [handleNext, isHovered]);
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-16 md:py-14 lg:px-[100px]">
+    <section className="w-full overflow-hidden bg-white px-4 py-4 sm:px-6 sm:py-8 md:px-16 md:py-14 lg:px-[100px]">
       <div className="max-w-8xl mx-auto px-0">
         {/* Section Header */}
         <div className="mb-6 text-center sm:mb-8 md:mb-12">
-          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px] font-medium text-gray-900">
+          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
             You're Not Alone We're Just a Click Away
           </h2>
-          <p className="text-xs sm:text-sm md:text-lg lg:text-lg xl:text-[24px] text-[#33333399]">
+          <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
             Consult with empathetic, qualified specialists who listen, guide,
             and support your health decisions.
           </p>
@@ -173,7 +173,9 @@ export default function ExpertsCarousel() {
                         animate={{ opacity: isCenter ? 1 : 0.6 }}
                         className={`absolute  ${isCenter ? "bottom-2 sm:bottom-4 md:bottom-8 lg:bottom-6" : "bottom-1 sm:bottom-2 md:bottom-4"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:gap-1 sm:px-2`}
                       >
-                        <span className={`${isCenter ? "h-1 w-1 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 lg:w-1.5 lg:h-1.5" : "h-0.5 w-0.5 sm:h-0.5 sm:w-0.5 md:h-1 md:w-1"} rounded-full bg-white`}></span>
+                        <span
+                          className={`${isCenter ? "h-1 w-1 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 lg:h-1.5 lg:w-1.5" : "h-0.5 w-0.5 sm:h-0.5 sm:w-0.5 md:h-1 md:w-1"} rounded-full bg-white`}
+                        ></span>
                         <span
                           className={`${isCenter ? "text-[8px] sm:text-[8px] md:text-[11px] lg:text-[12px]" : "text-[8px] sm:text-[8px] md:text-[9px] lg:text-[8px]"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out `}
                         >
@@ -204,9 +206,9 @@ export default function ExpertsCarousel() {
           className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
           onClick={() => (window.location.href = "/counselling")}
         >
-          <div className="order-0 group flex h-24 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-12 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8">
+          <div className="order-0 group flex w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] xs:h-16 xs:py-2 sm:h-12 sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-4 md:h-20 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8 xl:h-24">
             <div className="flex flex-1 justify-center">
-              <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px]">
+              <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px] ">
                 BOOK A SESSION WITH OUR EXPERTS
               </span>
             </div>
