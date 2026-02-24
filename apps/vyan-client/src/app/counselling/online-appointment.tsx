@@ -362,7 +362,7 @@ const OnlineAppointment = ({
         setStep(1);
 
         onOpenChange(false);
-        router.push("/profile/appointments");
+      
       })
       .catch((err) => {
         // toast({
