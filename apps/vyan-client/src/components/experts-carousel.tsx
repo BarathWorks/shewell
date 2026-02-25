@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { InteractiveButton } from "./ui/interactive-button";
 import router from "next/router";
+import { api } from "~/trpc/react";
 
 const EXPERTS_DATA = [
   {
@@ -36,29 +37,41 @@ const EXPERTS_DATA = [
     image:
       "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&h=300&q=80",
   },
-  {
-    id: 6,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&h=300&q=80",
-  },
-  {
-    id: 7,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&h=300&q=80",
-  },
-  {
-    id: 8,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=300&h=300&q=80",
-  },
 ];
 
+type ExpertData = {
+  id: string | number;
+  name?: string;
+  role: string;
+  image: string;
+  userName?: string;
+};
+
 export default function ExpertsCarousel() {
-  const [items, setItems] = useState(EXPERTS_DATA);
+  const { data, isLoading, error } = api.topExperts.getTopExperts.useQuery();
+
+  // Transform API data to carousel format
+  const expertsData = useMemo<ExpertData[]>(() => {
+    if (!data?.topExperts || data.topExperts.length === 0) {
+      return EXPERTS_DATA; // Fallback to mock data
+    }
+
+    return data.topExperts.map((doctor) => ({
+      id: doctor.id,
+      name: `${doctor.firstName} ${doctor.lastName}`,
+      role: doctor.displayQualification?.specialization ?? "Specialist",
+      image: doctor.media?.fileUrl ?? "/images/fallback-user-profile.png",
+      userName: doctor.userName,
+    }));
+  }, [data]);
+
+  const [items, setItems] = useState<ExpertData[]>(expertsData);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Update items when data is loaded
+  useEffect(() => {
+    setItems(expertsData);
+  }, [expertsData]);
 
   const handleNext = useCallback(() => {
     setItems((prev) => {
@@ -80,14 +93,21 @@ export default function ExpertsCarousel() {
 
   // Auto-scroll Timer
   useEffect(() => {
-    if (isHovered) return; // Pause timer when user hovers
+    if (isHovered || items.length <= 1) return; // Pause timer when user hovers or only 1 item
 
     const interval = setInterval(() => {
       handleNext();
     }, 3000); // Rotates every 3 seconds
 
     return () => clearInterval(interval);
-  }, [handleNext, isHovered]);
+  }, [handleNext, isHovered, items.length]);
+
+  // Don't render if no data and not loading
+  if (!isLoading && items.length === 0) {
+    return null;
+  }
+
+  const showNavigation = items.length > 1;
 
   return (
     <section className="w-full overflow-hidden bg-white px-4 py-4 sm:px-6 sm:py-8 md:px-16 md:py-14 lg:px-[100px]">
@@ -109,22 +129,27 @@ export default function ExpertsCarousel() {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-6 md:p-3"
-            aria-label="Previous expert"
-          >
-            <ChevronLeft
-              size={18}
-              className="text-gray-600 sm:size-5 md:size-6"
-            />
-          </button>
+          {showNavigation && (
+            <button
+              onClick={handlePrev}
+              className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-6 md:p-3"
+              aria-label="Previous expert"
+            >
+              <ChevronLeft
+                size={18}
+                className="text-gray-600 sm:size-5 md:size-6"
+              />
+            </button>
+          )}
 
           <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             <AnimatePresence mode="popLayout" initial={false}>
-              {items.slice(0, 5).map((expert, index) => {
-                const isCenter = index === 2;
-                const isSide = index === 1 || index === 3;
+              {items.slice(0, Math.min(5, items.length)).map((expert, index) => {
+                const totalItems = Math.min(5, items.length);
+                const centerIndex = Math.floor(totalItems / 2);
+                const isCenter = index === centerIndex;
+                const isSide = 
+                  totalItems >= 3 && (index === centerIndex - 1 || index === centerIndex + 1);
 
                 return (
                   <motion.div
@@ -136,15 +161,15 @@ export default function ExpertsCarousel() {
                       scale: isCenter ? 1.5 : isSide ? 1.4 : 1.1,
                       zIndex: isCenter ? 20 : 10,
                       marginLeft:
-                        index === 2
+                        index === centerIndex
                           ? "2rem"
-                          : index === 3 || index === 4
+                          : index > centerIndex
                             ? "1rem"
                             : "0",
                       marginRight:
-                        index === 2
+                        index === centerIndex
                           ? "2rem"
-                          : index === 1 || index === 0
+                          : index < centerIndex
                             ? "1rem"
                             : "0",
                     }}
@@ -189,16 +214,18 @@ export default function ExpertsCarousel() {
             </AnimatePresence>
           </div>
 
-          <button
-            onClick={handleNext}
-            className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-6 md:p-3"
-            aria-label="Next expert"
-          >
-            <ChevronRight
-              size={18}
-              className="text-gray-600 sm:size-5 md:size-6"
-            />
-          </button>
+          {showNavigation && (
+            <button
+              onClick={handleNext}
+              className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-6 md:p-3"
+              aria-label="Next expert"
+            >
+              <ChevronRight
+                size={18}
+                className="text-gray-600 sm:size-5 md:size-6"
+              />
+            </button>
+          )}
         </div>
 
         {/* CTA Button */}

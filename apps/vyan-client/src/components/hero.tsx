@@ -55,7 +55,7 @@ export default function Hero(): JSX.Element {
           prefetch={false}
         >
           <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
-            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white">
+            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white md:text-[14px] lg:text-[16px] xl:text-[18px] xxl:text-[20px]">
               Book Your Consultation
             </span>
             <InteractiveButton />
@@ -67,7 +67,7 @@ export default function Hero(): JSX.Element {
           prefetch={false}
         >
           <div className="group flex h-[64px] w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[72px] sm:px-5 md:h-[80px] md:px-6">
-            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white">
+            <span className="text-base font-medium text-[#00000066] sm:text-lg md:text-xl group-hover:text-white md:text-[14px] lg:text-[16px] xl:text-[18px] xxl:text-[20px]">
               Explore Our Sessions
             </span>
             <InteractiveButton />
