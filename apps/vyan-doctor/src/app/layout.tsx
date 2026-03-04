@@ -65,7 +65,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
             <ClientSessionProvider session={session}>
               <DoctorHeader />
               {children}
-              <Footer specializationParentCategories={specialisationParentCategories} specializations={specializations}/>
+              <Footer />
               <Toaster />
             </ClientSessionProvider>
           </TRPCReactProvider>
