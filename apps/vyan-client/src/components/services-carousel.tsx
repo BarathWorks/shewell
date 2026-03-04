@@ -87,7 +87,7 @@ const ServicesCarousel = () => {
 
   return (
     <section className="relative flex min-h-fit w-full flex-col justify-center bg-white px-4 py-4 sm:min-h-screen sm:px-6 sm:py-6 md:px-12 lg:px-[100px]">
-      <div className="z-10 max-w-full px-0 text-center">
+      {/* <div className="z-10 max-w-full px-0 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -107,7 +107,7 @@ const ServicesCarousel = () => {
           and healthy babies with expert led sessions and wellness products.
           Shewell isn’t just for India. It’s for every woman, everywhere
         </motion.p>
-      </div>
+      </div> */}
       <PregnancyStages
         onStageHover={setCurrentIndex}
         activeIndex={currentIndex}

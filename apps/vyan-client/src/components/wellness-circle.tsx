@@ -30,13 +30,13 @@ const WellnessCircle = () => {
           className="mx-auto mb-8 h-auto w-full cursor-pointer object-cover opacity-20 transition-opacity ease-in-out hover:opacity-100 xs:h-[200px] xs:w-[400px] xs:opacity-100 sm:h-[300px] sm:w-[300px] sm:opacity-100 md:w-full md:h-auto md:opacity-20 lg:w-full lg:h-auto lg:opacity-20 xl:w-full xl:h-auto xl:opacity-20 2xl:w-full 2xl:h-auto 2xl:opacity-20 "
         />
         {/* Shewell Title */}
-        <h1 className="mx-auto cursor-pointer text-center font-amatic-sc text-4xl font-bold tracking-wide text-primary opacity-40 transition-opacity duration-500 ease-in-out hover:opacity-100 sm:text-5xl md:text-6xl lg:text-7xl sm:text-8xl xs:text-6xl">
+        {/* <h1 className="mx-auto cursor-pointer text-center font-amatic-sc text-4xl font-bold tracking-wide text-primary opacity-40 transition-opacity duration-500 ease-in-out hover:opacity-100 sm:text-5xl md:text-6xl lg:text-7xl sm:text-8xl xs:text-6xl">
           Shewell
-        </h1>
+        </h1> */}
       </motion.div>
 
       {/* 2. Cursive Script Heading */}
-      <motion.div
+      {/* <motion.div
         variants={overallVariant}
         initial="hidden"
         animate="visible"
@@ -56,7 +56,7 @@ const WellnessCircle = () => {
             her baby
           </span>
         </h2>
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 };
