@@ -65,7 +65,7 @@ const Login = () => {
   const { toast } = useToast();
 
   if (session.status === "authenticated") {
-    router.push("/");
+    router.push("/dashboard");
   }
   const [loadingState, setLoadingState] = useState<boolean>(false);
   let errorMessage: string | undefined;
@@ -105,7 +105,7 @@ const Login = () => {
         title: "Login successful",
       });
       
-      router.push("/");
+      router.push("/dashboard");
     }
   };
 
