@@ -33,10 +33,6 @@ const CounsellingAppointment = ({
   const session = useSession();
   const { toast } = useToast();
   console.log("session");
-  const { data: timeDuration } =
-    api.appointmentTimeDuration.appointmentTimeDuration.useQuery({
-      professionalUserId: professionalUserId,
-    });
 
   const [timeSlot, setTimeSlot] = useState<{
     startTime: Date;
@@ -77,11 +73,11 @@ const CounsellingAppointment = ({
       <div className="w-full">
         <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
           {/* price */}
-          <div className="flex items-center gap-2 self-center rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3">
-            <span className="font-poppins text-xs sm:text-sm font-medium text-[#666666]">
+          <div className="flex items-center gap-2 self-center rounded-lg bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-2 sm:rounded-xl sm:px-4 sm:py-2.5 md:rounded-2xl md:px-5 md:py-3">
+            <span className="font-poppins text-xs font-medium text-[#666666] sm:text-sm">
               Starting from
             </span>
-            <span className="font-poppins text-lg sm:text-xl md:text-2xl font-bold text-[#00898F]">
+            <span className="font-poppins text-lg font-bold text-[#00898F] sm:text-xl md:text-2xl">
               ₹
               {priceInCents
                 ? (priceInCents / 100).toLocaleString("en-IN")

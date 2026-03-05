@@ -1,17 +1,13 @@
 "use client";
 
-import Image from "next/image";
 
 import CompleteDoctorProfile from "~/app/counselling/complete-doctor-profile";
-import { db } from "~/server/db";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import CounsellingFilter from "./counselling-filter";
 import { api } from "~/trpc/react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@repo/ui/src/@/components/button";
 import CompleteDoctorProfileSkeleton from "./complete-doctor-profile-skeleton";
-import SkeletonLoader from "~/components/shared/skeleton-loader";
-import dynamic from "next/dynamic";
 
 const Counselling = () => {
   function toUTCDate(date: Date) {
@@ -28,12 +24,6 @@ const Counselling = () => {
   const time = searchParams.get("time");
   const inputSearch = searchParams.get("therapistSearch");
   console.log("specialisationId", specialisationId);
-
-  const { data: doctor } =
-    api.findDoctorWithoutFilter.findDoctorWithoutFilter.useQuery();
-
-  const { data: specialisation } =
-    api.searchSpecialization.searchSpecialization.useQuery();
 
   const formattedLanguageIds: string[] =
     typeof languageId === "string" ? languageId.split(",") : [];
@@ -108,7 +98,7 @@ const Counselling = () => {
                       doctorProfile={updatedItem}
                       specialization={item.ProfessionalSpecializations}
                     />
-                  );ro
+                  );
                 })}
               {filteredDoctors?.professionalUsers.length === 0 && (
                 <div>No Doctors Found</div>

@@ -87,7 +87,7 @@ export const sessionRouter = createTRPCRouter({
       };
 
       // Fetch sessions
-      let sessions = await db.session.findMany({
+      const sessions = await db.session.findMany({
         where: whereCondition,
         select: {
           id: true,
@@ -96,54 +96,18 @@ export const sessionRouter = createTRPCRouter({
           startAt: true,
           endAt: true,
           price: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true,
-          categoryId: true,
-          thumbnailMediaId: true,
           thumbnailMedia: {
             select: {
-              id: true,
               fileUrl: true,
             },
           },
           language: true,
           type: true,
-          category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              trimester: true,
-            },
-          },
-          registrations: {
-            select: {
-              id: true,
-              paymentStatus: true,
-              createdAt: true,
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
-              },
-            },
-          },
         },
+        orderBy: input.sortBy
+          ? { price: input.sortBy === "price-asc" ? "asc" : "desc" }
+          : { startAt: "asc" },
       });
-
-      // Sort by price if needed (convert Decimal to number for comparison)
-      if (input.sortBy === "price-asc" || input.sortBy === "price-desc") {
-        sessions.sort((a, b) => {
-          const aPrice = Number(a.price ?? 0);
-          const bPrice = Number(b.price ?? 0);
-          return input.sortBy === "price-asc"
-            ? aPrice - bPrice
-            : bPrice - aPrice;
-        });
-      }
 
       return { sessions };
     }),
@@ -610,19 +574,8 @@ export const sessionRouter = createTRPCRouter({
           startAt: true,
           endAt: true,
           price: true,
-          status: true,
-          category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              trimester: true,
-            },
-          },
-          registrations: {
-            select: {
-              id: true,
-            },
+          _count: {
+            select: { registrations: true },
           },
           thumbnailMedia: {
             select: {

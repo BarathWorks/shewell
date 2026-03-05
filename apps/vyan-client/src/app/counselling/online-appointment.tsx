@@ -2,37 +2,25 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "@repo/ui/src/@/components/dialog";
 
 import { Button } from "@repo/ui/src/@/components/button";
 
-import AlreadyCustomer from "./already-customer";
-import ServiceMode from "./service-mode";
-import SelectExpert from "./select-expert";
 import PatientInformation from "./patient-information";
 
-// import AddPatient from "./add-patient";
-import SelectDateTime from "./select-date-time";
 import AppointmentApproval from "./appointment-approval";
 import { useCallback, useEffect, useState } from "react";
 import Stepper from "./stepper";
-import BookAppointmentUserAction from "./book-appointment-user-action";
 import { AppointmentType } from "@repo/database";
 import { useToast } from "@repo/ui/src/@/components/use-toast";
-import { createTime, createTimeDate } from "~/lib/utils";
+import { createTimeDate } from "~/lib/utils";
 import { endOfDay, getHours, getMinutes } from "date-fns";
 import CheckoutAction from "../actions/checkout-action";
 import { makePayment } from "~/lib/razorpay-payment";
-import { boolean } from "zod";
 import { startOfDay } from "date-fns";
 import { api } from "~/trpc/react";
-import React from "react";
-import { createEvent } from "~/lib/create-event";
 import { useRouter } from "next/navigation";
 import { env } from "~/env";
 
@@ -362,7 +350,6 @@ const OnlineAppointment = ({
         setStep(1);
 
         onOpenChange(false);
-      
       })
       .catch((err) => {
         // toast({
