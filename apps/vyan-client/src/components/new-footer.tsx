@@ -229,6 +229,13 @@ export default function NewFooter() {
             >
               Privacy Policy
             </a>
+            <span className="hidden text-gray-600 sm:inline">•</span>
+            <a
+              href="/refund-policy"
+              className="transition-all hover:text-[#167D71]"
+            >
+              Refund & Cancellation
+            </a>
           </div>
           <div className="text-center sm:text-right">
             <span className="text-gray-500">
