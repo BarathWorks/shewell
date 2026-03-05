@@ -1,4 +1,4 @@
-"use client";
+
 import React from "react";
 
 export default function Footer() {
@@ -114,7 +114,7 @@ export default function Footer() {
                     href="#"
                     className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
                   >
-                    appointments
+                    Appointments
                   </a>
                 </li>
                 <li>
@@ -122,7 +122,7 @@ export default function Footer() {
                     href="#"
                     className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
                   >
-                    profile
+                    Blog
                   </a>
                 </li>
               </ul>
@@ -228,6 +228,13 @@ export default function Footer() {
               className="transition-all hover:text-[#167D71]"
             >
               Privacy Policy
+            </a>
+            <span className="hidden text-gray-600 sm:inline">•</span>
+            <a
+              href="/refund-policy"
+              className="transition-all hover:text-[#167D71]"
+            >
+              Refund & Cancellation
             </a>
           </div>
           <div className="text-center sm:text-right">

@@ -3,24 +3,29 @@ import React from "react";
 const PrivacyPolicyPage = () => {
   return (
     <>
-      <div className="my-10">
+      <div className="mt-10">
         <div className="container mx-auto max-w-full text-justify">
           <h1 className="mb-2 mt-3 text-lg font-semibold xl:text-2xl">
-            Privacy Policy
+            SHEWELL PRIVACY POLICY
           </h1>
-          <h2 className="mb-2 text-base font-semibold xl:text-xl">
-            Collection of Information
+          <p className="mb-4 text-sm font-medium lg:text-base">
+            (Prenatal & Postnatal Counselling Platform)
+          </p>
+          <p className="mb-4 text-sm lg:text-base">
+            <strong>Effective Date:</strong> 01.03.2026
+          </p>
+          <p className="mb-4 text-sm lg:text-base">
+            Shewell ("we", "our", "us") is committed to protecting the privacy, confidentiality, and security of maternal and child health information shared on our platform.
+            This Privacy Policy explains how we collect, use, store, and protect your personal and health-related data when you use Shewell's counselling services, website, or mobile application.
+          </p>
+          <p className="mb-4 text-sm lg:text-base">
+            By using Shewell, you consent to this Privacy Policy.
+          </p>
+          <h2 className="mb-2 mt-4 text-base font-semibold xl:text-xl">
+            2. Information We Collect
           </h2>
-          <h3 className="mb-2 text-base font-semibold xl:text-lg">
-            Information You Provide to Us
-          </h3>
-          <p className="text-sm lg:text-base">
-            We collect information you provide directly to us, such as when you
-            create or modify your account, request on-demand services, contact
-            customer support, or otherwise communicate with us. This information
-            may include: name, email, phone number, postal address, profile
-            picture, payment method, items requested (for delivery services),
-            delivery notes, and other information you choose to provide.
+          <p className="mb-4 text-sm lg:text-base">
+            We may collect the following categories of information:
           </p>
           <h3 className="mb-2 text-base font-semibold xl:text-lg">
             Information We Collect Through Your Use
