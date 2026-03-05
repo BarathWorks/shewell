@@ -60,6 +60,24 @@ const BookAppointmentUserAction = async ({
     ) {
       throw new Error("Incomplete data for booking appointment");
     }
+
+    // Check if the timeslot is already booked
+    const existingAppointment = await db.bookAppointment.findFirst({
+      where: {
+        professionalUserId: professionalUser.professionalUserId,
+        startingTime: startingTime,
+        status: {
+          notIn: ["CANCELLED", "CANCELLED_WITH_REFUND"],
+        },
+      },
+    });
+
+    if (existingAppointment) {
+      throw new Error(
+        "This timeslot is already booked. Please select a different time."
+      );
+    }
+
     const appointment = await db.bookAppointment.create({
       data: {
         endingTime: endingTime,

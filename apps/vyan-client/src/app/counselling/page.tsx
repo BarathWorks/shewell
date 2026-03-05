@@ -108,7 +108,7 @@ const Counselling = () => {
                       doctorProfile={updatedItem}
                       specialization={item.ProfessionalSpecializations}
                     />
-                  );
+                  );ro
                 })}
               {filteredDoctors?.professionalUsers.length === 0 && (
                 <div>No Doctors Found</div>

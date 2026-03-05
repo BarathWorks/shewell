@@ -187,7 +187,7 @@ const Login = () => {
             </Dialog>
           </div> */}
           <div className="text-center font-inter text-base font-normal">
-            Don't have vyan account
+            Don't have Shewell account
             <Link
               className="ml-4 mt-2 block font-poppins text-base font-medium text-primary md:mt-0 md:inline"
               href="/auth/register"

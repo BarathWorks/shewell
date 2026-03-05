@@ -39,86 +39,88 @@ export const SessionCard: React.FC<SessionCardProps> = ({
   const day = dateObj.getDate();
 
   return (
-    <div className="group relative flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-6 rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl hover:border-[#00898F] max-w-full lg:max-w-[1440px] 2xl:max-w-[1920px] mx-auto w-full">
-      
-      {/* Date Box - Top on Mobile, Left on Desktop */}
-      <div className="flex lg:flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 lg:h-24 lg:w-20 text-white flex-shrink-0 shadow-md">
-        <div className="text-xs lg:text-sm uppercase font-bold tracking-wider opacity-90 mr-2 lg:mr-0">
-          {month}
-        </div>
-        <div className="text-xl lg:text-3xl font-black">
-          {day}
-        </div>
-      </div>
-
-      {/* Image Thumbnail - Responsive Sizing */}
-      <div className="relative h-48 sm:h-64 lg:h-32 w-full lg:w-48 2xl:w-64 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-            <Calendar size={32} />
+    <Link href={detailPath}>
+      <div className="group relative mx-auto flex w-full max-w-full flex-col items-stretch gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F] hover:shadow-xl lg:max-w-[1440px] lg:flex-row lg:items-center lg:gap-6 lg:p-6 2xl:max-w-[1920px]">
+        {/* Date Box - Top on Mobile, Left on Desktop */}
+        <div className="flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 text-white shadow-md lg:h-24 lg:w-20 lg:flex-col">
+          <div className="mr-2 text-xs font-bold uppercase tracking-wider opacity-90 lg:mr-0 lg:text-sm">
+            {month}
           </div>
-        )}
-        {/* Mobile-only Price Badge overlay */}
-        <div className="absolute top-2 right-2 lg:hidden">
+          <div className="text-xl font-black lg:text-3xl">{day}</div>
+        </div>
+
+        {/* Image Thumbnail - Responsive Sizing */}
+        <div className="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-64 lg:h-32 lg:w-48 2xl:w-64">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
+              <Calendar size={32} />
+            </div>
+          )}
+          {/* Mobile-only Price Badge overlay */}
+          <div className="absolute right-2 top-2 lg:hidden">
             <Badge className="bg-white/90 text-[#00898F] backdrop-blur-sm">
-                ₹{price}
+              ₹{price}
             </Badge>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 space-y-2 lg:space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="bg-[#E1EBED] text-[#00898F] font-medium border-none px-2.5 py-0.5">
-            {language}
-          </Badge>
-
-          {isOnline && (
-            <Badge className="bg-green-50 text-green-700 border-green-100 px-2.5 py-0.5">
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              Online
-            </Badge>
-          )}
-
-          {hasRecording && (
-            <Badge className="bg-orange-50 text-orange-700 border-orange-100 px-2.5 py-0.5">
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-orange-500" />
-              Recording
-            </Badge>
-          )}
-        </div>
-
-        <h2 className="text-lg lg:text-xl 2xl:text-2xl font-extrabold text-gray-900 line-clamp-2">
-          {title}
-        </h2>
-
-        <p className="text-sm lg:text-base text-gray-600 line-clamp-2 lg:line-clamp-3 max-w-3xl leading-relaxed">
-          {description}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <div className="hidden lg:block">
-            <InfoChip icon={<IndianRupee size={16} />} label={`${price}`} />
           </div>
-          <InfoChip icon={<Clock size={16} />} label={timeSlot} />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 space-y-2 lg:space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge
+              variant="secondary"
+              className="border-none bg-[#E1EBED] px-2.5 py-0.5 font-medium text-[#00898F]"
+            >
+              {language}
+            </Badge>
+
+            {isOnline && (
+              <Badge className="border-green-100 bg-green-50 px-2.5 py-0.5 text-green-700">
+                <span className="mr-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-green-500" />
+                Online
+              </Badge>
+            )}
+
+            {hasRecording && (
+              <Badge className="border-orange-100 bg-orange-50 px-2.5 py-0.5 text-orange-700">
+                <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-orange-500" />
+                Recording
+              </Badge>
+            )}
+          </div>
+
+          <h2 className="line-clamp-2 text-lg font-extrabold text-gray-900 lg:text-xl 2xl:text-2xl">
+            {title}
+          </h2>
+
+          <p className="line-clamp-2 max-w-3xl text-sm leading-relaxed text-gray-600 lg:line-clamp-3 lg:text-base">
+            {description}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <div className="hidden lg:block">
+              <InfoChip icon={<IndianRupee size={16} />} label={`${price}`} />
+            </div>
+            <InfoChip icon={<Clock size={16} />} label={timeSlot} />
+          </div>
+        </div>
+
+        {/* Action Button - Full width on mobile, Auto on desktop */}
+        <div className="flex flex-col items-center justify-center border-t border-gray-100 pt-4 lg:items-end lg:border-none lg:pt-0">
+          {detailPath && (
+            <Link href={detailPath} className="w-full lg:w-auto">
+              <InteractiveButton />
+            </Link>
+          )}
         </div>
       </div>
-
-      {/* Action Button - Full width on mobile, Auto on desktop */}
-      <div className="flex flex-col items-center lg:items-end justify-center pt-4 lg:pt-0 border-t lg:border-none border-gray-100">
-        {detailPath && (
-          <Link href={detailPath} className="w-full lg:w-auto">
-            <InteractiveButton />
-          </Link>
-        )}
-      </div>
-    </div>
+    </Link>
   );
 };
 

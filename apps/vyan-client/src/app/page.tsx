@@ -26,9 +26,12 @@ const WellnessCircle = dynamic(() => import("~/components/wellness-circle"), {
   ssr: false,
 });
 
-const ServicesCarousel = dynamic(() => import("~/components/services-carousel"), {
-  ssr: false,
-});
+const ServicesCarousel = dynamic(
+  () => import("~/components/services-carousel"),
+  {
+    ssr: false,
+  },
+);
 
 const PlatformSection = dynamic(() => import("~/components/platform-section"), {
   ssr: false,
@@ -45,6 +48,13 @@ const ExpertsCarousel = dynamic(() => import("~/components/experts-carousel"), {
 const ProductsGrid = dynamic(() => import("~/components/products-grid"), {
   ssr: false,
 });
+
+const UpcomingSessions = dynamic(
+  () => import("~/components/upcoming-sessions"),
+  {
+    ssr: false,
+  },
+);
 
 const Partners = dynamic(() => import("~/components/partners"), {
   ssr: false,
@@ -66,9 +76,10 @@ const HomePage = async () => {
         <WellnessCircle />
         <ServicesCarousel />
         {/* <PlatformSection /> */}
-        
+
+        <UpcomingSessions />
         <ExpertsCarousel />
-        <ProductsGrid />
+        {/* <ProductsGrid /> */}
         <Partners />
         <WhyShewell />
         <ShewellFAQ />

@@ -71,7 +71,7 @@ export const sessionRouter = createTRPCRouter({
           endAt: { lte: new Date(input.endDate) },
         });
       }
-     
+
       // Combine price conditions with existing where conditions if any price filters exist
       if (priceConditions.length > 0) {
         whereCondition = {
@@ -80,15 +80,11 @@ export const sessionRouter = createTRPCRouter({
       }
       whereCondition = {
         ...whereCondition,
-        OR  : [
+        OR: [
           { type: "RECORDING" },
-          { AND: [
-              { type: "ONLINE" },
-              { startAt: { gte: new Date() } },
-            ],
-          },
+          { AND: [{ type: "ONLINE" }, { startAt: { gte: new Date() } }] },
         ],
-      }
+      };
 
       // Fetch sessions
       let sessions = await db.session.findMany({
@@ -628,6 +624,13 @@ export const sessionRouter = createTRPCRouter({
               id: true,
             },
           },
+          thumbnailMedia: {
+            select: {
+              fileUrl: true,
+            },
+          },
+          language: true,
+          type: true,
         },
         orderBy: {
           startAt: "asc",

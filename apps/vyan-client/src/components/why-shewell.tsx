@@ -46,63 +46,70 @@ const WhyShewell = () => {
     const [hoveredId, setHoveredId] = useState<number | null>(null);
 
     return (
-        <section className="bg-[#F5F5F5] py-6 sm:py-8 md:py-12 px-4 sm:px-6 md:px-12 lg:px-[100px] overflow-hidden">
-            <div className="w-full flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 lg:gap-8 items-stretch h-full">
-                {/* Left Image Section */}
-                <div className="w-full lg:w-[50%] relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg h-[300px] sm:h-[400px] md:h-[500px] lg:h-[500px]">
-                    <Image
-                        src="/home/why-shewell.webp"
-                        alt="Why Shewell"
-                        fill
-                        className="object-cover"
-                        priority
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
-                    />
+      <section className="overflow-hidden  bg-[#F5F5F5] px-4 py-16 sm:px-6 sm:py-24 md:px-12 md:py-32 lg:px-[100px]">
+        <div className="flex h-full w-full flex-col items-stretch gap-3 sm:gap-4 md:gap-6 lg:flex-row lg:gap-8">
+          {/* Left Image Section */}
+          <div className="relative h-[300px] w-full overflow-hidden rounded-2xl shadow-lg sm:h-[400px] sm:rounded-3xl md:h-[500px] lg:h-[500px] lg:w-[50%]">
+            <Image
+              src="/home/why-shewell.webp"
+              alt="Why Shewell"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+
+          {/* Right List */}
+          <div className="flex w-full flex-col justify-between gap-2 sm:gap-3 lg:w-[60%]">
+            {WHY_SHEWELL_DATA.map((item) => (
+              <motion.div
+                key={item.id}
+                onMouseEnter={() => setHoveredId(item.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 shadow-sm transition-all duration-300 sm:gap-4 sm:rounded-2xl sm:p-4 md:rounded-3xl ${
+                  hoveredId === item.id
+                    ? "border-[#007D79] bg-[#00898F] shadow-lg"
+                    : "border-transparent bg-white hover:shadow-md"
+                }`}
+              >
+                {/* Icon Circle */}
+                <div
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-colors duration-300 sm:h-12 sm:w-12 ${
+                    hoveredId === item.id
+                      ? "bg-white text-[#007D79]"
+                      : "bg-[#E0F2F1] text-[#007D79]"
+                  }`}
+                >
+                  {item.icon}
                 </div>
 
-                {/* Right List */}
-                <div className="w-full lg:w-[60%] flex flex-col justify-between gap-2 sm:gap-3">
-                    {WHY_SHEWELL_DATA.map((item) => (
-                        <motion.div
-                            key={item.id}
-                            onMouseEnter={() => setHoveredId(item.id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                            className={`rounded-lg sm:rounded-2xl md:rounded-3xl shadow-sm border transition-all duration-300 p-3 sm:p-4 flex items-center gap-2 sm:gap-4 cursor-pointer ${hoveredId === item.id
-                                    ? "bg-[#007D79] border-[#007D79] shadow-lg"
-                                    : "bg-white border-transparent hover:shadow-md"
-                                }`}
-                        >
-                            {/* Icon Circle */}
-                            <div className={`w-10 sm:w-12 h-10 sm:h-12 flex-shrink-0 rounded-full flex items-center justify-center transition-colors duration-300 ${hoveredId === item.id
-                                    ? "bg-white text-[#007D79]"
-                                    : "bg-[#E0F2F1] text-[#007D79]"
-                                }`}>
-                                {item.icon}
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                                <h3 className={`text-xs sm:text-base md:text-lg font-medium transition-colors duration-300 line-clamp-2 ${hoveredId === item.id ? "text-white" : "text-[#4A4A4A]"
-                                    }`}>
-                                    {item.title}
-                                </h3>
-                                {/* Description shows on hover */}
-                                {hoveredId === item.id && (
-                                    <motion.p
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="text-white/90 text-xs sm:text-sm mt-1 sm:mt-2 leading-relaxed"
-                                    >
-                                        {item.description}
-                                    </motion.p>
-                                )}
-                            </div>
-                        </motion.div>
-                    ))}
+                <div className="min-w-0 flex-1">
+                  <h3
+                    className={`line-clamp-2 text-xs font-medium transition-colors duration-300 sm:text-base md:text-lg ${
+                      hoveredId === item.id ? "text-white" : "text-[#4A4A4A]"
+                    }`}
+                  >
+                    {item.title}
+                  </h3>
+                  {/* Description shows on hover */}
+                  {hoveredId === item.id && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-1 text-xs leading-relaxed text-white/90 sm:mt-2 sm:text-sm"
+                    >
+                      {item.description}
+                    </motion.p>
+                  )}
                 </div>
-            </div>
-        </section>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
     );
 };
 

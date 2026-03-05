@@ -92,8 +92,8 @@ const DoctorProfileContent = ({
 
   
 
-  console.log("sessionAtDoctorProfileContent", session);
-
+  console.log("sessionAtDoctorProfileContent", profile);
+  console.log("profileAtDoctorProfileContent", profile.media?.fileUrl);
   const cardImage = (
     <div className="w-[147px] ">
       <div className="bg- relative aspect-square ">

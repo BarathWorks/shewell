@@ -196,6 +196,9 @@ const UploadForm = ({
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: "PUT",
+              headers: {
+                "Content-Type": image.type,
+              },
               body: image,
             };
             const res = await fetch(presignedUrl!, requestOptions);
@@ -236,6 +239,9 @@ const UploadForm = ({
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: "PUT",
+              headers: {
+                "Content-Type": document.type,
+              },
               body: document,
             };
             const res = await fetch(presignedUrl!, requestOptions);
@@ -274,6 +280,9 @@ const UploadForm = ({
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: "PUT",
+              headers: {
+                "Content-Type": document.type,
+              },
               body: document,
             };
             const res = await fetch(presignedUrl!, requestOptions);
@@ -313,6 +322,9 @@ const UploadForm = ({
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: "PUT",
+              headers: {
+                "Content-Type": document.type,
+              },
               body: document,
             };
             const res = await fetch(presignedUrl!, requestOptions);

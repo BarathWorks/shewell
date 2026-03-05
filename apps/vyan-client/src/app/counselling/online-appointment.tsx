@@ -362,7 +362,7 @@ const OnlineAppointment = ({
         setStep(1);
 
         onOpenChange(false);
-        router.push("/profile/appointments");
+      
       })
       .catch((err) => {
         // toast({
@@ -376,9 +376,9 @@ const OnlineAppointment = ({
 
   const steps = [
     // { title: "Already a Customer" },
-    { title: "Select Service Mode" },
-    { title: "Select Expert" },
-    { title: "Select Time & Date" },
+    // { title: "Select Service Mode" },
+    // { title: "Select Expert" },
+    // { title: "Select Time & Date" },
     { title: "Patient Information" },
     { title: "Appointment Approval" },
   ];
@@ -404,7 +404,7 @@ const OnlineAppointment = ({
           price: priceInCents,
         },
       }));
-      setStep(4);
+      setStep(1);
     }
   }, [timeSlots]);
 
@@ -421,33 +421,35 @@ const OnlineAppointment = ({
           <div className=" border-b border-border-color">
             <div className="flex justify-between px-3  pb-2 pt-[30px] lg:px-[30px]">
               <div className="flex items-center gap-4">
-                <div className="hidden bg-[#F5F5F5] p-[10px] font-inter text-sm font-medium lg:block">
-                  <div className="flex items-center gap-[3px]">
-                    <div>
-                      <svg
-                        width="8"
-                        height="14"
-                        viewBox="0 0 8 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                {step > 1 && (
+                  <div className="hidden bg-[#F5F5F5] p-[10px] font-inter text-sm font-medium lg:block">
+                    <div className="flex items-center gap-[3px]">
+                      <div>
+                        <svg
+                          width="8"
+                          height="14"
+                          viewBox="0 0 8 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7 13L1 7L7 1"
+                            stroke="#121212"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => setStep(step - 1)}
                       >
-                        <path
-                          d="M7 13L1 7L7 1"
-                          stroke="#121212"
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => setStep(step - 1)}
-                    >
-                      Back
+                        Back
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="font-inter text-[20px] font-semibold leading-[30px]">
                   Register for appointment
@@ -459,14 +461,14 @@ const OnlineAppointment = ({
           <div className="flex flex-col pb-[100px] lg:flex-row  lg:gap-[76px] lg:px-[60px] xl:gap-[100px] 2xl:gap-[144px]">
             {/* left-options */}
             <div className="lg:basis-[231px]">
-              <Stepper currentStep={step} steps={steps} setStep={setStep} />
+              <Stepper currentStep={step - 1} steps={steps} setStep={setStep} />
             </div>
             {/* right-options */}
             <div className="w-full lg:basis-[477px] xl:basis-[657px]">
               {/* <Button onClick={handleSubmit}>Submit</Button> */}
               {/* {step === 1 && <AlreadyCustomer />} */}
               {/* passing callback function to child */}
-              {step === 1 && (
+              {/* {step === 1 && (
                 <ServiceMode
                   isActive={step === 1}
                   onNextStep={() => setStep(step + 1)}
@@ -478,8 +480,8 @@ const OnlineAppointment = ({
                   //   appointmentState.selectedServiceMode?.title!
                   // }
                 />
-              )}
-              {step === 2 && (
+              )} */}
+              {/* {step === 2 && (
                 <SelectExpert
                   defaultDoctorId={appointmentState.selectedExpert?.id!}
                   defaultSpecialisation={
@@ -490,8 +492,8 @@ const OnlineAppointment = ({
                   onSelectDoctor={handleExpertSelection}
                   onSelectSpecialisation={handleSelectedSpecialisation}
                 />
-              )}
-              {step === 3 && (
+              )} */}
+              {/* {step === 3 && (
                 <SelectDateTime
                   defaultDate={appointmentState.selectedDateTime?.date!}
                   defaultTimeSlots={
@@ -506,15 +508,15 @@ const OnlineAppointment = ({
                   onSelectDateTime={handleDateTimeSelection}
                   onSelectDuration={handleDurationSelection}
                 />
-              )}
-              {step === 4 && (
+              )} */}
+              {step === 1 && (
                 <PatientInformation
                   expertId={expertId}
                   defaultDuration={appointmentState.selectedDefaultDuration!}
                   timeDuration={appointmentState.selectedDuration!}
                   defaultSelectedPatient={appointmentState.selectedPatient!}
                   defaultCouple={appointmentState.selectedCouple!}
-                  isActive={step === 4}
+                  isActive={step === 1}
                   onNextStep={() => setStep(step + 1)}
                   onSelectPatient={handlePatientInformation}
                   onSelectFinalPrice={handleFinalPrice}
@@ -522,7 +524,7 @@ const OnlineAppointment = ({
                 />
               )}
 
-              {step === 5 && (
+              {step === 2 && (
                 <AppointmentApproval
                   isCouple={appointmentState.selectedCouple!}
                   professionalUserName={
@@ -541,7 +543,7 @@ const OnlineAppointment = ({
                   }
                 />
               )}
-              {step === 5 && (
+              {step === 2 && (
                 <div className="mr-3 flex justify-end">
                   <Button
                     className="self-end rounded-md bg-secondary px-[30px] py-2 font-inter text-base font-medium hover:bg-secondary"

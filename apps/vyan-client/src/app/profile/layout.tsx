@@ -27,12 +27,14 @@ export default async function OrdersPage({
           <div className="w-full bg-[#FBFBFB] font-inter pt-3">
          
           <div className=" container mx-auto 2xl:pb-[65px] xl:pb-[60px] lg:pb-[55px] pb-[32px] max-w-full">
-          <div className="items-start  xl:flex xl:flex-row xl:gap-[46px] 2xl:gap-[60px] ">
-          <div className="hidden xl:block 2xl:w-[375px] xl:w-[343px]">
+          <div className="items-start xl:flex xl:flex-row xl:gap-[46px] 2xl:gap-[60px] ">
+          <div className="w-full xl:w-[343px] 2xl:w-[375px] mb-4 xl:mb-0">
                   <ProfileNav email={userDetails?.email!}
                   name={userDetails?.name!} />
                   </div>
+            <div className="flex-1">
             {children}
+            </div>
             </div>
             </div>
             </div>

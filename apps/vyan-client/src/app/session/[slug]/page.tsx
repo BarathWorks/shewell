@@ -130,12 +130,7 @@ export default async function SessionDetailPage({
 
       <CourseInfoSection whoIsItFor={whoIsItFor} whatYouLearn={whatYouLearn} />
 
-      {canViewMeetingLink && (
-        <MeetingLinkSection
-          meetingLink={session.meetingLink!}
-          sessionTitle={session.title}
-        />
-      )}
+      
 
       <BookingSection
         banners={session.banners}

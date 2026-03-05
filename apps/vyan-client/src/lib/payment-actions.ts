@@ -282,7 +282,7 @@ export const createSessionOrder = async (bookingData: ISessionBookingData) => {
 
   if (!session) {
     return {
-      error: "You need to sign in to book a session.",
+      error: "Sign in to proceed",
     };
   }
 

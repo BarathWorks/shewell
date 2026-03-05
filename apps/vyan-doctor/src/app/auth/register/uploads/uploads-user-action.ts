@@ -55,11 +55,11 @@ const UploadsUserAction = async ({
     //   select : {
     //     aboutYou :true
     //   },
-    //   where : {
     //     email : session.user.email!
+    //   where : {
     //   }
-    // })
     // await db.professionalUser.create({
+      // })
     //   data :{
     //     aboutYou : aboutYou,
     //     email : session.user.email

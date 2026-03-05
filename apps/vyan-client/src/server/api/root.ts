@@ -26,6 +26,7 @@ import { similarDoctorProfileRouter } from "./routers/similarDoctorProfile";
 import { wishlistedRouter } from "./routers/wishlistedProducts";
 import { cartRouter } from "./routers/cart";
 import { sessionRouter } from "./routers/session";
+import { getTopExpertsRouter } from "./routers/getTopExperts";
 
 /**
  * This is the primary router for your server.
@@ -60,6 +61,7 @@ export const appRouter = createTRPCRouter({
   wishlisted: wishlistedRouter,
   cart: cartRouter,
   session: sessionRouter,
+  topExperts: getTopExpertsRouter,
 });
 
 // export type definition of API

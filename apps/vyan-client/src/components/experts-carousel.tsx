@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { InteractiveButton } from "./ui/interactive-button";
 import router from "next/router";
+import { api } from "~/trpc/react";
 
 const EXPERTS_DATA = [
   {
@@ -36,29 +37,41 @@ const EXPERTS_DATA = [
     image:
       "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&h=300&q=80",
   },
-  {
-    id: 6,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&h=300&q=80",
-  },
-  {
-    id: 7,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&h=300&q=80",
-  },
-  {
-    id: 8,
-    role: "Specialist",
-    image:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=300&h=300&q=80",
-  },
 ];
 
+type ExpertData = {
+  id: string | number;
+  name?: string;
+  role: string;
+  image: string;
+  userName?: string;
+};
+
 export default function ExpertsCarousel() {
-  const [items, setItems] = useState(EXPERTS_DATA);
+  const { data, isLoading, error } = api.topExperts.getTopExperts.useQuery();
+
+  // Transform API data to carousel format
+  const expertsData = useMemo<ExpertData[]>(() => {
+    if (!data?.topExperts || data.topExperts.length === 0) {
+      return EXPERTS_DATA; // Fallback to mock data
+    }
+
+    return data.topExperts.map((doctor) => ({
+      id: doctor.id,
+      name: `${doctor.firstName} ${doctor.lastName}`,
+      role: doctor.displayQualification?.specialization ?? "Specialist",
+      image: doctor.media?.fileUrl ?? "/images/fallback-user-profile.png",
+      userName: doctor.userName,
+    }));
+  }, [data]);
+
+  const [items, setItems] = useState<ExpertData[]>(expertsData);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Update items when data is loaded
+  useEffect(() => {
+    setItems(expertsData);
+  }, [expertsData]);
 
   const handleNext = useCallback(() => {
     setItems((prev) => {
@@ -80,24 +93,31 @@ export default function ExpertsCarousel() {
 
   // Auto-scroll Timer
   useEffect(() => {
-    if (isHovered) return; // Pause timer when user hovers
+    if (isHovered || items.length <= 1) return; // Pause timer when user hovers or only 1 item
 
     const interval = setInterval(() => {
       handleNext();
     }, 3000); // Rotates every 3 seconds
 
     return () => clearInterval(interval);
-  }, [handleNext, isHovered]);
+  }, [handleNext, isHovered, items.length]);
+
+  // Don't render if no data and not loading
+  if (!isLoading && items.length === 0) {
+    return null;
+  }
+
+  const showNavigation = items.length > 1;
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 sm:px-6 md:px-12 lg:px-[100px] py-6 sm:py-8 md:py-12">
+    <section className="w-full overflow-hidden bg-white px-4 py-4 sm:px-6 sm:py-8 md:px-16 md:py-14 lg:px-[100px]">
       <div className="max-w-8xl mx-auto px-0">
         {/* Section Header */}
-        <div className="mb-6 sm:mb-8 text-center md:mb-12">
-          <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium text-gray-900 leading-tight">
+        <div className="mb-6 text-center sm:mb-8 md:mb-12">
+          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
             You're Not Alone We're Just a Click Away
           </h2>
-          <p className="mx-auto max-w-2xl text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#33333399] leading-relaxed">
+          <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
             Consult with empathetic, qualified specialists who listen, guide,
             and support your health decisions.
           </p>
@@ -105,23 +125,31 @@ export default function ExpertsCarousel() {
 
         {/* Experts Carousel */}
         <div
-          className="relative flex h-[180px] sm:h-[220px] md:h-[280px] lg:h-[350px] items-center justify-center px-8 sm:px-10 md:px-12"
+          className="relative flex h-[180px] items-center justify-center px-8 sm:h-[220px] sm:px-10 md:h-[320px] md:px-14 lg:h-[350px]"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 sm:left-4 z-30 rounded-full border border-gray-300 bg-white p-1.5 sm:p-2 md:p-3 transition-colors hover:bg-gray-100 md:left-10"
-            aria-label="Previous expert"
-          >
-            <ChevronLeft size={18} className="text-gray-600 sm:size-5 md:size-6" />
-          </button>
+          {showNavigation && (
+            <button
+              onClick={handlePrev}
+              className="absolute left-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:left-4 sm:p-2 md:left-6 md:p-3"
+              aria-label="Previous expert"
+            >
+              <ChevronLeft
+                size={18}
+                className="text-gray-600 sm:size-5 md:size-6"
+              />
+            </button>
+          )}
 
-          <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 lg:gap-10">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             <AnimatePresence mode="popLayout" initial={false}>
-              {items.slice(0, 5).map((expert, index) => {
-                const isCenter = index === 2;
-                const isSide = index === 1 || index === 3;
+              {items.slice(0, Math.min(5, items.length)).map((expert, index) => {
+                const totalItems = Math.min(5, items.length);
+                const centerIndex = Math.floor(totalItems / 2);
+                const isCenter = index === centerIndex;
+                const isSide = 
+                  totalItems >= 3 && (index === centerIndex - 1 || index === centerIndex + 1);
 
                 return (
                   <motion.div
@@ -129,19 +157,19 @@ export default function ExpertsCarousel() {
                     layout
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{
-                      opacity: 1,
+                      opacity: isCenter ? 1 : isSide ? 0.85 : 0.7,
                       scale: isCenter ? 1.5 : isSide ? 1.4 : 1.1,
                       zIndex: isCenter ? 20 : 10,
                       marginLeft:
-                        index === 2
+                        index === centerIndex
                           ? "2rem"
-                          : index === 3 || index === 4
+                          : index > centerIndex
                             ? "1rem"
                             : "0",
                       marginRight:
-                        index === 2
+                        index === centerIndex
                           ? "2rem"
-                          : index === 1 || index === 0
+                          : index < centerIndex
                             ? "1rem"
                             : "0",
                     }}
@@ -154,8 +182,9 @@ export default function ExpertsCarousel() {
                     className="relative"
                   >
                     <div
-                      className={`relative overflow-hidden rounded-full border-2 border-white shadow-lg
-                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-28 lg:w-28"}`}
+                      className={`relative overflow-hidden rounded-full shadow-lg
+                        ${isCenter ? "h-16 w-16 sm:h-24 sm:w-24 md:h-32 md:w-32 lg:h-40 lg:w-40" : "h-12 w-12 sm:h-16 sm:w-16 md:h-24 md:w-24 lg:h-28 lg:w-28"}
+                        ${!isCenter ? "grayscale-[30%]" : ""}`}
                     >
                       <img
                         src={expert.image}
@@ -163,15 +192,17 @@ export default function ExpertsCarousel() {
                         className="h-full w-full object-cover"
                       />
                       {/* overlay */}
-                      <div className="absolute inset-0 top-[60%] bg-black/25   shadow-lg blur-[3px] " />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                       {/* Role Badge */}
                       <motion.div
                         animate={{ opacity: isCenter ? 1 : 0.6 }}
-                        className={`absolute  ${isCenter ? "bottom-3 sm:bottom-5 md:bottom-6 lg:bottom-8" : "bottom-1.5 sm:bottom-2"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:px-2`}
+                        className={`absolute  ${isCenter ? "bottom-2 sm:bottom-4 md:bottom-8 lg:bottom-6" : "bottom-1 sm:bottom-2 md:bottom-4"} left-1/2 flex -translate-x-1/2 items-center gap-0.5 bg-transparent px-1.5 py-0.5 sm:gap-1 sm:px-2`}
                       >
-                        <span className="h-0.5 w-0.5 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 rounded-full bg-white"></span>
                         <span
-                          className={`${isCenter ? "text-[8px] sm:text-xs md:text-sm lg:text-base" : "text-[7px] sm:text-[10px] md:text-xs"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out`}
+                          className={`${isCenter ? "h-1 w-1 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5 lg:h-1.5 lg:w-1.5" : "h-0.5 w-0.5 sm:h-0.5 sm:w-0.5 md:h-1 md:w-1"} rounded-full bg-white`}
+                        ></span>
+                        <span
+                          className={`${isCenter ? "text-[8px] sm:text-[8px] md:text-[11px] lg:text-[12px]" : "text-[8px] sm:text-[8px] md:text-[9px] lg:text-[8px]"} whitespace-nowrap font-medium text-white transition-all duration-300 ease-in-out `}
                         >
                           {expert.role}
                         </span>
@@ -183,24 +214,29 @@ export default function ExpertsCarousel() {
             </AnimatePresence>
           </div>
 
-          <button
-            onClick={handleNext}
-            className="absolute right-2 sm:right-4 z-30 rounded-full border border-gray-300 bg-white p-1.5 sm:p-2 md:p-3 transition-colors hover:bg-gray-100 md:right-10"
-            aria-label="Next expert"
-          >
-            <ChevronRight size={18} className="text-gray-600 sm:size-5 md:size-6" />
-          </button>
+          {showNavigation && (
+            <button
+              onClick={handleNext}
+              className="absolute right-2 z-30 rounded-full border border-gray-300 bg-white p-1.5 transition-colors hover:bg-gray-100 sm:right-4 sm:p-2 md:right-6 md:p-3"
+              aria-label="Next expert"
+            >
+              <ChevronRight
+                size={18}
+                className="text-gray-600 sm:size-5 md:size-6"
+              />
+            </button>
+          )}
         </div>
 
         {/* CTA Button */}
         <div
-          className="mt-8 sm:mt-10 md:mt-12 lg:mt-16 flex w-full justify-center"
-          onClick={() => window.location.href = "/counselling"}
+          className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
+          onClick={() => (window.location.href = "/counselling")}
         >
-          <div className="order-0 group flex h-11 sm:h-14 md:h-16 lg:h-20 w-full max-w-2xl cursor-pointer items-center justify-between gap-2 sm:gap-3 rounded-lg sm:rounded-xl md:rounded-2xl bg-[#F2F2F2] px-4 sm:px-5 md:px-6 lg:px-8 py-2 sm:py-3 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5]">
+          <div className="order-0 group flex w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] xs:h-16 xs:py-2 sm:h-12 sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-4 md:h-20 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8 xl:h-24">
             <div className="flex flex-1 justify-center">
-              <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-[#00000066] text-center">
-                Book a Session
+              <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px] ">
+                BOOK A SESSION WITH OUR EXPERTS
               </span>
             </div>
             <InteractiveButton />
