@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { ChevronDown, Search, User, Menu, X } from "lucide-react";
 import { env } from "~/env";
+import { useSession } from "next-auth/react";
 
 export function Header() {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const { data: session } = useSession();
   return (
     <header className="relative sticky top-0 z-50 w-full bg-gradient-to-r from-[#172F5B] to-[#00898F]  shadow-md">
       <nav className="mx-auto flex items-center justify-between px-3 py-3 sm:px-4 sm:py-4 md:px-6">
@@ -109,7 +110,7 @@ export function Header() {
 
           {/* User Profile */}
           <Link
-            href="/auth/login"
+            href={`${session ? "/profile/edit-profile" : "/auth/login"}`}
             className="rounded-full bg-[#1A8191] p-2 text-white transition-all duration-300 hover:bg-[#A5F3FC] hover:text-[#13647A]"
             aria-label="User profile"
           >
