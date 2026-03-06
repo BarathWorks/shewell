@@ -103,7 +103,7 @@ const SelectExpert = ({
   const handleLanguageChange = (value: string[]) => {
     setLanguageIds(value);
   };
-  useEffect(() => {}, []);
+
   useEffect(() => {
     if (selectedDoctorDetails && selectedDoctorId === defaultDoctorId) {
       handleDoctorSelection({
@@ -132,85 +132,89 @@ const SelectExpert = ({
         </div>
       </div>
 
-     
       <div className="flex max-h-[260px] flex-col gap-3 overflow-y-auto sm:gap-4 md:max-h-[350px] lg:max-h-[400px]">
-  {selectedDoctorId &&
-    expertData?.experts
-      .sort((a, b) => {
-        // Place the selected doctor first
-        if (a.id === selectedDoctorId) return -1;
-        if (b.id === selectedDoctorId) return 1;
-        return 0;
-      })
-      .map((doctor, index) => (
-        <div
-          key={index}
-          className={`flex flex-col gap-3 rounded-md border p-3 sm:flex-row sm:gap-2 sm:p-4 md:gap-3 md:p-4 ${
-            selectedDoctorId === doctor.id ? "border-primary" : "border-gray-300"
-          } xs:px-1`}
-        >
-          <input
-            type="radio"
-            checked={selectedDoctorId === doctor.id}
-            onChange={() =>
-              handleDoctorSelection({
-                id: doctor.id,
-                firstName: doctor.firstName!,
-              })
-            }
-            className="mt-1 sm:mt-2"
-          />
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 md:gap-4 lg:gap-6 xl:gap-[40px] flex-1">
-            <div className="w-full sm:w-[70px] md:w-[85px] lg:w-[95px] self-center">
-              <div className="relative aspect-square">
-                <Image
-                  src={
-                    doctor.media?.fileUrl ||
-                    "/images/fallback-user-profile.png"
+        {selectedDoctorId &&
+          expertData?.experts
+            .sort((a, b) => {
+              // Place the selected doctor first
+              if (a.id === selectedDoctorId) return -1;
+              if (b.id === selectedDoctorId) return 1;
+              return 0;
+            })
+            .map((doctor, index) => (
+              <div
+                key={index}
+                className={`flex flex-col gap-3 rounded-md border p-3 sm:flex-row sm:gap-2 sm:p-4 md:gap-3 md:p-4 ${
+                  selectedDoctorId === doctor.id
+                    ? "border-primary"
+                    : "border-gray-300"
+                } xs:px-1`}
+              >
+                <input
+                  type="radio"
+                  checked={selectedDoctorId === doctor.id}
+                  onChange={() =>
+                    handleDoctorSelection({
+                      id: doctor.id,
+                      firstName: doctor.firstName!,
+                    })
                   }
-                  alt="feature-card"
-                  className="rounded-full object-cover"
-                  fill={true}
+                  className="mt-1 sm:mt-2"
                 />
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 flex-1 sm:gap-3 xl:flex-row xl:gap-[40px] xl:self-center">
-              <div className="flex flex-col gap-1">
-                <div className="font-inter text-sm font-semibold sm:text-base md:text-lg lg:text-lg">
-                  {doctor.firstName}
-                </div>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-1">
-                  <div className="flex gap-1">
-                    <div>
-                      <Rating
-                        className="inline"
-                        readOnly={true}
-                        style={{ maxWidth: 80 }}
-                        value={Number(doctor.avgRating || "0")}
-                        itemStyles={customStyles}
+                <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:gap-3 md:gap-4 lg:gap-6 xl:gap-[40px]">
+                  <div className="w-full self-center sm:w-[70px] md:w-[85px] lg:w-[95px]">
+                    <div className="relative aspect-square">
+                      <Image
+                        src={
+                          doctor.media?.fileUrl ||
+                          "/images/fallback-user-profile.png"
+                        }
+                        alt="feature-card"
+                        className="rounded-full object-cover"
+                        fill={true}
                       />
                     </div>
-                    <div className="border-r border-primary pr-2 font-inter text-xs font-medium sm:text-sm">
-                      {Number(doctor.avgRating || "0").toFixed(1)}
-                    </div>
                   </div>
-                  <div className="font-inter text-xs font-normal">
-                    {doctor?.totalConsultations || 0} Consultation
+                  <div className="flex flex-1 flex-col gap-2 sm:gap-3 xl:flex-row xl:gap-[40px] xl:self-center">
+                    <div className="flex flex-col gap-1">
+                      <div className="font-inter text-sm font-semibold sm:text-base md:text-lg lg:text-lg">
+                        {doctor.firstName}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-1">
+                        <div className="flex gap-1">
+                          <div>
+                            <Rating
+                              className="inline"
+                              readOnly={true}
+                              style={{ maxWidth: 80 }}
+                              value={Number(doctor.avgRating || "0")}
+                              itemStyles={customStyles}
+                            />
+                          </div>
+                          <div className="border-r border-primary pr-2 font-inter text-xs font-medium sm:text-sm">
+                            {Number(doctor.avgRating || "0").toFixed(1)}
+                          </div>
+                        </div>
+                        <div className="font-inter text-xs font-normal">
+                          {doctor?.totalConsultations || 0} Consultation
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-full sm:w-auto sm:self-center">
+                      <Link
+                        href={`/doctor-profile/${doctor.userName}`}
+                        className="w-full"
+                      >
+                        <Button className="w-full rounded-md bg-black px-3 py-2 text-xs font-medium text-white hover:bg-black sm:w-auto sm:text-sm">
+                          View Profile
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="w-full sm:w-auto sm:self-center">
-                <Link href={`/doctor-profile/${doctor.userName}`} className="w-full">
-                  <Button className="w-full rounded-md bg-black px-3 py-2 text-xs font-medium text-white hover:bg-black sm:w-auto sm:text-sm">
-                    View Profile
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-</div>
+            ))}
+      </div>
 
       <Button
         className="self-end rounded-md bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary sm:px-6 sm:py-2 sm:text-base md:px-[30px]"

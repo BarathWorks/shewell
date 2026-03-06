@@ -852,18 +852,12 @@ const TimeSlots = ({
 
   console.log("timeSlotsDataForSelectedDate", timeSlotsData);
 
-  const { data: minTimeDurationData } =
+  const { data: timeDurationData } =
     api.appointmentTimeDuration.appointmentTimeDuration.useQuery({
       professionalUserId: professionalUserId,
     });
-
-  const { data: timeDurations } =
-    api.appointmentTimeDuration.appointmentTimeDuration.useQuery({
-      professionalUserId: professionalUserId,
-    });
-  // console.log("timeDurations", timeDurations);
   const { data: pricesInCents } = api.findPrice.findPrice.useQuery({
-    duration: timeDuration! || minTimeDurationData?.minTimeDuration?.time!,
+    duration: timeDuration! || timeDurationData?.minTimeDuration?.time!,
     expertId: professionalUserId,
     // couple :isCouple
   });
@@ -873,11 +867,11 @@ const TimeSlots = ({
   }, [selectedDate, refetch]);
 
   useEffect(() => {
-    if (minTimeDurationData?.minTimeDuration) {
-      setMinDuration(minTimeDurationData.minTimeDuration.time);
-      // onSelectDuration(minTimeDurationData.minTimeDuration.time);
+    if (timeDurationData?.minTimeDuration) {
+      setMinDuration(timeDurationData.minTimeDuration.time);
+      // onSelectDuration(timeDurationData.minTimeDuration.time);
     }
-  }, [minTimeDurationData]);
+  }, [timeDurationData]);
 
   useEffect(() => {
     const availableTimeSlots =
@@ -889,11 +883,11 @@ const TimeSlots = ({
         })),
       );
 
-    if (minTimeDurationData) {
+    if (timeDurationData) {
       setTimeSlots(
         generateTimeSlots(
           availableTimeSlots!,
-          minTimeDurationData.minTimeDuration?.time!,
+          timeDurationData.minTimeDuration?.time!,
         ),
       );
       // console.log("timeSlotsForMinDuration", timeSlots)
@@ -905,7 +899,7 @@ const TimeSlots = ({
         // console.log("timeSlotsForTimeDuration", timeSlots)
       }
     }
-  }, [timeSlotsData, timeDuration, minTimeDurationData, selectedDate]);
+  }, [timeSlotsData, timeDuration, timeDurationData, selectedDate]);
 
   console.log("timeSlotsInStateAfterUseEffect", timeSlots);
 
@@ -1056,7 +1050,7 @@ const TimeSlots = ({
           <Select
             value={
               timeDuration?.toString() ||
-              minTimeDurationData?.minTimeDuration?.time.toString()
+              timeDurationData?.minTimeDuration?.time.toString()
             }
             onValueChange={(selectedValue: string) => {
               setTimeDuration(parseInt(selectedValue));
@@ -1067,7 +1061,7 @@ const TimeSlots = ({
             </SelectTrigger>
             <SelectContent className="rounded-xl border-gray-100 bg-white shadow-lg">
               <SelectGroup>
-                {timeDurations?.timeDurations.map((timeDuration) => (
+                {timeDurationData?.timeDurations.map((timeDuration) => (
                   <SelectItem
                     className="cursor-pointer rounded-lg bg-white px-2 py-1.5 text-sm font-medium text-[#333333] hover:bg-gray-50"
                     key={timeDuration.time}

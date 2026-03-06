@@ -104,7 +104,6 @@ const SelectDateTime = ({
       //  console.log("selected time slot", selectedTimeSlot)
     }
   }, [duration]);
-  useEffect(() => {}, [selectedTimeSlot]);
 
   useEffect(() => {
     setSelectedTimeSlot(defaultTimeSlots);

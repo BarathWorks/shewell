@@ -1,15 +1,12 @@
 "use client";
 import { Button } from "@repo/ui/src/@/components/button";
 import AddPatient from "./edit-patient";
-import { db } from "~/server/db";
-import { getServerSession } from "next-auth";
 import { api } from "~/trpc/react";
 import { useEffect, useState } from "react";
 import DeletePatient from "./delete-patient-user-action";
 import { useToast } from "@repo/ui/src/@/components/use-toast";
 import AddNewPatient from "./add-new-patient";
 import EditPatient from "./edit-patient";
-import React from "react";
 
 interface IPatientInformation {
   id: string;
@@ -119,7 +116,7 @@ const PatientInformation = ({
 
   useEffect(() => {
     refetch();
-  });
+  }, [defaultCouple]);
 
   useEffect(() => {
     if (data?.patient?.length === 1) {

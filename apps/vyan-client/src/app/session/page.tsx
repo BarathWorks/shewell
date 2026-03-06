@@ -54,18 +54,21 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     isOnlyOnline,
   });
 
-  // Fetch sessions using the filter endpoint
-  const result = await api.session.filterSessions({
-    categoryId,
-    trimester,
-    minPrice,
-    maxPrice,
-    sortBy,
-    status,
-    startDate,
-    endDate,
-    isOnlyOnline,
-  });
+  // Fetch sessions and categories in parallel
+  const [result, categories] = await Promise.all([
+    api.session.filterSessions({
+      categoryId,
+      trimester,
+      minPrice,
+      maxPrice,
+      sortBy,
+      status,
+      startDate,
+      endDate,
+      isOnlyOnline,
+    }),
+    api.session.getAllCategories({}),
+  ]);
 
   let sessions = result.sessions || [];
 
@@ -84,21 +87,17 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     groups.get(month)!.push(session);
   });
 
-  const cassifiedSessions = Array.from(groups.entries()).map(([month, sessions]) => ({
-    month,
-    sessions,
-  }));
-  console.log("grouped sessions:", groups);
-
-
-  // Fetch categories for filter dropdown
-  const categories = await api.session.getAllCategories({});
+  const cassifiedSessions = Array.from(groups.entries()).map(
+    ([month, sessions]) => ({
+      month,
+      sessions,
+    }),
+  );
 
   console.log("Fetched sessions:", sessions.length, "sessions", sessions);
 
   return (
     <main className="flex w-full flex-col items-center bg-white">
-
       {/* Hero Section */}
       <div className="mx-auto max-w-7xl px-6 py-16 text-center">
         <h1 className=" font-inter text-[48px] font-medium leading-[48px] text-[#333333]">
