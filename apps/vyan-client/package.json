@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpx prisma@5.22.0 generate --schema=../../packages/database/prisma/schema.prisma && next build",
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 3001 -H 0.0.0.0",
     "lint": "next lint",
     "start": "next start -p 6001",
     "prisma:generate": "pnpx prisma@5.22.0 generate --schema=../../packages/database/prisma/schema.prisma"
