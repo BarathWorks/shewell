@@ -82,7 +82,6 @@ export const authOptions: NextAuthOptions = {
           type: "password",
           placeholder: "Enter your password",
         },
-
       },
 
       async authorize(credentials) {
@@ -99,7 +98,7 @@ export const authOptions: NextAuthOptions = {
 
         if (isDoctorAccount) {
           throw new Error(
-            "Doctor accounts cannot access this portal. Please use the professional portal."
+            "Doctor accounts cannot access this portal. Please use the professional portal.",
           );
         }
 
@@ -120,10 +119,8 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        if(!user){
-          throw new Error(
-            "User not found"
-          );
+        if (!user) {
+          throw new Error("User not found");
         }
 
         if (!user?.passwordHash) {
@@ -143,7 +140,92 @@ export const authOptions: NextAuthOptions = {
           verifiedAt: user.verifiedAt,
         };
       },
+    }),
 
+    // OTP-based login provider
+    CredentialsProvider({
+      id: "OtpVyanClient",
+      name: "OtpVyanClient",
+      credentials: {
+        email: {
+          label: "Email*",
+          type: "email",
+          placeholder: "Enter your email id",
+        },
+        otp: {
+          label: "OTP*",
+          type: "text",
+          placeholder: "Enter the OTP",
+        },
+      },
+
+      async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
+        // Check if email belongs to a doctor account
+        const isDoctorAccount = await db.professionalUser.findFirst({
+          where: { email: credentials.email },
+          select: { id: true },
+        });
+
+        if (isDoctorAccount) {
+          throw new Error(
+            "Doctor accounts cannot access this portal. Please use the professional portal.",
+          );
+        }
+
+        const user = await db.user.findFirst({
+          select: {
+            id: true,
+            email: true,
+            phoneNumber: true,
+            verifiedAt: true,
+            name: true,
+            otp: true,
+            otpCreatedAt: true,
+          },
+          where: {
+            email: credentials.email,
+            verifiedAt: { not: null },
+          },
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // Verify OTP
+        if (user.otp !== credentials.otp) {
+          throw new Error("Invalid OTP");
+        }
+
+        // Check OTP expiry (5 minutes)
+        if (user.otpCreatedAt) {
+          const otpAge = Date.now() - new Date(user.otpCreatedAt).getTime();
+          const FIVE_MINUTES = 5 * 60 * 1000;
+          if (otpAge > FIVE_MINUTES) {
+            throw new Error("OTP has expired. Please request a new one.");
+          }
+        } else {
+          throw new Error("OTP has expired. Please request a new one.");
+        }
+
+        // Clear OTP after successful verification
+        await db.user.update({
+          where: { email: credentials.email },
+          data: { otp: "", otpCreatedAt: null },
+        });
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          verifiedAt: user.verifiedAt,
+        };
+      },
     }),
   ],
 };

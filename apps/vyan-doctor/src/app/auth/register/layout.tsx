@@ -17,11 +17,13 @@ import StepperRegister from "./stepper-register";
 // import StepperComponent from "../components/stepper";
 
 const steps = [
- { title : 'Personal Information'},
-  {title : 'Qualifications'},
-  {title : 'Modes'},
-  {title : 'Uploads'},
-  {title : 'Bank Details'}
+  { title: 'Account Setup' },
+  { title: 'Personal Info' },
+  { title: 'Address' },
+  { title: 'Identity & Documents' },
+  { title: 'Education' },
+  { title: 'Practice Details' },
+  { title: 'Bank Details' },
 ]
 const RegisterLayout = ({ children }: { children: React.ReactNode }) => {
  const [step, setStep] = useState<number>(1)

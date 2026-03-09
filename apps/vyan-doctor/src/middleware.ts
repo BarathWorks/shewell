@@ -2,7 +2,7 @@ export { default } from "next-auth/middleware";
 // import type { NextRequest } from 'next/server'
 // import { NextResponse } from 'next/server'
 export const config = {
-  matcher: [ "/appointment", "/edit-profile", "/auth/register/qualifications","/auth/register/modes","/auth/register/uploads", "/dashboard"],
+  matcher: [ "/appointment", "/edit-profile", "/auth/register/personal-info", "/auth/register/address", "/auth/register/identity-documents", "/auth/register/education", "/auth/register/practice-details", "/auth/register/bank-details", "/dashboard"],
 };
 
  

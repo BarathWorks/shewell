@@ -1,156 +1,81 @@
 "use client";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const StepperRegister = () => {
-  const pathname = usePathname();
   const params = useSearchParams();
-  //   const step = params.get("step");
   const [step, setStep] = useState(params.get("step") || null);
 
   useEffect(() => {
     const currentStep = params.get("step");
     setStep(currentStep);
   }, [params]);
+
+  const totalSteps = 7;
+
+  const stepLabels: Record<string, string> = {
+    "1": "Account Setup",
+    "2": "Personal Info",
+    "3": "Address",
+    "4": "Identity & Documents",
+    "5": "Education",
+    "6": "Practice Details",
+    "7": "Bank Details",
+  };
+
+  const getStepLabel = () => {
+    if (step === null) return "Account Setup";
+    return stepLabels[step] || "";
+  };
+
+  const isStepActive = (stepNumber: number) => {
+    if (step === null && stepNumber === 1) return true;
+    return step !== null && parseInt(step) >= stepNumber;
+  };
+
+  const renderStepCircle = (stepNumber: number, isLast: boolean) => {
+    const active = isStepActive(stepNumber);
+    const lineActive = step !== null && parseInt(step) > stepNumber;
+
+    return (
+      <div className={isLast ? "" : "w-full"} key={stepNumber}>
+        <div
+          className={`flex gap-[12px] ${
+            !isLast
+              ? `after:absolute after:border-t-2 after:w-full ${
+                  lineActive ? "after:border-secondary" : "after:border-[#B4B4B4]"
+                } relative after:left-[40px] after:top-5`
+              : ""
+          }`}
+        >
+          {active ? (
+            <div className="h-[40px] z-10 rounded-full border bg-secondary relative">
+              <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
+                {stepNumber}
+              </div>
+            </div>
+          ) : (
+            <div className="h-[40px] w-[40px] z-10 rounded-full bg-[#D2D2D2] relative"></div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
-      <div className="block ">
-     
-        <div className="  flex  justify-between w-full  ">
-         <div className="w-full">
-         <div
-            className={`flex gap-[12px] after:absolute  after:border  after:w-full ${step && step > "1" ? "after:border-secondary" : "after:border-[#B4B4B4]"}  relative  after:top-6  after:left-[40px]`}
-          >
-            <div className="h-[40px] rounded-full border bg-secondary">
-              <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full font-inter text-[16px] font-medium text-[#FFFFFF] ">
-                1
-              </div>
-            </div>
-          </div>
-         </div>
-
-         <div className="w-full">
-         <div
-            className={`flex gap-[12px] after:absolute after:w-full  after:border  ${step && step > "2" ? "after:border-secondary" : "after:border-[#B4B4B4]"}  relative after:left-[40px]  after:top-6  `}
-          >
-            {step && step > "1" ? (
-              <div className="h-[40px] rounded-full border bg-secondary">
-                <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
-                  2
-                </div>
-              </div>
-            ) : (
-              <div className="h-[40px] w-[40px] rounded-full bg-[#D2D2D2]"></div>
-            )}
-          </div>
-         </div>
-
-         <div className="w-full">
-         <div
-            className={`flex gap-[12px] after:absolute  after:border after:w-full  ${step && step > "3" ? "after:border-secondary" : "after:border-[#B4B4B4]"}  relative after:left-[40px] after:top-6  `}
-          >
-            {step && step > "2" ? (
-              <div className="h-[40px] rounded-full border bg-secondary">
-                <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
-                  3
-                </div>
-              </div>
-            ) : (
-              <div className="h-[40px] w-[40px] z-[1000] rounded-full bg-[#D2D2D2]"></div>
-            )}
-          </div>
-         </div>
-
-         <div className="w-full">
-          <div
-            className={`flex gap-[12px] after:absolute  after:border after:w-full  ${step && step > "4" ? "after:border-secondary" : "after:border-[#B4B4B4]"}  relative after:left-[40px] after:top-6  `}
-          >
-            {step && step > "3" ? (
-              <div className="h-[40px] rounded-full border bg-secondary">
-                <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
-                  4
-                </div>
-              </div>
-            ) : (
-              <div className="h-[40px] w-[40px] z-[1000] rounded-full bg-[#D2D2D2]"></div>
-            )}
-          </div>
-         </div>
-
-         <div className="w-full">
-          <div
-            className={`flex gap-[12px] after:absolute  after:border after:w-full  ${step && step > "5" ? "after:border-secondary" : "after:border-[#B4B4B4]"}  relative after:left-[40px] after:top-6  `}
-          >
-            {step && step > "4" ? (
-              <div className="h-[40px] rounded-full border bg-secondary">
-                <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
-                  5
-                </div>
-              </div>
-            ) : (
-              <div className="h-[40px] w-[40px] z-[1000] rounded-full bg-[#D2D2D2]"></div>
-            )}
-          </div>
-         </div>
-
-          <div className="flex  gap-[12px]">
-            {step && step > "5" ? (
-              <div className="h-[40px] rounded-full border bg-secondary">
-                <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-secondary font-inter text-[16px] font-medium text-[#FFFFFF]">
-                  6
-                </div>
-              </div>
-            ) : (
-              <div className="h-[40px] w-[40px] z-[1000] rounded-full bg-[#D2D2D2]"></div>
-            )}
-          </div>
+      <div className="block">
+        <div className="flex justify-between w-full">
+          {Array.from({ length: totalSteps }, (_, i) =>
+            renderStepCircle(i + 1, i + 1 === totalSteps),
+          )}
         </div>
         <div>
-          {step === null && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Personal Information
-              </div>
+          <div className="my-[20px] flex flex-col gap-[6px]">
+            <div className="font-inter text-base font-semibold 2xl:text-lg">
+              {getStepLabel()}
             </div>
-          )}
-          {step === "2" && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Address & Identity
-              </div>
-            </div>
-          )}
-          {step === "3" && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Qualifications
-              </div>
-            </div>
-          )}
-          {step === "4" && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Modes
-              </div>
-            </div>
-          )}
-
-          {step === "5" && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Uploads
-              </div>
-            </div>
-          )}
-
-          {step === "6" && (
-            <div className="my-[20px] flex flex-col gap-[6px]">
-              <div className="font-inter text-base font-semibold  2xl:text-lg">
-                Bank Details
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </>

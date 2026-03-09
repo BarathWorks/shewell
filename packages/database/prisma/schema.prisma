@@ -245,12 +245,13 @@ model AvailablePincodes {
 
 model ProfessionalUser {
   id                                String                             @id @default(cuid())
-  firstName                         String
+  firstName                         String?
   lastName                          String?
-  phoneNumber                       String
-  dob                               DateTime
+  phoneNumber                       String?
+  dob                               DateTime?
   email                             String                             @unique
   passwordHash                      String
+  userName                          String                             @unique
   createdAt                         DateTime                           @default(now())
   updatedAt                         DateTime                           @updatedAt
   qualifications                    ProfessionalQualifications[]
@@ -260,7 +261,6 @@ model ProfessionalUser {
   ProfessionalSpecializations       ProfessionalSpecializations[]
   avgRating                         Decimal?
   totalConsultations                Int?
-  userName                          String?                            @unique
   gender                            String?
   sessionMode                       String?
   // sessionType                       String?
