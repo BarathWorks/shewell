@@ -192,7 +192,7 @@ const Login = () => {
 
           <div className="text-center font-inter text-base font-normal">
             Don't have SheWellCare account
-           <Link href="/auth/register/personal-information">
+           <Link href="/auth/register/account-setup">
            <div
               // onClick={() => handleOpenDialog()}
               className="ml-4 mt-2  block cursor-pointer font-poppins text-base font-medium text-primary md:mt-0 md:inline"

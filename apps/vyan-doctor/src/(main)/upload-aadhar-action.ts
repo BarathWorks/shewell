@@ -56,7 +56,7 @@ const uploadAadharAction = async (professionalUserId : string,fileKey: string,fi
     }
   });
   const url = await getUploadPresignedUrl(key, false, mimeType);
-  revalidatePath("/auth/register/uploads")
+  revalidatePath("/auth/register/identity-documents")
   // revalidatePath('/admin/media');
 
   return {
@@ -86,7 +86,7 @@ export const deleteDocumentFromKey = async (professionalUserId : string, key: st
       professionalUserId : professionalUserId
     }
   })
-  revalidatePath("auth/register/uploads")
+  revalidatePath("auth/register/identity-documents")
   if (!key) {
     return;
   }

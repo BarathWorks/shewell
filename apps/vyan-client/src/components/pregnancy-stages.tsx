@@ -87,21 +87,25 @@ export default function PregnancyStages({
                   onStageHover?.(stage.carouselIndex);
                 }}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex h-10 w-full items-center justify-center overflow-hidden rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6  ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
+                className={`relative flex flex-col h-10 w-full  justify-center overflow-hidden rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6  ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
               >
                 {/* The large Gradient Text */}
-                <h1 className="absolute -top-2 left-2 select-none text-3xl font-black leading-none tracking-tighter opacity-70 xs:hidden sm:text-5xl md:block md:text-6xl lg:text-[80px]">
+               <div>
+                 <h1 className=" text-[60px] font-bold uppercase ">
                   <span
                     className={`bg-gradient-to-b from-black/40 to-black/10 bg-clip-text text-transparent`}
                   >
                     {stage.prefix}
                   </span>
                 </h1>
+               </div>
 
                 {/* The Title Text */}
-                <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-right text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-lg lg:text-lg xs:text-[12px] xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
+                <div>
+                  <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-lg lg:text-lg xs:text-[12px] xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
                   {stage.title}
                 </h2>
+                </div>
               </motion.div>
             );
           })}
