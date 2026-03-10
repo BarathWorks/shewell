@@ -6,7 +6,6 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/src/@/components/button";
 import Link from "next/link";
-import { getYear } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -22,47 +21,37 @@ import { useToast } from "@repo/ui/src/@/components/use-toast";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "~/app/components/loading-spinner";
 
-const practiceDetailsSchema = z
-  .object({
-    department: z.string({ required_error: "Please enter the department" }),
-    position: z.string({ required_error: "Please enter the position" }),
-    location: z.string({ required_error: "Please enter the location" }),
-    startingYear: z.string({
-      required_error: "Please select the starting year",
-      invalid_type_error: "Please select the starting year",
-    }),
-    endingYear: z.string({
-      required_error: "Please select the ending year",
-      invalid_type_error: "Please select the ending year",
-    }),
-    sessionMode: z.string({
-      required_error: "Please select the Session Mode",
-      invalid_type_error: "Please select the Session Mode",
-    }),
-    listing: z.string({
-      required_error: "Please select the Listing Type",
-      invalid_type_error: "Please select the Listing Type",
-    }),
-  })
-  .refine((data) => parseInt(data.startingYear) < parseInt(data.endingYear), {
-    message: "Starting Year must be less than ending year",
-    path: ["startingYear"],
-  });
+const practiceDetailsSchema = z.object({
+  department: z.string({ required_error: "Please enter the department" }),
+  position: z.string({ required_error: "Please enter the position" }),
+  location: z.string({ required_error: "Please enter the location" }),
+  experience: z.string({
+    required_error: "Please enter years of experience",
+  }).refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+    message: "Please enter a valid number greater than 0",
+  }),
+  sessionMode: z.string({
+    required_error: "Please select the Session Mode",
+    invalid_type_error: "Please select the Session Mode",
+  }),
+  listing: z.string({
+    required_error: "Please select the Listing Type",
+    invalid_type_error: "Please select the Listing Type",
+  }),
+});
 
 const PracticeDetailsForm = ({
   department,
   position,
   location,
-  startingYear,
-  endingYear,
+  experience,
   sessionMode,
   listing,
 }: {
   department: string;
   position: string;
   location: string;
-  startingYear: string;
-  endingYear: string;
+  experience: string;
   sessionMode: string;
   listing: string;
 }) => {
@@ -75,8 +64,7 @@ const PracticeDetailsForm = ({
       department: department || "",
       position: position || "",
       location: location || "",
-      startingYear: startingYear || "",
-      endingYear: endingYear || "",
+      experience: experience || "",
       sessionMode: sessionMode || "",
       listing: listing || "",
     },
@@ -90,12 +78,6 @@ const PracticeDetailsForm = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
-
-  const currentYear = getYear(new Date());
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
-    const year = 1900 + i;
-    return { value: year, label: year.toString() };
-  });
 
   useEffect(() => {
     params.set("step", "6");
@@ -112,8 +94,7 @@ const PracticeDetailsForm = ({
       department: data.department!,
       position: data.position!,
       location: data.location!,
-      startingYear: data.startingYear!,
-      endingYear: data.endingYear!,
+      experience: data.experience!,
       sessionMode: data.sessionMode!,
       listing: data.listing!,
     })
@@ -221,80 +202,30 @@ const PracticeDetailsForm = ({
             </div>
           </div>
 
-          {/* Starting & Ending Year */}
-          <div className="flex items-center gap-2 w-full">
-            <div className="w-full">
-              <UIFormLabel>Starting Year*</UIFormLabel>
-              <Controller
-                name="startingYear"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <Select
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
-                        <SelectValue placeholder="e.g 2000" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white w-full">
-                        <SelectGroup>
-                          {years.map((year) => (
-                            <SelectItem
-                              value={year.value.toString()}
-                              key={year.value}
-                            >
-                              {year.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors?.startingYear && (
-                      <p className="text-red-500 text-sm">
-                        {errors.startingYear.message}
-                      </p>
-                    )}
-                  </>
-                )}
-              />
-            </div>
-            <div className="w-full">
-              <UIFormLabel>Ending Year*</UIFormLabel>
-              <Controller
-                name="endingYear"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <Select
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
-                        <SelectValue placeholder="e.g 2004" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white w-full">
-                        <SelectGroup>
-                          {years.map((year) => (
-                            <SelectItem
-                              value={year.value.toString()}
-                              key={year.value}
-                            >
-                              {year.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors?.endingYear && (
-                      <p className="text-red-500 text-sm">
-                        {errors.endingYear.message}
-                      </p>
-                    )}
-                  </>
-                )}
-              />
-            </div>
+          {/* Experience */}
+          <div>
+            <UIFormLabel>Years of Experience*</UIFormLabel>
+            <Controller
+              control={control}
+              name="experience"
+              render={({ field }) => (
+                <>
+                  <UIFormInput
+                    type="number"
+                    min="0"
+                    placeholder="Enter years of experience (e.g., 5)"
+                    className="placeholder:text-black"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                  {errors?.experience && (
+                    <p className="text-red-500 text-sm">
+                      {errors.experience.message}
+                    </p>
+                  )}
+                </>
+              )}
+            />
           </div>
 
           {/* Session Mode */}

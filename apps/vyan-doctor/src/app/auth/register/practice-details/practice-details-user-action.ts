@@ -8,8 +8,7 @@ interface IPracticeDetailsProps {
   department: string;
   position: string;
   location: string;
-  startingYear: string;
-  endingYear: string;
+  experience: string;
   sessionMode: string;
   listing: string;
 }
@@ -18,8 +17,7 @@ async function PracticeDetailsUserAction({
   department,
   position,
   location,
-  startingYear,
-  endingYear,
+  experience,
   sessionMode,
   listing,
 }: IPracticeDetailsProps) {
@@ -38,6 +36,12 @@ async function PracticeDetailsUserAction({
   }
 
   try {
+    // Calculate startingYear and endingYear from experience
+    const currentYear = new Date().getFullYear();
+    const yearsOfExperience = parseInt(experience);
+    const startingYear = (currentYear - yearsOfExperience).toString();
+    const endingYear = currentYear.toString();
+
     // Upsert professional experience
     await db.professionalExperience.deleteMany({
       where: { professionalUserId: professionalUser.id },

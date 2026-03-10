@@ -35,14 +35,19 @@ const PracticeDetailsPage = async () => {
     },
   });
 
+  // Calculate years of experience if both years exist
+  const yearsOfExperience = 
+    experience?.startingYear && experience?.endingYear
+      ? (parseInt(experience.endingYear) - parseInt(experience.startingYear)).toString()
+      : "";
+
   return (
     <>
       <PracticeDetailsForm
         department={experience?.department || ""}
         position={experience?.position || ""}
         location={experience?.location || ""}
-        startingYear={experience?.startingYear || ""}
-        endingYear={experience?.endingYear || ""}
+        experience={yearsOfExperience}
         sessionMode={professionalUser.sessionMode || ""}
         listing={professionalUser.listing || ""}
       />
