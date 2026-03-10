@@ -13,14 +13,12 @@ import Autoplay from "embla-carousel-autoplay";
 
 const Images = [
   {
-    image: "/images/signup.png",
+    image: "/images/doctor-auth-slide_1.png",
   },
   {
-    image: "/images/signup.png",
+    image: "/images/doctor-auth-slide_2.png",
   },
-  {
-    image: "/images/signup.png",
-  },
+ 
 ];
 const TestimonialCarousel = () => {
   const [api, setApi] = useState<CarouselApi>();
