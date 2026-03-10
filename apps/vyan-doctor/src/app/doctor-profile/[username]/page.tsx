@@ -221,7 +221,7 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
 
   // console.log(data);
   const cardImage = (
-    <div className="w-[147px] ">
+    <div className="w-[225px]">
       <div className=" relative aspect-square ">
         <Image
           src={profileObj.media?.fileUrl || "/images/fallback-user-profile.png"}

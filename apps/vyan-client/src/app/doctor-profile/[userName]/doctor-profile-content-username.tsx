@@ -92,7 +92,7 @@ const DoctorProfileContent = ({
  
 
   const cardImage = (
-    <div className="w-[147px] ">
+    <div className="w-[225px] ">
       <div className="relative aspect-square ">
         <Image
           src={profile.media?.fileUrl || "/images/fallback-user-profile.png"}
