@@ -109,6 +109,7 @@ const PersonalInfoForm = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loadingState, setLoadingState] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string>(fileUrl || "");
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
   const session = useSession();
@@ -306,7 +307,7 @@ const PersonalInfoForm = ({
                 control={control}
                 render={({ field }) => (
                   <>
-                    <Popover>
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                       <PopoverTrigger asChild>
                         <Button
                           variant={"outline"}
@@ -328,7 +329,10 @@ const PersonalInfoForm = ({
                           mode="single"
                           captionLayout="dropdown"
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            setIsCalendarOpen(false);
+                          }}
                           className="w-full bg-white py-3"
                           disabled={(date: Date) =>
                             date > new Date() || date < new Date("1900-01-01")

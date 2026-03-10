@@ -32,7 +32,6 @@ const bankDetailsSchema = z.object({
     .string({ required_error: "Please enter IFSC code" })
     .min(1, "Please enter IFSC code")
     .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format (e.g. SBIN0001234)"),
-  bankUpiId: z.string().optional(),
   termsAndConditions: z.literal(true, {
     errorMap: () => ({
       message: "You must read terms and conditions before submitting the details",
@@ -47,7 +46,6 @@ const BankDetailsForm = ({
   bankName,
   bankBranch,
   bankIfscCode,
-  bankUpiId,
 }: {
   professionalUserId: string;
   bankAccountHolderName: string;
@@ -55,7 +53,6 @@ const BankDetailsForm = ({
   bankName: string;
   bankBranch: string;
   bankIfscCode: string;
-  bankUpiId: string;
 }) => {
   const {
     handleSubmit,
@@ -68,7 +65,6 @@ const BankDetailsForm = ({
       bankName,
       bankBranch,
       bankIfscCode,
-      bankUpiId,
     },
     resolver: zodResolver(bankDetailsSchema),
   });
@@ -100,7 +96,6 @@ const BankDetailsForm = ({
       bankName: data.bankName,
       bankBranch: data.bankBranch,
       bankIfscCode: data.bankIfscCode,
-      bankUpiId: data.bankUpiId,
     })
       .then((resp) => {
         setLoadingState(false);
@@ -233,54 +228,29 @@ const BankDetailsForm = ({
             </div>
           </div>
 
-          {/* IFSC Code & UPI ID */}
-          <div className="flex flex-col gap-4 xl:flex-row xl:gap-6">
-            <div className="w-full">
-              <UIFormLabel>IFSC Code</UIFormLabel>
-              <Controller
-                control={control}
-                name="bankIfscCode"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        placeholder="e.g. SBIN0001234"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      {errors && errors.bankIfscCode && (
-                        <p className="text-red-500">
-                          {errors.bankIfscCode.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-            <div className="w-full">
-              <UIFormLabel>UPI ID (Optional)</UIFormLabel>
-              <Controller
-                control={control}
-                name="bankUpiId"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        placeholder="e.g. name@upi"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      {errors && errors.bankUpiId && (
-                        <p className="text-red-500">
-                          {errors.bankUpiId.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
+          {/* IFSC Code */}
+          <div className="w-full">
+            <UIFormLabel>IFSC Code</UIFormLabel>
+            <Controller
+              control={control}
+              name="bankIfscCode"
+              render={({ field }) => {
+                return (
+                  <>
+                    <UIFormInput
+                      placeholder="e.g. SBIN0001234"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                    {errors && errors.bankIfscCode && (
+                      <p className="text-red-500">
+                        {errors.bankIfscCode.message}
+                      </p>
+                    )}
+                  </>
+                );
+              }}
+            />
           </div>
 
           {/* Terms and Conditions */}

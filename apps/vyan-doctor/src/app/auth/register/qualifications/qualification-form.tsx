@@ -53,9 +53,9 @@ const qualificationSchema = z
       invalid_type_error: "Please select the Gender",
     }),
     startingYear: z.string({
-      required_error: "Please enter the experience ",
-      invalid_type_error: "Please enter the experience",
-    }),
+      required_error: "Please enter your experience",
+      invalid_type_error: "Please enter your experience",
+    }).min(1, "Please enter your experience"),
     endingYear: z.string({
       required_error: "Please enter the ending year",
       invalid_type_error: "Please enter the ending year",
@@ -67,10 +67,6 @@ const qualificationSchema = z
       required_error: "Please select the displayed qualification",
       invalid_type_error: "Please select the displayed qualification",
     }),
-  })
-  .refine((data) => parseInt(data.startingYear) < parseInt(data.endingYear), {
-    message: "Starting Year must be less than ending year",
-    path: ["startingYear"],
   });
 interface ISpecialization {
   value: string;
@@ -366,138 +362,56 @@ const QualificationForm = ({
             />
           </div>
 
-          <div className="w-full">
-            <UIFormLabel>Experience</UIFormLabel>
-            <div className="flex w-full flex-col gap-4 xl:gap-6">
-
-              <div className="flex gap-4 w-full xl:gap-6 flex-col">
-                {/* starting and ending year */}
-                <div className="flex items-center gap-2 w-full ">
-                  <div className="w-full">
-                    {/* <Controller
-                      control={control}
-                      name="startingYear"
-                      rules={{
-                        validate: (value) => {
-                          if (!/^\d{0,4}$/.test(value)) {
-                            return "Value must be a number up to 4 digits";
-                          }
-                          return true;
-                        },
-                      }}
-                      render={({ field }) => {
-                        return (
-                          <>
-                            <UIFormInput
-                              className="w-full placeholder:text-black"
-                              type="number"
-                              placeholder="Starting Year"
-                              value={field.value}
-                              onChange={(e) => {
-                                const newValue = e.target.value;
-
-                                if (/^\d{0,4}$/.test(newValue)) {
-                                  field.onChange(e);
-                                }
-                              }}
-                             
-                            />
-
-                            {errors && errors.startingYear && (
-                              <p className="text-red-500">
-                                {" "}
-                                {errors.startingYear.message}
-                              </p>
-                            )}
-                          </>
-                        );
-                      }}
-                    /> */}
-                    <Controller
-                      name="startingYear"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <>
-                            <Select
-                              value={field.value || ""}
-                              onValueChange={field.onChange}
-                              // defaultValue={gender || ""}
-                            >
-                              <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
-                                <SelectValue placeholder="e.g 2000" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white w-full">
-                                <SelectGroup>
-                                  {years.length &&
-                                    years.map((year) => {
-                                      return (
-                                        <SelectItem
-                                          value={year.value.toString()}
-                                          key={year.value}
-                                        >
-                                          {year.label}
-                                        </SelectItem>
-                                      );
-                                    })}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                            {errors && errors.startingYear && (
-                              <p className="text-red-500 text-sm">
-                                {" "}
-                                {errors.startingYear.message}
-                              </p>
-                            )}
-                          </>
-                        );
-                      }}
-                    />
+            <div className="w-full">
+              <UIFormLabel>Experience (in Years)*</UIFormLabel>
+              <div className="flex w-full flex-col gap-4 xl:gap-6">
+                <div className="flex gap-4 w-full xl:gap-6 flex-col">
+                  {/* combined experience field */}
+                  <div className="flex items-center gap-2 w-full ">
+                    <div className="w-full">
+                      <Controller
+                        name="startingYear"
+                        control={control}
+                        render={({ field }) => {
+                          // Display value as difference from current year
+                          const displayValue = field.value
+                            ? (new Date().getFullYear() - parseInt(field.value)).toString()
+                            : "";
+                          
+                          return (
+                            <>
+                              <UIFormInput
+                                className="w-full placeholder:text-black"
+                                type="number"
+                                placeholder="e.g 5"
+                                value={displayValue}
+                                onChange={(e) => {
+                                  let newValue = e.target.value;
+                                  if (newValue === "") {
+                                    field.onChange("");
+                                    setValue("endingYear", "");
+                                  } else if (/^\d{0,2}$/.test(newValue)) {
+                                    const yearsOfExp = parseInt(newValue);
+                                    const currentYear = new Date().getFullYear();
+                                    const startYear = (currentYear - yearsOfExp).toString();
+                                    
+                                    field.onChange(startYear);
+                                    setValue("endingYear", currentYear.toString());
+                                  }
+                                }}
+                              />
+                              {errors && errors.startingYear && (
+                                <p className="text-red-500 text-sm">
+                                  {" "}
+                                  {errors.startingYear.message}
+                                </p>
+                              )}
+                            </>
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
-                  {/* <div className="border">-</div> */}
-                  <div className="w-full">
-                  <Controller
-                      name="endingYear"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <>
-                            <Select
-                              value={field.value || ""}
-                              onValueChange={field.onChange}
-                              // defaultValue={gender || ""}
-                            >
-                              <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
-                                <SelectValue placeholder="e.g 2004" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white w-full">
-                                <SelectGroup>
-                                  {years.length &&
-                                    years.map((year) => {
-                                      return (
-                                        <SelectItem
-                                          value={year.value.toString()}
-                                          key={year.value}
-                                        >
-                                          {year.label}
-                                        </SelectItem>
-                                      );
-                                    })}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                            {errors && errors.endingYear && (
-                              <p className="text-red-500 text-sm">
-                                {" "}
-                                {errors.endingYear.message}
-                              </p>
-                            )}
-                          </>
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
 
              {/* department */}
                <Controller

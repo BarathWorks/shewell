@@ -63,6 +63,9 @@ function CustomisedCalendar({
           const options = React.Children.toArray(
             children,
           ) as React.ReactElement<React.HTMLProps<HTMLOptionElement>>[];
+          if (props.name === "years") {
+            options.reverse();
+          }
           const selected = options.find((child) => child.props.value === value);
           const handleChange = (value: string) => {
             const changeEvent = {
@@ -83,7 +86,8 @@ function CustomisedCalendar({
               <SelectContent position="popper">
                 <ScrollArea className="h-80">
                   {options.map((option, id: number) => (
-                    <SelectItem className="bg-white"
+                    <SelectItem
+                      className="bg-white"
                       key={`${option.props.value}-${id}`}
                       value={option.props.value?.toString() ?? ""}
                     >
@@ -104,9 +108,3 @@ function CustomisedCalendar({
 }
 CustomisedCalendar.displayName = "Calendar";
 export { CustomisedCalendar };
-
-
-
-
-
-

@@ -10,7 +10,6 @@ interface IBankDetailsProps {
   bankName: string;
   bankBranch: string;
   bankIfscCode: string;
-  bankUpiId?: string;
 }
 
 const BankDetailsUserAction = async ({
@@ -19,7 +18,6 @@ const BankDetailsUserAction = async ({
   bankName,
   bankBranch,
   bankIfscCode,
-  bankUpiId,
 }: IBankDetailsProps) => {
   const session = await getServerSession();
   if (!session?.user) {
@@ -41,7 +39,6 @@ const BankDetailsUserAction = async ({
       .string()
       .min(1, "IFSC code is required")
       .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
-    bankUpiId: z.string().optional(),
   });
 
   const isValidData = formData.parse({
@@ -50,7 +47,6 @@ const BankDetailsUserAction = async ({
     bankName,
     bankBranch,
     bankIfscCode,
-    bankUpiId,
   });
 
   if (!isValidData) return { error: "Please enter the valid data" };
@@ -76,7 +72,6 @@ const BankDetailsUserAction = async ({
         bankName,
         bankBranch,
         bankIfscCode,
-        bankUpiId: bankUpiId || null,
       },
       where: {
         email: session.user.email,

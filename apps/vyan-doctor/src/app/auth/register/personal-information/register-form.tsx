@@ -73,6 +73,7 @@ const RegisterForm = () => {
   const router = useRouter();
 
   const [loadingState, setLoadingState] = useState<boolean>(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
   // const [currentStep, setCurrentStep] = useState<number>(1)
   // const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -231,7 +232,7 @@ const RegisterForm = () => {
                 render={({ field }) => {
                   return (
                     <>
-                      <Popover>
+                      <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                         <PopoverTrigger asChild>
                           <Button
                             variant={"outline"}
@@ -253,7 +254,10 @@ const RegisterForm = () => {
                             mode="single"
                             captionLayout="dropdown"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                                field.onChange(date);
+                                setIsCalendarOpen(false);
+                            }}
                             className="w-full bg-white py-3"
                             disabled={(date: Date) =>
                               date > new Date() || date < new Date("1900-01-01")
