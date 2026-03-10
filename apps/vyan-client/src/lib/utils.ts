@@ -66,7 +66,6 @@ export function filterAvailableTimeSlots(
     slot1: { startingTime: Date; endingTime: Date },
     slot2: { startingTime: Date; endingTime: Date },
   ) => {
-    
     return (
       slot1.startingTime < slot2.endingTime &&
       slot1.endingTime > slot2.startingTime

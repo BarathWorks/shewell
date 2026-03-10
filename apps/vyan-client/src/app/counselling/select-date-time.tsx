@@ -217,10 +217,30 @@ const SelectDateTime = ({
       endingTime: items.endingTime,
     })),
   }));
-  const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
-    refactoredTimeSlots,
-    data?.bookedSlots ?? [],
-  );
+  const parsedBookedSlots =
+    data?.bookedSlots?.map((slot) => ({
+      startingTime: new Date(slot.startingTime),
+      endingTime: new Date(slot.endingTime),
+    })) ?? [];
+
+  const isOverlapping = (
+    slot1: { startingTime: Date; endingTime: Date },
+    slot2: { startingTime: Date; endingTime: Date },
+  ) => {
+    return (
+      slot1.startingTime.getTime() < slot2.endingTime.getTime() &&
+      slot1.endingTime.getTime() > slot2.startingTime.getTime()
+    );
+  };
+
+  const markedBookedSlotsFromTimeSlots = refactoredTimeSlots.map((slot) => ({
+    availableTimings: slot.availableTimings.map((availableSlot) => {
+      const isBooked = parsedBookedSlots?.some((bookedSlot) =>
+        isOverlapping(availableSlot, bookedSlot),
+      );
+      return { ...availableSlot, isBooked };
+    }),
+  }));
 
   const generateTimeSlots = (
     timeSlots: { startTime: Date; endTime: Date }[],
@@ -343,20 +363,24 @@ const SelectDateTime = ({
 
               {isLoading
                 ? "Loading..."
-                : filteredBookedSlotsFromTimeSlots.length > 0
-                  ? filteredBookedSlotsFromTimeSlots.map((slot, index) => (
+                : markedBookedSlotsFromTimeSlots.length > 0
+                  ? markedBookedSlotsFromTimeSlots.map((slot, index) => (
                       <div key={index} className="flex flex-col gap-2">
                         {slot.availableTimings.map((timing, idx) => (
                           <div key={idx} className="flex items-center">
                             <span
-                              className={`cursor-pointer rounded-md border border-primary px-2 py-1 font-inter text-sm font-medium text-black hover:bg-primary hover:text-white ${
-                                selectedTimeSlot?.startTime ===
-                                  timing.startingTime &&
-                                selectedTimeSlot.endTime === timing.endingTime
-                                  ? "bg-primary text-white"
-                                  : "bg-white text-black hover:bg-primary hover:text-white"
+                              className={`cursor-pointer rounded-md border border-primary px-2 py-1 font-inter text-sm font-medium ${
+                                timing.isBooked
+                                  ? "pointer-events-none cursor-not-allowed border-transparent bg-slate-200 text-slate-400"
+                                  : selectedTimeSlot?.startTime ===
+                                        timing.startingTime &&
+                                      selectedTimeSlot.endTime ===
+                                        timing.endingTime
+                                    ? "bg-primary text-white"
+                                    : "bg-white text-black hover:bg-primary hover:text-white"
                               }`}
                               onClick={() => {
+                                if (timing.isBooked) return;
                                 const updatedTiming = {
                                   startTime: timing.startingTime,
                                   endTime: timing.endingTime,

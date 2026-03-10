@@ -103,6 +103,7 @@ const OnlineAppointment = ({
   const { toast } = useToast();
   const [close, setClose] = useState<boolean>();
   const router = useRouter();
+  const trpcContext = api.useUtils();
 
   // state saving all data for booking the appointment
   const [appointmentState, setAppointmentState] = useState<IAppointmentState>({
@@ -311,6 +312,33 @@ const OnlineAppointment = ({
       endingTime: endingTime,
     };
 
+    const data = await trpcContext.searchTimeSlots.searchTimeSlots.fetch({
+      date: endOfDay(new Date(date)),
+      expertId: selectedExpert.id,
+    });
+
+    const parsedBookedSlots =
+      data?.bookedSlots?.map((slot) => ({
+        startingTime: new Date(slot.startingTime),
+        endingTime: new Date(slot.endingTime),
+      })) ?? [];
+
+    const hasOverlap = parsedBookedSlots.some((bookedSlot) => {
+      return (
+        startingTime < bookedSlot.endingTime &&
+        endingTime > bookedSlot.startingTime
+      );
+    });
+
+    if (hasOverlap) {
+      toast({
+        variant: "destructive",
+        title:
+          "This timeslot is already booked. Please select a different time.",
+      });
+      return;
+    }
+
     await makePayment(transformedData)
       .then((resp) => {
         toast({
@@ -352,10 +380,10 @@ const OnlineAppointment = ({
         onOpenChange(false);
       })
       .catch((err) => {
-        // toast({
-        //   variant: "destructive",
-        //   title: err.message,
-        // });
+        toast({
+          variant: "destructive",
+          title: err.message || "Something went wrong",
+        });
         console.log("wrong", err);
       });
     // console.log("payment");

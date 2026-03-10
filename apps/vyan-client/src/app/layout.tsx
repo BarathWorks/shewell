@@ -66,8 +66,6 @@ export default async function RootLayout({
     verifiedAt = user?.verifiedAt;
   }
 
-  
-
   let userDetails;
 
   if (session?.user?.email) {
@@ -81,15 +79,12 @@ export default async function RootLayout({
     });
   }
 
-
   return (
-    <html 
+    <html
       className={`scroll-smooth scroll-smooth ${poppins.variable} ${inter.variable} ${pacifico.variable} ${playfair.variable} ${amaticSC.variable}`}
       lang="en"
     >
-      <body
-        className={"relative font-sans"}
-      >
+      <body className={"relative font-sans"}>
         <div className="sticky top-0 z-40">
           <ClientSessionProvider session={session} verifiedAt={verifiedAt!}>
             <TRPCReactProvider>
@@ -106,11 +101,11 @@ export default async function RootLayout({
               {children}
               {/* <NewHeader /> */}
               <NewFooter />
-              <Toaster />
               <CardSheet />
             </TRPCReactProvider>
           </ClientSessionProvider>
         </div>
+        <Toaster />
 
         {/* <div className="">
           <ClientSessionProvider session={session} verifiedAt={verifiedAt!}>

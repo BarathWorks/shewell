@@ -109,7 +109,6 @@ const Rebook = ({
       // { enabled: false },
     );
 
-
   // fetching time durations of the professional user i.e doctor
   const { data: timeDurations } =
     api.appointmentTimeDuration.appointmentTimeDuration.useQuery({
@@ -161,7 +160,6 @@ const Rebook = ({
     }
   }, [date, refetch]);
 
-
   useEffect(() => {
     const availableTimeSlots =
       data &&
@@ -176,7 +174,6 @@ const Rebook = ({
       const currentTime = new Date();
 
       if (timeDuration) {
-        
         setTimeSlots(generateTimeSlots(availableTimeSlots!, timeDuration));
       }
     }
@@ -195,7 +192,6 @@ const Rebook = ({
     setSelectedTimeSlot(selectedTimeSlot);
     setSelectedPrice(priceInCents);
     // onSelectDateTime(date!, [selectedTimeSlot]);
-  
   };
 
   const formatTimeSlot = (startTime: string, endTime: string) => {
@@ -213,7 +209,6 @@ const Rebook = ({
   };
 
   // Generate time slots  working and original based on the selected duration
-  
 
   // latest working Generate time slots from counselling
   // const generateTimeSlots = (
@@ -252,7 +247,7 @@ const Rebook = ({
     const roundMinute = (date: Date): Date => {
       const rounded = new Date(date);
       const minutes = rounded.getMinutes();
-      
+
       if (minutes >= 1 && minutes <= 9) {
         rounded.setMinutes(10);
       } else if (minutes >= 11 && minutes <= 19) {
@@ -267,7 +262,7 @@ const Rebook = ({
         rounded.setMinutes(0);
         rounded.setHours(rounded.getHours() + 1);
       }
-      
+
       return rounded;
     };
     timeSlots?.forEach((slot) => {
@@ -282,7 +277,9 @@ const Rebook = ({
 
       while (currentTime.getTime() + duration * 60000 <= endTime.getTime()) {
         const startTime = new Date(currentTime);
-        const endingTime = roundMinute(new Date(currentTime.getTime() + duration * 60000));
+        const endingTime = roundMinute(
+          new Date(currentTime.getTime() + duration * 60000),
+        );
         generatedTimeSlots.push({
           availableTimings: [
             {
@@ -303,14 +300,15 @@ const Rebook = ({
   const { toast } = useToast();
   const [close, setClose] = useState<boolean>();
 
-  const taxedAmount = (parseInt(env.NEXT_PUBLIC_GST)/100)*selectedPrice
-      const totalPriceInCents = selectedPrice + (parseInt(env.NEXT_PUBLIC_GST)/100)*selectedPrice
+  const taxedAmount = (parseInt(env.NEXT_PUBLIC_GST) / 100) * selectedPrice;
+  const totalPriceInCents =
+    selectedPrice + (parseInt(env.NEXT_PUBLIC_GST) / 100) * selectedPrice;
   const submitData = {
     serviceMode: {
       serviceType: AppointmentType.ONLINE,
       priceInCents: selectedPrice,
-      taxedAmount : taxedAmount,
-      totalPriceInCents : totalPriceInCents,
+      taxedAmount: taxedAmount,
+      totalPriceInCents: totalPriceInCents,
       description:
         "Online (Virtual appointment) with doctor through Google Meet or Zoom.",
       planName: "Basic Plan",
@@ -331,16 +329,75 @@ const Rebook = ({
   };
   const trpcContext = api.useUtils();
   const submit = async () => {
-    makePayment(submitData).then(() => {
-      trpcContext.invalidate();
-      onOpenChange(false);
+    if (!selectedTimeSlot) return;
+
+    const dataFromApi = await trpcContext.searchTimeSlots.searchTimeSlots.fetch(
+      {
+        date: endOfDay(new Date(date!)),
+        expertId: expertId,
+      },
+    );
+
+    const refetchedBookedSlots =
+      dataFromApi?.bookedSlots?.map((slot) => ({
+        startingTime: new Date(slot.startingTime),
+        endingTime: new Date(slot.endingTime),
+      })) ?? [];
+
+    const hasOverlap = refetchedBookedSlots.some((bookedSlot) => {
+      return (
+        selectedTimeSlot.startingTime < bookedSlot.endingTime &&
+        selectedTimeSlot.endingTime > bookedSlot.startingTime
+      );
     });
+
+    if (hasOverlap) {
+      toast({
+        variant: "destructive",
+        title:
+          "This timeslot is already booked. Please select a different time.",
+      });
+      return;
+    }
+
+    makePayment(submitData)
+      .then(() => {
+        trpcContext.invalidate();
+        onOpenChange(false);
+      })
+      .catch((err) => {
+        toast({
+          variant: "destructive",
+          title: err.message || "Something went wrong",
+        });
+        console.log("rebook makePayment error", err);
+      });
   };
 
-  const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
-    timeSlots,
-    data?.bookedSlots ?? [],
-  );
+  const parsedBookedSlots =
+    data?.bookedSlots?.map((slot) => ({
+      startingTime: new Date(slot.startingTime),
+      endingTime: new Date(slot.endingTime),
+    })) ?? [];
+
+  const isOverlapping = (
+    slot1: { startingTime: Date; endingTime: Date },
+    slot2: { startingTime: Date; endingTime: Date },
+  ) => {
+    return (
+      slot1.startingTime.getTime() < slot2.endingTime.getTime() &&
+      slot1.endingTime.getTime() > slot2.startingTime.getTime()
+    );
+  };
+
+  const markedBookedSlotsFromTimeSlots = timeSlots.map((slot) => ({
+    availableTimings: slot.availableTimings.map((availableSlot) => {
+      const isBooked = parsedBookedSlots?.some((bookedSlot) =>
+        isOverlapping(availableSlot, bookedSlot),
+      );
+      return { ...availableSlot, isBooked };
+    }),
+  }));
 
   return (
     <>
@@ -420,22 +477,27 @@ const Rebook = ({
 
                 {isLoading
                   ? "Loading..."
-                  : filteredBookedSlotsFromTimeSlots.length > 0
-                    ? filteredBookedSlotsFromTimeSlots.map((slot, index) => (
+                  : markedBookedSlotsFromTimeSlots.length > 0
+                    ? markedBookedSlotsFromTimeSlots.map((slot, index) => (
                         <div key={index} className="flex flex-col gap-2">
                           {slot.availableTimings.map((timing, idx) => (
                             <div key={idx} className="flex items-center">
                               <span
-                                className={`cursor-pointer rounded-md border border-primary px-2 py-1 font-inter text-sm font-medium text-black hover:bg-primary hover:text-white ${
-                                  selectedTimeSlot &&
-                                  selectedTimeSlot.startingTime.getTime() ===
-                                    new Date(timing.startingTime).getTime() &&
-                                  selectedTimeSlot.endingTime.getTime() ===
-                                    new Date(timing.endingTime).getTime()
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-black hover:bg-primary hover:text-white"
+                                className={`cursor-pointer rounded-md border border-primary px-2 py-1 font-inter text-sm font-medium ${
+                                  timing.isBooked
+                                    ? "pointer-events-none cursor-not-allowed border-transparent bg-slate-200 text-slate-400"
+                                    : selectedTimeSlot &&
+                                        selectedTimeSlot.startingTime.getTime() ===
+                                          new Date(
+                                            timing.startingTime,
+                                          ).getTime() &&
+                                        selectedTimeSlot.endingTime.getTime() ===
+                                          new Date(timing.endingTime).getTime()
+                                      ? "bg-primary text-white"
+                                      : "bg-white text-black hover:bg-primary hover:text-white"
                                 }`}
                                 onClick={() => {
+                                  if (timing.isBooked) return;
                                   handleTimeSlot(timing, selectedPrice);
                                 }}
                               >
@@ -449,7 +511,6 @@ const Rebook = ({
                         </div>
                       ))
                     : "There are no appointments for this date"}
-               
               </div>
               <Button
                 disabled={!selectedTimeSlot}

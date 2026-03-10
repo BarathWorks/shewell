@@ -24,8 +24,8 @@ export const initializeRazorpay = () => {
 };
 interface IBookAppointmentDetailsProps {
   serviceMode: {
-    taxedAmount : number;
-    totalPriceInCents : number;
+    taxedAmount: number;
+    totalPriceInCents: number;
     serviceType: AppointmentType;
     priceInCents: number;
     description: string;
@@ -35,16 +35,16 @@ interface IBookAppointmentDetailsProps {
     professionalUserId: string;
   };
   patient: {
-    id: string,
+    id: string;
     firstName: string;
     email: string;
     phoneNumber: string;
-    message : string;
-    additionalPatients : {
-      firstName : string;
-      email : string;
-      phoneNumber : string;
-    }[]
+    message: string;
+    additionalPatients: {
+      firstName: string;
+      email: string;
+      phoneNumber: string;
+    }[];
   };
   startingTime: Date;
   endingTime: Date;
@@ -74,7 +74,7 @@ export const makePayment = async ({
     endingTime,
   );
 
-  console.log("startingTime", startingTime)
+  console.log("startingTime", startingTime);
   // Make API call to initiate the checkout process on the server with the provided bookAppointmentId
   try {
     await CheckoutAction({
@@ -84,6 +84,9 @@ export const makePayment = async ({
       startingTime,
       endingTime,
     }).then((data: any) => {
+      if (data?.error) {
+        throw new Error(data.error);
+      }
       var options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         name: data?.name,
@@ -93,8 +96,8 @@ export const makePayment = async ({
         description: data?.description,
         image: data?.image,
         //   callback function to handle payment response
-        handler: function (response: any) {   
-           console.log("paymentResponse", response);  
+        handler: function (response: any) {
+          console.log("paymentResponse", response);
           VerifyPayment(
             {
               razorpay_payment_id: response.razorpay_payment_id,
@@ -134,5 +137,6 @@ export const makePayment = async ({
     };
   } catch (error) {
     console.log("razorpayError", error);
+    throw error;
   }
 };

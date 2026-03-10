@@ -61,48 +61,53 @@ const BookAppointmentUserAction = async ({
       throw new Error("Incomplete data for booking appointment");
     }
 
-    // Check if the timeslot is already booked
-    const existingAppointment = await db.bookAppointment.findFirst({
-      where: {
-        professionalUserId: professionalUser.professionalUserId,
-        startingTime: startingTime,
-        status: {
-          notIn: ["CANCELLED", "CANCELLED_WITH_REFUND"],
-        },
-      },
-    });
+    // Use a transaction with Serializable isolation to prevent concurrent double bookings
+    const appointment = await db.$transaction(
+      async (tx) => {
+        // Check if the timeslot is already booked
+        const existingAppointment = await tx.bookAppointment.findFirst({
+          where: {
+            professionalUserId: professionalUser.professionalUserId,
+            startingTime: startingTime,
+            status: {
+              notIn: ["CANCELLED", "CANCELLED_WITH_REFUND"],
+            },
+          },
+        });
 
-    if (existingAppointment) {
-      throw new Error(
-        "This timeslot is already booked. Please select a different time."
-      );
-    }
+        if (existingAppointment) {
+          throw new Error(
+            "This timeslot is already booked. Please select a different time.",
+          );
+        }
 
-    const appointment = await db.bookAppointment.create({
-      data: {
-        endingTime: endingTime,
-        startingTime: startingTime,
-        description: serviceMode.description,
-        planName: serviceMode.description,
-        priceInCents: serviceMode.priceInCents,
-        serviceType: serviceMode.serviceType,
-        patientId: patientInfo?.id,
-        professionalUserId: professionalUser.professionalUserId,
-        userId: user.id,
-      },
-      include: {
-        professionalUser: {
-          select: {
-            user: {
+        return await tx.bookAppointment.create({
+          data: {
+            endingTime: endingTime,
+            startingTime: startingTime,
+            description: serviceMode.description,
+            planName: serviceMode.description,
+            priceInCents: serviceMode.priceInCents,
+            serviceType: serviceMode.serviceType,
+            patientId: patientInfo?.id,
+            professionalUserId: professionalUser.professionalUserId,
+            userId: user.id,
+          },
+          include: {
+            professionalUser: {
               select: {
-                name: true,
+                firstName: true,
+                lastName: true,
                 email: true,
               },
             },
           },
-        },
+        });
       },
-    });
+      {
+        isolationLevel: "Serializable",
+      },
+    );
 
     // Create Notification for the Professional
     await db.professionalNotification.create({
@@ -117,11 +122,16 @@ const BookAppointmentUserAction = async ({
     // Send confirmation emails
     try {
       const { sendEmail } = await import("@repo/mail");
-      const { getAppointmentBookingEmailTemplate, getDoctorAppointmentBookingEmailTemplate } = await import("~/lib/email-templates");
+      const {
+        getAppointmentBookingEmailTemplate,
+        getDoctorAppointmentBookingEmailTemplate,
+      } = await import("~/lib/email-templates");
       const { format } = await import("date-fns");
 
       const appointmentTime = `${format(startingTime, "hh:mm a")} - ${format(endingTime, "hh:mm a")}`;
-      const doctorName = appointment.professionalUser.user.name || "Doctor";
+      const doctorName =
+        `${appointment.professionalUser.firstName} ${appointment.professionalUser.lastName || ""}`.trim() ||
+        "Doctor";
 
       // Email to patient
       const patientEmailTemplate = getAppointmentBookingEmailTemplate({
@@ -132,7 +142,7 @@ const BookAppointmentUserAction = async ({
         appointmentTime: appointmentTime,
         planName: serviceMode.planName,
         serviceType: serviceMode.serviceType,
-        meetingLink: appointment.meeting,
+        meetingLink: (appointment.meeting as string) || "",
       });
 
       console.log("---------------------------------------------------");
@@ -157,19 +167,24 @@ const BookAppointmentUserAction = async ({
         appointmentTime: appointmentTime,
         planName: serviceMode.planName,
         serviceType: serviceMode.serviceType,
-        meetingLink: appointment.meeting,
+        meetingLink: (appointment.meeting as string) || "",
       });
 
       console.log("doctorEmailTemplate", doctorEmailTemplate);
-      console.log("Sending doctor email to:", appointment.professionalUser.user.email);
+      console.log(
+        "Sending doctor email to:",
+        appointment.professionalUser.email,
+      );
 
-      await sendEmail({
-        from: process.env.FROM_EMAIL!,
-        to: [appointment.professionalUser.user.email!],
-        subject: doctorEmailTemplate.subject,
-        html: doctorEmailTemplate.html,
-      });
-      console.log("Doctor email sent successfully.");
+      if (appointment.professionalUser.email) {
+        await sendEmail({
+          from: process.env.FROM_EMAIL!,
+          to: [appointment.professionalUser.email],
+          subject: doctorEmailTemplate.subject,
+          html: doctorEmailTemplate.html,
+        });
+        console.log("Doctor email sent successfully.");
+      }
       console.log("END BOOKING EMAIL PROCESS");
       console.log("---------------------------------------------------");
     } catch (emailError) {

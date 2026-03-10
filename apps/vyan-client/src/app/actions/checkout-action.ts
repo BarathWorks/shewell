@@ -101,9 +101,10 @@ async function CheckoutAction({
         });
 
         if (existingAppointment) {
-          throw new Error(
-            "This timeslot is already booked. Please select a different time."
-          );
+          return {
+            error:
+              "This timeslot is already booked. Please select a different time.",
+          };
         }
 
         const bookAppointment = await tx.bookAppointment.create({
@@ -123,6 +124,12 @@ async function CheckoutAction({
             userId: user.id,
           },
         });
+
+        if (!bookAppointment) {
+          return {
+            error: "Failed to create appointment",
+          };
+        }
         //   fetching appointment details from the database
         const appointment = await tx.bookAppointment.findFirst({
           where: {
@@ -147,6 +154,10 @@ async function CheckoutAction({
             appointmentId: bookAppointment.id,
             startTime: startingTime,
             endTime: endingTime,
+            patientName: patient.firstName,
+            patientEmail: patient.email,
+            planName: serviceMode.planName,
+            description: serviceMode.description,
           });
 
           await tx.bookAppointment.update({
@@ -188,11 +199,15 @@ async function CheckoutAction({
         };
       } catch (error) {
         console.log("booking", error);
-        throw new Error("Failed to Book the appointment");
+        if (error instanceof Error) {
+          return { error: error.message };
+        }
+        return { error: "Failed to Book the appointment" };
       }
     },
     {
       timeout: 10000,
+      isolationLevel: "Serializable",
     },
   );
 }

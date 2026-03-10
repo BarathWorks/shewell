@@ -90,7 +90,12 @@ export const searchTimeSlotsRouter = createTRPCRouter({
         },
         where: {
           professionalUserId: professionalUser.id,
-          status: BookAppointmentStatus.PAYMENT_SUCCESSFUL,
+          status: {
+            notIn: [
+              BookAppointmentStatus.CANCELLED,
+              BookAppointmentStatus.CANCELLED_WITH_REFUND,
+            ],
+          },
         },
       });
 
