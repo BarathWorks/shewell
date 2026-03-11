@@ -9,27 +9,29 @@ import { FooterInfoSection } from "@/components/course-detail/FooterInfoSection"
 import { SupportContactSection } from "@/components/course-detail/SupportContactSection";
 import { MeetingLinkSection } from "@/components/course-detail/MeetingLinkSection";
 import { api } from "~/trpc/server";
+import { db } from "~/server/db";
 import { format } from "date-fns";
 import { getServerAuthSession } from "~/server/auth";
 import { PaymentStatus } from "@repo/database";
 
-// Generate metadata for SEO
+// Generate metadata for SEO — minimal select to avoid duplicate heavy query
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
   try {
-    const session = await api.session.getSessionBySlug({ slug: params.slug });
-
+    const session = await db.session.findUnique({
+      where: { slug: params.slug },
+      select: { title: true, overview: true },
+    });
+    if (!session) return { title: "Session Not Found" };
     return {
       title: `${session.title} | Shewell`,
       description: session.overview || session.title,
     };
-  } catch (error) {
-    return {
-      title: "Session Not Found",
-    };
+  } catch {
+    return { title: "Session Not Found" };
   }
 }
 
@@ -39,17 +41,19 @@ export default async function SessionDetailPage({
 }: {
   params: { slug: string };
 }) {
-  // Fetch session from database
+  // Fetch auth first so userId can be passed into the session query
+  const userSession = await getServerAuthSession();
+  const currentUserId = userSession?.user?.id;
+
   let session;
   try {
-    session = await api.session.getSessionBySlug({ slug: params.slug });
+    session = await api.session.getSessionBySlug({
+      slug: params.slug,
+      userId: currentUserId,
+    });
   } catch (error) {
     notFound();
   }
-
-  // Get current user session
-  const userSession = await getServerAuthSession();
-  const currentUserId = userSession?.user?.id;
 
   // Check if user is registered and has completed payment
   const userRegistration = session.registrations.find(

@@ -969,6 +969,8 @@ model SessionCategory {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([trimester])
 }
 
 model Session {
@@ -1004,6 +1006,13 @@ model Session {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([startAt])
+  @@index([type])
+  @@index([categoryId])
+  @@index([status, startAt])
+  @@index([status, type])
 }
 
 model SessionBanner {
@@ -1041,6 +1050,9 @@ model SessionRegistration {
   createdAt DateTime @default(now())
 
   @@unique([sessionId, userId])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([paymentStatus])
 }
 
 // ============================================

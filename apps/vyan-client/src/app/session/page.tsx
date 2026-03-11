@@ -42,17 +42,6 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
   const startDate = searchParams.startDate;
   const endDate = searchParams.endDate;
   const isOnlyOnline = searchParams.isOnlyOnline || undefined;
-  console.log("Filter params:", {
-    categoryId,
-    trimester,
-    minPrice,
-    maxPrice,
-    sortBy,
-    status,
-    startDate,
-    endDate,
-    isOnlyOnline,
-  });
 
   // Fetch sessions and categories in parallel
   const [result, categories] = await Promise.all([
@@ -70,15 +59,9 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     api.session.getAllCategories({}),
   ]);
 
-  let sessions = result.sessions || [];
+  const sessions = result.sessions ?? [];
 
-  // Sort sessions by date (earliest first)
-  sessions.sort((a, b) => {
-    const dateA = new Date(a.startAt).getTime();
-    const dateB = new Date(b.startAt).getTime();
-    return dateA - dateB;
-  });
-
+  // DB already returns sessions ordered by startAt asc — no JS sort needed
   // Group sessions by month
   const groups = new Map<string, typeof sessions>();
   sessions.forEach((session) => {
@@ -93,8 +76,6 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
       sessions,
     }),
   );
-
-  console.log("Fetched sessions:", sessions.length, "sessions", sessions);
 
   return (
     <main className="flex w-full flex-col items-center bg-white">

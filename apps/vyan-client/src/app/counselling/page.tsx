@@ -1,9 +1,7 @@
 "use client";
 
-
 import CompleteDoctorProfile from "~/app/counselling/complete-doctor-profile";
 
-import { useEffect } from "react";
 import CounsellingFilter from "./counselling-filter";
 import { api } from "~/trpc/react";
 import { useSearchParams } from "next/navigation";
@@ -17,35 +15,30 @@ const Counselling = () => {
   }
 
   const searchParams = useSearchParams();
-  console.log("searchParams", searchParams);
   const specialisationId = searchParams.get("specialisationId");
   const selectedDate = searchParams.get("selectedDate");
   const languageId = searchParams.get("languageId");
   const time = searchParams.get("time");
   const inputSearch = searchParams.get("therapistSearch");
-  console.log("specialisationId", specialisationId);
 
   const formattedLanguageIds: string[] =
     typeof languageId === "string" ? languageId.split(",") : [];
-  console.log("formattedLanguageIds", formattedLanguageIds);
-  console.log("selectedDate", selectedDate);
-  console.log("time", time);
-  console.log("inputSearch", inputSearch);
+
+  // Only parse date when it's actually set — avoids new Date(null!) = Jan 1 1970
+  const parsedDate =
+    selectedDate ? toUTCDate(new Date(selectedDate)) : undefined;
+
   const {
     data: filteredDoctors,
-    refetch,
     isLoading,
   } = api.findDoctor.findDoctor.useQuery({
-    specialisationId: specialisationId!,
-    date: toUTCDate(new Date(selectedDate!)),
+    specialisationId: specialisationId ?? undefined,
+    date: parsedDate,
     languageIds: formattedLanguageIds,
     time: time,
     inputSearch: inputSearch,
   });
-  console.log("filteredDoctors", filteredDoctors);
-  useEffect(() => {
-    refetch();
-  }, [specialisationId]);
+  // No manual refetch needed — tRPC auto-refetches when query inputs change
 
   const handleSpecialisationId = (value: string) => {
     // setSpecialisationId(value);

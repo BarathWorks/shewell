@@ -25,70 +25,46 @@ export const sessionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      let whereCondition: Prisma.SessionWhereInput = {};
+      // Build flat AND array for clean index usage
+      const andConditions: Prisma.SessionWhereInput[] = [
+        // Default to PUBLISHED unless caller explicitly requests another status
+        { status: input.status ?? SessionStatus.PUBLISHED },
+        // Only show future online sessions or recordings (recordings always visible)
+        {
+          OR: [
+            { type: "RECORDING" },
+            { AND: [{ type: "ONLINE" }, { startAt: { gte: new Date() } }] },
+          ],
+        },
+      ];
 
-      // Filter by status
-      if (input.status !== undefined) {
-        whereCondition.status = input.status;
-      }
-
-      // Filter by category IDs
       if (input.categoryId && input.categoryId.length > 0) {
-        whereCondition.categoryId = { in: input.categoryId };
+        andConditions.push({ categoryId: { in: input.categoryId } });
       }
 
-      // Filter by trimester
       if (input.trimester) {
-        whereCondition.category = {
-          trimester: input.trimester,
-        };
+        andConditions.push({ category: { trimester: input.trimester } });
       }
-      // Filter by online sessions only
+
       if (input.isOnlyOnline) {
-        whereCondition.type = "ONLINE";
+        andConditions.push({ type: "ONLINE" });
       }
-      // Build price filter conditions
-      const priceConditions = [];
+
       if (input.minPrice !== undefined) {
-        priceConditions.push({
-          price: { gte: input.minPrice },
-        });
+        andConditions.push({ price: { gte: input.minPrice } });
       }
       if (input.maxPrice !== undefined) {
-        priceConditions.push({
-          price: { lte: input.maxPrice },
-        });
+        andConditions.push({ price: { lte: input.maxPrice } });
       }
-
-      // Build date filter conditions
       if (input.startDate) {
-        priceConditions.push({
-          startAt: { gte: new Date(input.startDate) },
-        });
+        andConditions.push({ startAt: { gte: new Date(input.startDate) } });
       }
       if (input.endDate) {
-        priceConditions.push({
-          endAt: { lte: new Date(input.endDate) },
-        });
+        andConditions.push({ endAt: { lte: new Date(input.endDate) } });
       }
 
-      // Combine price conditions with existing where conditions if any price filters exist
-      if (priceConditions.length > 0) {
-        whereCondition = {
-          AND: [{ ...whereCondition }, ...priceConditions],
-        };
-      }
-      whereCondition = {
-        ...whereCondition,
-        OR: [
-          { type: "RECORDING" },
-          { AND: [{ type: "ONLINE" }, { startAt: { gte: new Date() } }] },
-        ],
-      };
-
-      // Fetch sessions
       const sessions = await db.session.findMany({
-        where: whereCondition,
+        where: { AND: andConditions },
         select: {
           id: true,
           title: true,
@@ -97,9 +73,7 @@ export const sessionRouter = createTRPCRouter({
           endAt: true,
           price: true,
           thumbnailMedia: {
-            select: {
-              fileUrl: true,
-            },
+            select: { fileUrl: true },
           },
           language: true,
           type: true,
@@ -122,22 +96,17 @@ export const sessionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const whereCondition: Prisma.SessionWhereInput = {};
-
-      // Only filter by status if explicitly provided
-      if (input.status !== undefined) {
-        whereCondition.status = input.status;
-      }
-      // If status is not provided, don't filter by status at all (show all sessions)
+      const whereCondition: Prisma.SessionWhereInput = {
+        // Default to PUBLISHED unless explicitly specified
+        status: input.status ?? SessionStatus.PUBLISHED,
+      };
 
       if (input.categoryId) {
         whereCondition.categoryId = input.categoryId;
       }
 
       if (input.trimester) {
-        whereCondition.category = {
-          trimester: input.trimester,
-        };
+        whereCondition.category = { trimester: input.trimester };
       }
 
       const sessions = await db.session.findMany({
@@ -154,38 +123,29 @@ export const sessionRouter = createTRPCRouter({
           updatedAt: true,
           thumbnailMediaId: true,
           thumbnailMedia: {
-            select: {
-              id: true,
-              fileUrl: true,
-            },
+            select: { id: true, fileUrl: true },
           },
           language: true,
           type: true,
           category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              trimester: true,
-            },
+            select: { id: true, name: true, slug: true, trimester: true },
           },
-          registrations: {
-            select: {
-              id: true,
-            },
+          // Use _count instead of fetching full registration rows
+          _count: {
+            select: { registrations: true },
           },
         },
-        orderBy: {
-          startAt: "asc",
-        },
+        orderBy: { startAt: "asc" },
       });
 
       return sessions;
     }),
 
   // Get session by slug
+  // Pass the current userId so registrations are scoped to that user only.
+  // This avoids fetching all registrations (can be thousands) on a public page.
   getSessionBySlug: publicProcedure
-    .input(z.object({ slug: z.string() }))
+    .input(z.object({ slug: z.string(), userId: z.string().optional() }))
     .query(async ({ input }) => {
       const session = await db.session.findUnique({
         where: { slug: input.slug },
@@ -201,19 +161,11 @@ export const sessionRouter = createTRPCRouter({
           updatedAt: true,
           thumbnailMediaId: true,
           thumbnailMedia: {
-            select: {
-              id: true,
-              fileUrl: true,
-            },
+            select: { id: true, fileUrl: true },
           },
           banners: {
             select: {
-              media: {
-                select: {
-                  id: true,
-                  fileUrl: true,
-                },
-              },
+              media: { select: { id: true, fileUrl: true } },
             },
           },
           overview: true,
@@ -221,28 +173,20 @@ export const sessionRouter = createTRPCRouter({
           language: true,
           type: true,
           category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              trimester: true,
-            },
+            select: { id: true, name: true, slug: true, trimester: true },
           },
-          registrations: {
-            select: {
-              id: true,
-              paymentStatus: true,
-              createdAt: true,
-              userId: true,
-              user: {
+          // Scope to current user only — avoids loading all registrations publicly
+          registrations: input.userId
+            ? {
+                where: { userId: input.userId },
                 select: {
                   id: true,
-                  name: true,
-                  email: true,
+                  paymentStatus: true,
+                  createdAt: true,
+                  userId: true,
                 },
-              },
-            },
-          },
+              }
+            : false,
         },
       });
 
@@ -324,18 +268,16 @@ export const sessionRouter = createTRPCRouter({
           trimester: true,
           createdAt: true,
           updatedAt: true,
-          sessions: {
-            where: {
-              status: SessionStatus.PUBLISHED,
-            },
+          // Use _count instead of fetching session rows just to count them
+          _count: {
             select: {
-              id: true,
+              sessions: {
+                where: { status: SessionStatus.PUBLISHED },
+              },
             },
           },
         },
-        orderBy: {
-          name: "asc",
-        },
+        orderBy: { name: "asc" },
       });
 
       return categories;
