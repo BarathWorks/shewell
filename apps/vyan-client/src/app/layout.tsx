@@ -1,13 +1,12 @@
-import { getServerSession } from "next-auth";
 import "~/styles/globals.css";
 import { Inter, Pacifico, Playfair_Display, Amatic_SC } from "next/font/google";
 import { Toaster } from "@repo/ui/src/@/components/toaster";
 import { Header } from "~/components/header";
 import NewFooter from "~/components/new-footer";
-import { db } from "~/server/db";
 import ClientSessionProvider from "./client-session-provider";
 import CardSheet from "~/components/card-sheet";
 import { TRPCReactProvider } from "~/trpc/react";
+import { getServerAuthSession } from "~/server/auth";
 
 import { Poppins } from "next/font/google";
 // import { Header as NewHeader } from "./components/header";
@@ -48,36 +47,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
-  let verifiedAt: Date | undefined = undefined;
-  if (session) {
-    const user = await db.user.findFirst({
-      select: {
-        verifiedAt: true,
-        name: true,
-        email: true,
-        wishlistedProducts: true,
-      },
-      where: {
-        email: session.user.email!,
-      },
-    });
-
-    verifiedAt = user?.verifiedAt;
-  }
-
-  let userDetails;
-
-  if (session?.user?.email) {
-    userDetails = await db.user.findFirst({
-      select: {
-        wishlistedProducts: true,
-      },
-      where: {
-        email: session.user.email,
-      },
-    });
-  }
+  const session = await getServerAuthSession();
+  
+  // PERFORMANCE FIX: Removed blocking database queries from layout
+  // verifiedAt is now stored in JWT token and accessible via session
+  // This avoids database queries while maintaining verification redirect functionality
 
   return (
     <html
@@ -86,7 +60,7 @@ export default async function RootLayout({
     >
       <body className={"relative font-sans"}>
         <div className="sticky top-0 z-40">
-          <ClientSessionProvider session={session} verifiedAt={verifiedAt!}>
+          <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
             <TRPCReactProvider>
               {/* <Header
                 email={session?.user.email!}
@@ -99,22 +73,12 @@ export default async function RootLayout({
               <Header />
               {/* <NewHeader /> */}
               {children}
-              {/* <NewHeader /> */}
               <NewFooter />
               <CardSheet />
             </TRPCReactProvider>
           </ClientSessionProvider>
         </div>
         <Toaster />
-
-        {/* <div className="">
-          <ClientSessionProvider session={session} verifiedAt={verifiedAt!}>
-            <TRPCReactProvider>{children} </TRPCReactProvider>
-          </ClientSessionProvider>
-        </div> */}
-        {/* <Footer />
-        <Toaster />
-        <CardSheet /> */}
       </body>
     </html>
   );

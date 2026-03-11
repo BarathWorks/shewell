@@ -57,7 +57,7 @@ export default function PregnancyStages({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <section className="w-full overflow-hidden bg-white px-4 pb-4 pt-2 sm:px-6 sm:pb-8 sm:pt-4 md:px-12 md:pb-12 md:pt-6 lg:px-[100px]">
+    <section className="w-full bg-white pb-4 pt-2 sm:pb-8 sm:pt-4 md:pb-12 md:pt-6">
       <div className="mx-auto px-0">
         {/* Stages Cards */}
         <div className="grid w-full grid-cols-6 gap-2 opacity-80 sm:grid-cols-3 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
@@ -77,7 +77,7 @@ export default function PregnancyStages({
             return (
               <motion.div
                 key={stage.id}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, zIndex: 50 }}
                 transition={{ duration: 0.3 }}
                 onMouseEnter={() => {
                   setHoveredId(stage.id);
@@ -87,7 +87,7 @@ export default function PregnancyStages({
                   onStageHover?.(stage.carouselIndex);
                 }}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex flex-col h-10 w-full  justify-center overflow-hidden rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-3 font-sans shadow-lg sm:p-4 md:p-5 lg:p-6  ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
+                className={`relative flex flex-col h-10 w-full justify-center rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-0 font-sans shadow-lg sm:p-4 md:p-5 lg:pl-6 lg:pb-10 ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2 z-10" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
               >
                 {/* The large Gradient Text */}
                <div>
@@ -102,7 +102,7 @@ export default function PregnancyStages({
 
                 {/* The Title Text */}
                 <div>
-                  <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-lg lg:text-lg xs:text-[12px] xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
+                  <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-medium lg:text-medium  xs:text-lg xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
                   {stage.title}
                 </h2>
                 </div>

@@ -12,7 +12,7 @@ const COURSES_DATA = [
     category: "Women’s health",
     mainImage: "/home/Women’s-health.webp",
     services: [
-      { label: "Diet", position: "top-[25%] left-[20%]" },
+      { label: "Diet", position: "md:top-[25%] md:left-[20%] lg:top-[25%] lg:left-[20%]" },
       { label: "PCOS", position: "top-[25%] right-[20%]" },
       { label: "Emotional wellbeing", position: "bottom-[10%] left-[15%]" },
       { label: "Wellness", position: "bottom-[10%] right-[15%]" },

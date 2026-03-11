@@ -25,6 +25,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      verifiedAt?: Date | null;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -32,6 +33,14 @@ declare module "next-auth" {
 
   interface User extends DefaultUser {
     id: string;
+    verifiedAt?: Date | null;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    verifiedAt?: Date | null;
   }
 }
 
@@ -51,16 +60,18 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     jwt: async ({ token, user }) => {
-      // Cache user ID in JWT to avoid DB lookups on every request
+      // Cache user data in JWT to avoid DB lookups on every request
       if (user) {
         token.id = user.id;
+        token.verifiedAt = user.verifiedAt;
       }
       return token;
     },
     session: async ({ session, token }) => {
-      // Use cached ID from JWT instead of querying DB every time
+      // Use cached data from JWT instead of querying DB every time
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.verifiedAt = token.verifiedAt;
       }
       return session;
     },
@@ -89,35 +100,35 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // CRITICAL FIX: Check if email belongs to a doctor account
-        // This prevents doctor accounts from accessing client app
-        const isDoctorAccount = await db.professionalUser.findFirst({
-          where: { email: credentials.email },
-          select: { id: true },
-        });
+        // PERFORMANCE: Run both queries in parallel instead of sequentially
+        const [isDoctorAccount, user] = await Promise.all([
+          db.professionalUser.findFirst({
+            where: { email: credentials.email },
+            select: { id: true },
+          }),
+          db.user.findFirst({
+            select: {
+              id: true,
+              email: true,
+              phoneNumber: true,
+              passwordHash: true,
+              verifiedAt: true,
+              name: true,
+            },
+            where: {
+              email: credentials.email,
+              verifiedAt: {
+                not: null,
+              },
+            },
+          }),
+        ]);
 
         if (isDoctorAccount) {
           throw new Error(
             "Doctor accounts cannot access this portal. Please use the professional portal.",
           );
         }
-
-        const user = await db.user.findFirst({
-          select: {
-            id: true,
-            email: true,
-            phoneNumber: true,
-            passwordHash: true,
-            verifiedAt: true,
-            name: true,
-          },
-          where: {
-            email: credentials.email,
-            verifiedAt: {
-              not: null,
-            },
-          },
-        });
 
         if (!user) {
           throw new Error("User not found");
@@ -164,33 +175,34 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Check if email belongs to a doctor account
-        const isDoctorAccount = await db.professionalUser.findFirst({
-          where: { email: credentials.email },
-          select: { id: true },
-        });
+        // PERFORMANCE: Run both queries in parallel instead of sequentially
+        const [isDoctorAccount, user] = await Promise.all([
+          db.professionalUser.findFirst({
+            where: { email: credentials.email },
+            select: { id: true },
+          }),
+          db.user.findFirst({
+            select: {
+              id: true,
+              email: true,
+              phoneNumber: true,
+              verifiedAt: true,
+              name: true,
+              otp: true,
+              otpCreatedAt: true,
+            },
+            where: {
+              email: credentials.email,
+              verifiedAt: { not: null },
+            },
+          }),
+        ]);
 
         if (isDoctorAccount) {
           throw new Error(
             "Doctor accounts cannot access this portal. Please use the professional portal.",
           );
         }
-
-        const user = await db.user.findFirst({
-          select: {
-            id: true,
-            email: true,
-            phoneNumber: true,
-            verifiedAt: true,
-            name: true,
-            otp: true,
-            otpCreatedAt: true,
-          },
-          where: {
-            email: credentials.email,
-            verifiedAt: { not: null },
-          },
-        });
 
         if (!user) {
           throw new Error("User not found");
