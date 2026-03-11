@@ -196,62 +196,41 @@ export const productRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      let whereCondition: any = {
-        deletedAt: null, // Add this base condition for all queries
-      };
-      let orderByCondition: any = {};
+      // Build a flat AND array — Postgres can use indexes on all leaf conditions
+      const andConditions: any[] = [
+        { deletedAt: null },
+        { active: true },
+      ];
 
-      // Only apply category filter if categoryId array is not empty
       if (input.categoryId && input.categoryId.length > 0) {
-        whereCondition = {
-          ...whereCondition, // Spread existing conditions including deletedAt: null
-          category: {
-            id: {
-              in: input.categoryId,
-            },
-            deletedAt: null,
-          },
-        };
+        andConditions.push({
+          category: { id: { in: input.categoryId }, deletedAt: null },
+        });
       }
 
-      // Build price filter conditions
-      const priceConditions = [];
-
       if (input.minPrice) {
-        priceConditions.push({
-          productVariants: {
-            some: {
-              priceInCents: {
-                gte: input.minPrice * 100,
-              },
-            },
-          },
+        andConditions.push({
+          productVariants: { some: { deletedAt: null, priceInCents: { gte: input.minPrice * 100 } } },
         });
       }
 
       if (input.maxPrice) {
-        priceConditions.push({
-          productVariants: {
-            some: {
-              priceInCents: {
-                lte: input.maxPrice * 100,
-              },
-            },
-          },
+        andConditions.push({
+          productVariants: { some: { deletedAt: null, priceInCents: { lte: input.maxPrice * 100 } } },
         });
       }
 
-      // Combine price conditions with existing where conditions if any price filters exist
-      if (priceConditions.length > 0) {
-        whereCondition = {
-          AND: [
-            { deletedAt: null }, // Ensure deletedAt: null is included in AND conditions
-            ...priceConditions,
-            ...(whereCondition.category
-              ? [{ category: whereCondition.category }]
-              : []),
-          ],
-        };
+      const whereCondition: any = { AND: andConditions };
+
+      // Use DB-level sort for avgRating — avoids pulling all reviews into memory
+      let orderByCondition: any = undefined;
+      if (input.sortBy === "price-asc" || input.sortBy === "price-desc") {
+        // price sort happens in JS below (variant-level min price)
+        orderByCondition = undefined;
+      } else if (input.sortBy === "rating-asc") {
+        orderByCondition = { avgRating: "asc" };
+      } else if (input.sortBy === "rating-desc") {
+        orderByCondition = { avgRating: "desc" };
       }
 
       const filteredProducts = await db.product.findMany({
@@ -269,6 +248,7 @@ export const productRouter = createTRPCRouter({
           categoryId: true,
           avgRating: true,
           totalReviews: true,
+          // Only fetch approved reviews; limit to avoid massive payloads
           review: {
             select: {
               id: true,
@@ -278,22 +258,16 @@ export const productRouter = createTRPCRouter({
               approved: true,
               createdAt: true,
               user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
+                select: { id: true, name: true, email: true },
               },
             },
+            where: { approved: true },
+            take: 10,
+            orderBy: { createdAt: "desc" },
           },
-          productBenefits : {
-            select : {
-              id : true,
-              benefit : true
-            },
-            where : {
-              deletedAt : null
-            }
+          productBenefits: {
+            select: { id: true, benefit: true },
+            where: { deletedAt: null },
           },
           productVariants: {
             select: {
@@ -304,111 +278,46 @@ export const productRouter = createTRPCRouter({
               discountInCents: true,
               discountInPercentage: true,
               productVariantInventory: {
-                select: {
-                  id: true,
-                  available: true,
-                  productVariantId: true,
-                },
+                select: { id: true, available: true, productVariantId: true },
               },
             },
-
-            where: {
-              deletedAt: null,
-            },
-            
-            orderBy: {
-              priceInCents: "asc",
-            },
+            where: { deletedAt: null },
+            orderBy: { priceInCents: "asc" },
           },
           faq: {
-            select: {
-              id: true,
-              question: true,
-              answer: true,
-              order: true,
-            },
+            select: { id: true, question: true, answer: true, order: true },
           },
           category: {
-            select: {
-              id: true,
-              name: true,
-            },
+            select: { id: true, name: true },
           },
           media: {
-            where: {
-              NOT: {
-                media: {
-                  fileUrl: null,
-                },
-              },
-            },
+            where: { NOT: { media: { fileUrl: null } } },
             select: {
               order: true,
               imageAltText: true,
               comment: true,
               mediaId: true,
               productId: true,
-              media: {
-                select: {
-                  id: true,
-                  fileUrl: true,
-                  fileKey: true,
-                },
-              },
+              media: { select: { id: true, fileUrl: true, fileKey: true } },
             },
+            orderBy: { order: "asc" },
           },
         },
         where: whereCondition,
+        ...(orderByCondition ? { orderBy: orderByCondition } : {}),
       });
-
-      // Rest of the code remains the same...
-      // Sort products by price
-      if (input.sortBy === "price-asc" || input.sortBy === "price-desc") {
-        filteredProducts.sort((a, b) => {
-          const aMinPrice = Math.min(
-            ...a.productVariants.map((v) => v.priceInCents ?? 0),
-          );
-          const bMinPrice = Math.min(
-            ...b.productVariants.map((v) => v.priceInCents ?? 0),
-          );
-          return input.sortBy === "price-asc"
-            ? aMinPrice - bMinPrice
-            : bMinPrice - aMinPrice;
-        });
-      }
 
       const updatedFilteredProducts = filteredProducts.map((item) => ({
         ...item,
         avgRating: item.avgRating.toString(),
       }));
 
-      // Sort products by rating
-      if (input.sortBy === "rating-asc" || input.sortBy === "rating-desc") {
+      // Price sort: DB cannot easily sort by min variant price so keep in JS
+      if (input.sortBy === "price-asc" || input.sortBy === "price-desc") {
         updatedFilteredProducts.sort((a, b) => {
-          const aRatings =
-            a.review
-              ?.filter((r) => r.rating != null)
-              .map((r) => Number(r.rating)) ?? [];
-          const bRatings =
-            b.review
-              ?.filter((r) => r.rating != null)
-              .map((r) => Number(r.rating)) ?? [];
-
-          const aAvgRating =
-            aRatings.length > 0
-              ? aRatings.reduce((sum, rating) => sum + rating, 0) /
-                aRatings.length
-              : 0;
-
-          const bAvgRating =
-            bRatings.length > 0
-              ? bRatings.reduce((sum, rating) => sum + rating, 0) /
-                bRatings.length
-              : 0;
-
-          return input.sortBy === "rating-asc"
-            ? aAvgRating - bAvgRating
-            : bAvgRating - aAvgRating;
+          const aMin = Math.min(...a.productVariants.map((v) => v.priceInCents ?? 0));
+          const bMin = Math.min(...b.productVariants.map((v) => v.priceInCents ?? 0));
+          return input.sortBy === "price-asc" ? aMin - bMin : bMin - aMin;
         });
       }
 

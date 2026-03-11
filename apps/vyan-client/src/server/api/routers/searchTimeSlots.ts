@@ -26,23 +26,17 @@ export const searchTimeSlotsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { date, expertId } = input;
-      const professionalUser = await db.professionalUser.findFirst({
-        select: {
-          id: true,
-        },
-        where: {
-          id: expertId,
-        },
+      const professionalUser = await db.professionalUser.findUnique({
+        select: { id: true },
+        where: { id: expertId },
       });
       if (!professionalUser) {
         return { timeSlots: [], bookedSlots: [] };
       }
 
-      // finding day on which doctor is unavailable comparing the date selected by user with the date marked unavailable by expert
+      // Find if doctor marked this specific date unavailable
       const unavailableDay = await db.unAvailableDay.findFirst({
-        select: {
-          date: true,
-        },
+        select: { date: true },
         where: {
           date: new Date(format(formatISO(date), "yyyy-MM-dd")),
           professionalUserId: professionalUser.id,
@@ -52,51 +46,48 @@ export const searchTimeSlotsRouter = createTRPCRouter({
         return { timeSlots: [], bookedSlots: [] };
       }
 
-      // getting day(0: Sunday, 1: Monday ...): form the date
-      // const dayofWeek = new Date(date).getUTCDay();
       const dayofWeek = date.getDay();
       const dayEnum = dayMapping[dayofWeek];
-
-      // console.log("dayofWeek", dayofWeek, dayEnum);
 
       if (!dayEnum) {
         throw new Error("Invalid day of the week");
       }
 
-      // console.log("dayofWeek Valid", dayofWeek);
+      // Start and end boundaries of the selected day (UTC)
+      const dayStart = new Date(date);
+      dayStart.setUTCHours(0, 0, 0, 0);
+      const dayEnd = new Date(date);
+      dayEnd.setUTCHours(23, 59, 59, 999);
 
-      // finding time slots as per the day and selected expert
-      const timeSlots = await db.availability.findMany({
-        select: {
-          availableTimings: {
-            select: {
-              startingTime: true,
-              endingTime: true,
+      // Run availability + booked-slots queries in parallel
+      const [timeSlots, bookedSlots] = await Promise.all([
+        db.availability.findMany({
+          select: {
+            availableTimings: {
+              select: { startingTime: true, endingTime: true },
             },
           },
-        },
-        where: {
-          day: dayEnum,
-          professionalUserId: professionalUser?.id,
-          available: true,
-        },
-      });
-
-      const bookedSlots = await db.bookAppointment.findMany({
-        select: {
-          startingTime: true,
-          endingTime: true,
-        },
-        where: {
-          professionalUserId: professionalUser.id,
-          status: {
-            notIn: [
-              BookAppointmentStatus.CANCELLED,
-              BookAppointmentStatus.CANCELLED_WITH_REFUND,
-            ],
+          where: {
+            day: dayEnum,
+            professionalUserId: professionalUser.id,
+            available: true,
           },
-        },
-      });
+        }),
+        // Scope to the selected day only — prevents full-table scan
+        db.bookAppointment.findMany({
+          select: { startingTime: true, endingTime: true },
+          where: {
+            professionalUserId: professionalUser.id,
+            startingTime: { gte: dayStart, lte: dayEnd },
+            status: {
+              notIn: [
+                BookAppointmentStatus.CANCELLED,
+                BookAppointmentStatus.CANCELLED_WITH_REFUND,
+              ],
+            },
+          },
+        }),
+      ]);
 
       const formattedBookedSlots = bookedSlots.map((item, index) => ({
         startingTime: createTimeDate(

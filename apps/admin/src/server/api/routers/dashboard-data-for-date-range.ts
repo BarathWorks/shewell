@@ -27,191 +27,159 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
       const updatedStartDate = formatISO(startDate);
       const updatedEndDate = formatISO(endOfDay(endDate));
 
-      const totalDoctorsOnBoard = await db.professionalUser.findMany({
-        
-        where : {
-          createdAt : {
-            gte : updatedStartDate
-          },
-         
-        }
-      })
-      const appointmentDataForTable = await db.bookAppointment.findMany({
-        select: {
-          id: true,
-          patient: {
-            select: {
-              firstName: true,
-              email: true,
-              additionalPatients : {
-                select : {
-                  firstName : true,
-                  email : true
-                }
-              }
-            }
-          },
-          professionalUser: {
-            select: {
-              firstName: true,
-              email : true,
-              displayQualification: {
-                select: {
-                  specialization: true
-                }
-              }
-            }
-          },
-          priceInCents : true,
-          startingTime: true,
-          endingTime: true,
-          planName: true
-        },
-        where: {
-          startingTime: {
-            gte: updatedStartDate
-          },
-          endingTime: {
-            lte: updatedEndDate
-          }
-        },
-        orderBy: {
-          startingTime: 'desc'
-        }
-      });
+      const appointmentDateWhere = {
+        startingTime: { gte: updatedStartDate },
+        endingTime:   { lte: updatedEndDate },
+      };
 
-      const totalDoctorsOnBoardWithinDateRange = await db.professionalUser.aggregate({
-        _count : {
-         id : true
-        },
-       })
+      // Run all independent queries in parallel for maximum throughput
+      const [
+        totalDoctorsOnBoard,
+        appointmentDataForTable,
+        totalDoctorsOnBoardWithinDateRange,
+        totalAppointmentsWithCountAndPrice,
+        cancelledAppointments,
+        productCardAvg,
+        newUsers,
+        orders,
+        users,
+      ] = await Promise.all([
+        // Count only — no need to fetch entire rows
+        db.professionalUser.count({
+          where: { createdAt: { gte: updatedStartDate } },
+        }),
 
-      const totalAppointmentsWithCountAndPrice = await db.bookAppointment.aggregate({
-        _sum:{
-          totalPriceInCents : true
-        },
-        _count : {
-          id : true
-        },
-        where:{
-          startingTime: {
-            gte: updatedStartDate
-          },
-          endingTime: {
-            lte: updatedEndDate
-          },
-          status : BookAppointmentStatus.PAYMENT_SUCCESSFUL
-        }
-      })
-
-      const cancelledAppointments = await db.bookAppointment.aggregate({
-        _count:{
-          id : true
-        },
-        where : {
-          startingTime: {
-            gte: updatedStartDate
-          },
-          endingTime: {
-            lte: updatedEndDate
-          },
-          status : BookAppointmentStatus.CANCELLED || BookAppointmentStatus.CANCELLED_WITH_REFUND
-        }
-      })
-
-      const productCardAvg = await db.order.aggregate({
-          orderBy: {
-            orderPlaced: 'desc'
-          },
-          where: {
-            orderPlaced: {
-              lte: updatedEndDate,
-              gte: updatedStartDate
+        db.bookAppointment.findMany({
+          select: {
+            id: true,
+            patient: {
+              select: {
+                firstName: true,
+                email: true,
+                additionalPatients: {
+                  select: { firstName: true, email: true },
+                },
+              },
             },
+            professionalUser: {
+              select: {
+                firstName: true,
+                email: true,
+                displayQualification: { select: { specialization: true } },
+              },
+            },
+            priceInCents: true,
+            startingTime: true,
+            endingTime: true,
+            planName: true,
+          },
+          where: appointmentDateWhere,
+          orderBy: { startingTime: 'desc' },
+        }),
+
+        // BUG FIX: was missing the date filter entirely
+        db.professionalUser.count({
+          where: { createdAt: { gte: updatedStartDate, lte: updatedEndDate } },
+        }),
+
+        db.bookAppointment.aggregate({
+          _sum:   { totalPriceInCents: true },
+          _count: { id: true },
+          where: {
+            ...appointmentDateWhere,
+            status: BookAppointmentStatus.PAYMENT_SUCCESSFUL,
+          },
+        }),
+
+        // BUG FIX: JS `||` evaluated to a single string — use Prisma `in` instead
+        db.bookAppointment.aggregate({
+          _count: { id: true },
+          where: {
+            ...appointmentDateWhere,
             status: {
-              in: [OrderStatus.PAYMENT_SUCCESSFUL, OrderStatus.DELIVERED]
-            }
+              in: [
+                BookAppointmentStatus.CANCELLED,
+                BookAppointmentStatus.CANCELLED_WITH_REFUND,
+              ],
+            },
           },
-          _avg: {
-            totalInCent: true
-          }
-        });
-      
-        const newUsers = await db.user.count({
-          orderBy: {
-            createdAt: 'desc'
-          },
+        }),
+
+        db.order.aggregate({
           where: {
-            createdAt: {
-              lte: updatedEndDate,
-              gte: updatedStartDate 
-            }
-          }
-        });
+            orderPlaced: { lte: updatedEndDate, gte: updatedStartDate },
+            status: { in: [OrderStatus.PAYMENT_SUCCESSFUL, OrderStatus.DELIVERED] },
+          },
+          _avg: { totalInCent: true },
+        }),
 
-         const orders = await db.order.findMany({
-            include: {
-              lineItems: {
-                include: {
-                  productVariant: {
-                    include: {
-                      product: {
-                        select: {
-                          id: true,
-                          name: true,
-                          media: {
-                            select: {
-                              mediaId: true,
-                              imageAltText: true,
-                              comment: true,
-                              media: {
-                                select: {
-                                  id: true,
-                                  fileKey: true,
-                                  fileUrl: true
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              address: true
-            },
-            take: 10,
-            orderBy: {
-              orderPlaced: 'desc'
-            },
-            where: {
-              status: {
-                in: [OrderStatus.DELIVERED, OrderStatus.PAYMENT_SUCCESSFUL]
-              },
-              
-            }
-          });
+        db.user.count({
+          where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
+        }),
 
-          const users = await db.user.findMany({
+        db.order.findMany({
+          select: {
+            id: true,
+            status: true,
+            totalInCent: true,
+            orderPlaced: true,
+            address: true,
+            lineItems: {
               select: {
                 id: true,
-                name: true,
-                email: true
+                quantity: true,
+                perUnitPriceInCent: true,
+                totalInCent: true,
+                productVariant: {
+                  select: {
+                    id: true,
+                    name: true,
+                    priceInCents: true,
+                    product: {
+                      select: {
+                        id: true,
+                        name: true,
+                        media: {
+                          select: {
+                            mediaId: true,
+                            imageAltText: true,
+                            comment: true,
+                            media: { select: { id: true, fileKey: true, fileUrl: true } },
+                          },
+                          take: 1,
+                          orderBy: { order: 'asc' },
+                        },
+                      },
+                    },
+                  },
+                },
               },
-              where : {
-                createdAt : {
-                  lte : updatedEndDate,
-                  gte : updatedStartDate
-                }
-              }
-            });
+            },
+          },
+          take: 10,
+          orderBy: { orderPlaced: 'desc' },
+          where: {
+            orderPlaced: { lte: updatedEndDate, gte: updatedStartDate },
+            status: { in: [OrderStatus.DELIVERED, OrderStatus.PAYMENT_SUCCESSFUL] },
+          },
+        }),
 
-        
+        db.user.findMany({
+          select: { id: true, name: true, email: true },
+          where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
+        }),
+      ]);
 
-      console.log("start date", startDate)
       return {
-        appointmentDataForTable, totalDoctorsOnBoard, totalAppointmentsWithCountAndPrice, cancelledAppointments,productCardAvg, newUsers,orders,users
+        appointmentDataForTable,
+        totalDoctorsOnBoard,
+        totalAppointmentsWithCountAndPrice,
+        cancelledAppointments,
+        productCardAvg,
+        newUsers,
+        orders,
+        users,
+        totalDoctorsOnBoardWithinDateRange,
       };
     })
 });

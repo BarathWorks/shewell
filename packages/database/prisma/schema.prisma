@@ -169,6 +169,11 @@ model Order {
   shiprocket_shipment_id String?
   razorpay_refund_id     String?
   cancelledDate          DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderPlaced])
+  @@index([userId, status])
 }
 
 model AppConfig {
@@ -210,6 +215,9 @@ model LineItem {
   subTotalInCent     Int
   discountInCent     Int
   totalInCent        Int
+
+  @@index([orderId])
+  @@index([productVariantId])
 }
 
 model Country {
@@ -359,6 +367,8 @@ model ProfessionalUserRating {
   bookAppointment    BookAppointment   @relation(fields: [bookAppointmentId], references: [id])
   bookAppointmentId  String            @unique
   createdAt          DateTime          @default(now())
+
+  @@index([professionalUserId])
 }
 
 model professionalUserAppointmentPrice {
@@ -506,6 +516,8 @@ model AvailabilityTimings {
   endingTime     DateTime      @db.Time()
   availability   Availability? @relation(fields: [availabilityId], references: [id])
   availabilityId String?
+
+  @@index([availabilityId])
 }
 
 model UnAvailableDay {
@@ -707,6 +719,11 @@ model Product {
   review           Review[]
   coupon           Coupon[]
   faq              FAQ[]
+
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@index([active])
+  @@index([slug])
 }
 
 model FAQ {
@@ -744,6 +761,9 @@ model ProductVariant {
   lineItems                LineItem[]
   productVariantInventory  ProductVariantInventory?
   productVariantInventoyId String?
+
+  @@index([productId])
+  @@index([deletedAt])
 }
 
 model ProductVariantInventory {
@@ -833,6 +853,7 @@ model MediaOnProducts {
   updatedAt    DateTime @updatedAt
 
   @@id([mediaId, productId])
+  @@index([productId])
 }
 
 model Review {
@@ -848,6 +869,10 @@ model Review {
 
   productId String
   product   Product @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+  @@index([approved])
 }
 
 enum userType {

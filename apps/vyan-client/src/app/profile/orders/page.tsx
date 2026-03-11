@@ -24,126 +24,76 @@ import RacOrders from "./rac-orders";
 
 const Orders = async () => {
   const session = await getServerSession();
-  const userDetails = await db.user.findFirst({
-    select: {
-      id: true,
-      email: true,
-      phoneNumber: true,
-      name: true,
-    },
-    where: {
-      email: session?.user.email!,
-    },
-  });
 
-  const orders = await db.order.findMany({
-    select: {
-      id: true,
-      discountInCent: true,
-      orderPlaced: true,
-      cancelledDate: true,
-      expectedDelivery: true,
-      userId: true,
-      status: true,
-      subTotalInCent: true,
-      taxesInCent: true,
-      couponId: true,
-      deliveryFeesInCent: true,
-      totalInCent: true,
-      addressId: true,
-      coupon: {
-        select: {
-          id: true,
-          code: true,
-          isPercent: true,
-          amount: true,
+  // Fetch user details and orders in parallel using the email FK shortcut
+  const [userDetails, orders] = await Promise.all([
+    db.user.findFirst({
+      select: { id: true, email: true, phoneNumber: true, name: true },
+      where: { email: session?.user.email! },
+    }),
+    db.order.findMany({
+      select: {
+        id: true,
+        discountInCent: true,
+        orderPlaced: true,
+        cancelledDate: true,
+        expectedDelivery: true,
+        userId: true,
+        status: true,
+        subTotalInCent: true,
+        taxesInCent: true,
+        couponId: true,
+        deliveryFeesInCent: true,
+        totalInCent: true,
+        addressId: true,
+        coupon: {
+          select: { id: true, code: true, isPercent: true, amount: true },
         },
-      },
-      lineItems: {
-        select: {
-          id: true,
-          orderId: true,
-          productVariantId: true,
-          perUnitPriceInCent: true,
-          quantity: true,
-          subTotalInCent: true,
-          discountInCent: true,
-          totalInCent: true,
-          productVariant: {
-            select: {
-              id: true,
-              productId: true,
-              name: true,
-              createdAt: true,
-              updatedAt: true,
-              deletedAt: true,
-              priceInCents: true,
-              discountInCents: true,
-              discountEndDate: true,
-              discountInPercentage: true,
-              productVariantInventory: {
-                select: {
-                  id: true,
-                  available: true,
-                  productVariantId: true,
+        lineItems: {
+          select: {
+            id: true,
+            orderId: true,
+            productVariantId: true,
+            perUnitPriceInCent: true,
+            quantity: true,
+            subTotalInCent: true,
+            discountInCent: true,
+            totalInCent: true,
+            productVariant: {
+              select: {
+                id: true,
+                productId: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                deletedAt: true,
+                priceInCents: true,
+                discountInCents: true,
+                discountEndDate: true,
+                discountInPercentage: true,
+                productVariantInventory: {
+                  select: { id: true, available: true, productVariantId: true },
                 },
-              },
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  slug: true,
-                  shortDescription: true,
-                  description: true,
-
-                  review: {
-                    select: {
-                      id: true,
-                      review: true,
-                      rating: true,
-                      approved: true,
-                      createdAt: true,
-                      productId: true,
-                      user: {
-                        select: {
-                          id: true,
-                          name: true,
-                          email: true,
-                        },
-                      },
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    shortDescription: true,
+                    description: true,
+                    // Removed: review — fetched separately, scoped to this user
+                    // Removed: productVariants — lineItem already holds the purchased variant
+                    // Scope wishlisted check to current user only
+                    userWishlisted: {
+                      where: { email: session?.user.email! },
+                      select: { email: true },
                     },
-                  },
-                  userWishlisted: {
-                    select: {
-                      email: true,
-                    },
-                  },
-                  media: {
-                    select: {
-                      media: {
-                        select: {
-                          id: true,
-                          fileUrl: true,
-                          fileKey: true,
-                        },
+                    media: {
+                      select: {
+                        media: { select: { id: true, fileUrl: true, fileKey: true } },
                       },
-                    },
-                  },
-                  productVariants: {
-                    select: {
-                      id: true,
-                      discountEndDate: true,
-                      productVariantInventory: {
-                        select: {
-                          id: true,
-                          available: true,
-                          productVariantId: true,
-                        },
-                      },
-                      priceInCents: true,
-                      discountInCents: true,
-                      discountInPercentage: true,
-                      name: true,
+                      take: 1,
+                      orderBy: { order: "asc" },
                     },
                   },
                 },
@@ -151,31 +101,32 @@ const Orders = async () => {
             },
           },
         },
-      },
-      address: {
-        select: {
-          id: true,
-          name: true,
-          houseNo: true,
-          mobile: true,
-          area: true,
-          city: true,
-          countryId: true,
-          stateId: true,
-          landmark: true,
-          pincode: true,
-          addressType: true,
-          userId: true,
-          createdAt: true,
-          deletedAt: true,
-          updatedAt: true,
+        address: {
+          select: {
+            id: true,
+            name: true,
+            houseNo: true,
+            mobile: true,
+            area: true,
+            city: true,
+            countryId: true,
+            stateId: true,
+            landmark: true,
+            pincode: true,
+            addressType: true,
+            userId: true,
+            createdAt: true,
+            deletedAt: true,
+            updatedAt: true,
+          },
         },
       },
-    },
-    where: {
-      userId: userDetails?.id,
-    },
-  });
+      where: {
+        user: { email: session?.user.email! },
+      },
+      orderBy: { orderPlaced: "desc" },
+    }),
+  ]);
 
   const activeOrders = orders.filter(
     (i: any) => i.status === OrderStatus.PAYMENT_SUCCESSFUL,
@@ -188,6 +139,7 @@ const Orders = async () => {
       i.status === OrderStatus.RETURNED || i.status === OrderStatus.CANCELLED,
   );
 
+  // Only fetch reviews written by this user — avoids full-table scan
   const reviews = await db.review.findMany({
     select: {
       id: true,
@@ -197,12 +149,11 @@ const Orders = async () => {
       createdAt: true,
       productId: true,
       user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
+        select: { id: true, name: true, email: true },
       },
+    },
+    where: {
+      user: { email: session?.user.email! },
     },
   });
 

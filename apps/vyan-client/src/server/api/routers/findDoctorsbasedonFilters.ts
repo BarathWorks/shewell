@@ -15,15 +15,22 @@ export const findDoctorRouter = createTRPCRouter({
           .nullable(),
         time: z.string().optional().nullable(),
         inputSearch: z.string().optional().nullable(),
+        take: z.number().min(1).max(100).default(20),
+        skip: z.number().min(0).default(0),
       }),
     )
     .query(async ({ input }) => {
-      const { specialisationId, date, languageIds, time, inputSearch } = input;
-      let whereCondition: any = {};
+      const { specialisationId, date, languageIds, time, inputSearch, take, skip } = input;
+
+      // Always filter approved, non-deleted doctors first (uses indexes)
+      const andConditions: Prisma.ProfessionalUserWhereInput[] = [
+        { isapproved: true },
+        { deletedAt: null },
+      ];
 
       // Search conditions
       if (inputSearch) {
-        whereCondition = {
+        andConditions.push({
           OR: [
             { firstName: { contains: inputSearch, mode: "insensitive" } },
             { lastName: { contains: inputSearch, mode: "insensitive" } },
@@ -52,37 +59,23 @@ export const findDoctorRouter = createTRPCRouter({
               },
             },
           ],
-        };
+        });
       }
 
       // Date filter
       if (date) {
-        whereCondition = {
-          AND: [
-            whereCondition,
-            {
-              unavailableDay: {
-                none: {
-                  date: date,
-                },
-              },
-            },
-          ],
-        };
+        andConditions.push({
+          unavailableDay: {
+            none: { date: date },
+          },
+        });
       }
 
       // Specialisation filter
       if (specialisationId) {
-        whereCondition = {
-          AND: [
-            whereCondition,
-            {
-              displayQualification: {
-                id: specialisationId,
-              },
-            },
-          ],
-        };
+        andConditions.push({
+          displayQualification: { id: specialisationId },
+        });
       }
 
       // Language filter
@@ -91,20 +84,9 @@ export const findDoctorRouter = createTRPCRouter({
           (id): id is string => id !== null && id !== undefined,
         );
         if (validLanguageIds.length > 0) {
-          whereCondition = {
-            AND: [
-              whereCondition,
-              {
-                languages: {
-                  some: {
-                    id: {
-                      in: validLanguageIds,
-                    },
-                  },
-                },
-              },
-            ],
-          };
+          andConditions.push({
+            languages: { some: { id: { in: validLanguageIds } } },
+          });
         }
       }
 
@@ -114,78 +96,64 @@ export const findDoctorRouter = createTRPCRouter({
         let endTime: Date | null = null;
 
         if (time === "Morning") {
-          startTime = new Date(Date.UTC(1970, 0, 1, 18, 30)); // 00:00 IST
-          endTime = new Date(Date.UTC(1970, 0, 1, 6, 29)); // 11:59 IST
+          startTime = new Date(Date.UTC(1970, 0, 1, 18, 30));
+          endTime = new Date(Date.UTC(1970, 0, 1, 6, 29));
         } else if (time === "Afternoon") {
-          startTime = new Date(Date.UTC(1970, 0, 1, 6, 30)); // 12:00
-          endTime = new Date(Date.UTC(1970, 0, 1, 10, 29)); // 15:59
+          startTime = new Date(Date.UTC(1970, 0, 1, 6, 30));
+          endTime = new Date(Date.UTC(1970, 0, 1, 10, 29));
         } else if (time === "Evening") {
-          startTime = new Date(Date.UTC(1970, 0, 1, 10, 30)); // 16:00
-          endTime = new Date(Date.UTC(1970, 0, 1, 18, 29)); // 23:59
+          startTime = new Date(Date.UTC(1970, 0, 1, 10, 30));
+          endTime = new Date(Date.UTC(1970, 0, 1, 18, 29));
         }
 
         if (startTime && endTime) {
-          whereCondition = {
-            AND: [
-              whereCondition,
-              {
-                availability: {
+          andConditions.push({
+            availability: {
+              some: {
+                availableTimings: {
                   some: {
-                    availableTimings: {
-                      some: {
-                        AND: [
-                          {
-                            startingTime: {
-                              gte: startTime,
-                            },
-                          },
-                          {
-                            startingTime: {
-                              lte: endTime,
-                            },
-                          },
-                        ],
-                      },
-                    },
+                    AND: [
+                      { startingTime: { gte: startTime } },
+                      { startingTime: { lte: endTime } },
+                    ],
                   },
                 },
               },
-            ],
-          };
+            },
+          });
         }
       }
-      whereCondition = { AND: [whereCondition, { isapproved: true }] };
-      const professionalUsers = await db.professionalUser.findMany({
-        select: {
-          id: true,
-          firstName: true,
-          displayQualification: {
-            select: {
-              specialization: true,
-            },
-          },
-          avgRating: true,
-          totalConsultations: true,
-          userName: true,
-          media: {
-            select: {
-              fileUrl: true,
-            },
-          },
-          ProfessionalSpecializations: {
-            select: {
-              specialization: true,
-            },
-          },
-          languages: {
-            select: {
-              language: true,
-            },
-          },
-        },
-        where: whereCondition,
-      });
 
-      return { professionalUsers };
+      const whereCondition: Prisma.ProfessionalUserWhereInput = { AND: andConditions };
+
+      const [professionalUsers, total] = await Promise.all([
+        db.professionalUser.findMany({
+          select: {
+            id: true,
+            firstName: true,
+            displayQualification: {
+              select: { specialization: true },
+            },
+            avgRating: true,
+            totalConsultations: true,
+            userName: true,
+            media: {
+              select: { fileUrl: true },
+            },
+            ProfessionalSpecializations: {
+              select: { specialization: true },
+            },
+            languages: {
+              select: { language: true },
+            },
+          },
+          where: whereCondition,
+          take,
+          skip,
+        }),
+        db.professionalUser.count({ where: whereCondition }),
+      ]);
+
+      return { professionalUsers, total };
     }),
 });
