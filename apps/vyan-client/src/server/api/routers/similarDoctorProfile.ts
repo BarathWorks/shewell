@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 export const similarDoctorProfileRouter = createTRPCRouter({
   similarDoctorProfile: publicProcedure
     .input(
@@ -12,8 +11,6 @@ export const similarDoctorProfileRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { displayQualificationId, similarDoctorProfileId } = input;
-      const session = await getServerSession();
-      console.log("session", session);
       // if (!session) {
       //   throw new Error("Unauthorised");
       // }
@@ -32,14 +29,14 @@ export const similarDoctorProfileRouter = createTRPCRouter({
           displayQualification: true,
           avgRating: true,
           totalConsultations: true,
-          professionalUserAppointmentPrices : {
-            select : {
-              priceInCentsForSingle : true,
-              priceInCentsForCouple : true
+          professionalUserAppointmentPrices: {
+            select: {
+              priceInCentsForSingle: true,
+              priceInCentsForCouple: true,
             },
-            orderBy :{
-              time : "asc"
-            }
+            orderBy: {
+              time: "asc",
+            },
           },
           ProfessionalSpecializations: true,
           userName: true,
@@ -48,14 +45,14 @@ export const similarDoctorProfileRouter = createTRPCRouter({
               fileUrl: true,
             },
           },
-          languages : {
-            select : {
-              id : true,
-              language : true
-            }
-          }
+          languages: {
+            select: {
+              id: true,
+              language: true,
+            },
+          },
         },
-        
+
         where: {
           NOT: {
             id: similarDoctorProfileId,

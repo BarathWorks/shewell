@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import {
   format,
   startOfMonth,
@@ -20,50 +19,50 @@ type IGoogleCalenderEvent = {
   updated: string;
   summary: string;
   creator: {
-      email: string;
-      self: boolean;
+    email: string;
+    self: boolean;
   };
   organizer: {
-      email: string;
-      self: boolean;
+    email: string;
+    self: boolean;
   };
   start: {
-      dateTime: string;
-      timeZone: string;
+    dateTime: string;
+    timeZone: string;
   };
   end: {
-      dateTime: string;
-      timeZone: string;
+    dateTime: string;
+    timeZone: string;
   };
   iCalUID: string;
   sequence: number;
   hangoutLink: string;
   conferenceData: {
-      createRequest: {
-          requestId: string;
-          conferenceSolutionKey: unknown;
-          status: unknown;
-      };
-      entryPoints: unknown[];
-      conferenceSolution: {
-          key: unknown[];
-          name: string;
-          iconUri: string;
-      };
-      conferenceId: string;
+    createRequest: {
+      requestId: string;
+      conferenceSolutionKey: unknown;
+      status: unknown;
+    };
+    entryPoints: unknown[];
+    conferenceSolution: {
+      key: unknown[];
+      name: string;
+      iconUri: string;
+    };
+    conferenceId: string;
   };
   reminders: {
-      useDefault: boolean;
+    useDefault: boolean;
   };
   eventType: string;
   attachments: [
-      {
-          fileUrl: string;
-          title: string;
-          mimeType: string;
-          iconLink: string;
-          fileId: string;
-      }
+    {
+      fileUrl: string;
+      title: string;
+      mimeType: string;
+      iconLink: string;
+      fileId: string;
+    },
   ];
 };
 export const searchUpcomingAppointmentsRouter = createTRPCRouter({
@@ -73,22 +72,13 @@ export const searchUpcomingAppointmentsRouter = createTRPCRouter({
         date: z.date(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { date } = input;
 
-      const session = await getServerSession();
-
-      //   find user
-      const user = await db.user.findFirst({
-        where: {
-          email: session?.user.email!,
-        },
-      });
+      const user = { id: ctx.session?.user?.id };
 
       const startDate = startOfDay(addDays(new Date(date), 1));
       const endDate = addDays(startDate, 7);
-
-      
 
       const upcomingAppointments = await db.bookAppointment.findMany({
         select: {
@@ -100,26 +90,26 @@ export const searchUpcomingAppointmentsRouter = createTRPCRouter({
             select: {
               id: true,
               firstName: true,
-              displayQualification : {
-                select : {
-                  specialization : true
-                }
-              }
+              displayQualification: {
+                select: {
+                  specialization: true,
+                },
+              },
             },
           },
           serviceType: true,
-          patient : {
-            select : {
-              id : true,
-              firstName : true,
-              lastName : true,
-               email : true,
-               message : true,
-               additionalPatients : true
-            }
+          patient: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              message: true,
+              additionalPatients: true,
+            },
           },
-          
-          meeting : true
+
+          meeting: true,
         },
         where: {
           userId: user?.id,
@@ -137,15 +127,22 @@ export const searchUpcomingAppointmentsRouter = createTRPCRouter({
         },
       });
 
-       // Map through each appointment and typecast the meeting field
-       const typedUpcomingAppointments = upcomingAppointments.map((appointment) => {
-        // Typecast only the meeting field
-        return {
+      // Map through each appointment and typecast the meeting field
+      const typedUpcomingAppointments = upcomingAppointments.map(
+        (appointment) => {
+          // Typecast only the meeting field
+          return {
             ...appointment,
             meeting: appointment.meeting as IGoogleCalenderEvent, // Typecasting the meeting field
-        } ;
-    });
-      console.log("upcomingAppointments", upcomingAppointments, startDate, endDate);
+          };
+        },
+      );
+      console.log(
+        "upcomingAppointments",
+        upcomingAppointments,
+        startDate,
+        endDate,
+      );
       return { typedUpcomingAppointments };
     }),
 });

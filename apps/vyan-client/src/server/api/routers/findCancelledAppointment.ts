@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import {
   format,
   startOfMonth,
@@ -28,34 +27,27 @@ export const searchCancelledAppointmentsRouter = createTRPCRouter({
     //     ]),
     //   }),
     // )
-    .query(async ({ input }) => {
-    //   const { date, timeRange } = input;
+    .query(async ({ input, ctx }) => {
+      //   const { date, timeRange } = input;
 
-      const session = await getServerSession();
-
-      //   find user
-      const user = await db.user.findFirst({
-        where: {
-          email: session?.user.email!,
-        },
-      });
+      const user = { id: ctx.session?.user?.id };
 
       // Calculate start and end dates based on the time range
-    //   const yesterday = subDays(startOfDay(date), 1);
-    //   const endDate = endOfDay(yesterday);
-    //   let startDate;
-    //   if (timeRange === "1_WEEK") {
-    //     startDate = subDays(endDate, 7);
-    //   } else if (timeRange === "1_MONTH") {
-    //     startDate = subMonths(endDate, 1);
-    //   } else if (timeRange === "3_MONTHS") {
-    //     startDate = subMonths(endDate, 3);
-    //   } else if (timeRange === "6_MONTHS") {
-    //     startDate = subMonths(endDate, 6);
-    //   } else if (timeRange === "1_YEAR") {
-    //     startDate = subYears(endDate, 1);
-    //   }
-    //   console.log("startDate", startDate);
+      //   const yesterday = subDays(startOfDay(date), 1);
+      //   const endDate = endOfDay(yesterday);
+      //   let startDate;
+      //   if (timeRange === "1_WEEK") {
+      //     startDate = subDays(endDate, 7);
+      //   } else if (timeRange === "1_MONTH") {
+      //     startDate = subMonths(endDate, 1);
+      //   } else if (timeRange === "3_MONTHS") {
+      //     startDate = subMonths(endDate, 3);
+      //   } else if (timeRange === "6_MONTHS") {
+      //     startDate = subMonths(endDate, 6);
+      //   } else if (timeRange === "1_YEAR") {
+      //     startDate = subYears(endDate, 1);
+      //   }
+      //   console.log("startDate", startDate);
       try {
         const cancelledAppointments = await db.bookAppointment.findMany({
           select: {
@@ -63,25 +55,25 @@ export const searchCancelledAppointmentsRouter = createTRPCRouter({
             startingTime: true,
             endingTime: true,
             totalPriceInCents: true,
-            patient : {
-                select:{
-                    id: true,
-                    email :true,
-                    phoneNumber : true,
-                    firstName : true,
-                    message : true,
-                    additionalPatients :true
-                }
+            patient: {
+              select: {
+                id: true,
+                email: true,
+                phoneNumber: true,
+                firstName: true,
+                message: true,
+                additionalPatients: true,
+              },
             },
             professionalUser: {
               select: {
                 id: true,
                 firstName: true,
-                displayQualification : {
-                    select : {
-                        specialization : true
-                    }
-                }
+                displayQualification: {
+                  select: {
+                    specialization: true,
+                  },
+                },
               },
             },
             serviceType: true,

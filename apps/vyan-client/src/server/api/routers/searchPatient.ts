@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 export const searchPatientRouter = createTRPCRouter({
   searchPatient: publicProcedure
     .input(
@@ -9,19 +8,11 @@ export const searchPatientRouter = createTRPCRouter({
         id: z.string().optional(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { id } = input;
-      const session = await getServerSession();
 
-      const user = await db.user.findFirst({
-        select: {
-          id: true,
-        },
-        where: {
-          email: session?.user.email!,
-        },
-      });
-      if (!user) {
+      const user = { id: ctx.session?.user?.id };
+      if (!user.id) {
         return;
       }
       const patient = await db.patient.findMany({

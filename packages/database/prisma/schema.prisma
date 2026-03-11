@@ -32,7 +32,7 @@ model User {
   deletedAt            DateTime?
   AuthSession          AuthSession[]
   sessionRegistrations SessionRegistration[]
-  
+
   @@index([email])
   @@index([verifiedAt])
 }
@@ -306,7 +306,7 @@ model ProfessionalUser {
   /// Address & Identity
   address  ProfessionalAddress?
   identity ProfessionalIdentity?
-  
+
   @@index([email])
   @@index([userName])
   @@index([isapproved])
@@ -345,7 +345,7 @@ model ProfessionalSpecializations {
   displayQualificationUsers                  ProfessionalUser[]                        @relation("DisplayQualification")
   ProfessionalSpecializationParentCategory   ProfessionalSpecializationParentCategory? @relation(fields: [professionalSpecializationParentCategoryId], references: [id])
   professionalSpecializationParentCategoryId String?
-  
+
   @@index([professionalSpecializationParentCategoryId])
   @@index([active])
 }
@@ -406,12 +406,13 @@ model BookAppointment {
 
   /// Doctor Payout System
   appointmentPayment AppointmentPayment?
-  
+
   @@index([userId])
   @@index([professionalUserId])
   @@index([status])
   @@index([startingTime])
   @@index([userId, status])
+  @@index([userId, status, startingTime])
 }
 
 model Comment {
@@ -460,7 +461,7 @@ model Patient {
   user               User?               @relation(fields: [userId], references: [id])
   userId             String
   additionalPatients AdditionalPatient[]
-  
+
   @@index([userId])
   @@index([email])
 }
@@ -484,7 +485,7 @@ model Availability {
   professionalUser   ProfessionalUser      @relation(fields: [professionalUserId], references: [id])
   professionalUserId String
   availableTimings   AvailabilityTimings[]
-  
+
   @@index([professionalUserId])
   @@index([day])
 }
@@ -512,7 +513,7 @@ model UnAvailableDay {
   date               DateTime          @db.Date
   professionalUser   ProfessionalUser? @relation(fields: [professionalUserId], references: [id])
   professionalUserId String?
-  
+
   @@index([professionalUserId])
   @@index([date])
   @@index([professionalUserId, date])

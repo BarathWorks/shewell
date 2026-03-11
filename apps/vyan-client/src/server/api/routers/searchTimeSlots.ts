@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import { BookAppointmentStatus, Day } from "@repo/database";
 import { createTimeDate, filterAvailableTimeSlots } from "~/lib/utils";
 import { getHours, getMinutes, format } from "date-fns";

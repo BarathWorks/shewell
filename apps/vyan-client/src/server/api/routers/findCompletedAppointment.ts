@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import {
   format,
   startOfMonth,
@@ -28,17 +27,10 @@ export const searchCompletedAppointmentsRouter = createTRPCRouter({
         ]),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { date, timeRange } = input;
 
-      const session = await getServerSession();
-
-      //   find user
-      const user = await db.user.findFirst({
-        where: {
-          email: session?.user.email!,
-        },
-      });
+      const user = { id: ctx.session?.user?.id };
 
       // Calculate start and end dates based on the time range
       // const yesterday = subDays(startOfDay(date), 1);
@@ -110,7 +102,7 @@ export const searchCompletedAppointmentsRouter = createTRPCRouter({
                 BookAppointmentStatus.COMPLETED,
                 BookAppointmentStatus.CANCELLED,
                 // BookAppointmentStatus.PAYMENT_SUCCESSFUL,
-                BookAppointmentStatus.CANCELLED_WITH_REFUND
+                BookAppointmentStatus.CANCELLED_WITH_REFUND,
               ],
             },
           },

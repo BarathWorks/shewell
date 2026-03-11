@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import { startOfDay, endOfDay, isBefore, isAfter } from "date-fns";
 import { BookAppointmentStatus } from "@repo/database";
 type IGoogleCalenderEvent = {
@@ -14,50 +13,50 @@ type IGoogleCalenderEvent = {
   updated: string;
   summary: string;
   creator: {
-      email: string;
-      self: boolean;
+    email: string;
+    self: boolean;
   };
   organizer: {
-      email: string;
-      self: boolean;
+    email: string;
+    self: boolean;
   };
   start: {
-      dateTime: string;
-      timeZone: string;
+    dateTime: string;
+    timeZone: string;
   };
   end: {
-      dateTime: string;
-      timeZone: string;
+    dateTime: string;
+    timeZone: string;
   };
   iCalUID: string;
   sequence: number;
   hangoutLink: string;
   conferenceData: {
-      createRequest: {
-          requestId: string;
-          conferenceSolutionKey: unknown;
-          status: unknown;
-      };
-      entryPoints: unknown[];
-      conferenceSolution: {
-          key: unknown[];
-          name: string;
-          iconUri: string;
-      };
-      conferenceId: string;
+    createRequest: {
+      requestId: string;
+      conferenceSolutionKey: unknown;
+      status: unknown;
+    };
+    entryPoints: unknown[];
+    conferenceSolution: {
+      key: unknown[];
+      name: string;
+      iconUri: string;
+    };
+    conferenceId: string;
   };
   reminders: {
-      useDefault: boolean;
+    useDefault: boolean;
   };
   eventType: string;
   attachments: [
-      {
-          fileUrl: string;
-          title: string;
-          mimeType: string;
-          iconLink: string;
-          fileId: string;
-      }
+    {
+      fileUrl: string;
+      title: string;
+      mimeType: string;
+      iconLink: string;
+      fileId: string;
+    },
   ];
 };
 export const searchOngoingAppointmentsRouter = createTRPCRouter({
@@ -67,17 +66,10 @@ export const searchOngoingAppointmentsRouter = createTRPCRouter({
         date: z.date(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { date } = input;
 
-      const session = await getServerSession();
-
-      //   find user
-      const user = await db.user.findFirst({
-        where: {
-          email: session?.user.email!,
-        },
-      });
+      const user = { id: ctx.session?.user?.id };
 
       const startDate = startOfDay(date);
       const endDate = endOfDay(date);
@@ -93,22 +85,22 @@ export const searchOngoingAppointmentsRouter = createTRPCRouter({
             select: {
               firstName: true,
               id: true,
-              displayQualification : {
-              select : {
-                specialization : true
-              }
-              }
+              displayQualification: {
+                select: {
+                  specialization: true,
+                },
+              },
             },
           },
-          meeting : true,
-          patient:{
-            select:{
-              firstName : true,
-              message : true,
-              additionalPatients : true
-            }
+          meeting: true,
+          patient: {
+            select: {
+              firstName: true,
+              message: true,
+              additionalPatients: true,
+            },
           },
-          status : true,
+          status: true,
           serviceType: true,
           razorpayPaymentId: true,
         },
@@ -132,21 +124,16 @@ export const searchOngoingAppointmentsRouter = createTRPCRouter({
       //   (appointment) =>
       //     isAfter(new Date(appointment.startingTime), currentTime),
       // );
-      
-       // Map through each appointment and typecast the meeting field
-       const typedAppointments = onGoingAppointments.map((appointment) => {
+
+      // Map through each appointment and typecast the meeting field
+      const typedAppointments = onGoingAppointments.map((appointment) => {
         // Typecast only the meeting field
         return {
-            ...appointment,
-            meeting: appointment.meeting as IGoogleCalenderEvent, // Typecasting the meeting field
-        } ;
-    });
-      console.log(
-        "onGoingAppointmentsbeforeStartingTime",
-        onGoingAppointments,
-      );
+          ...appointment,
+          meeting: appointment.meeting as IGoogleCalenderEvent, // Typecasting the meeting field
+        };
+      });
+      console.log("onGoingAppointmentsbeforeStartingTime", onGoingAppointments);
       return { typedAppointments };
     }),
 });
-
-
