@@ -1,6 +1,6 @@
 "use server";
 import { AppointmentType } from "@repo/database";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 import { db } from "~/server/db";
 interface IBookAppointmentDetailsProps {
   serviceMode: {
@@ -27,24 +27,14 @@ const BookAppointmentUserAction = async ({
   startingTime,
   endingTime,
 }: IBookAppointmentDetailsProps) => {
-  const session = await getServerSession();
-  const user = await db.user.findFirst({
-    select: {
-      id: true,
-    },
-    where: {
-      email: session?.user.email!,
-    },
-  });
-  if (!user) {
-    return;
-  }
+  const session = await getServerAuthSession();
+  if (!session?.user?.id) return;
   const patientInfo = await db.patient.findFirst({
     select: {
       id: true,
     },
     where: {
-      userId: user.id,
+      userId: session.user.id,
     },
   });
   if (!patientInfo) {
@@ -91,7 +81,7 @@ const BookAppointmentUserAction = async ({
             serviceType: serviceMode.serviceType,
             patientId: patientInfo?.id,
             professionalUserId: professionalUser.professionalUserId,
-            userId: user.id,
+            userId: session.user.id,
           },
           include: {
             professionalUser: {
@@ -145,19 +135,12 @@ const BookAppointmentUserAction = async ({
         meetingLink: (appointment.meeting as string) || "",
       });
 
-      console.log("---------------------------------------------------");
-      console.log("START BOOKING EMAIL PROCESS");
-      console.log("Using FROM_EMAIL:", process.env.FROM_EMAIL);
-      console.log("Sending patient email to:", patient.email);
-
       await sendEmail({
         from: process.env.FROM_EMAIL!,
         to: [patient.email],
         subject: patientEmailTemplate.subject,
         html: patientEmailTemplate.html,
       });
-      console.log("patientEmailTemplate", patientEmailTemplate);
-      console.log("Patient email sent successfully.");
 
       // Email to doctor
       const doctorEmailTemplate = getDoctorAppointmentBookingEmailTemplate({
@@ -170,12 +153,6 @@ const BookAppointmentUserAction = async ({
         meetingLink: (appointment.meeting as string) || "",
       });
 
-      console.log("doctorEmailTemplate", doctorEmailTemplate);
-      console.log(
-        "Sending doctor email to:",
-        appointment.professionalUser.email,
-      );
-
       if (appointment.professionalUser.email) {
         await sendEmail({
           from: process.env.FROM_EMAIL!,
@@ -183,10 +160,7 @@ const BookAppointmentUserAction = async ({
           subject: doctorEmailTemplate.subject,
           html: doctorEmailTemplate.html,
         });
-        console.log("Doctor email sent successfully.");
       }
-      console.log("END BOOKING EMAIL PROCESS");
-      console.log("---------------------------------------------------");
     } catch (emailError) {
       console.error("Failed to send appointment booking emails:", emailError);
       // Don't fail the booking if email fails
@@ -196,7 +170,6 @@ const BookAppointmentUserAction = async ({
       message: "Appointment has booked",
     };
   } catch (error) {
-    console.log("booking", error);
     throw new Error("Failed to Book the appointment");
   }
 };

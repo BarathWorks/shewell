@@ -114,10 +114,8 @@ const AddNewPatient = ({
   const { toast } = useToast();
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log("data", data);
     AddNewPatientUserAction(data)
       .then((resp) => {
-        console.log(resp.message);
         toast({
           description: "Successfully added the Personal-Info",
           variant: "default",
@@ -127,7 +125,6 @@ const AddNewPatient = ({
         onOpenChange(false);
       })
       .catch((error) => {
-        console.log(error);
         toast({
           description: "Failed to save the patient-info",
           variant: "destructive",

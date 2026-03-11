@@ -1,8 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { useRouter } from "next/navigation";
+import { getServerAuthSession } from "~/server/auth";
 import { db } from "~/server/db";
 
 interface IPatientProps {
@@ -28,20 +27,10 @@ const AddNewPatientUserAction = async ({
   message? : string | undefined
 }) => {
   
-  const session = await getServerSession();
- 
+  const session = await getServerAuthSession();
+  if (!session?.user?.id) throw new Error("Not authenticated");
   
   try {
-    const user = await db.user.findFirst({
-      select: {
-        id: true,
-      },
-      where: {
-        email: session?.user.email!,
-      },
-    });
-
-    
     await db.patient.create({
       data:{
         firstName : firstName,
@@ -57,7 +46,7 @@ const AddNewPatientUserAction = async ({
           message : patient.message
           
         })) } },
-        userId : user?.id
+        userId : session.user.id
       }
     })
     
@@ -67,7 +56,6 @@ const AddNewPatientUserAction = async ({
       message: "Patient has been added",
     };
   } catch (error) {
-    console.log("findError", error);
     throw new Error("Patient has not been added");
   }
 };

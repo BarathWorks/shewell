@@ -71,7 +71,6 @@ const CounsellingFilter = ({
   /* Handlers */
   const handleSpecialisationChange = (value: string) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
-    console.log("value", value);
     if (value && value !== "All") {
       current.set("specialisationId", value);
     } else {
@@ -114,7 +113,6 @@ const CounsellingFilter = ({
       current.delete("therapistSearch");
     }
     router.push(`${pathname}?${current.toString()}`);
-    window.history.pushState(null, "", `${pathname}?${current.toString()}`);
   };
 
   // Calendar internal state

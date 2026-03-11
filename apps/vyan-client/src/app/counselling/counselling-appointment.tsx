@@ -32,7 +32,6 @@ const CounsellingAppointment = ({
 }) => {
   const session = useSession();
   const { toast } = useToast();
-  console.log("session");
 
   const [timeSlot, setTimeSlot] = useState<{
     startTime: Date;
@@ -50,7 +49,6 @@ const CounsellingAppointment = ({
     useState<boolean>();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  console.log("time slot in counselling appointment", timeSlot);
   const handleOpenDialogOnlineAppointment = () => {
     if (session.status === "unauthenticated") {
       const currentRoute = window.location.pathname;
