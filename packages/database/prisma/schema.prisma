@@ -1013,8 +1013,6 @@ model Session {
   @@index([categoryId])
   @@index([status, startAt])
   @@index([status, type])
-  @@index([status, type, startAt])
-  @@index([categoryId, status, startAt])
 }
 
 model SessionBanner {

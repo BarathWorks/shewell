@@ -3,7 +3,6 @@ import { SessionCard } from "@/components/SessionCard";
 import { api } from "~/trpc/server";
 import { format } from "date-fns";
 import { SessionStatus } from "@repo/database";
-import { unstable_cache } from "next/cache";
 
 type SessionPageProps = {
   searchParams: {
@@ -19,81 +18,64 @@ type SessionPageProps = {
   };
 };
 
-type SessionFilters = {
-  categoryId?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-  sortBy?: "price-asc" | "price-desc";
-  status?: "CANCELLED" | "COMPLETED" | "DRAFT" | "PUBLISHED";
-  trimester?: "FIRST" | "SECOND" | "THIRD";
-  startDate?: string;
-  endDate?: string;
-  isOnlyOnline?: string;
-};
-
-// Cache categories - they rarely change, so cache for 1 hour
-const getCachedCategories = unstable_cache(
-  async () => api.session.getAllCategories({}),
-  ["session-categories"],
-  { revalidate: 3600, tags: ["categories"] }
-);
-
-// Cache sessions based on filters - cache for 5 minutes
-const getCachedSessions = (filters: SessionFilters) => {
-  // Create cache key from filters
-  const cacheKey = JSON.stringify(filters);
-  
-  return unstable_cache(
-    async () => api.session.filterSessions(filters),
-    ["session-list", cacheKey],
-    { revalidate: 300, tags: ["sessions"] }
-  )();
-};
-
-// Optimized grouping function
-function groupSessionsByMonth(sessions: any[]) {
-  const grouped: Record<string, any[]> = {};
-  
-  for (const session of sessions) {
-    const month = format(new Date(session.startAt), "MMMM");
-    if (!grouped[month]) {
-      grouped[month] = [];
-    }
-    grouped[month].push(session);
-  }
-  
-  return Object.entries(grouped).map(([month, sessions]) => ({
-    month,
-    sessions,
-  }));
-}
+// Make the page dynamic to ensure searchParams are processed on each request
+export const dynamic = "force-dynamic";
 
 export default async function SessionsPage({ searchParams }: SessionPageProps) {
   // Parse search params for filtering
-  const filters: SessionFilters = {
-    categoryId: searchParams.categoryId
-      ? Array.isArray(searchParams.categoryId)
-        ? searchParams.categoryId
-        : [searchParams.categoryId]
-      : undefined,
-    minPrice: searchParams.minPrice ? parseFloat(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseFloat(searchParams.maxPrice) : undefined,
-    sortBy: searchParams.sortBy,
-    status: searchParams.status || undefined,
-    trimester: searchParams.trimester || undefined,
-    startDate: searchParams.startDate,
-    endDate: searchParams.endDate,
-    isOnlyOnline: searchParams.isOnlyOnline || undefined,
-  };
+  const categoryId = searchParams.categoryId
+    ? Array.isArray(searchParams.categoryId)
+      ? searchParams.categoryId
+      : [searchParams.categoryId]
+    : undefined;
 
-  // Fetch both in parallel (cached)
+  const minPrice = searchParams.minPrice
+    ? parseFloat(searchParams.minPrice)
+    : undefined;
+  const maxPrice = searchParams.maxPrice
+    ? parseFloat(searchParams.maxPrice)
+    : undefined;
+
+  const sortBy = searchParams.sortBy;
+  const status = searchParams.status || undefined;
+  const trimester = searchParams.trimester || undefined;
+  const startDate = searchParams.startDate;
+  const endDate = searchParams.endDate;
+  const isOnlyOnline = searchParams.isOnlyOnline || undefined;
+
+  // Fetch sessions and categories in parallel
   const [result, categories] = await Promise.all([
-    getCachedSessions(filters),
-    getCachedCategories(),
+    api.session.filterSessions({
+      categoryId,
+      trimester,
+      minPrice,
+      maxPrice,
+      sortBy,
+      status,
+      startDate,
+      endDate,
+      isOnlyOnline,
+    }),
+    api.session.getAllCategories({}),
   ]);
 
   const sessions = result.sessions ?? [];
-  const cassifiedSessions = groupSessionsByMonth(sessions);
+
+  // DB already returns sessions ordered by startAt asc — no JS sort needed
+  // Group sessions by month
+  const groups = new Map<string, typeof sessions>();
+  sessions.forEach((session) => {
+    const month = format(new Date(session.startAt), "MMMM");
+    if (!groups.has(month)) groups.set(month, []);
+    groups.get(month)!.push(session);
+  });
+
+  const cassifiedSessions = Array.from(groups.entries()).map(
+    ([month, sessions]) => ({
+      month,
+      sessions,
+    }),
+  );
 
   return (
     <main className="flex w-full flex-col items-center bg-white">

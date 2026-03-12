@@ -25,55 +25,46 @@ export const sessionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const now = new Date();
-      const status = input.status ?? SessionStatus.PUBLISHED;
-      
-      // Build optimized where clause
-      const whereClause: Prisma.SessionWhereInput = {
-        status,
-        // Simplified: Get RECORDING OR future ONLINE sessions
-        OR: [
-          { type: "RECORDING" },
-          { type: "ONLINE", startAt: { gte: now } },
-        ],
-      };
+      // Build flat AND array for clean index usage
+      const andConditions: Prisma.SessionWhereInput[] = [
+        // Default to PUBLISHED unless caller explicitly requests another status
+        { status: input.status ?? SessionStatus.PUBLISHED },
+        // Only show future online sessions or recordings (recordings always visible)
+        {
+          OR: [
+            { type: "RECORDING" },
+            { AND: [{ type: "ONLINE" }, { startAt: { gte: new Date() } }] },
+          ],
+        },
+      ];
 
-      // Add filters directly to where clause (not in AND array)
       if (input.categoryId && input.categoryId.length > 0) {
-        whereClause.categoryId = { in: input.categoryId };
+        andConditions.push({ categoryId: { in: input.categoryId } });
       }
 
       if (input.trimester) {
-        whereClause.category = { trimester: input.trimester };
+        andConditions.push({ category: { trimester: input.trimester } });
       }
 
       if (input.isOnlyOnline) {
-        whereClause.type = "ONLINE";
-        delete whereClause.OR; // Remove OR when type is explicit
+        andConditions.push({ type: "ONLINE" });
       }
 
-      if (input.minPrice !== undefined || input.maxPrice !== undefined) {
-        whereClause.price = {};
-        if (input.minPrice !== undefined) {
-          whereClause.price.gte = input.minPrice;
-        }
-        if (input.maxPrice !== undefined) {
-          whereClause.price.lte = input.maxPrice;
-        }
+      if (input.minPrice !== undefined) {
+        andConditions.push({ price: { gte: input.minPrice } });
       }
-
-      if (input.startDate || input.endDate) {
-        whereClause.startAt = {};
-        if (input.startDate) {
-          whereClause.startAt.gte = new Date(input.startDate);
-        }
-        if (input.endDate) {
-          whereClause.endAt = { lte: new Date(input.endDate) };
-        }
+      if (input.maxPrice !== undefined) {
+        andConditions.push({ price: { lte: input.maxPrice } });
+      }
+      if (input.startDate) {
+        andConditions.push({ startAt: { gte: new Date(input.startDate) } });
+      }
+      if (input.endDate) {
+        andConditions.push({ endAt: { lte: new Date(input.endDate) } });
       }
 
       const sessions = await db.session.findMany({
-        where: whereClause,
+        where: { AND: andConditions },
         select: {
           id: true,
           title: true,
