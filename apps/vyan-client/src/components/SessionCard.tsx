@@ -40,17 +40,17 @@ export const SessionCard: React.FC<SessionCardProps> = ({
 
   return (
     <Link href={detailPath}>
-      <div className="group relative mx-auto flex w-full max-w-full flex-col items-stretch gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F] hover:shadow-xl lg:max-w-[1440px] lg:flex-row lg:items-center lg:gap-6 lg:p-6 2xl:max-w-[1920px]">
+      <div className="group relative mx-auto flex w-full max-w-full flex-col items-stretch gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F] hover:shadow-xl md:flex-row md:items-center md:gap-6 md:p-6 lg:max-w-[1440px] 2xl:max-w-[1920px]">
         {/* Date Box - Top on Mobile, Left on Desktop */}
-        <div className="flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 text-white shadow-md lg:h-24 lg:w-20 lg:flex-col">
-          <div className="mr-2 text-xs font-bold uppercase tracking-wider opacity-90 lg:mr-0 lg:text-sm">
+        <div className="flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 text-white shadow-md md:h-24 md:w-20 md:flex-col">
+          <div className="mr-2 text-xs font-bold uppercase tracking-wider opacity-90 md:mr-0 md:text-sm">
             {month}
           </div>
-          <div className="text-xl font-black lg:text-3xl">{day}</div>
+          <div className="text-xl font-black md:text-3xl">{day}</div>
         </div>
 
         {/* Image Thumbnail - Responsive Sizing */}
-        <div className="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-64 lg:h-32 lg:w-48 2xl:w-64">
+        <div className="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-64 md:h-32 md:w-48 2xl:w-64">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -63,7 +63,7 @@ export const SessionCard: React.FC<SessionCardProps> = ({
             </div>
           )}
           {/* Mobile-only Price Badge overlay */}
-          <div className="absolute right-2 top-2 lg:hidden">
+          <div className="absolute right-2 top-2 md:hidden">
             <Badge className="bg-white/90 text-[#00898F] backdrop-blur-sm">
               ₹{price}
             </Badge>
@@ -71,7 +71,7 @@ export const SessionCard: React.FC<SessionCardProps> = ({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 space-y-2 lg:space-y-1">
+        <div className="flex-1 space-y-2 md:space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="secondary"
@@ -95,16 +95,16 @@ export const SessionCard: React.FC<SessionCardProps> = ({
             )}
           </div>
 
-          <h2 className="line-clamp-2 text-lg font-extrabold text-gray-900 lg:text-xl 2xl:text-2xl">
+          <h2 className="line-clamp-2 text-lg font-extrabold text-gray-900 md:text-xl 2xl:text-2xl">
             {title}
           </h2>
 
-          <p className="line-clamp-2 max-w-3xl text-sm leading-relaxed text-gray-600 lg:line-clamp-3 lg:text-base">
+          <p className="line-clamp-2 max-w-3xl text-sm leading-relaxed text-gray-600 md:line-clamp-3 md:text-base">
             {description}
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            <div className="hidden lg:block">
+            <div className="hidden md:block">
               <InfoChip icon={<IndianRupee size={16} />} label={`${price}`} />
             </div>
             <InfoChip icon={<Clock size={16} />} label={timeSlot} />
@@ -112,9 +112,9 @@ export const SessionCard: React.FC<SessionCardProps> = ({
         </div>
 
         {/* Action Button - Full width on mobile, Auto on desktop */}
-        <div className="flex flex-col items-center justify-center border-t border-gray-100 pt-4 lg:items-end lg:border-none lg:pt-0">
+        <div className="flex flex-col items-center justify-center border-t border-gray-100 pt-4 md:items-end md:border-none md:pt-0">
           {detailPath && (
-            <Link href={detailPath} className="w-full lg:w-auto">
+            <Link href={detailPath} className="w-full md:w-auto">
               <InteractiveButton />
             </Link>
           )}
@@ -131,7 +131,7 @@ const InfoChip = ({
   icon: React.ReactNode;
   label: string;
 }) => (
-  <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-xs lg:text-sm font-semibold text-gray-700 border border-gray-100">
+  <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-xs md:text-sm font-semibold text-gray-700 border border-gray-100">
     <span className="text-[#00898F]">{icon}</span>
     {label}
   </div>
