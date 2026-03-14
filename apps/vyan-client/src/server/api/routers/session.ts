@@ -574,31 +574,23 @@ export const sessionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const registrations = await db.sessionRegistration.findMany({
+      const stats = await db.sessionRegistration.groupBy({
+        by: ["paymentStatus"],
         where: {
           sessionId: input.sessionId,
         },
-        select: {
-          paymentStatus: true,
-        },
+        _count: true,
       });
 
-      const totalRegistrations = registrations.length;
-      const completedPayments = registrations.filter(
-        (r) => r.paymentStatus === PaymentStatus.COMPLETED,
-      ).length;
-      const pendingPayments = registrations.filter(
-        (r) => r.paymentStatus === PaymentStatus.PENDING,
-      ).length;
-      const failedPayments = registrations.filter(
-        (r) => r.paymentStatus === PaymentStatus.FAILED,
-      ).length;
+      const totalRegistrations = stats.reduce((acc, curr) => acc + curr._count, 0);
+      const getCount = (status: PaymentStatus) =>
+        stats.find((s) => s.paymentStatus === status)?._count || 0;
 
       return {
         totalRegistrations,
-        completedPayments,
-        pendingPayments,
-        failedPayments,
+        completedPayments: getCount(PaymentStatus.COMPLETED),
+        pendingPayments: getCount(PaymentStatus.PENDING),
+        failedPayments: getCount(PaymentStatus.FAILED),
       };
     }),
 });

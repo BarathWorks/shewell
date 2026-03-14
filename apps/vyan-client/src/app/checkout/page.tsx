@@ -17,23 +17,25 @@ import { db } from "~/server/db";
 const CheckOut = async () => {
   const session = await getServerSession();
 
-  const userDetails = await db.user.findFirst({
-    select: {
-      id: true,
-      email: true,
-      phoneNumber: true,
-      name: true,
-    },
-    where: {
-      email: session?.user.email!,
-    },
-  });
-  const countries = await db.country.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  const [userDetails, countries] = await Promise.all([
+    db.user.findFirst({
+      select: {
+        id: true,
+        email: true,
+        phoneNumber: true,
+        name: true,
+      },
+      where: {
+        email: session?.user.email!,
+      },
+    }),
+    db.country.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    }),
+  ]);
 
   
   const addedAddresses = await db.address.findMany({

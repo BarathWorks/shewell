@@ -112,8 +112,8 @@ export const searchOngoingAppointmentsRouter = createTRPCRouter({
           },
           status: {
             notIn: [
-              BookAppointmentStatus.CANCELLED &&
-                BookAppointmentStatus.CANCELLED_WITH_REFUND,
+              BookAppointmentStatus.CANCELLED,
+              BookAppointmentStatus.CANCELLED_WITH_REFUND,
             ],
           },
         },

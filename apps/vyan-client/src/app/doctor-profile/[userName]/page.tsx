@@ -313,7 +313,6 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
       qualifications: {
         select: {
           degree: true,
-          // displayedQualification: true,
         },
       },
       avgRating: true,
@@ -322,9 +321,34 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
       aboutYou: true,
       aboutEducation: true,
       displayQualificationId: true,
-      displayQualification: true,
-      ProfessionalSpecializations: true,
-
+      displayQualification: {
+        select: {
+          specialization: true,
+          active: true,
+          deletedAt: true,
+        },
+      },
+      ProfessionalSpecializations: {
+        select: {
+          specialization: true,
+          active: true,
+          deletedAt: true,
+        },
+      },
+      experiences: {
+        select: {
+          position: true,
+          department: true,
+          location: true,
+          startingYear: true,
+          endingYear: true,
+        },
+      },
+      degrees: {
+        select: {
+          degree: true,
+        },
+      },
       ratings: {
         select: {
           id: true,
@@ -359,55 +383,18 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
   }
 
   // converting the decimal avgrating to string avgrating
-  // if the profile is array, then i will use map just like did in products
   const profileObj = {
     ...profile,
-    avgRating: profile?.avgRating?.toString() || "",
+    avgRating: profile.avgRating?.toString() || "",
     displayQualification: profile.displayQualification?.specialization,
   };
-
-  const professionalExperience = await db.professionalExperience.findMany({
-    where: {
-      professionalUserId: profile?.id,
-    },
-    select: {
-      position: true,
-      department: true,
-      location: true,
-      startingYear: true,
-      endingYear: true,
-    },
-  });
-  // console.log("professionalExperience", professionalExperience);
-  const specialization = await db.professionalSpecializations.findMany({
-    select: {
-      specialization: true,
-    },
-  });
-
-  const degrees = await db.professionalDegree.findMany({
-    where: {
-      professionalUserId: profile.id,
-    },
-    select: {
-      degree: true,
-    },
-  });
-
-  if (!profileObj) {
-    return {
-      message: "Profile not found ",
-    };
-  }
-
-  
 
   return (
     <>
       <DoctorProfileContent
-        degrees={degrees}
+        degrees={profile.degrees}
         profile={profileObj}
-        professionalExperience={professionalExperience}
+        professionalExperience={profile.experiences}
       />
     </>
   );

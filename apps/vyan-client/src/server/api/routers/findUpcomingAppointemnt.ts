@@ -120,8 +120,8 @@ export const searchUpcomingAppointmentsRouter = createTRPCRouter({
           status: {
             in: [BookAppointmentStatus.PAYMENT_SUCCESSFUL],
             notIn: [
-              BookAppointmentStatus.CANCELLED &&
-                BookAppointmentStatus.CANCELLED_WITH_REFUND,
+              BookAppointmentStatus.CANCELLED,
+              BookAppointmentStatus.CANCELLED_WITH_REFUND,
             ],
           },
         },
