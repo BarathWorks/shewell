@@ -8,18 +8,22 @@ interface IAccountSetupProps {
   password: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const AccountSetupUserAction = async ({
   userName,
   email,
   password,
-}: IAccountSetupProps) => {
+}: IAccountSetupProps): Promise<ActionResult> => {
   const existingUser = await db.professionalUser.findFirst({
     where: {
       email: email,
     },
   });
   if (existingUser) {
-    throw new Error("User already exists");
+    return { success: false, error: "User already exists" };
   }
 
   const sameUserName = await db.professionalUser.findFirst({
@@ -28,7 +32,7 @@ const AccountSetupUserAction = async ({
     },
   });
   if (sameUserName) {
-    throw new Error("This Username already exists");
+    return { success: false, error: "This Username already exists" };
   }
 
   const passwordHash = await hash(password, 10);
@@ -43,11 +47,12 @@ const AccountSetupUserAction = async ({
     });
 
     return {
+      success: true,
       message: "Account created successfully",
     };
   } catch (error) {
     console.error("Failed SignUp", error);
-    throw new Error("Failed SignUp");
+    return { success: false, error: "Failed SignUp" };
   }
 };
 

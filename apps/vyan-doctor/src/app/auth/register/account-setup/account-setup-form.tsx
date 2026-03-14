@@ -53,24 +53,32 @@ const AccountSetupForm = () => {
   const submitForm = async (data: z.infer<typeof zodValidation>) => {
     setLoadingState(true);
 
-    AccountSetupUserAction(data)
-      .then(async () => {
-        const loginResult = await signIn("CredentialsVyanDoctor", {
-          redirect: false,
-          email: data.email,
-          password: data.password,
-        });
-        setLoadingState(false);
-        toast({
-          description: "Account created successfully",
-          variant: "default",
-        });
-        router.push(`/auth/register/personal-info/?step=2`);
+    AccountSetupUserAction(data as any)
+      .then(async (resp: any) => {
+        if (resp.success) {
+          const loginResult = await signIn("CredentialsVyanDoctor", {
+            redirect: false,
+            email: data.email,
+            password: data.password,
+          });
+          setLoadingState(false);
+          toast({
+            description: "Account created successfully",
+            variant: "default",
+          });
+          router.push(`/auth/register/personal-info/?step=2`);
+        } else {
+          setLoadingState(false);
+          toast({
+            description: resp.error,
+            variant: "destructive",
+          });
+        }
       })
       .catch((err) => {
         console.log(err);
         toast({
-          description: err.message,
+          description: "Something went wrong. Please try again.",
           variant: "destructive",
         });
       })

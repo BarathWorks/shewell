@@ -13,6 +13,10 @@ interface IPersInfoProps {
   userName: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const PersInfoUserAction = async ({
   firstName,
   lastName,
@@ -21,14 +25,14 @@ const PersInfoUserAction = async ({
   password,
   dob,
   userName,
-}: IPersInfoProps) => {
+}: IPersInfoProps): Promise<ActionResult> => {
   const user = await db.professionalUser.findFirst({
     where: {
       email: email,
     },
   });
   if (user) {
-    throw new Error("User already exists");
+    return { success: false, error: "User already exists" };
   }
 
   const sameUserName = await db.professionalUser.findFirst({
@@ -37,7 +41,7 @@ const PersInfoUserAction = async ({
     },
   });
   if (sameUserName) {
-    throw new Error("This Username already exists");
+    return { success: false, error: "This Username already exists" };
   }
 
   const passwordHash = await hash(password, 10);
@@ -56,11 +60,12 @@ const PersInfoUserAction = async ({
     });
 
     return {
+      success: true,
       message: "Successfully added the Personal Information",
     };
   } catch (error) {
     console.error("Failed SignUp", error);
-    throw new Error("Failed SignUp");
+    return { success: false, error: "Failed SignUp" };
   }
 };
 

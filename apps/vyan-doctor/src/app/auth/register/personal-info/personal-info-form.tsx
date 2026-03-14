@@ -167,22 +167,29 @@ const PersonalInfoForm = ({
       dob: data.dob,
       phoneNumber: data.phoneNumber,
       gender: data.gender,
-      languages: data.languages,
+      languages: data.languages as any,
       aboutYou: data.aboutYou,
       mediaId: data.mediaId,
     })
-      .then((resp) => {
+      .then((resp: any) => {
         setLoadingState(false);
-        toast({
-          description: resp?.message,
-          variant: "default",
-        });
-        router.push(`/auth/register/address/?step=3`);
+        if (resp.success) {
+          toast({
+            description: resp?.message,
+            variant: "default",
+          });
+          router.push(`/auth/register/address/?step=3`);
+        } else {
+          toast({
+            description: resp.error,
+            variant: "destructive",
+          });
+        }
       })
       .catch((err) => {
         setLoadingState(false);
         toast({
-          description: err.message,
+          description: "Something went wrong. Please try again.",
           variant: "destructive",
         });
       });

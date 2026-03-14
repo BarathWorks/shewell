@@ -73,19 +73,26 @@ const RegisterForm = () => {
 
   const submitForm = async (data: z.infer<typeof zodValidation>) => {
     RegisterUserAction(data as ISignUpFields)
-      .then(async (resp) => {
-        toast({
-          title: resp?.message,
-          variant: "default",
-        });
+      .then(async (resp: any) => {
+        if (resp.success) {
+          toast({
+            title: resp?.message,
+            variant: "default",
+          });
 
-        // Redirect to OTP page with email - do NOT sign in yet, user doesn't exist in DB
-        router.push(`/auth/register-otp?email=${encodeURIComponent(data.email)}`);
+          // Redirect to OTP page with email - do NOT sign in yet, user doesn't exist in DB
+          router.push(`/auth/register-otp?email=${encodeURIComponent(data.email)}`);
+        } else {
+          toast({
+            variant: "destructive",
+            title: resp.error,
+          });
+        }
       })
       .catch((err) => {
         toast({
           variant: "destructive",
-          title: err.message,
+          title: "Something went wrong. Please try again.",
         });
       });
   };

@@ -12,13 +12,17 @@ export interface ISignUpFields {
   age: boolean;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const RegisterUserAction = async ({
   name,
   email,
   password,
   phoneNumber,
   age,
-}: ISignUpFields) => {
+}: ISignUpFields): Promise<ActionResult> => {
   // Check if a verified user already exists
   const existingVerifiedUser = await db.user.findFirst({
     where: {
@@ -28,7 +32,7 @@ const RegisterUserAction = async ({
   });
 
   if (existingVerifiedUser) {
-    throw new Error("User already exists please login");
+    return { success: false, error: "User already exists please login" };
   }
 
   const passwordHash = await hash(password, 10);
@@ -70,11 +74,12 @@ const RegisterUserAction = async ({
     await sendEmail(emailBodySendGrid);
 
     return {
+      success: true,
       message: "OTP sent to your email",
     };
   } catch (error) {
     console.error("Failed SignUp", error);
-    throw new Error("Failed Signup");
+    return { success: false, error: "Failed Signup" };
   }
 };
 
