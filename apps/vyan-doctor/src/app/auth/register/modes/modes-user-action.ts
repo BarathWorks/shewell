@@ -7,56 +7,55 @@ import { z } from "zod";
 
 interface IModesProps {
   sessionMode: string;
-  // sessionType?: string;
-  // meetingType?: string;
   listing: string;
-  // issues: string;
 }
+
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const ModesUserAction = async ({
   sessionMode,
-  // sessionType,
-  // meetingType,
   listing,
-  // issues,
-}: IModesProps) => {
+}: IModesProps): Promise<ActionResult> => {
   const session = await getServerSession();
-  if (!session?.user) {
-    throw new Error("Unauthorised user");
+  if (!session?.user?.email) {
+    return { success: false, error: "Unauthorised user" };
   }
-  if(!session.user.email){
-    throw new Error("Unauthorised user")
+
+  const FormData = z.object({
+    sessionMode: z.string().min(1, "Session mode is required"),
+    listing: z.string().min(1, "Listing is required"),
+  });
+
+  const parsed = FormData.safeParse({
+    sessionMode,
+    listing,
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0]?.message || "Invalid data" };
   }
- const FormData = z.object({
-  sessionMode : z.string(),
-  // sessionType : z.string().optional(),
-  // meetingType : z.string().optional(),
-  listing : z.string()
- })
- const isValidData = FormData.parse({
-  sessionMode,
-  // sessionType,
-  // meetingType,
-  listing
- })
+
   try {
     await db.professionalUser.update({
       data: {
-        sessionMode: isValidData.sessionMode,
-        // sessionType: isValidData.sessionType,
-        // meetingType: isValidData.meetingType,
-        listing: isValidData.listing,
-        // issue: issues,
+        sessionMode: parsed.data.sessionMode,
+        listing: parsed.data.listing,
       },
       where: {
         email: session.user.email,
       },
     });
-    revalidatePath("/auth/register/modes")
+    revalidatePath("/auth/register/modes");
     return {
+      success: true,
       message: "Successfully modes added",
     };
   } catch (error) {
-    console.log(error);
+    console.error("Failed to save modes:", error);
+    return { success: false, error: "Failed to save modes" };
   }
 };
+
 export default ModesUserAction;

@@ -12,22 +12,23 @@ interface IBankDetailsProps {
   bankIfscCode: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const BankDetailsUserAction = async ({
   bankAccountHolderName,
   bankAccountNumber,
   bankName,
   bankBranch,
   bankIfscCode,
-}: IBankDetailsProps) => {
+}: IBankDetailsProps): Promise<ActionResult> => {
   const session = await getServerSession();
-  if (!session?.user) {
+  if (!session?.user?.email) {
     return {
+      success: false,
       error: "Unauthorised user",
     };
-  }
-
-  if (!session.user.email) {
-    throw new Error("Unauthorised");
   }
 
   const formData = z.object({
@@ -41,7 +42,7 @@ const BankDetailsUserAction = async ({
       .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
   });
 
-  const isValidData = formData.parse({
+  const isValidData = formData.safeParse({
     bankAccountHolderName,
     bankAccountNumber,
     bankName,
@@ -49,7 +50,9 @@ const BankDetailsUserAction = async ({
     bankIfscCode,
   });
 
-  if (!isValidData) return { error: "Please enter the valid data" };
+  if (!isValidData.success) {
+    return { success: false, error: isValidData.error.errors[0]?.message || "Please enter the valid data" };
+  }
 
   try {
     const professionalUser = await db.professionalUser.findFirst({
@@ -62,7 +65,7 @@ const BankDetailsUserAction = async ({
     });
 
     if (!professionalUser) {
-      return { error: "Professional user not found" };
+      return { success: false, error: "Professional user not found" };
     }
 
     await db.professionalUser.update({
@@ -80,12 +83,14 @@ const BankDetailsUserAction = async ({
 
     revalidatePath("/auth/register/bank-details");
     return {
+      success: true,
       message: "Successfully added bank details",
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error saving bank details:", error);
     return {
-      error: "Error",
+      success: false,
+      error: "Failed to save bank details. Please try again.",
     };
   }
 };

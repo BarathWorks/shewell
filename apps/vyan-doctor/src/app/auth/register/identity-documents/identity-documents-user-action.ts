@@ -10,13 +10,17 @@ interface IIdentityDocumentsProps {
   licenseNumber?: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 export default async function IdentityDocumentsUserAction(
   data: IIdentityDocumentsProps,
-) {
+): Promise<ActionResult> {
   const session = await getServerSession();
 
   if (!session?.user?.email) {
-    throw new Error("Unauthorized - Please login");
+    return { success: false, error: "Unauthorized - Please login" };
   }
 
   const professionalUser = await db.professionalUser.findFirst({
@@ -25,7 +29,7 @@ export default async function IdentityDocumentsUserAction(
   });
 
   if (!professionalUser) {
-    throw new Error("Professional user not found");
+    return { success: false, error: "Professional user not found" };
   }
 
   const professionalUserId = professionalUser.id;
@@ -54,6 +58,6 @@ export default async function IdentityDocumentsUserAction(
     };
   } catch (error) {
     console.error("Error saving identity documents:", error);
-    throw new Error("Failed to save identity documents. Please try again.");
+    return { success: false, error: "Failed to save identity documents. Please try again." };
   }
 }

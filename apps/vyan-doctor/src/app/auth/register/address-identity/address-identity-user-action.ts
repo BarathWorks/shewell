@@ -14,11 +14,17 @@ interface AddressIdentityData {
   licenseNumber: string | null;
 }
 
-export default async function AddressIdentityUserAction(data: AddressIdentityData) {
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
+export default async function AddressIdentityUserAction(
+  data: AddressIdentityData
+): Promise<ActionResult> {
   const session = await getServerSession();
   
   if (!session?.user?.email) {
-    throw new Error("Unauthorized - Please login");
+    return { success: false, error: "Unauthorized - Please login" };
   }
 
   const professionalUser = await db.professionalUser.findFirst({
@@ -27,7 +33,7 @@ export default async function AddressIdentityUserAction(data: AddressIdentityDat
   });
 
   if (!professionalUser) {
-    throw new Error("Professional user not found");
+    return { success: false, error: "Professional user not found" };
   }
 
   const professionalUserId = professionalUser.id;
@@ -77,6 +83,6 @@ export default async function AddressIdentityUserAction(data: AddressIdentityDat
     };
   } catch (error) {
     console.error("Error saving address/identity:", error);
-    throw new Error("Failed to save details. Please try again.");
+    return { success: false, error: "Failed to save details. Please try again." };
   }
 }

@@ -11,15 +11,19 @@ interface IEducationProps {
   displayedQualificationId: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 async function EducationUserAction({
   degree,
   collegeName,
   completionDate,
   displayedQualificationId,
-}: IEducationProps) {
+}: IEducationProps): Promise<ActionResult> {
   const session = await getServerSession();
   if (!session?.user?.email) {
-    throw new Error("Unauthorised user");
+    return { success: false, error: "Unauthorised user" };
   }
 
   const professionalUser = await db.professionalUser.findUnique({
@@ -28,7 +32,7 @@ async function EducationUserAction({
   });
 
   if (!professionalUser) {
-    throw new Error("Professional User does not exist");
+    return { success: false, error: "Professional User does not exist" };
   }
 
   try {
@@ -52,11 +56,12 @@ async function EducationUserAction({
 
     revalidatePath("/auth/register/education");
     return {
+      success: true,
       message: "Successfully saved education details",
     };
   } catch (error) {
     console.error("Failed to save education:", error);
-    throw new Error("Failed to save education details");
+    return { success: false, error: "Failed to save education details" };
   }
 }
 

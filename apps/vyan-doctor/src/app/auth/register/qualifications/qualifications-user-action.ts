@@ -2,13 +2,13 @@
 
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { StringifyOptions } from "querystring";
 import { db } from "~/server/db";
 
 interface ILanguageProps {
   id: string;
   name: string;
 }
+
 interface IQualificationProps {
   degree: string;
   collegeName: string;
@@ -22,6 +22,11 @@ interface IQualificationProps {
   startingYear: string;
   endingYear: string;
 }
+
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 async function QualificationUserAction({
   degree,
   collegeName,
@@ -34,51 +39,47 @@ async function QualificationUserAction({
   displayedQualificationId,
   startingYear,
   endingYear,
-}: IQualificationProps) {
-  return db.$transaction(
-    async (tx) => {
-      const session = await getServerSession();
-      console.log("sessionq", session);
-      if (!session?.user) {
-        throw new Error("Unauthorised user");
-      }
+}: IQualificationProps): Promise<ActionResult> {
+  try {
+    const result = await db.$transaction(
+      async (tx) => {
+        const session = await getServerSession();
+        if (!session?.user?.email) {
+          throw new Error("Unauthorised user");
+        }
 
-      const professionalUser = await tx.professionalUser.findUnique({
-        where: {
-          email: session.user.email!,
-        },
-        select: {
-          id: true,
-        },
-      });
-      if (!professionalUser) {
-        return {
-          message: "Professional User do not exist",
-        };
-      }
+        const professionalUser = await tx.professionalUser.findUnique({
+          where: {
+            email: session.user.email,
+          },
+          select: {
+            id: true,
+          },
+        });
 
-      console.log(
-        "displayedQualificationIddisplayedQualificationId",
-        displayedQualificationId,
-      );
+        if (!professionalUser) {
+          throw new Error("Professional User does not exist");
+        }
 
-      try {
         await tx.professionalDegree.deleteMany({
           where: {
             professionalUserId: professionalUser.id,
           },
         });
-        await tx.professionalDegree.createMany({
+
+        await tx.professionalDegree.create({
           data: {
             degree: degree,
             collegeName: collegeName,
             completionDate: new Date(completionDate),
-            professionalUserId: professionalUser?.id!,
+            professionalUserId: professionalUser.id,
           },
         });
+
         await tx.professionalUser.update({
           data: {
             displayQualificationId: displayedQualificationId,
+            gender: gender,
           },
           where: {
             id: professionalUser.id,
@@ -87,9 +88,10 @@ async function QualificationUserAction({
 
         await tx.professionalExperience.deleteMany({
           where: {
-            professionalUserId: professionalUser.id!,
+            professionalUserId: professionalUser.id,
           },
         });
+
         await tx.professionalExperience.create({
           data: {
             startingYear: startingYear,
@@ -97,7 +99,7 @@ async function QualificationUserAction({
             department: department,
             location: location,
             position: position,
-            professionalUserId: professionalUser?.id,
+            professionalUserId: professionalUser.id,
           },
         });
 
@@ -116,6 +118,7 @@ async function QualificationUserAction({
             },
           },
         });
+
         await tx.professionalUser.update({
           where: {
             id: professionalUser.id,
@@ -126,27 +129,26 @@ async function QualificationUserAction({
             },
           },
         });
-        await tx.professionalUser.update({
-          data: {
-            gender: gender,
-          },
-          where: {
-            email: session.user.email!,
-          },
-        });
-        revalidatePath("/auth/register/qualifications");
+
         return {
+          success: true,
           message: "Successfully submitted the Qualifications",
         };
-      } catch (error) {
-        console.log("qualificationError", error);
-        console.error("Failed to Submit the qualifications");
-        throw new Error("Failed to Submit the qualifications");
+      },
+      {
+        timeout: 70000,
       }
-    },
-    {
-      timeout: 70000,
-    },
-  );
+    );
+    
+    revalidatePath("/auth/register/qualifications");
+    return result as ActionResult;
+  } catch (error: any) {
+    console.error("Qualification submission error:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to Submit the qualifications",
+    };
+  }
 }
+
 export default QualificationUserAction;

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "~/server/db";
+
 interface IUploadsProps {
   aboutYou: string;
   mediaId: string;
@@ -12,26 +13,26 @@ interface IUploadsProps {
   aadharCard?: string;
   panCard?: string;
 }
+
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const UploadsUserAction = async ({
   aboutYou,
   mediaId,
   documents,
   aadharCard,
   panCard,
-}: IUploadsProps) => {
+}: IUploadsProps): Promise<ActionResult> => {
   const session = await getServerSession();
-  if (!session?.user) {
-    return {
-      error: "Unauthorised user",
-    };
+  if (!session?.user?.email) {
+    return { success: false, error: "Unauthorised user" };
   }
 
-  if(!session.user.email){
-    throw new Error("Unauthorised")
-  }
   const formData = z.object({
-    aboutYou: z.string(),
-    mediaId: z.string(),
+    aboutYou: z.string().min(1, "About you is required"),
+    mediaId: z.string().min(1, "Profile photo is required"),
     documents: z.array(
       z.object({
         documentId: z.string().optional(),
@@ -41,32 +42,19 @@ const UploadsUserAction = async ({
     panCard: z.string().optional(),
   });
 
-  const isValidData = formData.parse({
-    aboutYou: aboutYou,
-    mediaId: mediaId,
-    documents: documents,
-    aadharCard: aadharCard,
-    panCard: panCard,
+  const parsed = formData.safeParse({
+    aboutYou,
+    mediaId,
+    documents,
+    aadharCard,
+    panCard,
   });
 
-  if (!isValidData) return { error: "Please enter the valid data" };
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0]?.message || "Invalid data" };
+  }
+
   try {
-    // await db.professionalUser.delete({
-    //   select : {
-    //     aboutYou :true
-    //   },
-    //     email : session.user.email!
-    //   where : {
-    //   }
-    // await db.professionalUser.create({
-      // })
-    //   data :{
-    //     aboutYou : aboutYou,
-    //     email : session.user.email
-    //   },
-
-    // })
-
     const professionalUser = await db.professionalUser.findFirst({
       where: {
         email: session.user.email,
@@ -75,40 +63,28 @@ const UploadsUserAction = async ({
         id: true,
       },
     });
+
     if (!professionalUser) {
-      return;
+      return { success: false, error: "Professional user not found" };
     }
-
-
 
     await db.professionalUser.update({
       data: {
-        aboutYou: aboutYou,
-       
+        aboutYou: parsed.data.aboutYou,
       },
       where: {
         email: session.user.email,
       },
     });
 
-    
-    // await db.media.create({
-    //   data: {
-    //     fileKey,
-    //     fileUrl,
-    //     mimeType,
-    //     comments,
-    //   },
-    // });
     revalidatePath("/auth/register/uploads");
     return {
+      success: true,
       message: "Successfully added uploads",
     };
   } catch (error) {
-    console.log(error);
-    return {
-      error: "Error",
-    };
+    console.error("Error saving uploads:", error);
+    return { success: false, error: "Failed to save uploads" };
   }
 };
 

@@ -161,38 +161,38 @@ const PersonalInfoForm = ({
 
   const onSubmit = async (data: z.infer<typeof personalInfoSchema>) => {
     setLoadingState(true);
-    PersonalInfoUserAction({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dob: data.dob,
-      phoneNumber: data.phoneNumber,
-      gender: data.gender,
-      languages: data.languages as any,
-      aboutYou: data.aboutYou,
-      mediaId: data.mediaId,
-    })
-      .then((resp: any) => {
-        setLoadingState(false);
-        if (resp.success) {
-          toast({
-            description: resp?.message,
-            variant: "default",
-          });
-          router.push(`/auth/register/address/?step=3`);
-        } else {
-          toast({
-            description: resp.error,
-            variant: "destructive",
-          });
-        }
-      })
-      .catch((err) => {
-        setLoadingState(false);
+    try {
+      const resp = await PersonalInfoUserAction({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dob: data.dob,
+        phoneNumber: data.phoneNumber,
+        gender: data.gender,
+        languages: data.languages as any,
+        aboutYou: data.aboutYou,
+        mediaId: data.mediaId,
+      });
+      setLoadingState(false);
+      if (resp.success) {
         toast({
-          description: "Something went wrong. Please try again.",
+          description: resp.message,
+          variant: "default",
+        });
+        router.push(`/auth/register/address/?step=3`);
+      } else {
+        toast({
+          description: resp.error,
           variant: "destructive",
         });
+      }
+    } catch (err: any) {
+      setLoadingState(false);
+      console.error("Personal info submission error:", err);
+      toast({
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
       });
+    }
   };
 
   const errorHandler = (e: any) => {

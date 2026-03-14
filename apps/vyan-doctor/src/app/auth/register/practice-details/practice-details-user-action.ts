@@ -13,6 +13,10 @@ interface IPracticeDetailsProps {
   listing: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 async function PracticeDetailsUserAction({
   department,
   position,
@@ -20,10 +24,10 @@ async function PracticeDetailsUserAction({
   experience,
   sessionMode,
   listing,
-}: IPracticeDetailsProps) {
+}: IPracticeDetailsProps): Promise<ActionResult> {
   const session = await getServerSession();
   if (!session?.user?.email) {
-    throw new Error("Unauthorised user");
+    return { success: false, error: "Unauthorised user" };
   }
 
   const professionalUser = await db.professionalUser.findUnique({
@@ -32,7 +36,7 @@ async function PracticeDetailsUserAction({
   });
 
   if (!professionalUser) {
-    throw new Error("Professional User does not exist");
+    return { success: false, error: "Professional User does not exist" };
   }
 
   try {
@@ -71,11 +75,12 @@ async function PracticeDetailsUserAction({
 
     revalidatePath("/auth/register/practice-details");
     return {
+      success: true,
       message: "Successfully saved practice details",
     };
   } catch (error) {
     console.error("Failed to save practice details:", error);
-    throw new Error("Failed to save practice details");
+    return { success: false, error: "Failed to save practice details" };
   }
 }
 

@@ -76,14 +76,23 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
     if (watchCountryId) {
       fetchStatesByCountry(watchCountryId).then((statesData) => {
         setStates(statesData);
+        if (statesData.length === 1 && statesData[0]) {
+          setValue("stateId", statesData[0].id);
+        }
       });
     }
-  }, [watchCountryId]);
+  }, [watchCountryId, setValue]);
 
   const onSubmit = async (data: z.infer<typeof addressSchema>) => {
     setLoadingState(true);
     try {
-      const resp = await AddressUserAction(data);
+      const resp = await AddressUserAction({
+        countryId: data.countryId,
+        stateId: data.stateId,
+        city: data.city,
+        completeAddress: data.completeAddress,
+        pincode: data.pincode,
+      });
       setLoadingState(false);
       toast({
         description: resp?.message,

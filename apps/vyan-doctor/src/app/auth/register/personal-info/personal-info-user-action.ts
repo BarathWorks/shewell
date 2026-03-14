@@ -20,6 +20,10 @@ interface IPersonalInfoProps {
   mediaId?: string;
 }
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
 const PersonalInfoUserAction = async ({
   firstName,
   lastName,
@@ -29,13 +33,10 @@ const PersonalInfoUserAction = async ({
   languages,
   aboutYou,
   mediaId,
-}: IPersonalInfoProps) => {
+}: IPersonalInfoProps): Promise<ActionResult> => {
   const session = await getServerSession();
-  if (!session?.user) {
-    throw new Error("Unauthorised user");
-  }
-  if (!session.user.email) {
-    throw new Error("Unauthorised user");
+  if (!session?.user?.email) {
+    return { success: false, error: "Unauthorised user" };
   }
 
   const professionalUser = await db.professionalUser.findUnique({
@@ -48,7 +49,7 @@ const PersonalInfoUserAction = async ({
   });
 
   if (!professionalUser) {
-    throw new Error("Professional User does not exist");
+    return { success: false, error: "Professional User does not exist" };
   }
 
   try {
@@ -97,11 +98,12 @@ const PersonalInfoUserAction = async ({
 
     revalidatePath("/auth/register/personal-info");
     return {
+      success: true,
       message: "Successfully saved personal information",
     };
   } catch (error) {
     console.error("Failed to save personal info", error);
-    throw new Error("Failed to save personal information");
+    return { success: false, error: "Failed to save personal information" };
   }
 };
 
