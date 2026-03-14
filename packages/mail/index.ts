@@ -1,9 +1,18 @@
-import * as SendGrid from "@sendgrid/mail";
-export const sendEmail = async (mail: SendGrid.MailDataRequired) => {
-  SendGrid.setApiKey(process.env.SENDGRID_API_KEY!);
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+export const sendEmail = async (mail: nodemailer.SendMailOptions) => {
   try {
-    return await SendGrid.send(mail).catch(err => console.log(JSON.stringify(err)));
+    const info = await transporter.sendMail(mail);
+    return info;
   } catch (error) {
-    console.log("error is",error);
+    console.error("error is", error);
   }
 };

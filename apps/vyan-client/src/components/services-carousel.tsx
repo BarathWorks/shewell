@@ -13,9 +13,9 @@ const COURSES_DATA = [
     mainImage: "/home/Women’s-health.webp",
     services: [
       { label: "Diet", position: "md:top-[25%] md:left-[20%] lg:top-[25%] lg:left-[20%]" },
-      { label: "PCOS", position: "top-[25%] right-[20%]" },
-      { label: "Emotional wellbeing", position: "bottom-[10%] left-[15%]" },
-      { label: "Wellness", position: "bottom-[10%] right-[15%]" },
+      { label: "PCOS", position: "md:top-[25%] md:right-[20%] lg:top-[25%] lg:right-[20%]" },
+      { label: "Emotional wellbeing", position: "md:bottom-[10%] md:left-[15%] lg:bottom-[10%] lg:left-[15%]" },
+      { label: "Wellness", position: "md:bottom-[10%] md:right-[15%] lg:bottom-[10%] lg:right-[15%]" },
     ],
   },
   {
@@ -23,9 +23,9 @@ const COURSES_DATA = [
     category: "Pregency Planning",
     mainImage: "/home/Pregnancy-Planning.webp",
     services: [
-      { label: "Fertility diet", position: "top-[25%] left-[20%]" },
-      { label: "Fertility couple mindset", position: "top-[25%] right-[20%]" },
-      { label: "Fertility fitness", position: "bottom-[10%] left-[20%]" },
+      { label: "Fertility diet", position: "md:top-[25%] md:left-[20%] lg:top-[25%] lg:left-[20%]" },
+      { label: "Fertility couple mindset", position: "md:top-[25%] md:right-[20%] lg:top-[25%] lg:right-[20%]" },
+      { label: "Fertility fitness", position: "md:bottom-[10%] md:left-[20%] lg:bottom-[10%] lg:left-[20%]" },
     ],
   },
   {
@@ -33,11 +33,11 @@ const COURSES_DATA = [
     category: "Prenatal Care",
     mainImage: "/home/Prenatal Care.webp",
     services: [
-      { label: "Pregnancy Nutrition", position: "top-[32%] left-[15%]" },
-      { label: "Garbh Sanskar", position: "top-[15%] right-[20%]" },
-      { label: "Childbirth education", position: "bottom-[13%] left-[17%]" },
-      { label: "Emotional wellbeing", position: "bottom-[05%] right-[15%]" },
-      { label: "Pregnancy Selfcare", position: "bottom-[38%] right-[12%]" },
+      { label: "Pregnancy Nutrition", position: "md:top-[32%] md:left-[15%] lg:top-[32%] lg:left-[15%]" },
+      { label: "Garbh Sanskar", position: "md:top-[15%] md:right-[20%] lg:top-[15%] lg:right-[20%]" },
+      { label: "Childbirth education", position: "md:bottom-[13%] md:left-[17%] lg:bottom-[13%] lg:left-[17%]" },
+      { label: "Emotional wellbeing", position: "md:bottom-[05%] md:right-[15%] lg:bottom-[05%] lg:right-[15%]" },
+      { label: "Pregnancy Selfcare", position: "md:bottom-[38%] md:right-[12%] lg:bottom-[38%] lg:right-[12%]" },
     ],
   },
   {
@@ -45,10 +45,10 @@ const COURSES_DATA = [
     category: "Postnatal Care",
     mainImage: "/home/service-postnatal.webp",
     services: [
-      { label: "Lactational counselling", position: "top-[25%] left-[20%]" },
-      { label: "Postnatal Diet", position: "top-[25%] right-[20%]" },
-      { label: "Postpartum depression", position: "bottom-[10%] left-[20%]" },
-      { label: "Moms fitness", position: "bottom-[20%] right-[20%]" },
+      { label: "Lactational counselling", position: "md:top-[25%] md:left-[20%] lg:top-[25%] lg:left-[20%]" },
+      { label: "Postnatal Diet", position: "md:top-[25%] md:right-[20%] lg:top-[25%] lg:right-[20%]" },
+      { label: "Postpartum depression", position: "md:bottom-[10%] md:left-[20%] lg:bottom-[10%] lg:left-[20%]" },
+      { label: "Moms fitness", position: "md:bottom-[20%] md:right-[20%] lg:bottom-[20%] lg:right-[20%]" },
     ],
   },
 
@@ -57,14 +57,14 @@ const COURSES_DATA = [
     category: "Child Healthcare",
     mainImage: "/home/service-child.webp",
     services: [
-      { label: "Child psychology", position: "top-[25%] left-[15%]" },
-      { label: "Child nutrition", position: "top-[25%] right-[15%]" },
+      { label: "Child psychology", position: "md:top-[25%] md:left-[15%] lg:top-[25%] lg:left-[15%]" },
+      { label: "Child nutrition", position: "md:top-[25%] md:right-[15%] lg:top-[25%] lg:right-[15%]" },
       {
         label: "Speech language therapy",
-        position: "top-[60%] left-[40%]",
+        position: "md:top-[60%] md:left-[40%] lg:top-[60%] lg:left-[40%]",
       },
-      { label: "Occupational therapy", position: "bottom-[10%] right-[10%]" },
-      { label: "Special Education", position: "bottom-[10%] left-[10%]" },
+      { label: "Occupational therapy", position: "md:bottom-[10%] md:right-[10%] lg:bottom-[5%] lg:right-[10%]" },
+      { label: "Special Education", position: "md:bottom-[10%] md:left-[10%] lg:bottom-[10%] lg:left-[10%]" },
     ],
   },
 ];

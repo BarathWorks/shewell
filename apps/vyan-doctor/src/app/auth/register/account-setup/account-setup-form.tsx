@@ -25,13 +25,14 @@ const zodValidation = z.object({
   password: z
     .string({ required_error: "Please enter the password" })
     .min(8, { message: "Password must have 8 characters" })
+    .max(30, { message: "Password can have maximum 30 characters" })
     .regex(
       new RegExp(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$/i,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/i,
       ),
       {
         message:
-          "Minimum eight and maximum 10 characters, at least one uppercase letter, one lowercase letter, one number and one special character is required",
+          "Minimum eight and maximum 30 characters, at least one uppercase letter, one lowercase letter, one number and one special character is required",
       },
     ),
 });
