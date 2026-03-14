@@ -76,6 +76,13 @@ export const searchMeetingRouter = createTRPCRouter({
       if(!session.user.email){
         throw new Error("Unauthorised")
       }
+      // converting the input date to start and end of the day
+      // (using this we will get the meetings of a particular day regardless of the time)
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
       const meetings = await db.bookAppointment.findMany({
         select: {
           id: true,

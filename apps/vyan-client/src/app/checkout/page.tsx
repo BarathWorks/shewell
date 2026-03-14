@@ -24,6 +24,24 @@ const CheckOut = async () => {
         email: true,
         phoneNumber: true,
         name: true,
+        addresses: {
+          select: {
+            id: true,
+            name: true,
+            city: true,
+            houseNo: true,
+            area: true,
+            mobile: true,
+            landmark: true,
+            pincode: true,
+            addressType: true,
+            countryId: true,
+            stateId: true,
+          },
+          where: {
+            deletedAt: null,
+          },
+        },
       },
       where: {
         email: session?.user.email!,
@@ -37,26 +55,7 @@ const CheckOut = async () => {
     }),
   ]);
 
-  
-  const addedAddresses = await db.address.findMany({
-    select: {
-      id: true,
-      name: true,
-      city: true,
-      houseNo: true,
-      area: true,
-      mobile: true,
-      landmark: true,
-      pincode: true,
-      addressType: true,
-      countryId: true,
-      stateId: true,
-    },
-    where: {
-      userId: userDetails?.id,
-      deletedAt: null,
-    },
-  });
+  const addedAddresses = userDetails?.addresses || [];
   return (
     <>
       <div className="w-full font-inter">
