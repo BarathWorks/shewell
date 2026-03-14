@@ -42,6 +42,8 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
+import { SlowSiteAlert } from "~/components/slow-site-alert";
+
 export default async function RootLayout({
   children,
 }: {
@@ -59,6 +61,7 @@ export default async function RootLayout({
       lang="en"
     >
       <body className={"relative font-sans"}>
+        <SlowSiteAlert />
         <div className="sticky top-0 z-40">
           <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
             <TRPCReactProvider>
