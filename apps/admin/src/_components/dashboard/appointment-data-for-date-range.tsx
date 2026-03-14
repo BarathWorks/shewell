@@ -18,7 +18,7 @@ const DoctorsOnBoardForDateRange = () => {
     endDate: new Date(endDate)
   });
 
-  const doctorOnBoardItems = { title: `New Doctors Onboard  (${startDate} to ${endDate})`, value: `${(data?.totalDoctorsOnBoard.length || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
+  const doctorOnBoardItems = { title: `New Doctors Onboard  (${startDate} to ${endDate})`, value: `${(data?.totalDoctorsOnBoard || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
   const cancelledAppointmentItems = { title: `Cancelled Appointments`, value: `${(data?.cancelledAppointments?._count?.id || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
 
   

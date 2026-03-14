@@ -25,7 +25,7 @@ const TotalDoctorsOnBoard = () => {
         value: `${(data?.totalAppointmentsWithCountAndPrice._count.id || 0).toString()}`,
         borderColor: 'text-purple-500'
       };
-      const doctorOnBoardItems = { title: `Total Doctors Onboard`, value: `${(data?.totalDoctorsOnBoard.length || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
+      const doctorOnBoardItems = { title: `Total Doctors Onboard`, value: `${(data?.totalDoctorsOnBoard || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
     return(
         <>
         <div className="col-12 lg:col-6 xl:col-6">
