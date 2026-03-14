@@ -339,53 +339,41 @@ const OnlineAppointment = ({
       return;
     }
 
-    await makePayment(transformedData)
-      .then((resp) => {
+    try {
+      const resp = await makePayment(transformedData);
+      
+      if (resp.success) {
         toast({
-          title: resp?.message,
+          title: "Appointment Booked",
+          description: resp.message,
         });
-        console.log(
-          "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀resp",
-          resp,
-        );
-        setAppointmentState((prevState) => ({
-          ...prevState,
-          selectedServiceMode: {
-            description:
-              "Online (Virtual appointment) with doctor through Google Meet or Zoom.",
-            planName: "Basic Plan",
-            price: 500,
-            type: AppointmentType.ONLINE,
-          },
-        }));
+        
+        // Reset states only on success
         setClose(false);
-
-        setAppointmentState((prevState) => ({
-          ...prevState,
-          selectedExpert: {
-            id: "",
-            firstName: "",
-          },
-        }));
-        setAppointmentState((prevState) => ({
-          ...prevState,
-          selectedDateTime: {
-            date: new Date(),
-            // timeSlots: [{ startTime: new Date(), endTime: new Date() }],
-            timeSlots: { startTime: new Date(), endTime: new Date() },
-          },
-        }));
         setStep(1);
-
         onOpenChange(false);
-      })
-      .catch((err) => {
-        toast({
-          variant: "destructive",
-          title: err.message || "Something went wrong",
+        
+        // Clear appointment state for next time
+        setAppointmentState({
+          selectedExpert: null,
+          selectedServiceMode: null,
+          selectedPatient: null,
+          selectedDefaultDuration: null,
+          selectedDuration: null,
+          selectedSpecialisation: null,
+          selectedCouple: null,
+          selectedDateTime: null,
+          selectedPrice: null,
         });
-        console.log("wrong", err);
+      }
+    } catch (err: any) {
+      console.error("Payment flow error:", err);
+      toast({
+        variant: "destructive",
+        title: "Booking Failed",
+        description: err.message || "Something went wrong during the booking process.",
       });
+    }
     // console.log("payment");
   };
 

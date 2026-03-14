@@ -20,7 +20,7 @@ import { useToast } from "@repo/ui/src/@/components/use-toast";
 import { useSession } from "next-auth/react";
 import Multiselect from "multiselect-react-dropdown";
 import LoadingSpinner from "~/app/components/loading-spinner";
-import PersonalInfoUserAction from "./personal-info-user-action";
+import PersonalInfoUserAction, { type ActionResult } from "./personal-info-user-action";
 import { CustomisedCalendar } from "@repo/ui/src/@/components/customised-calendar";
 import {
   Popover,

@@ -1,7 +1,6 @@
 import { AppointmentType } from "@repo/database";
 import CheckoutAction from "~/app/actions/checkout-action";
 import VerifyPayment from "~/app/actions/verify-payment";
-import { useToast } from "@repo/ui/src/@/components/use-toast";
 
 // function to dynamically load the Razorpay SDK script
 export const initializeRazorpay = () => {
@@ -22,6 +21,7 @@ export const initializeRazorpay = () => {
     document.body.appendChild(script);
   });
 };
+
 interface IBookAppointmentDetailsProps {
   serviceMode: {
     taxedAmount: number;
@@ -57,86 +57,71 @@ export const makePayment = async ({
   patient,
   startingTime,
   endingTime,
-}: IBookAppointmentDetailsProps) => {
+}: IBookAppointmentDetailsProps): Promise<{ success: boolean; message: string }> => {
   const res = await initializeRazorpay();
-  // const { toast } = useToast();
   if (!res) {
-    alert("Razorpay SDK failed to load");
-    return;
+    throw new Error("Razorpay SDK failed to load");
   }
 
-  console.log(
-    "checkout&RazorpayData",
+  const data: any = await CheckoutAction({
     serviceMode,
     professionalUser,
     patient,
     startingTime,
     endingTime,
-  );
+  });
 
-  console.log("startingTime", startingTime);
-  // Make API call to initiate the checkout process on the server with the provided bookAppointmentId
-  try {
-    await CheckoutAction({
-      serviceMode,
-      professionalUser,
-      patient,
-      startingTime,
-      endingTime,
-    }).then((data: any) => {
-      if (data?.error) {
-        throw new Error(data.error);
-      }
-      var options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        name: data?.name,
-        currency: data?.currency,
-        amount: data?.amount,
-        order_id: data?.orderId,
-        description: data?.description,
-        image: data?.image,
-        //   callback function to handle payment response
-        handler: function (response: any) {
-          console.log("paymentResponse", response);
-          VerifyPayment(
+  if (data?.error) {
+    throw new Error(data.error);
+  }
+
+  return new Promise((resolve, reject) => {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      name: data?.name,
+      currency: data?.currency,
+      amount: data?.amount,
+      order_id: data?.orderId,
+      description: data?.description,
+      image: data?.image,
+      handler: async function (response: any) {
+        console.log("paymentResponse", response);
+        try {
+          const resp = await VerifyPayment(
             {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             },
-            data?.orderId!,
-          )
-            .then((resp: { message: string }) => {
-              // toast({
-              //   title: resp?.message,
-              //   variant: "success",
-              // });
-              console.log("verifyPayment", resp.message);
-            })
-            .catch((err: Error) => {
-              // toast({
-              //   variant: "destructive",
-              //   title: err.message,
-              // });
-              console.log("verifyPayment", err.message);
-            });
+            data?.orderId!
+          );
+          
+          if (resp.message === "Payment is verified") {
+            resolve({ success: true, message: "Appointment has been booked successfully" });
+          } else {
+            reject(new Error(resp.message || "Payment verification failed"));
+          }
+        } catch (err: any) {
+          console.error("verifyPayment Error", err.message);
+          reject(new Error(err.message || "Failed to verify payment"));
+        }
+      },
+      modal: {
+        ondismiss: function () {
+          console.log("Checkout modal closed by user");
+          reject(new Error("Payment cancelled. Your appointment is not booked."));
         },
-        //   prefill user information
-        prefill: {
-          name: data?.user?.name,
-          email: data?.user?.email,
-        },
-      };
-
-      // @ts-ignore
-      //  Creating a new Razorpay object with the configure options and call its "open" method to display the payment modal to the user
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
-    });
-    return {
-      message: "Appointment has booked",
+      },
+      prefill: {
+        name: data?.user?.name,
+        email: data?.user?.email,
+      },
+      theme: {
+        color: "#3399cc",
+      },
     };
-  } catch (error) {
-    console.log("razorpayError", error);
-    throw error;
-  }
+
+    // @ts-ignore
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  });
 };

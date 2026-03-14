@@ -148,30 +148,8 @@ async function CheckoutAction({
         });
 
         //  applying try-catch block so that even if the create event cannot be created for any reason , our appointment must be booked inspite when event cannot be created
-        try {
-          const response = await createEvent({
-            professionalUserId: bookAppointment.professionalUserId,
-            appointmentId: bookAppointment.id,
-            startTime: startingTime,
-            endTime: endingTime,
-            patientName: patient.firstName,
-            patientEmail: patient.email,
-            planName: serviceMode.planName,
-            description: serviceMode.description,
-          });
-
-          await tx.bookAppointment.update({
-            data: {
-              meeting: response,
-            },
-            where: {
-              userId: user.id,
-              id: bookAppointment.id,
-            },
-          });
-        } catch (error) {
-          console.log("error while creating event", error);
-        }
+        // Note: Meeting creation removed from checkout to prevent "zombie" meetings for unpaid attempts.
+        // It is now handled in verify-payment.ts upon successful payment captured.
 
         await tx.bookAppointment.update({
           data: {
