@@ -278,13 +278,13 @@ const DayNavigatorWithTimeSlots = ({
   // useEffect(() => {setSelectedTimeSlot(selectedTimeSlot)},[selectedTimeSlot])
   return (
     <>
-      <div className="mb-6 flex items-center gap-2">
+      <div className="mb-2 flex items-center gap-2">
         <Clock className="h-5 w-5 text-[#00898F]" />
         <span className="text-lg font-semibold text-[#333333]">
           Available Time Slots
         </span>
       </div>
-      <div className="mb-6 mt-4 h-px w-full bg-gray-100"></div>
+      <div className="mb-4 mt-2 h-px w-full bg-gray-300"></div>
       <div className="flex flex-wrap justify-between gap-y-5">
         <div className="flex items-center gap-2 rounded-2xl bg-[#F8F8F8] p-1.5">
           <button
