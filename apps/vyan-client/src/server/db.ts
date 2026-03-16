@@ -31,3 +31,6 @@ export const db =
 // }
 
 if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// Ensure Prisma singleton is also used in production to reuse connections during warm starts:
+globalForPrisma.prisma = db;
+

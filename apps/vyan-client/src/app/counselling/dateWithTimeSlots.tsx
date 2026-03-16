@@ -118,11 +118,19 @@ const DayNavigatorWithTimeSlots = ({
     api.appointmentTimeDuration.appointmentTimeDuration.useQuery({
       professionalUserId: professionalUserId,
     });
-  const { data: pricesInCents } = api.findPrice.findPrice.useQuery({
-    duration: timeDuration! || timeDurationData?.minTimeDuration?.time!,
-    expertId: professionalUserId,
-    // couple :isCouple
-  });
+  const { data: pricesInCents } = api.findPrice.findPrice.useQuery(
+    {
+      duration: timeDuration! || timeDurationData?.minTimeDuration?.time!,
+      expertId: professionalUserId,
+      // couple :isCouple
+    },
+    {
+      enabled:
+        !!professionalUserId &&
+        !!(timeDuration || timeDurationData?.minTimeDuration?.time),
+    },
+  );
+
 
   useEffect(() => {
     refetch();
