@@ -9,7 +9,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
     <>
       {/* Mobile — horizontal compact pill stepper */}
       <div className="block font-poppins lg:hidden">
-        <div className="flex items-center justify-center gap-2 px-4 py-5">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-4 py-4 sm:gap-x-8">
           {steps.map((item, index) => {
             const isCompleted = currentStep > index + 1;
             const isActive = currentStep === index + 1;
@@ -42,7 +42,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                 {/* Connector line between steps */}
                 {index < steps.length - 1 && !isActive && (
                   <div
-                    className={`h-[2px] w-8 rounded-full ${isCompleted ? "bg-[#00898F]" : "bg-gray-200"}`}
+                    className={`h-[2px] w-6 shrink-0 rounded-full sm:w-8 ${isCompleted ? "bg-[#00898F]" : "bg-gray-200"}`}
                   />
                 )}
               </div>

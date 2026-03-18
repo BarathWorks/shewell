@@ -419,55 +419,45 @@ const OnlineAppointment = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className=" h-[90vh] w-full overflow-y-auto p-0 xs:max-w-[300px] sm:max-w-[393px] lg:max-w-[904px] xl:max-w-[1100px] 2xl:max-w-[1280px]">
+        <DialogContent className="flex h-[95vh] w-full flex-col overflow-hidden p-0 xs:max-w-[calc(100vw-32px)] sm:max-w-[440px] md:max-w-[680px] lg:h-[90vh] lg:max-w-[904px] xl:max-w-[1100px] 2xl:max-w-[1280px]">
           {/* heading */}
-          <div className=" border-b border-border-color">
-            <div className="flex justify-between px-3  pb-2 pt-[30px] lg:px-[30px]">
-              <div className="flex items-center gap-4">
+          <div className="shrink-0 border-b border-border-color bg-white">
+            <div className="flex justify-between px-4 pb-4 pt-6 lg:px-[30px] lg:pt-[30px]">
+              <div className="flex items-center gap-3 lg:gap-4">
                 {step > 1 && (
-                  <div className="hidden bg-[#F5F5F5] p-[10px] font-inter text-sm font-medium lg:block">
-                    <div className="flex items-center gap-[3px]">
-                      <div>
-                        <svg
-                          width="8"
-                          height="14"
-                          viewBox="0 0 8 14"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M7 13L1 7L7 1"
-                            stroke="#121212"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      </div>
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => setStep(step - 1)}
-                      >
-                        Back
-                      </div>
-                    </div>
+                  <div className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#F5F5F5] px-3 py-1.5 font-inter text-sm font-medium transition-colors hover:bg-gray-200" onClick={() => setStep(step - 1)}>
+                    <svg
+                      width="6"
+                      height="10"
+                      viewBox="0 0 8 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M7 13L1 7L7 1"
+                        stroke="#121212"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <span>Back</span>
                   </div>
                 )}
-
-                <div className="font-inter text-[20px] font-semibold leading-[30px]">
+                <div className="font-inter text-lg font-bold leading-tight text-[#1a1a1a] sm:text-xl lg:font-semibold lg:leading-[30px]">
                   Register for appointment
                 </div>
               </div>
             </div>
           </div>
           {/* main-content */}
-          <div className="flex flex-col pb-[100px] lg:flex-row  lg:gap-[76px] lg:px-[60px] xl:gap-[100px] 2xl:gap-[144px]">
+          <div className="flex flex-1 flex-col overflow-y-auto pb-10 lg:flex-row lg:gap-[60px] lg:px-[60px] lg:pt-8 xl:gap-[100px] 2xl:gap-[144px]">
             {/* left-options */}
-            <div className="lg:basis-[231px]">
+            <div className="shrink-0 lg:basis-[231px]">
               <Stepper currentStep={step - 1} steps={steps} setStep={setStep} />
             </div>
             {/* right-options */}
-            <div className="w-full lg:basis-[477px] xl:basis-[657px]">
+            <div className="w-full px-4 lg:basis-[477px] lg:px-0 xl:basis-[657px]">
               {/* <Button onClick={handleSubmit}>Submit</Button> */}
               {/* {step === 1 && <AlreadyCustomer />} */}
               {/* passing callback function to child */}

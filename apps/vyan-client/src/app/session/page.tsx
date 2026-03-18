@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { SessionStatus } from "@repo/database";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type SessionPageProps = {
   searchParams: {
@@ -28,7 +29,9 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
   const categoryId = searchParams.categoryId
     ? Array.isArray(searchParams.categoryId)
       ? searchParams.categoryId
-      : [searchParams.categoryId]
+      : searchParams.categoryId.includes(",")
+        ? searchParams.categoryId.split(",")
+        : [searchParams.categoryId]
     : undefined;
 
   const minPrice = searchParams.minPrice
@@ -82,13 +85,13 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
   return (
     <main className="flex w-full flex-col items-center bg-white">
       {/* Hero Section */}
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 text-center sm:px-6 sm:py-12 md:py-16">
-        <h1 className="font-inter text-2xl font-medium leading-tight text-[#333333] sm:text-3xl md:text-4xl lg:text-[48px] lg:leading-[48px]">
-          Courses That Support You Every Step of the Way
+      <div className="mx-auto w-full max-w-7xl px-4 py-12 text-center sm:px-6 sm:py-16 md:py-20">
+        <h1 className="font-outfit text-3xl font-bold tracking-tight text-[#1a1a1a] sm:text-4xl md:text-5xl lg:text-6xl">
+          Courses That <span className="text-[#1B8A8E]">Support You</span> <br className="hidden sm:block" /> Every Step of the Way
         </h1>
-        <p className="mt-2 font-inter text-sm text-gray-500 sm:mt-3 sm:text-base">
-          From fertility to first steps. evidence based, heart led,
-          expert-designed just for you.
+        <p className="mx-auto mt-4 max-w-2xl font-inter text-base text-gray-500 sm:mt-6 sm:text-lg">
+          From fertility to first steps. Evidence-based, heart-lead,
+          and expert-designed just for you.
         </p>
       </div>
 
@@ -98,14 +101,23 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
       {/* Sessions List */}
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
         {sessions.length === 0 ? (
-          <div className="py-12 text-center">
-            <p className="mb-2 text-xl text-gray-600">
-              No sessions available at the moment.
+          <div className="flex flex-col items-center justify-center py-16 text-center sm:py-24">
+            <div className="relative mb-8 h-48 w-48 sm:h-64 sm:w-64">
+              <img 
+                src="/no_sessions_illustration_clean.svg" 
+                alt="No sessions found" 
+                className="h-full w-full object-contain opacity-90"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent"></div>
+            </div>
+            <h3 className="mb-3 text-2xl font-bold text-[#1a1a1a] sm:text-3xl">
+              No sessions found
+            </h3>
+            <p className="mx-auto max-w-md text-base text-gray-500 sm:text-lg">
+              We couldn't find any sessions matching your current filters. 
+              Try adjusting your search or checking back later.
             </p>
-            <p className="text-sm text-gray-400">
-              Please check back later or contact support if you believe this is
-              an error.
-            </p>
+            
           </div>
         ) : (
           cassifiedSessions.map((group) => (

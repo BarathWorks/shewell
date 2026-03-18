@@ -192,7 +192,7 @@ const CounsellingAppointment = ({
             {timeSlot ? (
               <div onClick={() => handleOpenDialogOnlineAppointment()}>
                 {" "}
-                <Button className="group flex h-[20px] w-[10px] items-center gap-3 rounded-2xl bg-[#00898F] px-0 py-0 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#007a80] hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
+                <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-[#00898F] px-6 py-4 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#007a80] hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
                   <svg
                     className="transition-transform duration-300 group-hover:scale-110"
                     width="19"
