@@ -86,7 +86,7 @@ const ServicesCarousel = () => {
   };
 
   return (
-    <section className="relative flex min-h-fit w-full flex-col justify-center bg-white px-4 py-4 sm:min-h-screen sm:px-6 sm:py-6 md:px-12 lg:px-[100px]">
+    <section className="relative flex min-h-fit w-full flex-col justify-center bg-white px-3 xs:px-4 sm:px-6 md:px-12 lg:px-[100px] py-4 xs:py-5 sm:py-6 md:py-0 sm:min-h-screen md:py-6">
       {/* <div className="z-10 max-w-full px-0 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
@@ -116,7 +116,7 @@ const ServicesCarousel = () => {
         {/* Carousel Container */}
         <div className="relative flex flex-col items-center">
           {/* Main Image Area with Title Integrated */}
-          <div className="relative mb-2 flex w-full items-center justify-center sm:mb-8 md:mb-10">
+          <div className="relative mb-2 xs:mb-4 sm:mb-8 md:mb-10 flex w-full items-center justify-center">
             {/* Main Image */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -125,7 +125,7 @@ const ServicesCarousel = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative h-[250px] w-full max-w-5xl sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[650px]"
+                className="relative h-[200px] xs:h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-full max-w-5xl"
               >
                 <Image
                   src={current?.mainImage + ""}

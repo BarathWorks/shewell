@@ -99,10 +99,10 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
       <FilterBar categories={categories} />
 
       {/* Sessions List */}
-      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto w-full max-w-7xl px-3 xs:px-4 sm:px-6 py-4 xs:py-6 sm:py-10">
         {sessions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center sm:py-24">
-            <div className="relative mb-8 h-48 w-48 sm:h-64 sm:w-64">
+          <div className="flex flex-col items-center justify-center py-12 xs:py-16 sm:py-24 text-center">
+            <div className="relative mb-6 xs:mb-8 h-32 xs:h-40 sm:h-48 md:h-64 w-32 xs:w-40 sm:w-48 md:w-64">
               <img 
                 src="/no_sessions_illustration_clean.svg" 
                 alt="No sessions found" 
@@ -110,10 +110,10 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent"></div>
             </div>
-            <h3 className="mb-3 text-2xl font-bold text-[#1a1a1a] sm:text-3xl">
+            <h3 className="mb-2 xs:mb-3 text-xl xs:text-2xl sm:text-3xl font-bold text-[#1a1a1a]">
               No sessions found
             </h3>
-            <p className="mx-auto max-w-md text-base text-gray-500 sm:text-lg">
+            <p className="mx-auto max-w-md px-2 text-sm xs:text-base sm:text-lg text-gray-500">
               We couldn't find any sessions matching your current filters. 
               Try adjusting your search or checking back later.
             </p>
@@ -121,13 +121,13 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
           </div>
         ) : (
           cassifiedSessions.map((group) => (
-            <div key={group.month} className="mb-6 sm:mb-8">
-              <h2 className="mb-3 font-inter text-xl font-medium text-[#333333] sm:mb-4 sm:text-2xl">
+            <div key={group.month} className="mb-4 xs:mb-5 sm:mb-6 md:mb-8">
+              <h2 className="mb-2 xs:mb-3 sm:mb-4 font-inter text-lg xs:text-xl sm:text-2xl font-medium text-[#333333]">
                 {group.month}
               </h2>
               
               {/* Mobile & Tablet View: Vertical Stack Layout (Homepage Style Cards) */}
-              <div className="flex flex-col gap-4 md:hidden">
+              <div className="flex flex-col gap-3 xs:gap-3.5 sm:gap-4 md:hidden">
                 {group.sessions.map((session: any) => {
                   const startDate = new Date(session.startAt);
                   const month = startDate.toLocaleString("default", { month: "short" });
@@ -139,7 +139,7 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
                       className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
                     >
                       {/* Header Image Area */}
-                      <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                      <div className="relative h-40 xs:h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
                         {session?.thumbnailMedia?.fileUrl ? (
                           <img
                             src={session.thumbnailMedia.fileUrl}
@@ -148,17 +148,17 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                            <Calendar className="h-12 w-12 opacity-50" />
+                            <Calendar className="h-10 xs:h-11 sm:h-12 w-10 xs:w-11 sm:w-12 opacity-50" />
                           </div>
                         )}
 
                         {/* Date Ribbon */}
-                        <div className="absolute right-4 top-0 flex h-[70px] w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-2 text-white shadow-md">
+                        <div className="absolute right-3 xs:right-4 top-0 flex h-[60px] xs:h-[65px] sm:h-[70px] w-[45px] xs:w-[48px] sm:w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-1.5 xs:pt-2 text-white shadow-md">
                           <div className="flex flex-col items-center">
-                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">
+                            <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90">
                               {month}
                             </span>
-                            <span className="text-xl font-bold leading-none">
+                            <span className="text-base xs:text-lg sm:text-xl font-bold leading-none">
                               {day}
                             </span>
                           </div>
@@ -178,33 +178,33 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
                       </div>
 
                       {/* Content Area */}
-                      <div className="flex flex-1 flex-col p-5">
+                      <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5">
                         {/* Tags */}
-                        <div className="mb-3 flex flex-wrap items-center gap-2">
-                          <span className="rounded bg-[#E3F6F5] px-2.5 py-1 text-xs font-semibold text-[#1B8A8E]">
+                        <div className="mb-2 xs:mb-3 flex flex-wrap items-center gap-1.5 xs:gap-2">
+                          <span className="rounded bg-[#E3F6F5] px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-[#1B8A8E]">
                             {session.language || "English"}
                           </span>
                           {session.type === "ONLINE" && (
-                            <span className="flex items-center gap-1.5 rounded bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
-                              <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                            <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-green-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-green-600">
+                              <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-green-500"></span>
                               Online
                             </span>
                           )}
                           {session.type === "RECORDING" && (
-                            <span className="flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
-                              <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                            <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-blue-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-blue-600">
+                              <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-blue-500"></span>
                               Recording
                             </span>
                           )}
                         </div>
 
                         {/* Title */}
-                        <h3 className="mb-2 line-clamp-2 text-xl font-extrabold leading-tight text-gray-900">
+                        <h3 className="mb-1.5 xs:mb-2 line-clamp-2 text-base xs:text-lg sm:text-xl font-extrabold leading-tight text-gray-900">
                           {session.title}
                         </h3>
 
                         {/* Description placeholder */}
-                        <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-500">
+                        <p className="mb-3 xs:mb-4 line-clamp-3 text-xs xs:text-sm leading-relaxed text-gray-500">
                           A comprehensive session focusing on health and wellness. Join
                           us to learn from the best experts in the field.
                         </p>
@@ -213,13 +213,13 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
                         <div className="flex-1"></div>
 
                         {/* Footer: Price & Action */}
-                        <div className="mt-4 flex items-center justify-between gap-3">
-                          <div className="flex h-[42px] min-w-[90px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-base font-bold text-[#1B8A8E]">
+                        <div className="mt-3 xs:mt-4 flex items-center justify-between gap-2 xs:gap-3">
+                          <div className="flex h-[36px] xs:h-[40px] sm:h-[42px] min-w-[80px] xs:min-w-[85px] sm:min-w-[90px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-xs xs:text-sm sm:text-base font-bold text-[#1B8A8E]">
                             ₹ {Number(session.price).toLocaleString()}
                           </div>
 
                           <Link href={`/session/${session.slug}`} className="flex-1">
-                            <button className="flex h-[42px] w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-4 text-sm font-bold text-white transition-colors hover:bg-[#156f73]">
+                            <button className="flex h-[36px] xs:h-[40px] sm:h-[42px] w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-3 xs:px-4 text-xs xs:text-sm sm:text-sm font-bold text-white transition-colors hover:bg-[#156f73] active:scale-[0.98]">
                               Register
                             </button>
                           </Link>

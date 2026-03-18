@@ -69,7 +69,7 @@ const CounsellingAppointment = ({
   return (
     <>
       <div className="w-full">
-        <div className="flex  gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
+        <div className="flex gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
           {/* price */}
           <div className="flex items-center gap-2 self-center rounded-lg bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-2 sm:rounded-xl sm:px-4 sm:py-2.5 md:rounded-2xl md:px-5 md:py-3">
             <span className="font-poppins text-xs font-medium text-[#666666]  sm:hidden xs:hidden md:block">

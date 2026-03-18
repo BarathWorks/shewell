@@ -35,7 +35,7 @@ export default function UpcomingSessions() {
 
   if (!sessions || sessions.length === 0) {
     return (
-      <section className="flex h-[80vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
+      <section className="flex min-h-[80vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
         <div className="mb-8 text-center">
           <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
             Upcoming Wellness Sessions
@@ -47,7 +47,7 @@ export default function UpcomingSessions() {
 
         {/* Empty state */}
         <div className="flex flex-1 items-center justify-center">
-          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-12 shadow-sm sm:p-16 md:p-20">
+          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-6 shadow-sm sm:p-10 md:p-16 lg:p-20">
             {/* Image area */}
             <div className="mb-6 flex w-full items-center justify-center">
               <img
@@ -96,7 +96,7 @@ export default function UpcomingSessions() {
               className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
             >
               {/* Header Image Area */}
-              <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+              <div className="relative h-40 xs:h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
                 {session?.thumbnailMedia?.fileUrl ? (
                   <img
                     src={session.thumbnailMedia.fileUrl}
@@ -105,23 +105,20 @@ export default function UpcomingSessions() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                    <Calendar className="h-12 w-12 opacity-50" />
+                    <Calendar className="h-10 xs:h-11 sm:h-12 w-10 xs:w-11 sm:w-12 opacity-50" />
                   </div>
                 )}
 
                 {/* Date Ribbon */}
-                <div className="absolute right-4 top-0 flex h-[70px] w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-2 text-white shadow-md">
-                  {/* Simplified Ribbon Shape using clip-path or just a rounded bottom div for now to match style roughly */}
-                  {/* To match the screenshot exactly requires SVG path, simplified here */}
+                <div className="absolute right-3 xs:right-4 top-0 flex h-[60px] xs:h-[65px] sm:h-[70px] w-[45px] xs:w-[48px] sm:w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-1.5 xs:pt-2 text-white shadow-md">
                   <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">
+                    <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90">
                       {month}
                     </span>
-                    <span className="text-xl font-bold leading-none">
+                    <span className="text-base xs:text-lg sm:text-xl font-bold leading-none">
                       {day}
                     </span>
                   </div>
-                  {/* Triangle bottom for ribbon effect */}
                   <div
                     style={{
                       position: "absolute",
@@ -137,15 +134,15 @@ export default function UpcomingSessions() {
               </div>
 
               {/* Content Area */}
-              <div className="flex flex-1 flex-col p-5">
+              <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5">
                 {/* Tags */}
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded bg-[#E3F6F5] px-2.5 py-1 text-xs font-semibold text-[#1B8A8E]">
+                <div className="mb-2 xs:mb-3 flex flex-wrap items-center gap-1.5 xs:gap-2">
+                  <span className="rounded bg-[#E3F6F5] px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-[#1B8A8E]">
                     {session.language || "English"}
                   </span>
                   {session.type === "ONLINE" && (
-                    <span className="flex items-center gap-1.5 rounded bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                    <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-green-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-green-600">
+                      <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-green-500"></span>
                       Online
                     </span>
                   )}

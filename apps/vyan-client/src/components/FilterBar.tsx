@@ -140,33 +140,33 @@ export const FilterBar = ({
   };
 
   return (
-    <div className="w-full space-y-4 font-inter">
+    <div className="w-full space-y-3 xs:space-y-4 font-inter">
       {/* Mobile & Tablet Toggle (below md) */}
-      <div className="flex w-full justify-end px-4 md:hidden">
+      <div className="flex w-full justify-end px-3 xs:px-4 sm:px-6 md:hidden">
         <Sheet>
           <SheetTrigger asChild>
             <Button
               variant="outline"
-              className="flex items-center gap-2 rounded-full border-gray-200 bg-white px-6 py-6 text-sm font-bold text-[#1a1a1a] shadow-lg shadow-black/5 hover:bg-gray-50 transition-all active:scale-95"
+              className="flex items-center gap-1.5 xs:gap-2 rounded-full border-gray-200 bg-white px-4 xs:px-5 sm:px-6 py-2.5 xs:py-3 sm:py-6 text-xs xs:text-sm font-bold text-[#1a1a1a] shadow-lg shadow-black/5 hover:bg-gray-50 transition-all active:scale-95"
             >
-              <Filter size={18} className="text-[#1B8A8E]" strokeWidth={2.5} />
+              <Filter size={16} className="xs:size-[18px] text-[#1B8A8E]" strokeWidth={2.5} />
               Filters
               {filterObjects.length > 0 && (
-                <span className="ml-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#1B8A8E] text-[11px] font-bold text-white shadow-md shadow-[#1B8A8E]/20">
+                <span className="ml-0.5 xs:ml-1 flex h-5 xs:h-6 w-5 xs:w-6 items-center justify-center rounded-full bg-[#1B8A8E] text-[10px] xs:text-[11px] font-bold text-white shadow-md shadow-[#1B8A8E]/20">
                   {filterObjects.length}
                 </span>
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="flex flex-col p-0 w-[300px] sm:w-[400px] bg-white border-l shadow-2xl">
-            <SheetHeader className="px-6 pt-6 pb-4 border-b flex flex-row items-center justify-between">
-              <SheetTitle className="text-xl font-bold text-[#1a1a1a]">Filters</SheetTitle>
-              <SheetClose className="rounded-full p-2 hover:bg-gray-100 transition-colors">
-                <X size={20} className="text-gray-500" />
+          <SheetContent side="right" className="flex flex-col p-0 w-[90vw] xs:w-[320px] sm:w-[380px] md:w-[400px] bg-white border-l shadow-2xl">
+            <SheetHeader className="px-4 xs:px-5 sm:px-6 pt-4 xs:pt-5 sm:pt-6 pb-3 xs:pb-4 border-b flex flex-row items-center justify-between gap-2">
+              <SheetTitle className="text-lg xs:text-xl font-bold text-[#1a1a1a] truncate">Filters</SheetTitle>
+              <SheetClose className="rounded-full p-1.5 xs:p-2 hover:bg-gray-100 transition-colors flex-shrink-0">
+                <X size={18} className="xs:size-5 text-gray-500" />
               </SheetClose>
             </SheetHeader>
 
-            <div className="flex-1 overflow-y-auto px-6 py-8 space-y-10">
+            <div className="flex-1 overflow-y-auto px-4 xs:px-5 sm:px-6 py-6 xs:py-7 sm:py-8 space-y-8 xs:space-y-9 sm:space-y-10">
               {/* Active Filters (Mobile Only) */}
               {filterObjects.length > 0 && (
                 <div className="space-y-4">
@@ -260,7 +260,7 @@ export const FilterBar = ({
                 <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-[#555555]">
                   Price Range
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3">
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                     <Input
@@ -378,7 +378,7 @@ export const FilterBar = ({
               </div>
             </div>
 
-            <div className="p-6 border-t bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+            <div className="px-4 xs:px-5 sm:px-6 py-4 xs:py-5 sm:py-6 border-t bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
               <Button
                 variant="outline"
                 className="w-full h-12 rounded-xl border-red-100 text-red-500 font-bold hover:bg-red-50 hover:text-red-600 transition-all active:scale-[0.98]"
