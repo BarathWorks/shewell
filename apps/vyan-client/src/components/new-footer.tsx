@@ -132,7 +132,7 @@ export default function NewFooter() {
                 Contact Us
               </h4>
               <ul className="space-y-3.5 text-sm text-gray-300 sm:space-y-4 sm:text-base">
-                <li className="flex items-start gap-2">
+                <li className="flex min-w-0 items-start gap-2">
                   <svg
                     className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#167D71]"
                     fill="none"
@@ -156,13 +156,13 @@ export default function NewFooter() {
                     href="https://maps.google.com/?q=NO.1274,+CHARUKESI+APARTMENTS,+17TH+STREET,+POOMPUHAR+NAGAR,+KOLATHUR,+CHENNAI,+Tamil+Nadu,+India+600099"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="leading-relaxed transition-colors hover:text-[#167D71]"
+                    className="min-w-0 break-words leading-relaxed transition-colors hover:text-[#167D71]"
                   >
                     NO.1274, CHARUKESI APARTMENTS,
-                    <br className="hidden sm:block" /> 17TH STREET, POOMPUHAR
+                    <br /> 17TH STREET, POOMPUHAR
                     NAGAR,
-                    <br className="hidden sm:block" /> KOLATHUR, CHENNAI,
-                    <br className="hidden sm:block" /> Tamil Nadu, India -
+                    <br /> KOLATHUR, CHENNAI,
+                    <br /> Tamil Nadu, India -
                     600099
                   </a>
                 </li>
