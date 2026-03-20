@@ -69,7 +69,7 @@ const CounsellingAppointment = ({
   return (
     <>
       <div className="w-full">
-        <div className="flex  gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
+        <div className="flex gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
           {/* price */}
           <div className="flex items-center gap-2 self-center rounded-lg bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-2 sm:rounded-xl sm:px-4 sm:py-2.5 md:rounded-2xl md:px-5 md:py-3">
             <span className="font-poppins text-xs font-medium text-[#666666]  sm:hidden xs:hidden md:block">
@@ -192,7 +192,7 @@ const CounsellingAppointment = ({
             {timeSlot ? (
               <div onClick={() => handleOpenDialogOnlineAppointment()}>
                 {" "}
-                <Button className="group flex h-[20px] w-[10px] items-center gap-3 rounded-2xl bg-[#00898F] px-0 py-0 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#007a80] hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
+                <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-[#00898F] px-6 py-4 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#007a80] hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
                   <svg
                     className="transition-transform duration-300 group-hover:scale-110"
                     width="19"

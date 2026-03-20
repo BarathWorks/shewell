@@ -15,19 +15,19 @@ const overallVariant = {
 
 const WellnessCircle = () => {
   return (
-    <div className="flex  w-full flex-col items-center justify-center overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:h-screen md:px-8 md:py-12 lg:h-screen xl:h-screen 2xl:h-screen">
+    <div className="flex w-full flex-col items-center justify-center overflow-hidden bg-white px-3 xs:px-4 sm:px-6 py-4 xs:py-6 sm:py-8 md:h-screen md:px-8 md:py-12 lg:h-screen xl:h-screen 2xl:h-screen">
       {/* 1. Illustration Area */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-8 w-full px-0"
+        className="mb-6 xs:mb-8 w-full px-0"
       >
         {/* Mother and Baby Illustration */}
         <img
           src="/home/Vector.png"
           alt="Mother and baby illustration"
-          className="mx-auto mb-8 h-auto w-full cursor-pointer object-cover opacity-20 transition-opacity ease-in-out hover:opacity-100 xs:h-[200px] xs:w-[400px] xs:opacity-100 sm:h-[300px] sm:w-[300px] sm:opacity-100 md:w-full md:h-auto md:opacity-20 lg:w-full lg:h-auto lg:opacity-20 xl:w-full xl:h-auto xl:opacity-20 2xl:w-full 2xl:h-auto 2xl:opacity-20 "
+          className="mx-auto mb-6 xs:mb-8 h-[160px] xs:h-[200px] sm:h-[300px] md:h-auto w-[200px] xs:w-[280px] sm:w-[300px] md:w-full cursor-pointer object-cover opacity-60 xs:opacity-100 md:opacity-20 transition-opacity ease-in-out hover:opacity-100"
         />
         {/* Shewell Title */}
         {/* <h1 className="mx-auto cursor-pointer text-center font-amatic-sc text-4xl font-bold tracking-wide text-primary opacity-40 transition-opacity duration-500 ease-in-out hover:opacity-100 sm:text-5xl md:text-6xl lg:text-7xl sm:text-8xl xs:text-6xl">

@@ -57,22 +57,20 @@ export default function PregnancyStages({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <section className="w-full bg-white pb-4 pt-2 sm:pb-8 sm:pt-4 md:pb-12 md:pt-6">
+    <section className="w-full bg-white px-3 xs:px-4 sm:px-6 pb-3 xs:pb-4 sm:pb-8 pt-2 xs:pt-3 sm:pt-4 md:pb-12 md:pt-6">
       <div className="mx-auto px-0">
         {/* Stages Cards */}
-        <div className="grid w-full grid-cols-6 gap-2 opacity-80 sm:grid-cols-3 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
+        <div className="grid w-full grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
           {STAGES_DATA.map((stage, index) => {
             const isActive = activeIndex === stage.carouselIndex;
 
-            // Positioning for 3-2 centered layout on mobile (grid-cols-6)
-            // Top row: items 0, 1, 2 take 2 columns each (total 6)
-            // Bottom row: item 3 starts at col 2, item 4 follows.
+            // Responsive layout: 3 cols on mobile, 3 on tablet, 5 on desktop
             const responsiveColClasses =
               index < 3
-                ? "col-span-2 sm:col-auto"
+                ? "col-span-1"
                 : index === 3
-                  ? "col-start-2 col-span-2 sm:col-start-auto sm:col-auto"
-                  : "col-span-2 sm:col-auto";
+                  ? "col-start-auto col-span-1 sm:col-start-auto"
+                  : "col-span-1";
 
             return (
               <motion.div
@@ -87,24 +85,22 @@ export default function PregnancyStages({
                   onStageHover?.(stage.carouselIndex);
                 }}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex flex-col h-10 w-full justify-center rounded-lg sm:h-16 sm:rounded-xl md:h-28 md:rounded-2xl lg:h-32 lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-0 font-sans shadow-lg sm:p-4 md:p-5 lg:pl-6 lg:pb-10 ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2 z-10" : "opacity-80 hover:opacity-100 hover:shadow-xl"}`}
+                className={`relative flex flex-col justify-between items-start h-20 xs:h-24 sm:h-28 md:h-32 lg:h-40 rounded-lg xs:rounded-xl sm:rounded-2xl md:rounded-2xl lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-2 xs:p-2.5 sm:p-3 md:p-4 lg:p-6 font-sans shadow-lg ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2 z-10" : "opacity-80 hover:opacity-100 hover:shadow-xl transition-all"}`}
               >
                 {/* The large Gradient Text */}
-               <div>
-                 <h1 className=" text-[60px] font-bold uppercase ">
-                  <span
-                    className={`bg-gradient-to-b from-black/40 to-black/10 bg-clip-text text-transparent`}
-                  >
-                    {stage.prefix}
-                  </span>
-                </h1>
-               </div>
+                <div className="w-full">
+                  <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase leading-none">
+                    <span className="bg-gradient-to-b from-black/40 to-black/10 bg-clip-text text-transparent">
+                      {stage.prefix}
+                    </span>
+                  </h1>
+                </div>
 
                 {/* The Title Text */}
-                <div>
-                  <h2 className="relative z-20 ml-auto mt-auto max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] xs:text-sm sm:text-base md:text-medium lg:text-medium  xs:text-lg xs:font-medium xs:text-wrap xs:tracking-normal xs:leading-none xs:max-w-[100%]" >
-                  {stage.title}
-                </h2>
+                <div className="w-full">
+                  <h2 className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-base font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] break-words">
+                    {stage.title}
+                  </h2>
                 </div>
               </motion.div>
             );
