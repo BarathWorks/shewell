@@ -18,6 +18,8 @@ export interface ISession {
   meetingLink?: string | null;
   language?: string;
   type?: SessionType;
+  maxBookings?: number | null;
+
 
   // UI-only field for duration-based creation (not stored in DB)
   duration?: number; // in minutes

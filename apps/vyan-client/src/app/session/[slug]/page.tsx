@@ -142,6 +142,8 @@ export default async function SessionDetailPage({
         sessionId={session.id}
         isRegistered={userRegistration !== undefined}
         meetingLink={session.meetingLink}
+        maxBookings={session.maxBookings}
+        currentRegistrations={session._count?.registrations || 0}
       />
       
       <FooterInfoSection terms={terms} />

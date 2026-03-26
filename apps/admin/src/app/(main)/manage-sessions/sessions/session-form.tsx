@@ -519,6 +519,33 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
             }}
           />
         </div>
+ 
+        {/* Field for Max Bookings */}
+        <div className="field">
+          <label htmlFor="maxBookings">Max Bookings (Leave empty for unlimited)</label>
+          <Controller
+            name="maxBookings"
+            control={control}
+            render={({ field, fieldState }) => {
+              return (
+                <>
+                  <InputNumber
+                    id={field.name}
+                    value={field.value}
+                    onValueChange={(e) => field.onChange(e.value)}
+                    min={0}
+                    placeholder="Unlimited"
+                    className={classNames({
+                      'p-invalid': fieldState.error
+                    })}
+                  />
+                  {fieldState.error && <small className="p-error">{fieldState.error.message}</small>}
+                </>
+              );
+            }}
+          />
+        </div>
+
 
         {/* Conditional Meeting Link Field (only for ONLINE sessions) */}
         {sessionType === SessionType.ONLINE && (

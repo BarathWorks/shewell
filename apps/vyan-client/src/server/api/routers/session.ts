@@ -172,7 +172,16 @@ export const sessionRouter = createTRPCRouter({
           meetingLink: true,
           language: true,
           type: true,
+          maxBookings: true,
+          _count: {
+            select: {
+              registrations: {
+                where: { paymentStatus: PaymentStatus.COMPLETED },
+              },
+            },
+          },
           category: {
+
             select: { id: true, name: true, slug: true, trimester: true },
           },
           // Scope to current user only — avoids loading all registrations publicly
@@ -332,62 +341,91 @@ export const sessionRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.session.user.id;
-
-      // Check if session exists and is published
-      const session = await db.session.findUnique({
-        where: { id: input.sessionId },
-        select: {
-          id: true,
-          status: true,
-          startAt: true,
-        },
-      });
-
-      if (!session) {
-        throw new Error("Session not found");
-      }
-
-      if (session.status !== SessionStatus.PUBLISHED) {
-        throw new Error("Session is not available for registration");
-      }
-
-      // Check if session has already started
-      if (new Date() > session.startAt) {
-        throw new Error("Session has already started");
-      }
-
-      // Check if user is already registered
-      const existingRegistration = await db.sessionRegistration.findUnique({
-        where: {
-          sessionId_userId: {
+ 
+      return await db.$transaction(async (tx) => {
+        // Lock the session row to prevent race conditions during capacity check
+        // Note: Using a raw query for FOR UPDATE as Prisma doesn't support it natively in findUnique yet
+        await tx.$executeRaw`SELECT * FROM "Session" WHERE id = ${input.sessionId} FOR UPDATE`;
+ 
+        const session = await tx.session.findUnique({
+          where: { id: input.sessionId },
+          select: {
+            status: true,
+            startAt: true,
+            maxBookings: true,
+          },
+        });
+ 
+        if (!session) {
+          throw new Error("Session not found");
+        }
+ 
+        if (session.status !== SessionStatus.PUBLISHED) {
+          throw new Error("Session is not available for registration");
+        }
+ 
+        // Check if session has already started
+        if (new Date() > session.startAt) {
+          throw new Error("Session has already started");
+        }
+ 
+        // Check Capacity
+        if (session.maxBookings) {
+          const activeRegistrations = await tx.sessionRegistration.count({
+            where: {
+              sessionId: input.sessionId,
+              OR: [
+                { paymentStatus: PaymentStatus.COMPLETED },
+                {
+                  paymentStatus: PaymentStatus.PENDING,
+                  createdAt: {
+                    // Count pending registrations from the last 15 minutes as "reserving" a slot
+                    gte: new Date(Date.now() - 15 * 60 * 1000),
+                  },
+                },
+              ],
+            },
+          });
+ 
+          if (activeRegistrations >= session.maxBookings) {
+            throw new Error("Session is full");
+          }
+        }
+ 
+        // Check if user is already registered
+        const existingRegistration = await tx.sessionRegistration.findUnique({
+          where: {
+            sessionId_userId: {
+              sessionId: input.sessionId,
+              userId: userId,
+            },
+          },
+        });
+ 
+        if (existingRegistration) {
+          throw new Error("You are already registered for this session");
+        }
+ 
+        // Create registration
+        const registration = await tx.sessionRegistration.create({
+          data: {
             sessionId: input.sessionId,
             userId: userId,
+            paymentStatus: PaymentStatus.PENDING,
           },
-        },
+          select: {
+            id: true,
+            sessionId: true,
+            userId: true,
+            paymentStatus: true,
+            createdAt: true,
+          },
+        });
+ 
+        return registration;
       });
-
-      if (existingRegistration) {
-        throw new Error("You are already registered for this session");
-      }
-
-      // Create registration
-      const registration = await db.sessionRegistration.create({
-        data: {
-          sessionId: input.sessionId,
-          userId: userId,
-          paymentStatus: PaymentStatus.PENDING,
-        },
-        select: {
-          id: true,
-          sessionId: true,
-          userId: true,
-          paymentStatus: true,
-          createdAt: true,
-        },
-      });
-
-      return registration;
     }),
+
 
   // Get user's registered sessions (protected)
   getUserRegistrations: protectedProcedure.query(async ({ ctx }) => {

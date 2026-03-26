@@ -16,7 +16,10 @@ interface BookingSectionProps {
   sessionId: string;
   isRegistered?: boolean;
   meetingLink?: string | null;
+  maxBookings?: number | null;
+  currentRegistrations?: number;
 }
+
 
 export const BookingSection = ({
   price,
@@ -24,7 +27,10 @@ export const BookingSection = ({
   sessionId,
   isRegistered = false,
   meetingLink,
+  maxBookings = null,
+  currentRegistrations = 0,
 }: BookingSectionProps): JSX.Element => {
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isPregnant, setIsPregnant] = useState(false);
   const [isNewMom, setIsNewMom] = useState(false);
@@ -32,6 +38,10 @@ export const BookingSection = ({
   const [isOther, setIsOther] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+ 
+  const isFull = maxBookings !== null && currentRegistrations >= maxBookings;
+  const remainingSlots = maxBookings !== null ? Math.max(0, maxBookings - currentRegistrations) : null;
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -682,31 +692,47 @@ export const BookingSection = ({
                   </div>
 
                   {/* CONTINUE BUTTON */}
-                  <div
-                    onClick={() => {
-                      if (isProcessing) return;
+                  {isFull && !isRegistered ? (
+                    <div className="order-0 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-200 px-3 py-4 text-gray-500 sm:rounded-lg md:rounded-lg lg:rounded-xl">
+                      <span className="text-sm font-medium md:text-base lg:text-lg text-center w-full">
+                        This session is currently full
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => {
+                        if (isProcessing) return;
+ 
+                        // Validate Step 1
+                        if (step === 1) {
+                          if (!validateStep(1)) return;
+                          setStep(2);
+                        }
+                        // Validate Step 2 and Submit
+                        else if (step === 2) {
+                          handleBooking();
+                        }
+                      }}
+                      className="order-0 group flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-3 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] hover:text-white sm:gap-2.5 sm:rounded-lg sm:px-4 sm:py-2.5 md:rounded-lg md:px-5 md:py-3 lg:rounded-xl lg:px-6 lg:py-4"
+                    >
+                      <span className="text-xs font-medium text-[#00000066] group-hover:text-white sm:text-sm md:text-base lg:text-lg">
+                        {isProcessing
+                          ? "Processing..."
+                          : step === 2
+                            ? "Proceed to Pay"
+                            : "Continue"}
+                      </span>
+                      <InteractiveButton />
+                    </div>
+                  )}
+ 
+                  {/* SLOTS LEFT INDICATOR */}
+                  {!isRegistered && remainingSlots !== null && remainingSlots > 0 && remainingSlots <= 5 && (
+                    <div className="mt-2 text-center text-[10px] font-medium text-[#00898F] sm:text-px">
+                      Only {remainingSlots} slot{remainingSlots > 1 ? "s" : ""} left!
+                    </div>
+                  )}
 
-                      // Validate Step 1
-                      if (step === 1) {
-                        if (!validateStep(1)) return;
-                        setStep(2);
-                      }
-                      // Validate Step 2 and Submit
-                      else if (step === 2) {
-                        handleBooking();
-                      }
-                    }}
-                    className="order-0 group flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-3 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] hover:text-white sm:gap-2.5 sm:rounded-lg sm:px-4 sm:py-2.5 md:rounded-lg md:px-5 md:py-3 lg:rounded-xl lg:px-6 lg:py-4"
-                  >
-                    <span className="text-xs font-medium text-[#00000066] group-hover:text-white sm:text-sm md:text-base lg:text-lg">
-                      {isProcessing
-                        ? "Processing..."
-                        : step === 2
-                          ? "Proceed to Pay"
-                          : "Continue"}
-                    </span>
-                    <InteractiveButton />
-                  </div>
                 </>
               )}
             </motion.div>

@@ -24,8 +24,10 @@ const createSessionSchema = (type?: SessionType) => {
       overview: z.string().optional().nullable(),
       meetingLink: z.string().url('Meeting link must be a valid URL').optional().nullable().or(z.literal('')),
       language: z.string().default('English'),
-      type: z.nativeEnum(SessionType).default(SessionType.ONLINE)
+      type: z.nativeEnum(SessionType).default(SessionType.ONLINE),
+      maxBookings: z.number().int().min(0).nullable().optional()
     })
+
     .refine(
       (data) => {
         // Validate that endAt is after startAt
@@ -60,7 +62,8 @@ export const createSession = async (data: ISession) => {
     };
   }
 
-  const { title, slug, startAt, endAt, price, status, categoryId, thumbnailMediaId, bannerMediaIds, overview, meetingLink, language, type, banners } = data;
+  const { title, slug, startAt, endAt, price, status, categoryId, thumbnailMediaId, bannerMediaIds, overview, meetingLink, language, type, banners, maxBookings } = data;
+
 
   console.log('createSession data:', { bannerMediaIds, banners });
 
@@ -80,8 +83,10 @@ export const createSession = async (data: ISession) => {
     overview,
     meetingLink: meetingLink || null,
     language: language || 'English',
-    type: type || SessionType.ONLINE
+    type: type || SessionType.ONLINE,
+    maxBookings: maxBookings || null
   });
+
 
   if (!isValidData.success) {
     return {
@@ -107,8 +112,10 @@ export const createSession = async (data: ISession) => {
         overview,
         meetingLink: meetingLink || null,
         language: language || 'English',
-        type: type || SessionType.ONLINE
+        type: type || SessionType.ONLINE,
+        maxBookings: maxBookings || null
       }
+
     });
 
     revalidatePath('/admin/manage-sessions/sessions');
@@ -135,7 +142,8 @@ export const updateSession = async (data: ISession) => {
     };
   }
 
-  const { id, title, slug, startAt, endAt, price, status, categoryId, thumbnailMediaId, bannerMediaIds, overview, meetingLink, language, type, banners } = data;
+  const { id, title, slug, startAt, endAt, price, status, categoryId, thumbnailMediaId, bannerMediaIds, overview, meetingLink, language, type, banners, maxBookings } = data;
+
 
   console.log('updateSession data:', { id, bannerMediaIds, banners });
 
@@ -161,8 +169,10 @@ export const updateSession = async (data: ISession) => {
     overview,
     meetingLink: meetingLink || null,
     language: language || 'English',
-    type: type || SessionType.ONLINE
+    type: type || SessionType.ONLINE,
+    maxBookings: maxBookings || null
   });
+
 
   if (!isValidData.success) {
     return {
@@ -194,8 +204,10 @@ export const updateSession = async (data: ISession) => {
         overview,
         meetingLink: meetingLink || null,
         language: language || 'English',
-        type: type || SessionType.ONLINE
+        type: type || SessionType.ONLINE,
+        maxBookings: maxBookings || null
       }
+
     });
 
     revalidatePath('/admin/manage-sessions/sessions');

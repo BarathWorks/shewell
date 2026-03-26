@@ -277,101 +277,139 @@ interface ISessionBookingData {
 
 export const createSessionOrder = async (bookingData: ISessionBookingData) => {
   let messageError: string | null = null;
-
+ 
   const session = await getServerSession();
-
+ 
   if (!session) {
     return {
       error: "Sign in to proceed",
     };
   }
-
+ 
   const user = await db.user.findFirst({
     where: {
       email: session.user.email!,
     },
   });
-
+ 
   if (!user) {
     return {
       error: "User not found.",
     };
   }
-
-  // Fetch session details to get price
-  const sessionDetails = await db.session.findUnique({
-    where: {
-      id: bookingData.sessionId,
-    },
-  });
-
-  if (!sessionDetails) {
-    return {
-      error: "Session not found.",
-    };
-  }
-
-  // Convert price from decimal to paise (multiply by 100)
-  const amountInPaise = Math.round(Number(sessionDetails.price) * 100);
-
+ 
   try {
-    // Create Razorpay order
-    console.log("Creating razorpay order for session booking",amountInPaise);
+    // Phase 1: Atomic Reservation within a transaction
+    const sessionDetails = await db.$transaction(async (tx) => {
+      // Lock the session row to prevent race conditions
+      await tx.$executeRaw`SELECT * FROM "Session" WHERE id = ${bookingData.sessionId} FOR UPDATE`;
+ 
+      const details = await tx.session.findUnique({
+        where: { id: bookingData.sessionId },
+        select: {
+          id: true,
+          price: true,
+          title: true,
+          slug: true,
+          maxBookings: true,
+        },
+      });
+ 
+      if (!details) {
+        throw new Error("Session not found.");
+      }
+ 
+      // Check Capacity
+      if (details.maxBookings) {
+        const activeRegistrations = await tx.sessionRegistration.count({
+          where: {
+            sessionId: bookingData.sessionId,
+            OR: [
+              { paymentStatus: "COMPLETED" },
+              {
+                paymentStatus: "PENDING",
+                createdAt: {
+                  // Count pending registrations from the last 15 minutes as "reserving" a slot
+                  gte: new Date(Date.now() - 15 * 60 * 1000),
+                },
+              },
+            ],
+          },
+        });
+ 
+        if (activeRegistrations >= details.maxBookings) {
+          throw new Error("Session is full. Please try again later.");
+        }
+      }
+ 
+      // Check for existing registration before creating a new one
+      const existingRegistration = await tx.sessionRegistration.findFirst({
+        where: {
+          userId: user.id,
+          sessionId: bookingData.sessionId,
+        },
+      });
+ 
+      if (existingRegistration && existingRegistration.paymentStatus === "COMPLETED") {
+        throw new Error("You have already registered for this session.");
+      }
+ 
+      // Upsert pending registration to "reserve" the slot early
+      if (existingRegistration) {
+        await tx.sessionRegistration.update({
+          where: { id: existingRegistration.id },
+          data: {
+            paymentStatus: "PENDING",
+            amountPaid: details.price,
+            createdAt: new Date(), // Refresh the 15-minute reservation timer
+          },
+        });
+      } else {
+        await tx.sessionRegistration.create({
+          data: {
+            userId: user.id,
+            sessionId: bookingData.sessionId,
+            paymentStatus: "PENDING",
+            amountPaid: details.price,
+          },
+        });
+      }
+ 
+      return details;
+    }, { timeout: 10000 });
+ 
+    // Phase 2: Create Razorpay order (outside of DB transaction to avoid long-held locks)
+    const amountInPaise = Math.round(Number(sessionDetails.price) * 100);
+    console.log("Creating razorpay order for session booking", amountInPaise);
+    
     const razorpayOrder = await createRazorpayOrder({
       amount: amountInPaise,
       currency: "INR",
       receipt: `session_${bookingData.sessionId}_${Date.now()}`.slice(0, 36),
       name: "Shewell Session Booking",
     });
-
-    console.log("Razorpay order created for session:", razorpayOrder);
-
-    // Guard against null razorpay order
+ 
     if (!razorpayOrder || !razorpayOrder.id) {
       return {
         error: "Failed to create payment order. Please try again.",
       };
     }
-
-    // Check for existing registration before creating a new one
-    const existingRegistration = await db.sessionRegistration.findFirst({
+ 
+    // Phase 3: Update registration with the real Razorpay order ID
+    await db.sessionRegistration.update({
       where: {
-        userId: user.id,
-        sessionId: bookingData.sessionId,
+        sessionId_userId: {
+          sessionId: bookingData.sessionId,
+          userId: user.id,
+        },
+      },
+      data: {
+        razorpayOrderId: razorpayOrder.id,
       },
     });
-
-    if (existingRegistration) {
-      // If already has a successful payment, don't create a new one
-      if (existingRegistration.paymentStatus === "COMPLETED") {
-        return {
-          error: "You have already registered for this session.",
-        };
-      }
-
-      // If pending, we can either reuse the razorpayOrderId or create a new one.
-      // For simplicity, let's update the existing one with a new razorpayOrderId
-      await db.sessionRegistration.update({
-        where: { id: existingRegistration.id },
-        data: {
-          razorpayOrderId: razorpayOrder.id,
-        },
-      });
-    } else {
-      // Create pending SessionRegistration
-      await db.sessionRegistration.create({
-        data: {
-          userId: user.id,
-          sessionId: bookingData.sessionId,
-          paymentStatus: "PENDING",
-          amountPaid: sessionDetails.price,
-          razorpayOrderId: razorpayOrder.id,
-        },
-      });
-    }
-
+ 
     revalidatePath(`/session/${sessionDetails.slug}`);
-
+ 
     const razorpayConfig = {
       user: {
         name: bookingData.name || user.name,
@@ -382,12 +420,12 @@ export const createSessionOrder = async (bookingData: ISessionBookingData) => {
       currency: razorpayOrder.currency,
       description: `Booking for ${sessionDetails.title}`,
     };
-
-    return { error: messageError, razorpay: razorpayConfig };
+ 
+    return { error: null, razorpay: razorpayConfig };
   } catch (err: any) {
-    messageError = err.message;
+    console.error("Error in createSessionOrder:", err);
     return {
-      error: messageError,
+      error: err.message || "An unexpected error occurred",
     };
   }
 };
