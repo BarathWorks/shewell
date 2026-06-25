@@ -38,3 +38,5 @@ yarn-error.log*
 *.pem
 vyan/
 .env*.local
+
+/adminuser.csv/
