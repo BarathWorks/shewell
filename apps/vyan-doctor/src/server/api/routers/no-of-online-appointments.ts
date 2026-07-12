@@ -89,6 +89,7 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
           startingTime: true,
           endingTime: true,
           planName: true,
+          status: true,
         },
         where: {
           startingTime: {

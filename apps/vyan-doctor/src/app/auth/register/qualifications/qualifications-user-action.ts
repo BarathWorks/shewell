@@ -139,7 +139,7 @@ async function QualificationUserAction({
         timeout: 70000,
       }
     );
-    
+
     revalidatePath("/auth/register/qualifications");
     return result as ActionResult;
   } catch (error: any) {

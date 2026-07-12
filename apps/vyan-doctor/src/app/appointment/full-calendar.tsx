@@ -1,40 +1,23 @@
 "use client";
-// import { useState } from "react";
-
+import React, { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import timeGridPlugin from "@fullcalendar/timegrid";
-
-// const events = [{ title: "Meeting", start: new Date() }];
-
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
-import EditAvailablity from "./add-unavailability";
-
-import AppointmentSettings from "./appointment-settings";
-import DateNavigator from "./date-navigator";
-import Meetings from "./meetings";
-import DateNavigationMeeting from "./date-navigation-meeting";
+import { format } from "date-fns";
 import { api } from "~/trpc/react";
-import { useEffect, useState } from "react";
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
 import { Day } from "@repo/database";
-import React from "react";
+import { useToast } from "@repo/ui/src/@/components/use-toast";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@repo/ui/src/@/components/dialog";
 import { Button } from "@repo/ui/src/@/components/button";
 import DeleteAvailabilityUserAction from "./delete-availability-user-action";
-import { useToast } from "@repo/ui/src/@/components/use-toast";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import AppointmentSettings from "./appointment-settings";
+import EditAvailablity from "./add-unavailability";
 
 interface IAvailaibleTimings {
   startingTime: Date;
@@ -48,243 +31,312 @@ interface IAvailabilities {
   day: Day;
   availableTimings: IAvailaibleTimings[];
 }
+
+interface IFullCalendarPageProps {
+  availabilities: IAvailabilities[];
+  unavailableDays: IUnavailableDays[];
+  prices?: {
+    priceInCentsForSingle: number | null;
+    priceInCentsForCouple: number | null;
+  } | null;
+}
+
 const FullCalendarPage = ({
   availabilities,
-  unavailableDays
-}: {
-  availabilities: IAvailabilities[];
-  unavailableDays : IUnavailableDays[]
-}) => {
-  
-
-  type Meeting = {
-    id: string;
-    serviceType: string; // Assuming AppointmentType is a string
-    priceInCents: number;
-    description: string;
-    planName: string;
-    professionalUserId: string;
-    patientId: string;
-    startingTime: Date;
-    endingTime: Date;
-    createdAt: Date;
-    updatedAt: Date;
-    status?: string | null; // Assuming BookAppointmentStatus is a string or optional
-    userId: string;
-    razorpayOrderId?: string | null;
-    razorpayPaymentId?: string | null;
-  };
-
-  type Events = {
-    [date: string]: {
-      title?: string;
-      start: string; // Start date in string format
-      count: number;
-    };
-  };
-  function renderEventContent(eventInfo: any) {
-    return (
-      <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
-      </>
-    );
-  }
-
-  const [openDeleteUnvailableDialog, setOpenDeleteUnavailableDialog] =
-    useState<boolean>(false);
-
+  unavailableDays,
+  prices,
+}: IFullCalendarPageProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isTimingsOpen, setIsTimingsOpen] = useState(false);
+  const [isBlackoutOpen, setIsBlackoutOpen] = useState(false);
+  const [openDeleteUnvailableDialog, setOpenDeleteUnavailableDialog] = useState<boolean>(false);
   const [dayToBeDeleted, setDayToBeDeleted] = useState<Date>();
-  console.log("dayToBeDeleted", dayToBeDeleted);
-  
 
-  // // function to calculate the last and first day of month
   const findFirstAndLastDayOfMonth = (date: Date) => {
-    let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     return { firstDay, lastDay };
   };
 
-  // // using function, to calculate the first day and last Day
   const { firstDay, lastDay } = findFirstAndLastDayOfMonth(new Date());
 
-  // // fetching  meetings and unavailable days for complete month
-  const { data, refetch } =
-    api.searchMeetingForADayRange.searchMeetingForADayRange.useQuery({
-      startDate: firstDay,
-      endDate: lastDay,
-    });
+  // Fetch meetings and unavailable days for complete month
+  const { data } = api.searchMeetingForADayRange.searchMeetingForADayRange.useQuery({
+    startDate: firstDay,
+    endDate: lastDay,
+  });
 
-  // console.log(
-  //   "meetingsRange",
-  //   data?.meetingsForADayRange,
-  //   data?.unAvailableDays,
-  // );
-
-  // // Process the data to create events
-  const events = data
-    ? (data.meetingsForADayRange as any[]).reduce((acc: Events, meeting: Meeting) => {
-        const meetingDate = meeting.startingTime.toISOString().split("T")[0]; // Convert to YYYY-MM-DD format
-        if (!acc[meetingDate!]) {
-          acc[meetingDate!] = {
-            title: "1 Meeting aligned",
-            start: meetingDate!,
+  // Process the data to create calendar event markers
+  const events: Record<string, { title: string; start: string; count: number }> = {};
+  if (data?.meetingsForADayRange) {
+    (data.meetingsForADayRange as any[]).forEach((meeting: any) => {
+      const meetingDate = new Date(meeting.startingTime).toISOString().split("T")[0];
+      if (meetingDate) {
+        if (!events[meetingDate]) {
+          events[meetingDate] = {
+            title: "1 Session",
+            start: meetingDate,
             count: 1,
           };
         } else {
-          acc[meetingDate!]!.count += 1;
-          acc[meetingDate!]!.title =
-            `${acc[meetingDate!]!.count} Meetings aligned `;
+          events[meetingDate].count += 1;
+          events[meetingDate].title = `${events[meetingDate].count} Sessions`;
         }
-
-        return acc;
-      }, {} as Events)
-    : {};
-
-  // Process unavailable days and override meetings if necessary
-  if (data?.unAvailableDays) {
-    data.unAvailableDays.forEach((unavailableDay ) => {
-      const unavailableDate = new Date(unavailableDay.date)
-        .toISOString()
-        .split("T")[0];
-      events[unavailableDate!] = {
-        title: "Unavailable",
-        start: unavailableDate!,
-        count: 0,
-      };
+      }
     });
   }
-  // // Convert the events object to an array
-  const eventsArray = Object.values(events);
 
-  const getDate = data?.professionalUser?.createdAt;
-  // console.log("getdate", format(getDate!, "MM/dd/yyyy"));
+  if (data?.unAvailableDays) {
+    data.unAvailableDays.forEach((unavailableDay) => {
+      const unavailableDate = new Date(unavailableDay.date).toISOString().split("T")[0];
+      if (unavailableDate) {
+        events[unavailableDate] = {
+          title: "Blackout Day",
+          start: unavailableDate,
+          count: 0,
+        };
+      }
+    });
+  }
+
+  const eventsArray = Object.values(events);
 
   const { toast } = useToast();
   const trpcContext = api.useUtils();
+
   const handleDeleteUnavailableDay = () => {
-   if(dayToBeDeleted){
-    DeleteAvailabilityUserAction(dayToBeDeleted)
-    .then((resp) => {
-      console.log(resp?.message);
-      toast({
-        description: resp?.message,
-        variant: "default",
-      });
-      trpcContext.invalidate();
-      setOpenDeleteUnavailableDialog(false);
-    })
-    .catch((err) => {
-      console.log(err);
-      toast({
-        description: err.message,
-        variant: "destructive",
-      });
-    });
-   }
+    if (dayToBeDeleted) {
+      DeleteAvailabilityUserAction(dayToBeDeleted)
+        .then((resp) => {
+          toast({
+            description: resp?.message,
+            variant: "default",
+          });
+          trpcContext.invalidate();
+          setOpenDeleteUnavailableDialog(false);
+        })
+        .catch((err) => {
+          toast({
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    }
   };
+
+  // Filter meetings for the selected date to show in the Agenda list
+  const selectedMeetings =
+    data?.meetingsForADayRange?.filter((meeting: any) => {
+      const meetingDate = new Date(meeting.startingTime);
+      return (
+        meetingDate.getDate() === selectedDate.getDate() &&
+        meetingDate.getMonth() === selectedDate.getMonth() &&
+        meetingDate.getFullYear() === selectedDate.getFullYear()
+      );
+    }) || [];
+
+  // Setup pricing tags
+  const singlePrice = prices?.priceInCentsForSingle
+    ? `₹${(prices.priceInCentsForSingle / 100).toLocaleString()}`
+    : "₹1,500";
+  const couplePrice = prices?.priceInCentsForCouple
+    ? `₹${(prices.priceInCentsForCouple / 100).toLocaleString()}`
+    : "₹2,500";
+
   return (
-    <>
-      <div className="pb-10 pt-8 md:py-[45px] xl:py-[50px] 2xl:py-[65px]">
-        {/* heading */}
-        <div className="flex flex-row justify-between items-center flex-wrap gap-y-5 rounded-2xl bg-[#00898F] p-4 md:p-6 shadow-lg">
-          {/* div-date */}
-          <div className="flex w-fit items-center gap-2 rounded-xl bg-white/15 backdrop-blur-sm px-4 py-2 border border-white/20">
-            <div>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M3.75 3.75C3.33579 3.75 3 4.08579 3 4.5V15C3 15.4142 3.33579 15.75 3.75 15.75H14.25C14.6642 15.75 15 15.4142 15 15V4.5C15 4.08579 14.6642 3.75 14.25 3.75H3.75ZM1.5 4.5C1.5 3.25736 2.50736 2.25 3.75 2.25H14.25C15.4926 2.25 16.5 3.25736 16.5 4.5V15C16.5 16.2426 15.4926 17.25 14.25 17.25H3.75C2.50736 17.25 1.5 16.2426 1.5 15V4.5Z"
-                  fill="#A5F3FC"
-                />
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M12 0.75C12.4142 0.75 12.75 1.08579 12.75 1.5V4.5C12.75 4.91421 12.4142 5.25 12 5.25C11.5858 5.25 11.25 4.91421 11.25 4.5V1.5C11.25 1.08579 11.5858 0.75 12 0.75Z"
-                  fill="#A5F3FC"
-                />
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M6 0.75C6.41421 0.75 6.75 1.08579 6.75 1.5V4.5C6.75 4.91421 6.41421 5.25 6 5.25C5.58579 5.25 5.25 4.91421 5.25 4.5V1.5C5.25 1.08579 5.58579 0.75 6 0.75Z"
-                  fill="#A5F3FC"
-                />
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M1.5 7.5C1.5 7.08579 1.83579 6.75 2.25 6.75H15.75C16.1642 6.75 16.5 7.08579 16.5 7.5C16.5 7.91422 16.1642 8.25 15.75 8.25H2.25C1.83579 8.25 1.5 7.91422 1.5 7.5Z"
-                  fill="#A5F3FC"
-                />
-              </svg>
-            </div>{" "}
-            <div className="font-poppins text-xs font-medium text-white/90 xl:rounded-md xl:text-sm 2xl:text-[18px] 2xl:leading-[29px]">
-              {" "}
-              {getDate && format(getDate!, "LLL dd',' y")} - Present
+    <div className="space-y-lg">
+      {/* Calendar Header Row */}
+      <header className="flex items-center justify-between">
+        <div className="space-y-base flex items-center justify-between w-full">
+          <div className="space-y-1">
+            <h1 className="font-display-lg text-display-lg text-primary">Appointment</h1>
+            <p className="text-body-md text-on-surface-variant">
+              Manage clinical hours, view scheduled sessions, and plan blackout periods.
+            </p>
+          </div>
+          <div className="flex items-center gap-sm">
+            <button
+              onClick={() => setIsTimingsOpen(true)}
+              className="flex items-center gap-xs px-sm py-xs bg-white border border-outline-variant/30 rounded-xl shadow-sm hover:bg-surface-container-low transition-all font-bold text-body-sm text-on-surface"
+            >
+              <span className="material-symbols-outlined text-secondary text-[20px]">schedule</span>
+              <span>Timings</span>
+            </button>
+            <button
+              onClick={() => setIsBlackoutOpen(true)}
+              className="flex items-center gap-xs px-sm py-xs bg-white border border-outline-variant/30 rounded-xl shadow-sm hover:bg-surface-container-low transition-all font-bold text-body-sm text-on-surface"
+            >
+              <span className="material-symbols-outlined text-error text-[20px]">event_busy</span>
+              <span>Blackout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main 12-Column Layout Grid */}
+      <div className="grid grid-cols-12 gap-lg">
+        {/* Left Column: Monthly Calendar (col-span-8) */}
+        <section className="col-span-12 lg:col-span-8">
+          <div className="bg-surface-container-lowest rounded-xl custom-shadow p-lg border border-outline-variant/10">
+            <FullCalendar
+              plugins={[dayGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              dateClick={(info) => {
+                setSelectedDate(info.date);
+                if (info.dayEl.innerText.includes("Blackout")) {
+                  setOpenDeleteUnavailableDialog(true);
+                  setDayToBeDeleted(info.date);
+                }
+              }}
+              weekends={true}
+              events={eventsArray}
+              eventDidMount={(info) => {
+                if (info.event.title.includes("Session")) {
+                  info.el.style.backgroundColor = "#0d4759";
+                  info.el.style.borderColor = "#0d4759";
+                  info.el.style.color = "#ffffff";
+                } else if (info.event.title.includes("Blackout")) {
+                  info.el.style.backgroundColor = "#ba1a1a";
+                  info.el.style.borderColor = "#ba1a1a";
+                  info.el.style.color = "#ffffff";
+                  info.el.style.zIndex = "-1";
+                }
+              }}
+            />
+          </div>
+        </section>
+
+        {/* Right Column: Pricing & Agenda Timeline (col-span-4) */}
+        <section className="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+          {/* Session Pricing */}
+          <div className="bg-surface-container-lowest rounded-xl custom-shadow p-lg border border-outline-variant/10">
+            <h3 className="font-headline-sm text-headline-sm mb-md text-on-surface">Session Pricing</h3>
+            <div className="space-y-sm">
+              <div className="flex justify-between items-center py-sm border-b border-outline-variant/30">
+                <span className="font-body-md text-on-surface-variant">Single Session</span>
+                <div className="flex items-center gap-xs">
+                  <span className="tabular-nums font-bold text-headline-sm text-on-surface">
+                    {singlePrice}
+                  </span>
+                  <span className="text-label-caps text-outline">/hr</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center py-sm">
+                <span className="font-body-md text-on-surface-variant">Couple Session</span>
+                <div className="flex items-center gap-xs">
+                  <span className="tabular-nums font-bold text-headline-sm text-on-surface">
+                    {couplePrice}
+                  </span>
+                  <span className="text-label-caps text-outline">/hr</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="font-poppins text-[18px] sm:text-[22px] font-bold leading-8 text-white md:text-[30px] md:leading-[48px] xl:text-[36px] 2xl:text-[40px] 2xl:leading-[52px]">
-              Appointment Calendar
+
+          {/* Dynamic Selected Date Agenda */}
+          <div className="bg-surface-container-lowest rounded-xl custom-shadow flex flex-col h-[520px] overflow-hidden border border-outline-variant/10">
+            <div className="p-lg border-b border-outline-variant/30 bg-surface-container-low/30">
+              <div className="flex items-center gap-sm mb-xs">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[20px]">event</span>
+                </div>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Selected Date Agenda</h3>
+              </div>
+              <p className="font-body-md font-bold text-primary">
+                {format(selectedDate, "eeee, MMM dd, yyyy")}
+              </p>
             </div>
-            <div className="cursor-pointer flex gap-3 flex-wrap">
-              <AppointmentSettings availabilities={availabilities} />
-                {/* edit-unavailability */}
-          <EditAvailablity unavailableDays={unavailableDays} />
+            <div className="flex-1 p-lg overflow-y-auto no-scrollbar">
+              {selectedMeetings.length > 0 ? (
+                <div className="flex flex-col gap-sm">
+                  {selectedMeetings.map((meeting: any) => {
+                    const patientName = meeting.patient?.firstName || "Patient";
+                    const initial = patientName[0] || "P";
+                    const start = new Date(meeting.startingTime);
+                    const isCouple = meeting.planName?.toLowerCase().includes("couple");
+
+                    return (
+                      <div
+                        key={meeting.id}
+                        className="flex items-center justify-between p-md bg-white rounded-xl border border-outline-variant/10 shadow-sm"
+                      >
+                        <div className="flex items-center gap-sm">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-body-md">
+                            {initial}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-xs">
+                              <span className="font-data-mono text-xs text-outline">
+                                {format(start, "hh:mm aa")}
+                              </span>
+                              <span className="text-outline/20">•</span>
+                              <p className="font-body-md font-bold text-on-surface">
+                                {patientName}
+                              </p>
+                            </div>
+                            <div
+                              className={`flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full w-fit ${
+                                isCouple
+                                  ? "bg-secondary/10 text-secondary"
+                                  : "bg-primary/10 text-primary"
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-[14px]">
+                                {isCouple ? "groups" : "videocam"}
+                              </span>
+                              <span className="text-[10px] font-bold tracking-wide uppercase">
+                                {isCouple ? "Couple Session" : "Telehealth"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <button className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all">
+                          <span className="material-symbols-outlined text-[20px]">videocam</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center text-outline text-body-sm py-12">
+                  <span className="material-symbols-outlined text-[48px] text-outline/30 mb-2">
+                    calendar_today
+                  </span>
+                  No sessions scheduled for this day
+                </div>
+              )}
             </div>
-         
-        </div>
+          </div>
+        </section>
       </div>
 
-      {/* calendar */}
-      <div className="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          dateClick={(info) => {
-            if (info.dayEl.innerText.includes("Unavailable")) {
-              setOpenDeleteUnavailableDialog(true);
-              setDayToBeDeleted(info.date);
-            }
-          }}
-          weekends={true}
-          events={eventsArray}
-          eventContent={renderEventContent}
-          eventDidMount={(info) => {
-            if (info.event.title.includes("Meetings")) {
-              info.el.style.backgroundColor = "#0084FE";
-            } else if (info.event.title.includes("Unavailable")) {
-              info.el.style.backgroundColor = "#008F4E";
-              info.el.style.zIndex = "-1";
-            }
-            info.el.style.color = "#0084FE";
-          }}
-        />
-      </div>
+      {/* Dialog Containers (Controlled) */}
+      <AppointmentSettings
+        availabilities={availabilities}
+        open={isTimingsOpen}
+        onOpenChange={setIsTimingsOpen}
+      />
+      <EditAvailablity
+        unavailableDays={unavailableDays}
+        open={isBlackoutOpen}
+        onOpenChange={setIsBlackoutOpen}
+      />
 
       {/* Delete-Unavailable-Day-Dialog */}
-      <Dialog
-        open={openDeleteUnvailableDialog}
-        onOpenChange={setOpenDeleteUnavailableDialog}
-      >
+      <Dialog open={openDeleteUnvailableDialog} onOpenChange={setOpenDeleteUnavailableDialog}>
         <DialogContent className="rounded-2xl border-0 bg-white pt-[50px] shadow-xl">
           <DialogHeader>
             <DialogTitle className="mb-5 font-poppins text-lg font-bold text-[#0E3A47]">
               Do you want to delete the unavailable day?
             </DialogTitle>
             <DialogDescription className="flex items-center gap-4">
-              <Button 
+              <Button
                 onClick={handleDeleteUnavailableDay}
                 className="rounded-xl bg-[#00898F] px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#007a80] hover:shadow-lg"
               >
                 Yes
               </Button>
-              <Button 
+              <Button
                 onClick={() => setOpenDeleteUnavailableDialog(false)}
                 className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-poppins text-sm font-semibold text-gray-600 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md"
               >
@@ -294,7 +346,8 @@ const FullCalendarPage = ({
           </DialogHeader>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };
+
 export default FullCalendarPage;

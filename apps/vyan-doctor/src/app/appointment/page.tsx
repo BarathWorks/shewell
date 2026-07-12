@@ -57,17 +57,25 @@ const Appointment = async () => {
   console.log("unavailableDays", professionalUser.unavailableDay);
   
 
+  const prices = await db.professionalUserAppointmentPrice.findFirst({
+    where: {
+      professionalUserId: professionalUser.id,
+    },
+    select: {
+      priceInCentsForSingle: true,
+      priceInCentsForCouple: true,
+    },
+  });
+
   return (
     <>
       <div className="w-full">
         <div className="container mx-auto max-w-full">
-          <FullCalendarPage availabilities={availabilities} unavailableDays={professionalUser.unavailableDay} />
-
-          <div>
-            <DateNavigationMeeting
-              unavailableDays={professionalUser.unavailableDay}
-            />
-          </div>
+          <FullCalendarPage
+            availabilities={availabilities}
+            unavailableDays={professionalUser.unavailableDay}
+            prices={prices}
+          />
         </div>
       </div>
     </>

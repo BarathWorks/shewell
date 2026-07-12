@@ -7,17 +7,17 @@ import { db } from "~/server/db";
 type IAppointmentPrice = {
   appointmentPrice: {
     // coupleSession: boolean;
-    time: number|null;
-    priceInCentsForSingle: number|null;
-    priceInCentsForCouple : number | null
+    time: number | null;
+    priceInCentsForSingle: number | null;
+    priceInCentsForCouple: number | null
   }[];
 };
 const SetPriceUserAction = async ({ appointmentPrice }: IAppointmentPrice) => {
   const session = await getServerSession();
-  if(!session){
+  if (!session) {
     throw new Error("Unauthorised")
   }
-  if(!session.user.email){
+  if (!session.user.email) {
     throw new Error("Unauthorised")
   }
   const professionalUser = await db.professionalUser.findFirst({
@@ -42,15 +42,15 @@ const SetPriceUserAction = async ({ appointmentPrice }: IAppointmentPrice) => {
     // create prices
     await db.professionalUserAppointmentPrice.createMany({
       data: appointmentPrice.map((item) => ({
-      
+
         priceInCentsForSingle: item.priceInCentsForSingle! * 100,
-        priceInCentsForCouple : item.priceInCentsForCouple! * 100,
+        priceInCentsForCouple: item.priceInCentsForCouple! * 100,
         time: item.time!,
         professionalUserId: professionalUser.id,
       })),
     });
     revalidatePath("/edit-profile/prices");
-    
+
     return {
       message: "Prices are set",
     };

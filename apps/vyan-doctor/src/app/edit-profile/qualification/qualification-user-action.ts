@@ -11,8 +11,8 @@ export interface IDegree {
 export interface IExperience {
   // id: string;
   // years: string;
-  startingYear : string;
-  endingYear : string;
+  startingYear: string;
+  endingYear: string;
   position: string;
   department: string;
   location: string;
@@ -30,15 +30,15 @@ async function EditQualificationUserAction({
   return db.$transaction(
     async (tx) => {
       const session = await getServerSession();
-      if(!session){
+      if (!session) {
         throw new Error("Unauthorised")
       }
-      if(!session.user.email){
+      if (!session.user.email) {
         throw new Error("Unauthorised")
       }
       const professionalUser = await db.professionalUser.findFirst({
         where: {
-          email: session.user.email ,
+          email: session.user.email,
         },
         select: {
           id: true,
@@ -81,8 +81,8 @@ async function EditQualificationUserAction({
         await tx.professionalExperience.createMany({
           data: experiences.map((experience) => ({
             // years: experience.years,
-            startingYear : experience.startingYear!,
-            endingYear : experience.endingYear!,
+            startingYear: experience.startingYear!,
+            endingYear: experience.endingYear!,
             department: experience.department!,
             location: experience.location!,
             position: experience.position!,

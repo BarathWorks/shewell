@@ -13,20 +13,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { addDays, format } from "date-fns";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { format } from "date-fns";
+import { ArrowUpDown } from "lucide-react";
 
-import { Button } from "@repo/ui/src/@/components/button";
-import { Checkbox } from "@repo/ui/src/@/components/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@repo/ui/src/@/components/dropdown-menu";
 import { Input } from "@repo/ui/src/@/components/input";
 import {
   Table,
@@ -45,82 +34,115 @@ export type ITableInterface = {
   bookingDate: Date;
   startingTime: Date;
   endingTime: Date;
-
   doctorSpecialicity: string | undefined;
+  status: string | undefined;
 };
 
 export const columns: ColumnDef<ITableInterface>[] = [
   {
     accessorKey: "patientName",
-    accessorFn: (row) => row.patientName,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Patient Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
-        {row.getValue("patientName")}
-      </div>
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="flex items-center gap-xs font-bold hover:text-primary transition-colors text-[10px] uppercase tracking-widest text-outline"
+      >
+        Patient
+        <ArrowUpDown className="h-3 w-3" />
+      </button>
     ),
+    cell: ({ row }) => {
+      const name = row.getValue("patientName") as string;
+      const initial = name ? name[0] : "P";
+      return (
+        <div className="flex items-center gap-sm">
+          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-body-sm">
+            {initial}
+          </div>
+          <span className="font-bold text-body-md text-on-surface">{name}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "patientEmail",
-    accessorFn: (row) => row.patientEmail,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          {/* Email */}
-          Patient Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    header: () => <span className="text-[10px] uppercase font-bold text-outline tracking-widest">Contact Info</span>,
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal lowercase leading-[27px] text-[#434343]">
+      <div className="text-body-sm text-on-surface-variant font-medium">
         {row.getValue("patientEmail")}
       </div>
     ),
   },
   {
-    accessorKey: "bookingDate",
-    header: "Booking Date",
-    accessorFn: (row) => row.bookingDate,
-    cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
-        {format(new Date(row.getValue("bookingDate")), "dd/MM/yyyy")}
-      </div>
-    ),
-  },
-  {
     accessorKey: "startingTime",
-    header: "Appointment Time",
-    accessorFn: (row) => row.startingTime,
-
-    cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
-        {format(new Date(row.getValue("startingTime")), "hh:mm aa")}-
-        {format(new Date(row.original.endingTime), "hh:mm aa")}{" "}
-      </div>
-    ),
+    header: () => <span className="text-[10px] uppercase font-bold text-outline tracking-widest">Session Schedule</span>,
+    cell: ({ row }) => {
+      const start = new Date(row.getValue("startingTime") as Date);
+      const end = new Date(row.original.endingTime as Date);
+      return (
+        <div className="flex flex-col">
+          <span className="text-body-sm font-bold text-on-surface">
+            {format(start, "MMM dd, yyyy")}
+          </span>
+          <span className="text-xs text-outline tabular-nums">
+            {format(start, "hh:mm aa")} - {format(end, "hh:mm aa")}
+          </span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "doctorSpecialicity",
-    header: "Appointment & Mode",
-    accessorFn: (row) => row.doctorSpecialicity,
-    cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
-        {row.getValue("doctorSpecialicity")}{" "}
-        <span className="text-[17px] font-semibold text-secondary">Online</span>
+    header: () => <span className="text-[10px] uppercase font-bold text-outline tracking-widest">Mode</span>,
+    cell: ({ row }) => {
+      const spec = row.getValue("doctorSpecialicity") as string;
+      const isCouple = spec?.toLowerCase().includes("couple");
+      return (
+        <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
+          {isCouple ? (
+            <>
+              <span className="material-symbols-outlined text-secondary text-sm">groups</span>
+              <span className="text-secondary">Couple</span>
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined text-primary text-sm">videocam</span>
+              <span>Online</span>
+            </>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => <span className="text-[10px] uppercase font-bold text-outline tracking-widest">Status</span>,
+    cell: ({ row }) => {
+      const status = (row.getValue("status") as string) || "PENDING";
+      const isCompleted = status === "COMPLETED";
+      return (
+        <span
+          className={`px-2 py-1 text-[10px] font-bold rounded-full ${
+            isCompleted
+              ? "bg-emerald-100 text-emerald-700"
+              : "bg-amber-100 text-amber-700"
+          }`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: () => <span className="text-[10px] uppercase font-bold text-outline tracking-widest text-center block">Actions</span>,
+    cell: () => (
+      <div className="flex justify-center gap-2">
+        <button className="w-8 h-8 rounded-lg bg-surface-container-low text-on-surface-variant flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all">
+          <span className="material-symbols-outlined text-[18px]">chat</span>
+        </button>
+        <button className="w-8 h-8 rounded-lg bg-surface-container-low text-on-surface-variant flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all">
+          <span className="material-symbols-outlined text-[18px]">call</span>
+        </button>
       </div>
     ),
   },
@@ -145,7 +167,6 @@ const DashboardDataTable = ({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    // getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -160,74 +181,48 @@ const DashboardDataTable = ({
   });
 
   return (
-    <div className="w-full rounded-[9.37px] border border-[#DFE7EF] p-4 sm:p-6 xl:p-5 2xl:p-[26px]">
-      <div className="mb-[24px] font-inter text-[24px] text-[#121212] leading-[38px]">Recent Booked Slots</div>
-
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Search Patient Name"
-          value={(table.getColumn("patientName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("patientName")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+    <div className="bg-surface-container-lowest rounded-xl custom-shadow overflow-hidden border border-outline-variant/10">
+      <div className="px-lg py-md border-b border-outline-variant/10 flex justify-between items-center">
+        <h3 className="font-headline-sm text-headline-sm text-on-surface">Recent Patients Registry</h3>
+        <div className="flex items-center gap-md">
+          <Input
+            placeholder="Search Patient Name..."
+            value={(table.getColumn("patientName")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("patientName")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm h-9 bg-surface border border-outline-variant/30 rounded-lg text-body-sm"
+          />
+        </div>
       </div>
-      <div className="rounded-md border">
-        <Table  >
-          <TableHeader  className="bg-[#F9FAFB]">
+      <div className="overflow-x-auto no-scrollbar">
+        <Table>
+          <TableHeader className="bg-surface-container-low/30">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+              <TableRow key={headerGroup.id} className="border-b border-outline-variant/10">
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="px-lg py-4">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
-            {/* {table && table.getRowModel()?.rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )} */}
           </TableHeader>
-          <TableBody>
-            {table?.getRowModel().rows?.length ? (
+          <TableBody className="divide-y divide-outline-variant/10">
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-surface-container-low/20 transition-colors border-b border-outline-variant/10"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-lg py-4">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -240,9 +235,9 @@ const DashboardDataTable = ({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-body-sm text-outline"
                 >
-                  No results.
+                  No patients found.
                 </TableCell>
               </TableRow>
             )}
@@ -250,8 +245,8 @@ const DashboardDataTable = ({
         </Table>
       </div>
 
-      <div>
-        <DataTablePagination table={table}/>
+      <div className="px-lg py-3 border-t border-outline-variant/10 flex items-center justify-between">
+        <DataTablePagination table={table} />
       </div>
     </div>
   );

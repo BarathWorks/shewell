@@ -36,13 +36,21 @@ import { api } from "~/trpc/react";
 interface IUnavailableDays {
   date: Date;
 }
+interface AddUnavailabilityProps {
+  unavailableDays: IUnavailableDays[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
 const AddUnavailability = ({
   unavailableDays,
-}: {
-  unavailableDays: IUnavailableDays[];
-}) => {
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: AddUnavailabilityProps) => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const [close, setClose] = useState<boolean>();
+  const [internalClose, setInternalClose] = useState<boolean>(false);
+  const close = controlledOpen !== undefined ? controlledOpen : internalClose;
+  const setClose = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setInternalClose;
   const trpcContext = api.useUtils();
   const schema = z.object({
     dates: z.array(z.date({ required_error: "Please select a date" })),
@@ -88,7 +96,7 @@ const AddUnavailability = ({
     console.log("error", e);
   };
   const monthCaptionStyle = {
-    backgroundColor: "#00898F",
+    backgroundColor: "#0d4759",
   };
 
   const formattedUnavailableDays = unavailableDays.map((item) => item.date);
@@ -111,10 +119,12 @@ const AddUnavailability = ({
     <>
       <div>
         <Dialog open={close} onOpenChange={setClose}>
-          <DialogTrigger className="rounded-xl bg-white/90 px-[18px] py-2.5 font-poppins text-sm font-semibold text-[#0E3A47] shadow-md transition-all duration-300 hover:bg-[#A5F3FC] hover:shadow-lg md:px-5 md:text-base">
-            + Unavailability
-          </DialogTrigger>
-          <DialogContent className="flex flex-col gap-5 rounded-2xl border border-[#00898F]/20 bg-white p-0 py-5 shadow-xl xs:max-w-[300px] sm:max-w-[590px]">
+          {controlledOpen === undefined && (
+            <DialogTrigger className="rounded-xl bg-white/90 px-[18px] py-2.5 font-poppins text-sm font-semibold text-[#0E3A47] shadow-md transition-all duration-300 hover:bg-[#A5F3FC] hover:shadow-lg md:px-5 md:text-base">
+              + Unavailability
+            </DialogTrigger>
+          )}
+          <DialogContent className="flex flex-col gap-5 rounded-2xl border border-primary/20 bg-white p-0 py-5 shadow-xl xs:max-w-[300px] sm:max-w-[590px]">
             <form onSubmit={handleSubmit(onSubmit, errorHandler)}>
               <div>
                 <Controller
@@ -146,7 +156,7 @@ const AddUnavailability = ({
 
                 <Button
                   type="submit"
-                  className="rounded-xl bg-[#00898F] px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#007a80] hover:shadow-lg"
+                  className="rounded-xl bg-primary px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-primary/90 hover:shadow-lg"
                 >
                   Create
                 </Button>

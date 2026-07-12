@@ -21,6 +21,7 @@ const PersonalInfo = async () => {
   const personalInfo = await db.professionalUser.findUnique({
     select: {
       firstName: true,
+      lastName: true,
       email: true,
       phoneNumber: true,
       displayQualificationId: true,
@@ -37,13 +38,14 @@ const PersonalInfo = async () => {
     },
   });
   console.log(personalInfo);
+  const fullName = `${personalInfo?.firstName || ""} ${personalInfo?.lastName || ""}`.trim();
   return (
     <>
       <PersonalInfoForm
         aboutYou={personalInfo?.aboutYou!}
         displayQualificationId={personalInfo?.displayQualificationId!}
         email={personalInfo?.email!}
-        firstName={personalInfo?.firstName!}
+        firstName={fullName}
         phoneNumber={personalInfo?.phoneNumber!}
         specialisations={specialisations.map((a) => ({
           value: a.id,

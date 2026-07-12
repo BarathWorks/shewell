@@ -9,6 +9,7 @@
     "db:seed": "pnpm run db:seed:admin && pnpm run db:seed:country",
     "db:seed:admin": "npx ts-node prisma/seed-admin.ts",
     "db:seed:country": "npx ts-node prisma/seed-country-state.ts",
+    "db:seed:doctor": "npx ts-node prisma/seed-doctor-profile.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prisma": {

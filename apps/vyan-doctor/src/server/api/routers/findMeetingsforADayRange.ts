@@ -36,6 +36,9 @@ export const searchMeetingRouterForADayRange = createTRPCRouter({
           professionalUserId: professionalUser?.id,
           status : BookAppointmentStatus.PAYMENT_SUCCESSFUL
         },
+        include: {
+          patient: true,
+        },
       });
       const unAvailableDays = await db.unAvailableDay.findMany({
         where: {

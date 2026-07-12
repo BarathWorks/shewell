@@ -47,6 +47,7 @@ const DoctorProfile = async () => {
     select: {
       id: true,
       firstName: true,
+      lastName: true,
       qualifications: {
         select: {
           degree: true,
@@ -102,6 +103,7 @@ const DoctorProfile = async () => {
   // if the profile is array, then i will use map just like did in products
   const profileObj = {
     ...profile,
+    firstName: `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim(),
     avgRating: profile?.avgRating?.toString() || "",
     displayQualification: profile.displayQualification?.specialization,
   };
@@ -120,9 +122,13 @@ const DoctorProfile = async () => {
     },
   });
   // console.log("professionalExperience", professionalExperience);
-  const specialization = await db.professionalSpecializations.findMany({
+  const allSpecializations = await db.professionalSpecializations.findMany({
     select: {
+      id: true,
       specialization: true,
+    },
+    where: {
+      active: true,
     },
   });
 
@@ -143,14 +149,16 @@ const DoctorProfile = async () => {
 
   console.log("sessionAtPage", session.user.id);
 
-  
-console.log("")
   return (
     <>
       <DoctorProfileContent
         degrees={degrees}
         professionalExperience={professionalExperience}
         profile={profileObj}
+        allSpecializations={allSpecializations.map((a) => ({
+          value: a.id,
+          label: a.specialization,
+        }))}
       />
     </>
   );

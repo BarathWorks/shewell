@@ -18,7 +18,7 @@ const PersonalInfoUserAction = async ({
   // alternativeNumber,
   displayQualificationId,
   bio,
-    // id
+  // id
 }: IPersonalInfo) => {
   const session = await getServerSession();
   // console.log("bhu", session?.user.id);
@@ -48,7 +48,7 @@ const PersonalInfoUserAction = async ({
     //   },
     // });
     // await db.professionalUser.deleteMany({
-      
+
     //   where: {
     //     id: professionalUserId?.id,
     //   },
@@ -63,18 +63,23 @@ const PersonalInfoUserAction = async ({
     //   },
     // });
 
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || null;
+
     await db.professionalUser.update({
-        where: {
-          email: session?.user.email!,
-        },
-        data: {
-          firstName: fullName,
-          phoneNumber: phoneNumber,
-          aboutYou: bio,
-          displayQualificationId: displayQualificationId,
-        },
-      });
-    
+      where: {
+        email: session?.user.email!,
+      },
+      data: {
+        firstName,
+        lastName,
+        phoneNumber: phoneNumber,
+        aboutYou: bio,
+        displayQualificationId: displayQualificationId,
+      },
+    });
+
     //All Professional Qualifications where professional user id is "ProfessionalUserId during the session"
     // const qualification = await db.professionalQualifications.findFirst({
     //   where: {
