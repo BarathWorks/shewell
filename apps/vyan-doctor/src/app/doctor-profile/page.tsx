@@ -48,6 +48,8 @@ const DoctorProfile = async () => {
       id: true,
       firstName: true,
       lastName: true,
+      email: true,
+      phoneNumber: true,
       qualifications: {
         select: {
           degree: true,

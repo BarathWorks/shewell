@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { LogOut } from "lucide-react";
 import PersonalInfoUserAction from "../edit-profile/personal-info/personal-info-user-action";
 import EditQualificationUserAction from "../edit-profile/qualification/qualification-user-action";
 import SpecializationUserAction from "../edit-profile/specialization/specialization-user-action";
@@ -188,6 +189,13 @@ const DoctorProfileContent = ({
           </p>
         </div>
         <div className="flex items-center gap-sm">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="px-lg py-sm border border-red-200 text-red-600 font-bold rounded-xl hover:bg-red-50 transition-colors flex items-center gap-xs"
+          >
+            <LogOut className="h-4 w-4 stroke-[2]" />
+            Logout
+          </button>
           <button
             onClick={() => router.refresh()}
             className="px-lg py-sm text-on-surface-variant font-bold rounded-xl hover:bg-surface-container-low transition-colors"
