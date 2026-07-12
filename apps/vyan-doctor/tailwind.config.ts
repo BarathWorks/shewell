@@ -12,7 +12,7 @@ const config = {
         "surface-variant": "#d3e4fe",
         "on-secondary-container": "#006979",
         "background": "#f8f9ff",
-        "primary": "#0d4759",
+        "primary": "#00898F",
         "on-tertiary-fixed": "#191c1d",
         "tertiary-container": "#56595a",
         "surface-container-high": "#dce9ff",

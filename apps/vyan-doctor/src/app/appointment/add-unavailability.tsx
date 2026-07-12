@@ -96,7 +96,7 @@ const AddUnavailability = ({
     console.log("error", e);
   };
   const monthCaptionStyle = {
-    backgroundColor: "#0d4759",
+    backgroundColor: "#00898F",
   };
 
   const formattedUnavailableDays = unavailableDays.map((item) => item.date);
