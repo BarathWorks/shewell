@@ -18,6 +18,7 @@ import { Button } from "@repo/ui/src/@/components/button";
 import DeleteAvailabilityUserAction from "./delete-availability-user-action";
 import AppointmentSettings from "./appointment-settings";
 import EditAvailablity from "./add-unavailability";
+import MeetingCard from "./overlay-meeting-card";
 
 interface IAvailaibleTimings {
   startingTime: Date;
@@ -47,6 +48,7 @@ const FullCalendarPage = ({
   prices,
 }: IFullCalendarPageProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isTimingsOpen, setIsTimingsOpen] = useState(false);
   const [isBlackoutOpen, setIsBlackoutOpen] = useState(false);
   const [openDeleteUnvailableDialog, setOpenDeleteUnavailableDialog] = useState<boolean>(false);
@@ -58,7 +60,7 @@ const FullCalendarPage = ({
     return { firstDay, lastDay };
   };
 
-  const { firstDay, lastDay } = findFirstAndLastDayOfMonth(new Date());
+  const { firstDay, lastDay } = findFirstAndLastDayOfMonth(currentMonth);
 
   // Fetch meetings and unavailable days for complete month
   const { data } = api.searchMeetingForADayRange.searchMeetingForADayRange.useQuery({
@@ -190,16 +192,45 @@ const FullCalendarPage = ({
               }}
               weekends={true}
               events={eventsArray}
+              dayCellClassNames={(arg) => {
+                const isSelected =
+                  arg.date.getDate() === selectedDate.getDate() &&
+                  arg.date.getMonth() === selectedDate.getMonth() &&
+                  arg.date.getFullYear() === selectedDate.getFullYear();
+                return isSelected ? "!bg-primary/10 border-2 border-primary rounded-lg shadow-inner" : "";
+              }}
+              eventContent={(eventInfo) => {
+                const isBlackout = eventInfo.event.title.includes("Blackout");
+                return (
+                  <div
+                    className={`flex items-center gap-xs px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm w-full ${
+                      isBlackout
+                        ? "bg-red-50 text-red-700 border border-red-200/50"
+                        : "bg-teal-50 text-teal-700 border border-teal-200/50"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[14px]">
+                      {isBlackout ? "event_busy" : "event_available"}
+                    </span>
+                    <span className="truncate">{eventInfo.event.title}</span>
+                  </div>
+                );
+              }}
               eventDidMount={(info) => {
-                if (info.event.title.includes("Session")) {
-                  info.el.style.backgroundColor = "#0d4759";
-                  info.el.style.borderColor = "#0d4759";
-                  info.el.style.color = "#ffffff";
-                } else if (info.event.title.includes("Blackout")) {
-                  info.el.style.backgroundColor = "#ba1a1a";
-                  info.el.style.borderColor = "#ba1a1a";
-                  info.el.style.color = "#ffffff";
+                info.el.style.backgroundColor = "transparent";
+                info.el.style.borderColor = "transparent";
+                info.el.style.boxShadow = "none";
+                if (info.event.title.includes("Blackout")) {
                   info.el.style.zIndex = "-1";
+                }
+              }}
+              datesSet={(dateInfo) => {
+                const visibleDate = dateInfo.view.currentStart;
+                if (
+                  visibleDate.getMonth() !== currentMonth.getMonth() ||
+                  visibleDate.getFullYear() !== currentMonth.getFullYear()
+                ) {
+                  setCurrentMonth(visibleDate);
                 }
               }}
             />
@@ -240,7 +271,9 @@ const FullCalendarPage = ({
                 <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                   <span className="material-symbols-outlined text-[20px]">event</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">Selected Date Agenda</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                  Selected Date Agenda ({selectedMeetings.length} {selectedMeetings.length === 1 ? "Session" : "Sessions"})
+                </h3>
               </div>
               <p className="font-body-md font-bold text-primary">
                 {format(selectedDate, "eeee, MMM dd, yyyy")}
@@ -258,7 +291,7 @@ const FullCalendarPage = ({
                     return (
                       <div
                         key={meeting.id}
-                        className="flex items-center justify-between p-md bg-white rounded-xl border border-outline-variant/10 shadow-sm"
+                        className="flex items-center justify-between p-md bg-white rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow duration-200"
                       >
                         <div className="flex items-center gap-sm">
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-body-md">
@@ -290,9 +323,20 @@ const FullCalendarPage = ({
                             </div>
                           </div>
                         </div>
-                        <button className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all">
-                          <span className="material-symbols-outlined text-[20px]">videocam</span>
-                        </button>
+                        <div className="flex items-center gap-xs">
+                          {meeting.meeting?.hangoutLink && (
+                            <a
+                              href={meeting.meeting.hangoutLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Join Video Session"
+                              className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-200"
+                            >
+                              <span className="material-symbols-outlined text-[20px]">videocam</span>
+                            </a>
+                          )}
+                          <MeetingCard meetingInfo={meeting as any} />
+                        </div>
                       </div>
                     );
                   })}

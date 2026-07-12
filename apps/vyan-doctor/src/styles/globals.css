@@ -43,6 +43,16 @@
   color: #0E3A47;
 }
 
+.fc .fc-button-group {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.fc .fc-button-group .fc-button {
+  border-radius: 0.5rem !important;
+  margin-left: 0 !important;
+}
+
 .fc .fc-button {
   background-color: #00898F !important;
   border: none !important;
