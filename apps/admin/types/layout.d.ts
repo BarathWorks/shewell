@@ -78,6 +78,7 @@ export interface MenuProps {
 export interface MenuModel {
     label: string;
     icon?: string;
+    svgIcon?: ReactNode;
     items?: MenuModel[];
     to?: string;
     url?: string;

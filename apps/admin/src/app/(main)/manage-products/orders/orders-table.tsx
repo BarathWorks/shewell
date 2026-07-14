@@ -4,9 +4,8 @@ import { IProduct } from '@/src/_models/product.model';
 import { OrderStatus } from '@repo/database';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputText } from 'primereact/inputtext';
-import { ChangeEvent, useState } from 'react';
 import { FilterMatchMode } from 'primereact/api';
+import { useState } from 'react';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -14,6 +13,8 @@ import Image from 'next/image';
 import { IOrder } from '@/src/_models/order.model';
 import OrderDialog from './order-dialog';
 import ShipRocketForm from './shipRocket-form';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 type IProductVariant = {
   id: string | null;
   product: {
@@ -119,6 +120,8 @@ const OrderTable = ({ orders }: { orders: IOrderDetail[] }) => {
     height: 0,
     weight: 0
   };
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const [globalFilter, setGlobalFilter] = useState('');
   const [showShipRocketDialog, setShowShipRocketDialog] = useState<boolean>(false);
   const [shippingData, setShippingData] = useState<IShipRocket>(emptyForm);
@@ -154,12 +157,9 @@ const OrderTable = ({ orders }: { orders: IOrderDetail[] }) => {
         return 'danger';
     }
   };
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onGlobalFilterChange = (value: string) => {
     let _filters: any = { ...filters };
-
     _filters.global.value = value;
-
     setFilters(_filters);
     setGlobalFilter(value);
   };
@@ -224,30 +224,23 @@ const OrderTable = ({ orders }: { orders: IOrderDetail[] }) => {
     setVisible(false);
     setShowShipRocketDialog(false);
   };
-  const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Orders</h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-      </span>
-    </div>
-  );
   console.log('orders are finallyyy', orders);
   return (
     <>
+      <TableToolbar
+        onExport={undefined}
+        searchValue={globalFilter}
+        onSearchChange={onGlobalFilterChange}
+        searchPlaceholder="Search orders..."
+      />
       <DataTable
         stripedRows
         value={orders}
-        header={header}
         filters={filters}
         globalFilterFields={['id', 'status']}
         emptyMessage="No orders found"
-        rows={10}
-        rowsPerPageOptions={[5, 10, 25]}
-        paginator
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        first={first}
+        rows={rows}
         className="datatable-responsive"
       >
         <Column field="id" header="id"></Column>
@@ -258,6 +251,19 @@ const OrderTable = ({ orders }: { orders: IOrderDetail[] }) => {
         <Column field="deliveryFeesInCent" header="DeliveryFees" headerStyle={{ minWidth: '15rem' }}></Column>
         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '25rem' }}></Column>
       </DataTable>
+
+      <CustomPaginator
+        first={first}
+        rows={rows}
+        totalRecords={orders.length}
+        onPageChange={(event) => setFirst(event.first)}
+        onRowsChange={(event) => {
+          setRows(event.rows);
+          setFirst(0);
+        }}
+        entityName="orders"
+        rowsPerPageOptions={[5, 10, 25]}
+      />
 
       <OrderDialog currentLineItems={currentLineItems} currentOrderInfo={currentOrderInfo} visible={visible} onHide={hideDialog} />
       <ShipRocketForm orderId={orderId} shippingData={shippingData} showShipRocketDialog={showShipRocketDialog} onHide={hideDialog} />

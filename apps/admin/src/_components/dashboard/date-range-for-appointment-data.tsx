@@ -6,6 +6,7 @@ import { Nullable } from 'primereact/ts-helpers';
 import { useEffect, useState } from 'react';
 
 const DateRangeForAppointmentData = () => {
+
     const [dates, setDates] = useState<Nullable<(Date | null)[]>>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,22 +52,33 @@ const DateRangeForAppointmentData = () => {
   
 
   return (
-    <>
-
-      <div className='my-4 '>
+    <div className="flex align-items-center">
       <Calendar
         value={dates}
         onChange={handleDateChange}
         selectionMode="range"
-      
-        className="max-w-[380px]"
+        className="max-w-[300px]"
         showIcon
+        icon="pi pi-calendar"
         dateFormat="yy-mm-dd"
         placeholder="Select Date Range"
+        inputStyle={{
+          backgroundColor: '#eff4ff',
+          border: 'none',
+          color: '#40484b',
+          fontWeight: 600,
+          fontFamily: "'Inter', sans-serif",
+          fontSize: '14px',
+          borderRadius: '8px 0 0 8px'
+        }}
+        buttonStyle={{
+          backgroundColor: '#eff4ff',
+          border: 'none',
+          color: '#00898f',
+          borderRadius: '0 8px 8px 0'
+        }}
       />
-      </div>
-    
-    </>
+    </div>
   );
 };
 export default DateRangeForAppointmentData;

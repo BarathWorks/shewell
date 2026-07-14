@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { Chart } from 'primereact/chart';
 import { Dropdown } from 'primereact/dropdown';
 import { useEffect, useState } from 'react';
@@ -6,66 +7,71 @@ import { useEffect, useState } from 'react';
 const SaleOverview = () => {
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const categories = [{ name: 'Weekly' }, { name: 'Monthly' }, { name: 'Yearly' }];
 
   useEffect(() => {
     const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary') || '#40484b';
+    const primaryColor = documentStyle.getPropertyValue('--primary-color') || '#00898f';
+
     const data = {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [
         {
-          type: 'bar',
-          label: 'Dataset 1',
-          backgroundColor: documentStyle.getPropertyValue('--blue-500'),
-          data: [50, 25, 12, 48, 90, 76, 42]
-        },
-        {
-          type: 'bar',
-          label: 'Dataset 2',
-          backgroundColor: documentStyle.getPropertyValue('--green-500'),
-          data: [21, 84, 24, 75, 37, 65, 34]
-        },
-        {
-          type: 'bar',
-          label: 'Dataset 3',
-          backgroundColor: documentStyle.getPropertyValue('--yellow-500'),
-          data: [41, 52, 24, 74, 23, 21, 32]
+          label: 'Appointments',
+          data: [35, 45, 30, 60, 40, 75, 50],
+          fill: true,
+          borderColor: primaryColor,
+          tension: 0.4,
+          backgroundColor: 'rgba(0, 137, 143, 0.03)',
+          pointBackgroundColor: primaryColor,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }
       ]
     };
+
     const options = {
       maintainAspectRatio: false,
       aspectRatio: 0.8,
       plugins: {
-        tooltips: {
+        legend: {
+          display: false
+        },
+        tooltip: {
           mode: 'index',
           intersect: false
-        },
-        legend: {
-          labels: {
-            color: textColor
-          }
         }
       },
       scales: {
         x: {
-          stacked: true,
-          ticks: {
-            color: textColorSecondary
-          },
           grid: {
-            color: surfaceBorder
+            display: false,
+            drawBorder: false
+          },
+          ticks: {
+            color: textColorSecondary,
+            font: {
+              family: 'Inter',
+              size: 12
+            }
           }
         },
         y: {
-          stacked: true,
-          ticks: {
-            color: textColorSecondary
-          },
           grid: {
-            color: surfaceBorder
+            display: false,
+            drawBorder: false
+          },
+          ticks: {
+            color: textColorSecondary,
+            font: {
+              family: 'Inter',
+              size: 12
+            }
           }
         }
       }
@@ -74,18 +80,20 @@ const SaleOverview = () => {
     setChartData(data);
     setChartOptions(options);
   }, []);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const categories = [{ name: 'Quaterly' }, { name: 'Monthly' }, { name: 'Yearly' }];
 
   return (
-    <div className="card">
-      <div className="flex justify-content-between align-items-center">
-        <h5>Sales Overview</h5>
-        <Dropdown value={selectedCategory} onChange={(e) => setSelectedCategory(e.value)} options={categories} optionLabel="name" placeholder="Select Category" className="w-10rem mb-4" />
+    <div className="card h-full">
+      <div className="flex justify-content-between align-items-center mb-4">
+        <div>
+          <span className="text-xs font-bold text-500 uppercase tracking-wider block" style={{ letterSpacing: '0.05em' }}>Overview</span>
+          <h5 className="m-0 text-xl font-bold text-900" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>Appointment Trends</h5>
+        </div>
+        <Dropdown value={selectedCategory} onChange={(e) => setSelectedCategory(e.value)} options={categories} optionLabel="name" placeholder="Select Range" className="w-10rem" />
       </div>
 
-      <Chart type="bar" data={chartData} options={chartOptions} />
+      <div style={{ height: '300px' }}>
+        <Chart type="line" data={chartData} options={chartOptions} style={{ height: '100%', width: '100%' }} />
+      </div>
     </div>
   );
 };

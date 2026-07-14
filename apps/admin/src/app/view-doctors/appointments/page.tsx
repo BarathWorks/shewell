@@ -11,6 +11,7 @@ import { Column } from 'primereact/column';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { useState } from 'react';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Nullable } from 'primereact/ts-helpers';
@@ -43,8 +44,9 @@ const Appointments = () => {
     'professionalUser.firstName': { value: null, matchMode: FilterMatchMode.STARTS_WITH }
   });
   const [selectedStatus, setSelectedStatus] = useState<BookAppointmentStatus | string>(BookAppointmentStatus.PAYMENT_SUCCESSFUL);
-
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(5);
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     let _filters = { ...filters };
@@ -146,13 +148,26 @@ const Appointments = () => {
         <div>
           <h5>View Appointment Details</h5>
         </div>
-        <DataTable value={updatedData} stripedRows paginator rows={5} filters={filters} globalFilterFields={['professionalUser.firstName', 'status']} header={header}>
+        <DataTable value={updatedData} stripedRows rows={rows} first={first} filters={filters} globalFilterFields={['professionalUser.firstName', 'status']} header={header}>
           <Column field="professionalUser" header="Doctor Details" body={doctorDetailsTemplate}></Column>
           <Column field="patient" header="Patient Details" body={patientDetailsTemplate}></Column>
           <Column field="startingTime" header="Appointment Details" body={appointmentDetailsTemplate}></Column>
           <Column field="statusTemplagte" header="Status" body={statusTemplagte}></Column>
           <Column field="priceInCents" header="Price" body={priceInTemplate}></Column>
         </DataTable>
+
+        <CustomPaginator
+          first={first}
+          rows={rows}
+          totalRecords={updatedData?.length || 0}
+          onPageChange={(event) => setFirst(event.first)}
+          onRowsChange={(event) => {
+            setRows(event.rows);
+            setFirst(0);
+          }}
+          entityName="appointments"
+          rowsPerPageOptions={[5, 10, 25]}
+        />
       </div>
     </>
   );

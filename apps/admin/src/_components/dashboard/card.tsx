@@ -1,43 +1,6 @@
-// import { Image } from "primereact/image";
+'use client';
 
-// type ICardProps = {
-//     title: string;
-//     value: string;
-//     valueStat: string;
-//     repeated: string;
-//     customerStats: string;
-//     icon: React.JSX.Element;
-//     borderColor: string;
-//     iconBg:string;
-//     svg?:boolean
-// }
-// const Card = ({item}:{item:ICardProps}) => {
-//   return (
-//     <div className={`bg-white px-3 py-5 mb-0 ${item.borderColor} border-1 border-round-xl`}>
-//       <div className="flex justify-content-between mb-3 ">
-//         <div>
-//           <span className="block text-900 font-semibold mb-3 text-base">{item.title}</span>
-//           <div className="text-900 font-medium text-lg flex gap-3">
-//             <span className="text-base">$ {item.value}</span> <span className="text-green-500 text-sm">{item.valueStat}</span>
-//           </div>
-//         </div>
-//         <div className={`flex align-items-center justify-content-center ${item.iconBg} border-round`} style={{ width: '2.5rem', height: '2.5rem' }}>
-//           {!item.svg ?item.icon: <Image src="/layout/images/membership-icon.png" alt="icon" width="17" height="17"/>}
-//         </div>
-//       </div>
-//       <div className="flex gap-2 align-items-center">
-//         <span className="text-green-500 font-medium text-sm ">{item.repeated}</span>
-//         <span className="text-500 text-xs">Repeated customer</span>
-//         <span className="text-green-500 text-sm">{item.customerStats}</span>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Card;
-
-
-import { Image } from 'primereact/image';
+import React from 'react';
 
 type ICardProps = {
   title: string;
@@ -46,38 +9,56 @@ type ICardProps = {
   borderColor: string;
   iconBg?: string;
   svg?: boolean;
-  anotherTitle? : string
-  anotherValue? : string;
+  anotherTitle?: string;
+  anotherValue?: string;
 };
+
 const Card = ({ item }: { item: ICardProps }) => {
   return (
-    <div className={`bg-white px-3 py-5 mb-0 ${item.borderColor} border-1 border-round-xl`}>
-      <div className="flex justify-content-between">
-        <div className='w-full'>
-          <div className='flex justify-content-between w-full'>
-          <span className="block text-900 font-semibold mb-3 text-base">{item.title}</span>
-          <span className='block text-900 font-semibold mb-3 text-base'>{item.anotherTitle}</span>
-          </div>
-          <div className="text-900 font-medium text-lg flex gap-3">
-            <div className='flex justify-content-between w-full'>
-            <span className="text-base">{item.value}</span>
-            <span className="text-base">{item.anotherValue}</span>
-            </div>
-            
-            {/* <span className="text-green-500 text-sm">{item.valueStat}</span> */}
-          </div>
+    <div className="surface-card p-4 border-1 border-round-lg shadow-1 flex align-items-center gap-3 w-full" style={{ border: '1px solid var(--surface-border)', minHeight: '100px' }}>
+      {/* Icon Area */}
+      {item.icon && (
+        <div 
+          className="flex align-items-center justify-content-center border-round-lg" 
+          style={{ 
+            width: '3rem', 
+            height: '3rem', 
+            backgroundColor: '#eff4ff', 
+            color: 'var(--primary-color)', 
+            fontSize: '1.5rem',
+            flexShrink: 0 
+          }}
+        >
+          {!item.svg ? item.icon : ""}
         </div>
-      {
-        item.icon &&   <div className={`flex align-items-center justify-content-center ${item.iconBg} border-round`} style={{ width: '2.5rem', height: '2.5rem' }}>
-        {!item.svg ? item.icon : ""}
+      )}
+      
+      {/* Text Metrics Area */}
+      <div className="flex-grow-1 min-w-0">
+        {/* Subtitles / Categories */}
+        <div className="flex justify-content-between align-items-center mb-1">
+          <span className="text-xs font-bold text-500 uppercase tracking-wider block truncate" style={{ letterSpacing: '0.05em' }}>
+            {item.title}
+          </span>
+          {item.anotherTitle && (
+            <span className="text-xs font-bold text-500 uppercase tracking-wider block truncate" style={{ letterSpacing: '0.05em' }}>
+              {item.anotherTitle}
+            </span>
+          )}
+        </div>
+        
+        {/* Metric Values */}
+        <div className="flex justify-content-between align-items-baseline">
+          <span className="text-2xl font-bold text-900 block" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+            {item.value}
+          </span>
+          {item.anotherValue && (
+            <span className="text-lg font-bold text-primary block" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              {item.anotherValue}
+            </span>
+          )}
+        </div>
       </div>
-      }
-      </div>
-      {/* <div className="flex gap-2 align-items-center">
-        <span className="text-green-500 font-medium text-sm ">{item.repeated}</span>
-        <span className="text-500 text-xs">Repeated customer</span>
-        <span className="text-green-500 text-sm">{item.customerStats}</span>
-      </div> */}
     </div>
   );
 };

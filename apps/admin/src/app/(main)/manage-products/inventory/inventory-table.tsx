@@ -10,6 +10,7 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 
 import InventoryFormAvailable from './inventory-form-available';
 import InventoryFormOnHand from './inventory-form-onHand';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 export type IInventoryData = {
   id: string;
@@ -38,6 +39,8 @@ export type IInventoryData = {
   } | null;
 };
 const InventoryTable = ({ inventoryData }: { inventoryData: IInventoryData[] }) => {
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
   });
@@ -138,12 +141,9 @@ const InventoryTable = ({ inventoryData }: { inventoryData: IInventoryData[] }) 
             ref={dt}
             value={inventoryData}
             dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
+            first={first}
+            rows={rows}
             className="datatable-responsive"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             emptyMessage="No inventories found."
             header={header}
             filters={filters}
@@ -159,6 +159,19 @@ const InventoryTable = ({ inventoryData }: { inventoryData: IInventoryData[] }) 
             <Column field="available" body={availableBodyTemplate} header="Available" sortable headerStyle={{ minWidth: '15rem' }}></Column>
             <Column field="onHand" body={onHandBodyTemplate} header="on Hand" sortable headerStyle={{ minWidth: '15rem' }}></Column>
           </DataTable>
+
+          <CustomPaginator
+            first={first}
+            rows={rows}
+            totalRecords={inventoryData.length}
+            onPageChange={(event) => setFirst(event.first)}
+            onRowsChange={(event) => {
+              setRows(event.rows);
+              setFirst(0);
+            }}
+            entityName="inventory items"
+            rowsPerPageOptions={[5, 10, 25]}
+          />
 
           {selectedRowForAvailable && (
             <OverlayPanel ref={op1} showCloseIcon>

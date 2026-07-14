@@ -8,13 +8,12 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { deleteSession } from './session-actions';
 import SessionForm from './session-form';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
 
 type SessionTableProps = {
   sessions: ISession[];
@@ -46,23 +45,12 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
   const dt = useRef<DataTable<any>>(null);
   const toast = useRef<Toast>(null);
 
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onGlobalFilterChange = (value: string) => {
     let _filters: any = { ...filters };
     _filters.global.value = value;
     setFilters(_filters);
     setGlobalFilter(value);
   };
-
-  const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Sessions</h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-      </span>
-    </div>
-  );
 
   const hideDeleteSessionDialog = () => {
     setDeleteSessionDialog(false);
@@ -81,23 +69,7 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
     setSessionDialog(true);
   };
 
-  const leftToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <div className="my-2">
-          <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-        </div>
-      </React.Fragment>
-    );
-  };
 
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-      </React.Fragment>
-    );
-  };
 
   const editSession = (session: ISession) => {
     setSession({ ...session });
@@ -168,7 +140,14 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
       <div className="grid crud-demo">
         <div className="col-12">
           <div className="card">
-            <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+            <TableToolbar
+              newLabel="New Session"
+              onNew={openNew}
+              onExport={exportCSV}
+              searchValue={globalFilter}
+              onSearchChange={onGlobalFilterChange}
+              searchPlaceholder="Search sessions..."
+            />
             <DataTable
               stripedRows
               ref={dt}
@@ -183,7 +162,6 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
               filters={filters}
               globalFilterFields={['title', 'slug', 'status']}
               emptyMessage="No sessions found."
-              header={header}
               exportFilename="Sessions"
             >
               <Column field="title" header="Title" sortable headerStyle={{ minWidth: '15rem' }}></Column>

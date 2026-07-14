@@ -10,12 +10,11 @@ import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
-import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import { Message } from 'primereact/message';
-import { Dropdown } from 'primereact/dropdown';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { apiClient as api } from '@/src/trpc/react';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 const PayoutsTable = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -33,6 +32,10 @@ const PayoutsTable = () => {
 
   // Fetch selected doctor details
   const { data: doctorDetails, isLoading: detailsLoading, refetch: refetchDetails } = api.payoutAdmin.getDoctorPayoutDetails.useQuery({ doctorId: selectedDoctorId! }, { enabled: !!selectedDoctorId });
+
+  // Pagination state
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
 
   // Fetch all payouts (for the "All Payouts" tab)
   const { data: allPayoutsData, isLoading: allPayoutsLoading, refetch: refetchAllPayouts } = api.payoutAdmin.getAllPayouts.useQuery({ limit: 50 });
@@ -125,50 +128,51 @@ const PayoutsTable = () => {
     const hasBankDetails = d.bankAccountNumber || d.bankUpiId;
 
     return (
-      <Card className="mb-4" title="Bank Details">
+      <div className="card mb-4">
+        <h5 className="m-0 text-md font-bold text-900 mb-3" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>Bank Details</h5>
         {!hasBankDetails ? (
-          <Message severity="warn" text="No bank details found for this doctor. Please ask them to update their bank details." className="w-full" />
+          <Message severity="warn" text="No bank details found for this doctor." className="w-full" />
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid">
             {d.bankAccountHolderName && (
-              <div>
-                <label className="text-sm text-gray-500 block">Account Holder</label>
-                <span className="font-semibold text-gray-900">{d.bankAccountHolderName}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>Account Holder</label>
+                <span className="font-semibold text-900">{d.bankAccountHolderName}</span>
               </div>
             )}
             {d.bankAccountNumber && (
-              <div>
-                <label className="text-sm text-gray-500 block">Account Number</label>
-                <span className="font-semibold text-gray-900">{d.bankAccountNumber}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>Account Number</label>
+                <span className="font-semibold text-900">{d.bankAccountNumber}</span>
               </div>
             )}
             {d.bankName && (
-              <div>
-                <label className="text-sm text-gray-500 block">Bank Name</label>
-                <span className="font-semibold text-gray-900">{d.bankName}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>Bank Name</label>
+                <span className="font-semibold text-900">{d.bankName}</span>
               </div>
             )}
             {d.bankBranch && (
-              <div>
-                <label className="text-sm text-gray-500 block">Branch</label>
-                <span className="font-semibold text-gray-900">{d.bankBranch}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>Branch</label>
+                <span className="font-semibold text-900">{d.bankBranch}</span>
               </div>
             )}
             {d.bankIfscCode && (
-              <div>
-                <label className="text-sm text-gray-500 block">IFSC Code</label>
-                <span className="font-semibold text-gray-900">{d.bankIfscCode}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>IFSC Code</label>
+                <span className="font-semibold text-900 font-data-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{d.bankIfscCode}</span>
               </div>
             )}
             {d.bankUpiId && (
-              <div>
-                <label className="text-sm text-gray-500 block">UPI ID</label>
-                <span className="font-semibold text-gray-900">{d.bankUpiId}</span>
+              <div className="col-12 md:col-4 py-2">
+                <label className="text-xs text-500 block uppercase font-bold mb-1" style={{ letterSpacing: '0.02em' }}>UPI ID</label>
+                <span className="font-semibold text-900">{d.bankUpiId}</span>
               </div>
             )}
           </div>
         )}
-      </Card>
+      </div>
     );
   };
 
@@ -178,44 +182,53 @@ const PayoutsTable = () => {
     const e = doctorDetails.earnings;
 
     return (
-      <Card className="mb-4" title="Earnings Summary">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 rounded-lg p-3 text-center">
-            <div className="text-sm text-blue-600 mb-1">Total Appointments</div>
-            <div className="text-2xl font-bold text-blue-900">{e.totalAppointments}</div>
+      <div className="card mb-4">
+        <h5 className="m-0 text-md font-bold text-900 mb-3" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>Earnings Summary</h5>
+        <div className="grid mb-3">
+          <div className="col-12 md:col-6 lg:col-3">
+            <div className="p-3 text-center border-round" style={{ backgroundColor: '#eff4ff', border: '1px solid var(--surface-border)' }}>
+              <div className="text-xs text-600 font-bold uppercase mb-2" style={{ letterSpacing: '0.02em' }}>Total Appointments</div>
+              <div className="text-xl font-bold text-900" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>{e.totalAppointments}</div>
+            </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-3 text-center">
-            <div className="text-sm text-green-600 mb-1">Doctor Earnings</div>
-            <div className="text-2xl font-bold text-green-900">{formatCurrency(e.doctorEarningsInCents)}</div>
+          <div className="col-12 md:col-6 lg:col-3">
+            <div className="p-3 text-center border-round" style={{ backgroundColor: '#eff4ff', border: '1px solid var(--surface-border)' }}>
+              <div className="text-xs text-600 font-bold uppercase mb-2" style={{ letterSpacing: '0.02em' }}>Doctor Earnings</div>
+              <div className="text-xl font-bold text-900" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>{formatCurrency(e.doctorEarningsInCents)}</div>
+            </div>
           </div>
-          <div className="bg-orange-50 rounded-lg p-3 text-center">
-            <div className="text-sm text-orange-600 mb-1">Paid Out</div>
-            <div className="text-2xl font-bold text-orange-900">{formatCurrency(e.paidOutInCents)}</div>
+          <div className="col-12 md:col-6 lg:col-3">
+            <div className="p-3 text-center border-round" style={{ backgroundColor: '#eff4ff', border: '1px solid var(--surface-border)' }}>
+              <div className="text-xs text-600 font-bold uppercase mb-2" style={{ letterSpacing: '0.02em' }}>Paid Out</div>
+              <div className="text-xl font-bold text-900" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>{formatCurrency(e.paidOutInCents)}</div>
+            </div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-3 text-center">
-            <div className="text-sm text-purple-600 mb-1">Available Balance</div>
-            <div className="text-2xl font-bold text-purple-900">{formatCurrency(e.availableBalanceInCents)}</div>
+          <div className="col-12 md:col-6 lg:col-3">
+            <div className="p-3 text-center border-round" style={{ backgroundColor: '#eff4ff', border: '1px solid var(--surface-border)' }}>
+              <div className="text-xs text-600 font-bold uppercase mb-2" style={{ letterSpacing: '0.02em' }}>Available Balance</div>
+              <div className="text-xl font-bold text-primary" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>{formatCurrency(e.availableBalanceInCents)}</div>
+            </div>
           </div>
         </div>
 
         <Divider />
 
-        <div className="flex justify-between items-center">
-          <div>
-            <span className="text-sm text-gray-500 mr-4">Total Revenue: {formatCurrency(e.totalRevenueInCents)}</span>
-            <span className="text-sm text-gray-500">Platform Share: {formatCurrency(e.platformEarningsInCents)}</span>
+        <div className="flex justify-content-between align-items-center flex-wrap gap-2">
+          <div className="flex gap-4">
+            <span className="text-sm text-500 font-medium">Total Revenue: <strong className="text-900">{formatCurrency(e.totalRevenueInCents)}</strong></span>
+            <span className="text-sm text-500 font-medium">Platform Share: <strong className="text-900">{formatCurrency(e.platformEarningsInCents)}</strong></span>
           </div>
-          <Button label="Initiate Payout" icon="pi pi-wallet" severity="success" disabled={e.availableBalanceInCents <= 0} onClick={() => setShowPayoutDialog(true)} />
+          <Button label="Initiate Payout" icon="pi pi-wallet" style={{ backgroundColor: '#00898f', border: 'none', borderRadius: '6px' }} disabled={e.availableBalanceInCents <= 0} onClick={() => setShowPayoutDialog(true)} />
         </div>
-      </Card>
+      </div>
     );
   };
 
   // Doctor selection tab
   const renderDoctorSelection = () => (
-    <div className="space-y-4">
+    <div className="flex flex-column gap-3">
       {/* Search */}
-      <div className="flex gap-3 items-center mb-4">
+      <div className="flex gap-3 align-items-center mb-2">
         <span className="p-input-icon-left flex-1">
           <i className="pi pi-search" />
           <InputText value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search doctors by name or email..." className="w-full" />
@@ -233,34 +246,40 @@ const PayoutsTable = () => {
           const doc = e.value as any;
           setSelectedDoctorId(doc?.id ?? null);
         }}
-        paginator
-        rows={10}
-        rowsPerPageOptions={[10, 25, 50]}
-        className="p-datatable-sm"
+        first={first}
+        rows={rows}
+        className="p-datatable-sm datatable-responsive"
         rowClassName={() => 'cursor-pointer'}
       >
         <Column
           header="Doctor"
-          body={(rowData: any) => (
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">{rowData.firstName?.[0]?.toUpperCase() ?? '?'}</div>
-              <div>
-                <div className="font-semibold text-gray-900">
-                  {rowData.firstName} {rowData.lastName || ''}
+          body={(rowData: any) => {
+            const firstInitial = (rowData.firstName || '')[0] || '';
+            const lastInitial = (rowData.lastName || '')[0] || '';
+            const initials = (firstInitial + lastInitial).toUpperCase() || 'D';
+            return (
+              <div className="flex align-items-center gap-3">
+                <div className="flex align-items-center justify-content-center border-round-3xl text-primary font-bold text-xs" style={{ width: '2.25rem', height: '2.25rem', backgroundColor: 'rgba(0, 137, 143, 0.08)' }}>
+                  {initials}
                 </div>
-                <div className="text-sm text-gray-500">{rowData.email}</div>
+                <div>
+                  <div className="font-semibold text-900">
+                    {rowData.firstName} {rowData.lastName || ''}
+                  </div>
+                  <div className="text-sm text-500">{rowData.email}</div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          }}
         />
         <Column
           header="Available Balance"
-          body={(rowData: any) => <span className={`font-bold text-lg ${rowData.availableBalanceInCents > 0 ? 'text-green-600' : 'text-gray-400'}`}>{formatCurrency(rowData.availableBalanceInCents)}</span>}
+          body={(rowData: any) => <span className={`font-bold text-md ${rowData.availableBalanceInCents > 0 ? 'text-primary' : 'text-400'}`}>{formatCurrency(rowData.availableBalanceInCents)}</span>}
           sortable
           sortField="availableBalanceInCents"
         />
-        <Column header="Total Earned" body={(rowData: any) => <span className="text-gray-700">{formatCurrency(rowData.totalEarningsInCents)}</span>} />
-        <Column header="Total Paid" body={(rowData: any) => <span className="text-gray-700">{formatCurrency(rowData.totalPaidOutInCents)}</span>} />
+        <Column header="Total Earned" body={(rowData: any) => <span className="text-600 font-medium">{formatCurrency(rowData.totalEarningsInCents)}</span>} />
+        <Column header="Total Paid" body={(rowData: any) => <span className="text-600 font-medium">{formatCurrency(rowData.totalPaidOutInCents)}</span>} />
         <Column
           header="Bank Status"
           body={(rowData: any) => {
@@ -270,33 +289,47 @@ const PayoutsTable = () => {
         />
       </DataTable>
 
+      <CustomPaginator
+        first={first}
+        rows={rows}
+        totalRecords={doctors?.length || 0}
+        onPageChange={(event) => setFirst(event.first)}
+        onRowsChange={(event) => {
+          setRows(event.rows);
+          setFirst(0);
+        }}
+        entityName="payouts"
+        rowsPerPageOptions={[5, 10, 25]}
+      />
+
       {/* Selected doctor details */}
       {selectedDoctorId && (
-        <div className="mt-6">
+        <div className="mt-4">
           <Divider />
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i className="pi pi-user" />
-            {doctorDetails?.doctor ? `${doctorDetails.doctor.firstName} ${doctorDetails.doctor.lastName || ''}` : 'Loading...'}
-          </h2>
+          <h4 className="text-xl font-bold text-900 mb-4 flex align-items-center gap-2" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+            <i className="pi pi-user text-primary" />
+            {doctorDetails?.doctor ? `Dr. ${doctorDetails.doctor.firstName} ${doctorDetails.doctor.lastName || ''}` : 'Loading...'}
+          </h4>
 
           {detailsLoading ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-content-center py-8">
               <i className="pi pi-spinner pi-spin text-4xl text-gray-400" />
             </div>
           ) : (
-            <>
+            <div className="flex flex-column gap-3">
               {renderBankDetails()}
               {renderEarningsSummary()}
 
               {/* Payout History for this doctor */}
               {doctorDetails?.payoutHistory && doctorDetails.payoutHistory.length > 0 && (
-                <Card title="Payout History">
+                <div className="card">
+                  <h5 className="m-0 text-md font-bold text-900 mb-3" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>Payout History</h5>
                   <DataTable value={doctorDetails.payoutHistory} emptyMessage="No payouts yet" className="p-datatable-sm">
-                    <Column field="amountInCents" header="Amount" body={(rowData: any) => <span className="font-semibold text-gray-900">{formatCurrency(rowData.amountInCents)}</span>} />
+                    <Column field="amountInCents" header="Amount" body={(rowData: any) => <span className="font-semibold text-900">{formatCurrency(rowData.amountInCents)}</span>} />
                     <Column field="status" header="Status" body={statusTemplate} />
-                    <Column header="Initiated By" body={(rowData: any) => <span className="text-gray-600 text-sm">{rowData.initiatedByAdmin?.name ?? '—'}</span>} />
-                    <Column field="paidAt" header="Paid At" body={(rowData: any) => (rowData.paidAt ? <span className="text-gray-600 text-sm">{formatDate(rowData.paidAt)}</span> : '—')} sortable />
-                    <Column field="transactionRef" header="Txn Ref" body={(rowData: any) => <span className="text-gray-500 text-sm">{rowData.transactionRef || '—'}</span>} />
+                    <Column header="Initiated By" body={(rowData: any) => <span className="text-600 text-sm">{rowData.initiatedByAdmin?.name ?? '—'}</span>} />
+                    <Column field="paidAt" header="Paid At" body={(rowData: any) => (rowData.paidAt ? <span className="text-600 text-sm">{formatDate(rowData.paidAt)}</span> : '—')} sortable />
+                    <Column field="transactionRef" header="Txn Ref" body={(rowData: any) => <span className="text-500 text-sm font-data-mono">{rowData.transactionRef || '—'}</span>} />
                     <Column
                       header="Actions"
                       body={(rowData: any) =>
@@ -308,9 +341,9 @@ const PayoutsTable = () => {
                       }
                     />
                   </DataTable>
-                </Card>
+                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       )}
@@ -319,23 +352,23 @@ const PayoutsTable = () => {
 
   // All payouts tab
   const renderAllPayouts = () => (
-    <DataTable value={allPayoutsData?.payouts || []} loading={allPayoutsLoading} emptyMessage="No payout records found" paginator rows={10} rowsPerPageOptions={[10, 25, 50]} className="p-datatable-sm">
+    <DataTable value={allPayoutsData?.payouts || []} loading={allPayoutsLoading} emptyMessage="No payout records found" paginator rows={10} rowsPerPageOptions={[10, 25, 50]} className="p-datatable-sm datatable-responsive">
       <Column
         header="Doctor"
         body={(rowData: any) => (
           <div>
-            <div className="font-semibold text-gray-900">
+            <div className="font-semibold text-900">
               {rowData.doctor?.firstName} {rowData.doctor?.lastName || ''}
             </div>
-            <div className="text-sm text-gray-500">{rowData.doctor?.email}</div>
+            <div className="text-sm text-500">{rowData.doctor?.email}</div>
           </div>
         )}
       />
-      <Column field="amountInCents" header="Amount" body={(rowData: any) => <span className="font-semibold text-gray-900">{formatCurrency(rowData.amountInCents)}</span>} sortable />
+      <Column field="amountInCents" header="Amount" body={(rowData: any) => <span className="font-semibold text-900">{formatCurrency(rowData.amountInCents)}</span>} sortable />
       <Column field="status" header="Status" body={statusTemplate} sortable />
-      <Column header="Admin" body={(rowData: any) => <span className="text-gray-600 text-sm">{rowData.initiatedByAdmin?.name ?? '—'}</span>} />
-      <Column field="paidAt" header="Paid At" body={(rowData: any) => (rowData.paidAt ? <span className="text-gray-600 text-sm">{formatDate(rowData.paidAt)}</span> : '—')} sortable />
-      <Column field="transactionRef" header="Txn Ref" body={(rowData: any) => <span className="text-gray-500 text-sm">{rowData.transactionRef || '—'}</span>} />
+      <Column header="Admin" body={(rowData: any) => <span className="text-600 text-sm">{rowData.initiatedByAdmin?.name ?? '—'}</span>} />
+      <Column field="paidAt" header="Paid At" body={(rowData: any) => (rowData.paidAt ? <span className="text-600 text-sm">{formatDate(rowData.paidAt)}</span> : '—')} sortable />
+      <Column field="transactionRef" header="Txn Ref" body={(rowData: any) => <span className="text-500 text-sm font-data-mono">{rowData.transactionRef || '—'}</span>} />
       <Column
         header="Actions"
         body={(rowData: any) =>
@@ -364,26 +397,26 @@ const PayoutsTable = () => {
         footer={
           <div className="flex justify-end gap-2">
             <Button label="Cancel" severity="secondary" outlined onClick={() => setShowPayoutDialog(false)} />
-            <Button label="Confirm & Pay" icon="pi pi-wallet" severity="success" onClick={handleInitiatePayout} loading={initiatePayoutMutation.isPending} disabled={!payoutAmount || payoutAmount <= 0 || payoutAmount > maxAmount} />
+            <Button label="Confirm & Pay" icon="pi pi-wallet" style={{ backgroundColor: '#00898f', border: 'none' }} onClick={handleInitiatePayout} loading={initiatePayoutMutation.isPending} disabled={!payoutAmount || payoutAmount <= 0 || payoutAmount > maxAmount} />
           </div>
         }
       >
-        <div className="space-y-4">
+        <div className="flex flex-column gap-3">
           <Message severity="info" text={`Available balance: ${formatCurrency(availableBalance)}`} className="w-full" />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payout Amount (₹)</label>
+            <label className="block text-sm font-medium text-700 mb-1">Payout Amount (₹)</label>
             <InputNumber value={payoutAmount} onValueChange={(e) => setPayoutAmount(e.value ?? null)} mode="currency" currency="INR" locale="en-IN" min={1} max={maxAmount} className="w-full" placeholder="Enter amount" />
             {payoutAmount && payoutAmount > maxAmount && <small className="text-red-500 mt-1 block">Amount exceeds available balance of {formatCurrency(availableBalance)}</small>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Reference (optional)</label>
+            <label className="block text-sm font-medium text-700 mb-1">Transaction Reference (optional)</label>
             <InputText value={transactionRef} onChange={(e) => setTransactionRef(e.target.value)} className="w-full" placeholder="e.g. NEFT/IMPS reference number" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+            <label className="block text-sm font-medium text-700 mb-1">Notes (optional)</label>
             <InputTextarea value={payoutNotes} onChange={(e) => setPayoutNotes(e.target.value)} className="w-full" rows={3} placeholder="Any notes about this payout..." />
           </div>
 
@@ -401,12 +434,12 @@ const PayoutsTable = () => {
       <TabView activeIndex={activeTab} onTabChange={(e) => setActiveTab(e.index)}>
         {/* Doctor Payouts Tab */}
         <TabPanel header="Doctor Payouts" leftIcon="pi pi-wallet mr-2">
-          <div className="bg-white rounded-lg border p-4">{renderDoctorSelection()}</div>
+          <div className="card p-4">{renderDoctorSelection()}</div>
         </TabPanel>
 
         {/* All Payouts Tab */}
         <TabPanel header="All Payouts" leftIcon="pi pi-list mr-2">
-          <div className="bg-white rounded-lg border">{renderAllPayouts()}</div>
+          <div className="card p-0">{renderAllPayouts()}</div>
         </TabPanel>
       </TabView>
     </>

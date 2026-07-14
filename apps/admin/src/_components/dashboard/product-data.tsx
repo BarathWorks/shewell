@@ -27,7 +27,7 @@ const ProductData = () => {
     <>
       {CARD.map((item) => {
         return (
-          <div className="col-12 lg:col-6 xl:col-6" key={item.title}>
+          <div className="col-12 md:col-6 lg:col-3 xl:col-3" key={item.title}>
             <Card item={item} />
           </div>
         );

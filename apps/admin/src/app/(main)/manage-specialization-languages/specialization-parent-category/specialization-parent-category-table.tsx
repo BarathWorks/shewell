@@ -3,17 +3,13 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Toolbar } from 'primereact/toolbar';
-import React, { ChangeEvent, useRef, useState } from 'react';
-import StateForm from '@/src/app/(main)/manage-locations/states/state-form';
+import React, { useRef, useState } from 'react';
 import { FilterMatchMode } from 'primereact/api';
-import { deleteState } from '@/src/app/(main)/manage-locations/states/state-actions';
-import { IState,} from '@/src/_models/state.model';
 import { deleteSpecializations } from './specialization-parent-category-action';
-import SpecializationForm from './specialization-parent-category-form';
 import { IMedia } from '@/src/_models/media.model';
 import SpecializationParentCategoryForm from './specialization-parent-category-form';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 
 interface ISpecialization {
@@ -25,6 +21,8 @@ interface ISpecialization {
   }
 const SpecializationParentCategoryTable = ({ specializations }: { specializations: ISpecialization[] }) => {
   const emptySpecialization: ISpecialization = { id: '', name: '', active: false, media : null, mediaId : ""};
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const [specializationDialog, setSpecializationDialog] = useState(false);
   const [specializaton, setSpecialization] = useState<ISpecialization>(emptySpecialization);
   const [selectedSpecializations, setSelectedSpecializations] = useState<ISpecialization[]>([]);
@@ -62,25 +60,7 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
     setConfirmSpecializationDeleteDialog(true);
   };
 
-  const leftToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <div className="my-2">
-          <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-          <Button label="Delete" icon="pi pi-trash" severity="danger" className=" mr-2" onClick={confirmDelete} disabled={!selectedSpecializations || !selectedSpecializations.length} />
-        </div>
-      </React.Fragment>
-    );
-  };
 
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        {/*<FileUpload mode="basic" accept="image/*" maxFileSize={1000000} chooseLabel="Import" className="mr-2 inline-block" />*/}
-        <Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-      </React.Fragment>
-    );
-  };
 
   const idBodyTemplate = (rowData: ISpecialization) => {
     return (
@@ -109,25 +89,12 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
     );
   };
 
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onGlobalFilterChange = (value: string) => {
     let _filters: any = { ...filters };
-
     _filters.global.value = value;
-
     setFilters(_filters);
     setGlobalFilter(value);
   };
-
-  const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Specializations</h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-      </span>
-    </div>
-  );
 
   const hideConfirmSpecializationsDeleteDialog = () => {
     setConfirmSpecializationDeleteDialog(false);
@@ -160,7 +127,17 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
     <div className="grid crud-demo">
       <div className="col-12">
         <div className="card">
-          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+          <TableToolbar
+            newLabel="New Parent Category"
+            onNew={openNew}
+            showDelete={true}
+            onDelete={confirmDelete}
+            deleteDisabled={!selectedSpecializations || !selectedSpecializations.length}
+            onExport={exportCSV}
+            searchValue={globalFilter}
+            onSearchChange={onGlobalFilterChange}
+            searchPlaceholder="Search parent categories..."
+          />
 
           <DataTable
             stripedRows
@@ -173,16 +150,12 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
             selection={selectedSpecializations}
             onSelectionChange={(e) => setSelectedSpecializations(e.value)}
             dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
+            first={first}
+            rows={rows}
             className="datatable-responsive"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             filters={filters}
             globalFilterFields={['id', 'specialization']}
             emptyMessage="No specializaitons found."
-            header={header}
             exportFilename="Specializations"
           >
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
@@ -190,6 +163,19 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
             <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
           </DataTable>
+
+          <CustomPaginator
+            first={first}
+            rows={rows}
+            totalRecords={specializations.length}
+            onPageChange={(event) => setFirst(event.first)}
+            onRowsChange={(event) => {
+              setRows(event.rows);
+              setFirst(0);
+            }}
+            entityName="categories"
+            rowsPerPageOptions={[5, 10, 25]}
+          />
 
           <Dialog visible={specializationDialog} style={{ width: '50vw' }} header="Specializations" modal className="p-fluid" onHide={hideDialog}>
             {/* <StateForm state={state}  hideDialog={hideDialog} /> */}

@@ -28,10 +28,10 @@ const TotalDoctorsOnBoard = () => {
       const doctorOnBoardItems = { title: `Total Doctors Onboard`, value: `${(data?.totalDoctorsOnBoard || 0).toString()}`, icon: <i className="pi pi-comment text-purple-500 text-xl" />, borderColor: 'text-purple-500', iconBg: 'bg-purple-100' };
     return(
         <>
-        <div className="col-12 lg:col-6 xl:col-6">
+        <div className="col-12 md:col-6 lg:col-3 xl:col-3">
         <Card item={doctorTotalAppointmentsWithCountAndPriceItems} />
       </div>
-      <div className="col-12 lg:col-6 xl:col-6">
+      <div className="col-12 md:col-6 lg:col-3 xl:col-3">
         <Card item={doctorOnBoardItems} />
       </div>
         </>

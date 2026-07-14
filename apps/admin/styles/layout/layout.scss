@@ -27,3 +27,662 @@
 .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
   color: #ffffff;
 }
+
+/* ==========================================================================
+   Stitch UI Clinical Modern Overrides
+   ========================================================================== */
+
+/* 1. Global variables and typography override */
+:root {
+  --primary-color: #00898f;
+  --primary-color-text: #ffffff;
+  --surface-ground: #F9FBFC; /* Clinical Modern background */
+  --surface-card: #ffffff;
+  --text-color: #0b1c30;
+  --text-color-secondary: #40484b;
+  --surface-border: #e5eeff;
+  --surface-hover: rgba(229, 238, 255, 0.4);
+  --font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--surface-ground) !important;
+  color: var(--text-color) !important;
+  font-family: var(--font-family) !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-headline-md, .font-headline-sm {
+  font-family: 'Hanken Grotesk', sans-serif !important;
+}
+
+.font-data-mono, .text-data-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* 2. Hide Topbar on Desktop and adjust position */
+@media (min-width: 992px) {
+  .layout-topbar {
+    display: none !important;
+  }
+}
+
+/* 3. Global Cards styling */
+.card, .surface-card {
+  background: var(--surface-card) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid var(--surface-border) !important;
+  padding: 1.5rem !important;
+}
+
+/* 4. Global InputText / Password styling */
+.p-inputtext, .p-password-input {
+  background-color: #e8f0fe !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  color: var(--text-color) !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease-in-out !important;
+
+  &:focus, &:enabled:focus {
+    background-color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(0, 137, 143, 0.1) !important;
+    outline: none !important;
+  }
+  
+  &::placeholder {
+    color: rgba(64, 72, 75, 0.4) !important;
+  }
+}
+
+/* Fix for PrimeReact Password wrapper to prevent line breaks */
+.p-password {
+  display: inline-flex !important;
+  width: 100% !important;
+}
+
+/* ===== Custom SVG Icons (extends PrimeIcons) ===== */
+.pi-stethoscope {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 8a3 3 0 0 1 .78 5.9A5.5 5.5 0 0 1 14 19h-1v1a2 2 0 0 1-4 0v-1H8a5.5 5.5 0 0 1-5.78-5.1A3 3 0 0 1 3 8V4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a1 1 0 0 0 2 0V4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a3 3 0 0 1-2.78 2.99A3.5 3.5 0 0 0 11.5 17h1a3.5 3.5 0 0 0 3.28-4.71A3 3 0 0 1 16 8h1a1 1 0 0 1 1 1v.17A3.001 3.001 0 0 1 19 8Zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 8a3 3 0 0 1 .78 5.9A5.5 5.5 0 0 1 14 19h-1v1a2 2 0 0 1-4 0v-1H8a5.5 5.5 0 0 1-5.78-5.1A3 3 0 0 1 3 8V4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a1 1 0 0 0 2 0V4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a3 3 0 0 1-2.78 2.99A3.5 3.5 0 0 0 11.5 17h1a3.5 3.5 0 0 0 3.28-4.71A3 3 0 0 1 16 8h1a1 1 0 0 1 1 1v.17A3.001 3.001 0 0 1 19 8Zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  vertical-align: middle;
+}
+
+/* 5. Global Button styling with Severity Overrides to match Stitch UI */
+.p-button {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.25rem !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: none !important;
+
+  /* Primary State (Default, e.g. Save, Submit) */
+  & {
+    background-color: var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
+    color: #ffffff !important;
+
+    &:hover, &:enabled:hover {
+      background-color: #26a18d !important;
+      border-color: #26a18d !important;
+    }
+  }
+
+  /* Success State (e.g. New User, Add) */
+  &.p-button-success {
+    background-color: rgba(0, 137, 143, 0.08) !important;
+    border: 1px solid transparent !important;
+    color: var(--primary-color) !important;
+
+    &:hover, &:enabled:hover {
+      background-color: rgba(0, 137, 143, 0.15) !important;
+      color: var(--primary-color) !important;
+    }
+  }
+
+  /* Secondary / Export State (Secondary and Help severity) */
+  &.p-button-secondary,
+  &.p-button-help {
+    background-color: #eff4ff !important;
+    color: #40484b !important;
+    border: 1px solid transparent !important;
+
+    &:hover, &:enabled:hover {
+      background-color: #e0ebff !important;
+      color: #0b1c30 !important;
+    }
+  }
+
+  /* Danger State */
+  &.p-button-danger {
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fee2e2 !important;
+
+    &:hover, &:enabled:hover {
+      background-color: #fee2e2 !important;
+      color: #b91c1c !important;
+      border-color: #fee2e2 !important;
+    }
+  }
+
+  /* Outlined button overrides */
+  &.p-button-outlined {
+    background-color: transparent !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+
+    &:hover, &:enabled:hover {
+      background-color: rgba(0, 137, 143, 0.05) !important;
+    }
+  }
+
+  /* Text button overrides */
+  &.p-button-text {
+    background-color: transparent !important;
+    color: var(--primary-color) !important;
+    border: none !important;
+
+    &:hover, &:enabled:hover {
+      background-color: rgba(0, 137, 143, 0.05) !important;
+    }
+    
+    &.p-button-success {
+      color: var(--primary-color) !important;
+      &:hover {
+        background-color: rgba(0, 137, 143, 0.05) !important;
+      }
+    }
+  }
+}
+
+/* 6. Global Table styling (Force white background, remove striped green/gray color) */
+.p-datatable {
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+
+  .p-datatable-thead > tr > th {
+    background: #F9FBFC !important;
+    color: var(--text-color-secondary) !important;
+    font-size: 11px !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    padding: 1rem !important;
+    border-bottom: 1px solid var(--surface-border) !important;
+    font-family: 'Inter', sans-serif !important;
+  }
+
+  .p-datatable-tbody > tr {
+    background: #ffffff !important;
+    color: var(--text-color) !important;
+    border-bottom: 1px solid var(--surface-border) !important;
+    transition: background-color 0.2s ease !important;
+
+    &:nth-child(even),
+    &.p-row-odd,
+    &.p-datatable-row-even,
+    .p-datatable-striped & {
+      background: #ffffff !important; /* Force all rows to be white, matching the Stitch design! */
+    }
+
+    &:hover {
+      background-color: rgba(229, 238, 255, 0.2) !important;
+    }
+
+    &.p-highlight {
+      background: rgba(0, 137, 143, 0.05) !important;
+      color: var(--primary-color) !important;
+    }
+
+    > td {
+      padding: 1.25rem 1rem !important;
+      border: none !important;
+      font-size: 14px !important;
+    }
+  }
+}
+
+/* 7. Global Paginator styling to match Stitch UI */
+.p-paginator {
+  background: #ffffff !important;
+  border-top: 1px solid #f1f5f9 !important;
+  padding: 1rem 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+
+  /* Left-align text info if present */
+  .p-paginator-current {
+    font-size: 13px !important;
+    color: #64748b !important;
+    font-weight: 400 !important;
+    order: 1 !important;
+    margin-right: auto !important;
+    font-family: 'Inter', sans-serif !important;
+
+    strong, b {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  /* Right-align navigation and dropdown grouping */
+  .p-paginator-pages,
+  .p-paginator-first,
+  .p-paginator-prev,
+  .p-paginator-next,
+  .p-paginator-last,
+  .p-paginator-rpp-options {
+    order: 2 !important;
+  }
+
+  /* Hide First/Last double chevrons to match the clean single-chevron image */
+  .p-paginator-first,
+  .p-paginator-last {
+    display: none !important;
+  }
+
+  /* Dropdown selector for rows per page with absolute positioned label */
+  .p-dropdown.p-paginator-rpp-options {
+    position: relative !important;
+    margin-left: 110px !important; /* Allocate space for the label on the left */
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    height: auto !important;
+    padding: 0.2rem 0.4rem !important;
+    order: 2 !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    
+    &::before {
+      content: "Rows per page:" !important;
+      position: absolute !important;
+      left: -110px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      white-space: nowrap !important;
+      font-size: 13px !important;
+      color: #64748b !important;
+      font-weight: 400 !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    .p-dropdown-label {
+      padding: 0.15rem 0.5rem 0.15rem 0.25rem !important;
+      font-weight: 500 !important;
+      color: #1e293b !important;
+    }
+
+    .p-dropdown-trigger {
+      width: 1rem !important;
+      color: #64748b !important;
+      font-size: 0.75rem !important;
+    }
+  }
+
+  /* Page numbers */
+  .p-paginator-pages {
+    display: inline-flex !important;
+    gap: 0.25rem !important;
+    margin: 0 0.5rem !important;
+
+    .p-paginator-page {
+      border-radius: 8px !important;
+      min-width: 2rem !important;
+      height: 2rem !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #475569 !important;
+      background: transparent !important;
+      border: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.15s ease !important;
+
+      &.p-highlight {
+        background-color: var(--primary-color) !important; /* Teal */
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        box-shadow: 0 1px 3px rgba(0, 137, 143, 0.2) !important;
+      }
+
+      &:hover:not(.p-highlight) {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+      }
+    }
+  }
+
+  /* Navigation buttons (chevrons) */
+  .p-paginator-prev,
+  .p-paginator-next {
+    border-radius: 8px !important;
+    min-width: 2rem !important;
+    height: 2rem !important;
+    background: transparent !important;
+    border: none !important;
+    color: #475569 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+
+    &:hover:not(.p-disabled) {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    &.p-disabled {
+      opacity: 0.25 !important;
+      color: #cbd5e1 !important;
+    }
+  }
+}
+
+/* 8. Status Badge Styling overrides */
+.p-tag {
+  border-radius: 9999px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  padding: 0.25rem 0.5rem !important;
+  border: 1px solid transparent !important;
+
+  &.p-tag-success {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border-color: #d1fae5 !important;
+  }
+
+  &.p-tag-danger {
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+    border-color: #fee2e2 !important;
+  }
+  
+  &.p-tag-warning {
+    background-color: #fffbef !important;
+    color: #b25e00 !important;
+    border-color: #fef3c7 !important;
+  }
+  
+  &.p-tag-info {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #dbeafe !important;
+  }
+}
+
+/* 8b. Global Toolbar Overrides */
+.p-toolbar {
+  background: #ffffff !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 8px !important;
+  padding: 1rem 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* 8c. Global Dialog / Popup Modal Overrides */
+.p-dialog {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 50px rgba(11, 28, 48, 0.12) !important;
+  border: 1px solid var(--surface-border) !important;
+  background-color: #ffffff !important;
+
+  .p-dialog-header {
+    background: #ffffff !important;
+    padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+    border-bottom: none !important;
+    color: var(--text-color) !important;
+    
+    .p-dialog-title {
+      font-family: 'Hanken Grotesk', sans-serif !important;
+      font-size: 20px !important;
+      font-weight: 700 !important;
+    }
+    
+    .p-dialog-header-icon {
+      border-radius: 50% !important;
+      width: 2rem !important;
+      height: 2rem !important;
+      transition: background-color 0.2s !important;
+      
+      &:hover {
+        background-color: #eff4ff !important;
+      }
+    }
+  }
+
+  .p-dialog-content {
+    background: #ffffff !important;
+    padding: 0 1.5rem 1.5rem 1.5rem !important;
+    color: var(--text-color) !important;
+  }
+
+  .p-dialog-footer {
+    background: #f8f9ff !important;
+    padding: 1rem 1.5rem !important;
+    border-top: 1px solid var(--surface-border) !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+    
+    button {
+      margin: 0 !important;
+    }
+  }
+}
+
+/* 9. Sidebar Navigation Menu & Collapsible Dropdowns Override */
+.layout-sidebar {
+  .layout-menuitem-root-text {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: rgba(64, 72, 75, 0.6) !important;
+    margin: 1.5rem 0 0.5rem 0.5rem !important;
+  }
+
+  .layout-menu {
+    li {
+      margin-bottom: 0.25rem;
+      
+      a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem !important;
+        border-radius: 8px !important;
+        color: var(--text-color-secondary) !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease-in-out !important;
+        text-decoration: none !important;
+        
+        .layout-menuitem-icon {
+          font-size: 18px !important;
+          color: inherit !important;
+          margin-right: 0.75rem !important;
+        }
+
+        .layout-menuitem-text {
+          font-family: inherit !important;
+        }
+
+        .layout-submenu-toggler {
+          margin-left: auto !important;
+          font-size: 12px !important;
+          transition: transform 0.25s ease !important;
+        }
+        
+        &:hover {
+          background-color: #eff4ff !important;
+          color: var(--primary-color) !important;
+        }
+
+        /* Active top-level route */
+        &.active-route {
+          background-color: rgba(0, 137, 143, 0.05) !important;
+          color: var(--primary-color) !important;
+          font-weight: 600 !important;
+        }
+      }
+
+      /* Active dropdown parent item */
+      &.active-menuitem {
+        > a {
+          background-color: rgba(0, 137, 143, 0.05) !important;
+          color: var(--primary-color) !important;
+          font-weight: 600 !important;
+          
+          .layout-submenu-toggler {
+            transform: rotate(-180deg) !important;
+          }
+        }
+      }
+      
+      /* Submenu nested lists */
+      ul {
+        padding-left: 0.75rem !important;
+        margin-top: 0.25rem !important;
+        list-style-type: none !important;
+        
+        li {
+          margin-bottom: 0.15rem !important;
+          
+          a {
+            font-size: 13px !important;
+            padding: 0.5rem 1rem !important;
+            
+            &.active-route {
+              background-color: rgba(0, 137, 143, 0.1) !important;
+              color: var(--primary-color) !important;
+              font-weight: 600 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 6b. Global Table Row Action Button Overrides (Pencil Edit Button) */
+.p-datatable-tbody {
+  .p-button.p-button-danger.p-button-rounded {
+    background: transparent !important;
+    border: none !important;
+    color: #dc2626 !important;
+    padding: 0.5rem !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    &:hover {
+      background-color: rgba(220, 38, 38, 0.08) !important;
+      color: #dc2626 !important;
+    }
+
+    .pi {
+      font-size: 1.15rem !important;
+    }
+  }
+}
+
+/* ===== 7. Table Toolbar Bar (Stitch Action Bar) ===== */
+.table-toolbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+
+  .table-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .table-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Override PrimeReact's default button padding inside toolbar */
+  .table-toolbar-btn {
+    padding: 0.55rem 1.15rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+
+    .p-button-icon {
+      font-size: 1rem !important;
+    }
+  }
+
+  /* Search input */
+  .table-toolbar-search {
+    .p-inputtext {
+      background: #F9FBFC !important;
+      border: 1px solid var(--surface-border) !important;
+      border-radius: 8px !important;
+      padding: 0.55rem 0.75rem 0.55rem 2.25rem !important;
+      min-width: 240px !important;
+      font-size: 0.875rem !important;
+      transition: border-color 0.2s, background 0.2s !important;
+
+      &:focus {
+        background: #ffffff !important;
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 2px rgba(0,137,143,0.12) !important;
+      }
+
+      &::placeholder {
+        color: #9aa5b4 !important;
+      }
+    }
+  }
+}
+
+/* Hide the old PrimeReact Toolbar borders when used inside cards */
+.card .p-toolbar {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 1rem !important;
+}
+

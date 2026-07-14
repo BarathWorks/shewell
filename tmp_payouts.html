@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary-container": "#006979",
+                            "primary-fixed": "#b9eaff",
+                            "primary": "#00898f",
+                            "surface-container-highest": "#d3e4fe",
+                            "on-error-container": "#93000a",
+                            "surface": "#f8f9ff",
+                            "surface-container-lowest": "#ffffff",
+                            "on-primary-fixed-variant": "#154d5e",
+                            "error-container": "#ffdad6",
+                            "on-tertiary-fixed-variant": "#444748",
+                            "primary-container": "#00898f",
+                            "primary-fixed-dim": "#9ccee3",
+                            "surface-container": "#e5eeff",
+                            "tertiary": "#3e4243",
+                            "on-surface-variant": "#40484b",
+                            "secondary": "#006879",
+                            "on-background": "#0b1c30",
+                            "inverse-surface": "#213145",
+                            "surface-bright": "#f8f9ff",
+                            "tertiary-container": "#56595a",
+                            "surface-tint": "#00898f",
+                            "on-primary": "#ffffff",
+                            "inverse-primary": "#9ccee3",
+                            "inverse-on-surface": "#eaf1ff",
+                            "surface-container-high": "#dce9ff",
+                            "secondary-container": "#8be7fe",
+                            "on-primary-container": "#a5d7ec",
+                            "outline-variant": "#c0c8cc",
+                            "on-primary-fixed": "#001f29",
+                            "on-tertiary-container": "#cdd0d1",
+                            "secondary-fixed-dim": "#77d4ea",
+                            "on-tertiary-fixed": "#191c1d",
+                            "secondary-fixed": "#a8edff",
+                            "tertiary-fixed-dim": "#c4c7c8",
+                            "surface-variant": "#d3e4fe",
+                            "surface-container-low": "#eff4ff",
+                            "on-tertiary": "#ffffff",
+                            "on-error": "#ffffff",
+                            "surface-dim": "#cbdbf5",
+                            "on-secondary-fixed": "#001f26",
+                            "background": "#f8f9ff",
+                            "on-secondary": "#ffffff",
+                            "tertiary-fixed": "#e1e3e4",
+                            "on-surface": "#0b1c30",
+                            "on-secondary-fixed-variant": "#004e5b",
+                            "outline": "#71787c",
+                            "error": "#ba1a1a"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "8px",
+                            "xl": "12px",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "xl": "48px",
+                            "gutter": "24px",
+                            "base": "4px",
+                            "xs": "8px",
+                            "sm": "16px",
+                            "container-max": "1440px",
+                            "lg": "32px",
+                            "md": "24px"
+                        },
+                        "fontFamily": {
+                            "data-mono": ["JetBrains Mono"],
+                            "body-lg": ["Inter"],
+                            "headline-sm": ["Hanken Grotesk"],
+                            "display-lg": ["Hanken Grotesk"],
+                            "headline-md": ["Hanken Grotesk"],
+                            "body-sm": ["Inter"],
+                            "label-caps": ["Inter"],
+                            "body-md": ["Inter"]
+                        },
+                        "fontSize": {
+                            "data-mono": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                            "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                            "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface selection:bg-primary/20 overflow-x-hidden">
+<div class="flex min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="flex flex-col h-screen py-lg px-md bg-surface-container-lowest dark:bg-inverse-surface sticky top-0 w-72 shrink-0 z-50">
+<div class="mb-xl px-sm shrink-0">
+<div class="flex items-center gap-xs">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary leading-none">Shewell</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1 tracking-wider opacity-70">Admin Portal</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto space-y-8 custom-scrollbar px-sm pb-md">
+<!-- Home -->
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant/50 uppercase px-sm mb-3 tracking-[0.1em]">Home</p>
+<a class="flex items-center gap-sm px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+</div>
+<!-- Manage Users -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="font-body-md text-body-md">Manage Users</span>
+</div>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/collapsible:rotate-180 opacity-50">expand_more</span>
+</button>
+<div class="hidden group-hover/collapsible:block space-y-1 mt-1 pl-10 border-l border-outline-variant/30 ml-4">
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-on-surface-variant/80 font-medium hover:text-primary transition-colors" href="#">
+<span class="font-body-md text-body-md">Admin Users</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Manage Sessions -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">event_repeat</span>
+<span class="font-body-md text-body-md">Manage Sessions</span>
+</div>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/collapsible:rotate-180 opacity-50">expand_more</span>
+</button>
+</div>
+</div>
+<!-- View Doctors And Appointments -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">medical_services</span>
+<span class="font-body-md text-body-md">Doctors &amp; Appointments</span>
+</div>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/collapsible:rotate-180 opacity-50">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Manage Payouts -->
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant/50 uppercase px-sm mb-3 tracking-[0.1em]">Finance</p>
+<div class="space-y-1">
+<a class="flex items-center gap-sm px-sm py-2.5 rounded-xl text-primary bg-primary/5 font-bold border-r-2 border-primary transition-all shadow-sm shadow-primary/5" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-body-md text-body-md">Payout Requests</span>
+</a>
+</div>
+</div>
+<!-- Manage Product / Orders -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+<span class="font-body-md text-body-md">Inventory</span>
+</div>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/collapsible:rotate-180 opacity-50">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Settings -->
+<div class="pt-4">
+<a class="flex items-center gap-sm px-sm py-2.5 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container/50 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Sidebar Bottom: User Profile and Logout -->
+<div class="mt-auto pt-lg border-t border-outline-variant/10 shrink-0">
+<div class="flex items-center gap-sm px-sm py-3 mb-2 cursor-pointer hover:bg-surface-container/30 transition-colors rounded-xl">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB8JeCMFqChy8c02s1FL7RMYhoe7wzkWRhjovkDY3xeIryI6MeZG5-AYgdD0fGl0fZR8JlZMQW1v3XjL9UAlylc9978fakSeBNVtge3DCLUDaxWLvHbMCNdDCKDV8sgZtw-iezSpOawCxyQ346Cz8a5sp8QmxjwChdiUefT8iiTL_0YtaWET4nIZvLp_B39zNha6zROqOMo4pXzsMR1VcfPev3FAJIzq1Gg6cVMu2EoDNN8dWvK1ikHg"/>
+<div class="overflow-hidden">
+<p class="font-body-md text-body-md font-bold text-on-surface leading-tight truncate">Admin User</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase truncate tracking-wide">Medical Admin</p>
+</div>
+</div>
+<a class="flex items-center gap-sm px-sm py-2.5 rounded-xl text-on-surface-variant/70 font-medium hover:bg-error/5 hover:text-error transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 p-xl min-h-screen bg-surface">
+<div class="max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="mb-xl">
+<h2 class="text-headline-md font-headline-md text-on-surface mb-2 tracking-tight">Manage Payouts</h2>
+<p class="text-body-lg text-on-surface-variant max-w-2xl">Effortlessly track doctor earnings and process payouts with clinical precision. Review outstanding balances and settled accounts in a single view.</p>
+</div>
+<!-- Dashboard Stats Row (Tonal Minimal) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<div class="bg-surface-container-lowest p-lg rounded-2xl flex items-center justify-between shadow-[0_4px_20px_-10px_rgba(0,137,143,0.1)] transition-all hover:shadow-[0_8px_30px_-10px_rgba(0,137,143,0.15)] group">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant/60 mb-2 tracking-wider">TOTAL PENDING</p>
+<h3 class="text-headline-sm font-headline-sm text-primary">₹4,25,000</h3>
+</div>
+<div class="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="pending_actions">pending_actions</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-2xl flex items-center justify-between shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-all hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] group">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant/60 mb-2 tracking-wider">PAID THIS MONTH</p>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">₹12,80,000</h3>
+</div>
+<div class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center text-on-surface transition-colors group-hover:bg-on-surface group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-2xl flex items-center justify-between shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-all hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] group">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant/60 mb-2 tracking-wider">ACTIVE DOCTORS</p>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">142</h3>
+</div>
+<div class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center text-on-surface transition-colors group-hover:bg-on-surface group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="groups">groups</span>
+</div>
+</div>
+</div>
+<!-- Main Payout Interface -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0_8px_40px_-15px_rgba(0,0,0,0.06)] overflow-hidden">
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant/10 px-lg bg-surface-container-lowest">
+<button class="px-lg py-4 text-body-md font-bold text-primary border-b-2 border-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_balance_wallet">account_balance_wallet</span>
+                        Doctor Payouts
+                    </button>
+<button class="px-lg py-4 text-body-md text-on-surface-variant/70 hover:text-primary transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="list_alt">list_alt</span>
+                        All Payouts
+                    </button>
+</div>
+<!-- Table Controls -->
+<div class="p-lg flex flex-col sm:flex-row items-center justify-between gap-md bg-white">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40" data-icon="search">search</span>
+<input class="w-full pl-12 pr-6 py-3 bg-surface-container-low/50 border-none rounded-xl text-body-md focus:ring-2 focus:ring-primary/10 focus:bg-surface-container-low outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Search doctors by name or email..." type="text"/>
+</div>
+<div class="flex gap-sm w-full sm:w-auto">
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-surface-container-low rounded-xl text-body-md font-medium text-on-surface-variant hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="filter_list">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-surface-container-low rounded-xl text-body-md font-medium text-on-surface-variant hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="download">download</span>
+                            Export
+                        </button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low/30 border-b border-outline-variant/10">
+<tr>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider">DOCTOR</th>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider">
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
+                                        AVAILABLE BALANCE
+                                        <span class="material-symbols-outlined text-[14px]" data-icon="unfold_more">unfold_more</span>
+</div>
+</th>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider">TOTAL EARNED</th>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider">TOTAL PAID</th>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider text-center">BANK STATUS</th>
+<th class="px-lg py-5 text-label-caps font-label-caps text-on-surface-variant/60 tracking-wider text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low/20 transition-colors group">
+<td class="px-lg py-5">
+<div class="flex items-center gap-md">
+<div class="w-11 h-11 rounded-xl bg-surface-container-high flex items-center justify-center text-primary font-bold text-lg">A</div>
+<div>
+<p class="text-body-md font-bold text-on-surface">admindocter</p>
+<p class="text-body-sm text-on-surface-variant/70">admindocter@admin.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-primary font-bold">₹0.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹45,200.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹45,200.00</td>
+<td class="px-lg py-5 text-center">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[10px] font-bold bg-error-container/20 text-error uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]" data-icon="error_outline">error_outline</span>
+                                        Missing
+                                    </span>
+</td>
+<td class="px-lg py-5 text-right">
+<button class="p-2.5 text-on-surface-variant/50 hover:bg-primary/5 hover:text-primary rounded-xl transition-all">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/20 transition-colors group">
+<td class="px-lg py-5">
+<div class="flex items-center gap-md">
+<div class="w-11 h-11 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold text-lg">D</div>
+<div>
+<p class="text-body-md font-bold text-on-surface">Demo Doctor</p>
+<p class="text-body-sm text-on-surface-variant/70">doctor@shewell.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-primary font-bold">₹12,450.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹89,000.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹76,550.00</td>
+<td class="px-lg py-5 text-center">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[10px] font-bold bg-secondary-container/20 text-secondary uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                        Verified
+                                    </span>
+</td>
+<td class="px-lg py-5 text-right">
+<button class="px-6 py-2 bg-primary text-white rounded-xl text-body-sm font-bold transition-all hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:scale-95">
+                                        Pay Now
+                                    </button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/20 transition-colors group">
+<td class="px-lg py-5">
+<div class="flex items-center gap-md">
+<img class="w-11 h-11 rounded-xl object-cover shadow-sm ring-1 ring-outline-variant/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUpYdXC7H3bg6si1BV0Iz8K-Hl5qqaYjOwAkKt4GcobVzLKsp5xvrJBVNlBbYf2Ww8KIUpN_6fSMkzVvTWa2nwDnWiDRJWP-zIC5TKsR0dYPspuCZwtCPhJ4P8KoRCvVmjpePNVBP98qXaWfz_pytzAd_RO5-TjJuoSarDiN2xem5teBb8dHvmXQMmwfIbe6u6qz7qSqWdLnpH8qUX9YPap2Z7jN50Y65Yhbqtzf4H-1tQUuTfYpk8cg"/>
+<div>
+<p class="text-body-md font-bold text-on-surface">Dr. Sarah Jenkins</p>
+<p class="text-body-sm text-on-surface-variant/70">s.jenkins@shewell.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-primary font-bold">₹4,200.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹1,24,000.00</td>
+<td class="px-lg py-5 font-data-mono text-data-mono text-on-surface-variant">₹1,19,800.00</td>
+<td class="px-lg py-5 text-center">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[10px] font-bold bg-secondary-container/20 text-secondary uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                        Verified
+                                    </span>
+</td>
+<td class="px-lg py-5 text-right">
+<button class="px-6 py-2 bg-primary text-white rounded-xl text-body-sm font-bold transition-all hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:scale-95">
+                                        Pay Now
+                                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination-->
+<div class="px-lg py-6 flex flex-col sm:flex-row items-center justify-between gap-md bg-surface-container-low/10 border-t border-outline-variant/10">
+<div class="flex items-center gap-sm order-2 sm:order-1">
+<p class="text-body-sm text-on-surface-variant/60">Rows per page:</p>
+<select class="bg-transparent border-none text-body-sm font-bold focus:ring-0 cursor-pointer text-on-surface">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-xs order-1 sm:order-2">
+<button class="p-2 text-on-surface-variant/40 hover:bg-surface-container-low rounded-xl disabled:opacity-20" disabled="">
+<span class="material-symbols-outlined" data-icon="first_page">first_page</span>
+</button>
+<button class="p-2 text-on-surface-variant/40 hover:bg-surface-container-low rounded-xl disabled:opacity-20" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<div class="flex items-center gap-1 px-2">
+<button class="w-9 h-9 rounded-xl bg-primary text-on-primary text-body-sm font-bold shadow-lg shadow-primary/20">1</button>
+<button class="w-9 h-9 rounded-xl hover:bg-surface-container-low text-body-sm text-on-surface-variant font-medium transition-colors">2</button>
+<button class="w-9 h-9 rounded-xl hover:bg-surface-container-low text-body-sm text-on-surface-variant font-medium transition-colors">3</button>
+</div>
+<button class="p-2 text-on-surface-variant/40 hover:bg-surface-container-low rounded-xl">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="p-2 text-on-surface-variant/40 hover:bg-surface-container-low rounded-xl">
+<span class="material-symbols-outlined" data-icon="last_page">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+    // Simple search filter logic
+    const searchInput = document.querySelector('input[placeholder*="Search doctors"]');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    }
+</script>
+</body></html>

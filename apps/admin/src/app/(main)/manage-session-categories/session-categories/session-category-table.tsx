@@ -7,12 +7,11 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { deleteSessionCategory } from './session-category-actions';
 import SessionCategoryForm from './session-category-form';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
 
 type SessionCategoryTableProps = {
     sessionCategories: ISessionCategory[];
@@ -32,23 +31,12 @@ const SessionCategoryTable = ({ sessionCategories }: SessionCategoryTableProps) 
     const dt = useRef<DataTable<any>>(null);
     const toast = useRef<Toast>(null);
 
-    const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
+    const onGlobalFilterChange = (value: string) => {
         let _filters: any = { ...filters };
         _filters.global.value = value;
         setFilters(_filters);
         setGlobalFilter(value);
     };
-
-    const header = (
-        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Manage Session Categories</h5>
-            <span className="block mt-2 md:mt-0 p-input-icon-left">
-                <i className="pi pi-search" />
-                <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-            </span>
-        </div>
-    );
 
     const hideDeleteSessionCategoryDialog = () => {
         setDeleteSessionCategoryDialog(false);
@@ -67,23 +55,7 @@ const SessionCategoryTable = ({ sessionCategories }: SessionCategoryTableProps) 
         setSessionCategoryDialog(true);
     };
 
-    const leftToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <div className="my-2">
-                    <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-                </div>
-            </React.Fragment>
-        );
-    };
 
-    const rightToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-            </React.Fragment>
-        );
-    };
 
     const editSessionCategory = (sessionCategory: ISessionCategory) => {
         setSessionCategory({ ...sessionCategory });
@@ -131,7 +103,14 @@ const SessionCategoryTable = ({ sessionCategories }: SessionCategoryTableProps) 
             <div className="grid crud-demo">
                 <div className="col-12">
                     <div className="card">
-                        <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+                        <TableToolbar
+                            newLabel="New Session Category"
+                            onNew={openNew}
+                            onExport={exportCSV}
+                            searchValue={globalFilter}
+                            onSearchChange={onGlobalFilterChange}
+                            searchPlaceholder="Search session categories..."
+                        />
                         <DataTable
                             stripedRows
                             ref={dt}
@@ -146,7 +125,6 @@ const SessionCategoryTable = ({ sessionCategories }: SessionCategoryTableProps) 
                             filters={filters}
                             globalFilterFields={['name', 'slug']}
                             emptyMessage="No session categories found."
-                            header={header}
                             exportFilename="SessionCategories"
                         >
                             <Column field="name" header="Name" sortable headerStyle={{ minWidth: '15rem' }}></Column>

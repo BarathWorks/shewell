@@ -14,6 +14,8 @@ import { Column } from 'primereact/column';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { useState } from 'react';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
+import { Tag } from 'primereact/tag';
 
 interface IRecentAppointments {
   id: string;
@@ -68,6 +70,8 @@ const Doctors = () => {
     'displayQualification.specialization': { value: null, matchMode: FilterMatchMode.STARTS_WITH }
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(6);
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     let _filters = { ...filters };
@@ -134,7 +138,7 @@ const Doctors = () => {
   const doctorStatusTemplate = (row: IRecentAppointments) => {
     return (
       <>
-        <div className="text-sm">{row.isapproved ? "Approved" : "Not Approved"}</div>
+        <Tag severity={row.isapproved ? 'success' : 'warning'} value={row.isapproved ? 'YES' : 'NO'} />
       </>
     );
   }
@@ -144,7 +148,7 @@ const Doctors = () => {
       return <div className="text-sm text-red-500">Not provided</div>;
     }
     return (
-      <div className="text-sm">
+      <div className="text-sm" style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.45' }}>
         <div><strong>Country:</strong> {row.address.country?.name || 'N/A'}</div>
         <div><strong>State:</strong> {row.address.state?.name || 'N/A'}</div>
         <div><strong>City:</strong> {row.address.city}</div>
@@ -159,7 +163,7 @@ const Doctors = () => {
       return <div className="text-sm text-red-500">Not provided</div>;
     }
     return (
-      <div className="text-sm">
+      <div className="text-sm" style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.45' }}>
         <div><strong>PAN:</strong> {row.identity.panNumber || 'Not provided'}</div>
         <div><strong>Aadhaar:</strong> {row.identity.aadhaarNumber ? `**** **** ${row.identity.aadhaarNumber.slice(-4)}` : 'Not provided'}</div>
         <div><strong>License:</strong> {row.identity.licenseNumber || 'Not provided'}</div>
@@ -175,7 +179,7 @@ const Doctors = () => {
       return <div className="text-sm text-red-500">Not provided</div>;
     }
     return (
-      <div className="text-sm">
+      <div className="text-sm" style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.45' }}>
         {row.degrees.map((degree, index) => (
           <div key={index} className="mb-2">
             <div><strong>{degree.degree}</strong></div>
@@ -192,7 +196,7 @@ const Doctors = () => {
       return <div className="text-sm text-red-500">Not provided</div>;
     }
     return (
-      <div className="text-sm">
+      <div className="text-sm" style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.45' }}>
         {row.experiences.map((exp, index) => (
           <div key={index} className="mb-2">
             <div><strong>{exp.position}</strong> - {exp.department}</div>
@@ -212,7 +216,7 @@ const Doctors = () => {
       });
     }
 
-    function handleApprove(): void {
+    function handleActivate(): void {
       // Check if all required information is provided
       const missingInfo = [];
       if (!row.address) missingInfo.push('Address');
@@ -239,16 +243,27 @@ const Doctors = () => {
       row.degrees && row.degrees.length > 0 &&
       row.experiences && row.experiences.length > 0;
 
+    const actionButtonStyle = {
+      border: '1px solid',
+      borderColor: row.isapproved ? '#dc2626' : '#0f9f6e',
+      backgroundColor: row.isapproved ? 'rgba(220, 38, 38, 0.08)' : 'rgba(15, 159, 110, 0.08)',
+      color: row.isapproved ? '#dc2626' : '#0f9f6e',
+      letterSpacing: '0.04em',
+      minWidth: '92px',
+      whiteSpace: 'nowrap' as const
+    };
+
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex align-items-center gap-2 flex-wrap" style={{ minWidth: 0 }}>
         {!isProfileComplete && !row.isapproved && (
-          <span className="text-xs text-orange-600 font-semibold">⚠ Incomplete Profile</span>
+          <span className="text-xs text-orange-600 font-semibold w-full">⚠ Incomplete Profile</span>
         )}
-        <button 
-          className={`${row.isapproved ? "bg-red-500 text-white" : "bg-green-500 text-white"} border-none hover:bg-blue-700 p-2 rounded-full`} 
-          onClick={row.isapproved ? handleDeactivate : handleApprove}
+        <button
+          className="inline-flex align-items-center justify-content-center px-3 py-1 border-round-full text-xs font-bold uppercase"
+          style={actionButtonStyle}
+          onClick={row.isapproved ? handleDeactivate : handleActivate}
         >
-          {row.isapproved ? "Deactivate" : "Approve"}
+          {row.isapproved ? 'Deactivate' : 'Activate'}
         </button>
       </div>
     );
@@ -264,24 +279,37 @@ const Doctors = () => {
           value={data?.professionalUsers} 
           filters={filters} 
           globalFilterFields={['firstName', 'lastName', 'email', 'displayQualification.specialization']} 
-          paginator 
-          rows={6} 
+          rows={rows}
+          first={first}
           header={header}
           scrollable
           scrollHeight="600px"
         >
-          <Column field="professionalUser" header="Doctor Name" body={doctorNameTemplate} frozen style={{minWidth: '180px'}}></Column>
-          <Column field="professionalUser" header="Email" body={doctorEmailTemplate} style={{minWidth: '200px'}}></Column>
-          <Column field="professionalUser" header="Phone" body={doctorPhoneNumberTemplate} style={{minWidth: '130px'}}></Column>
-          <Column field="professionalUser" header="Speciality" body={doctorDateSpecialityTemplate} style={{minWidth: '150px'}}></Column>
-          <Column field="address" header="Address Details" body={doctorAddressTemplate} style={{minWidth: '250px'}}></Column>
-          <Column field="identity" header="Identity Verification" body={doctorIdentityTemplate} style={{minWidth: '200px'}}></Column>
-          <Column field="degrees" header="Education" body={doctorEducationTemplate} style={{minWidth: '250px'}}></Column>
-          <Column field="experiences" header="Experience" body={doctorExperienceTemplate} style={{minWidth: '250px'}}></Column>
-          <Column field="professionalUser" header="Joining Date" body={doctorDateOfJoiningTemplate} style={{minWidth: '120px'}}></Column>
-          <Column field="status" header="Status" body={doctorStatusTemplate} style={{minWidth: '120px'}}></Column>
-          <Column field="actions" header="Actions" body={doctorActionsTemplate} frozen alignFrozen="right" style={{minWidth: '120px'}}></Column>
+          <Column field="professionalUser" header="Doctor Name" body={doctorNameTemplate} frozen style={{minWidth: '180px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="professionalUser" header="Email" body={doctorEmailTemplate} style={{minWidth: '200px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="professionalUser" header="Phone" body={doctorPhoneNumberTemplate} style={{minWidth: '130px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="professionalUser" header="Speciality" body={doctorDateSpecialityTemplate} style={{minWidth: '150px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="address" header="Address Details" body={doctorAddressTemplate} style={{minWidth: '250px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="identity" header="Identity Verification" body={doctorIdentityTemplate} style={{minWidth: '220px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="degrees" header="Education" body={doctorEducationTemplate} style={{minWidth: '250px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="experiences" header="Experience" body={doctorExperienceTemplate} style={{minWidth: '250px'}} bodyStyle={{ whiteSpace: 'normal', verticalAlign: 'top' }}></Column>
+          <Column field="professionalUser" header="Joining Date" body={doctorDateOfJoiningTemplate} style={{minWidth: '120px'}} bodyStyle={{ whiteSpace: 'nowrap', verticalAlign: 'top' }}></Column>
+          <Column field="status" header="Status" body={doctorStatusTemplate} style={{minWidth: '120px'}} bodyStyle={{ whiteSpace: 'nowrap', verticalAlign: 'top' }}></Column>
+          <Column field="actions" header="Actions" body={doctorActionsTemplate} frozen alignFrozen="right" style={{minWidth: '140px'}} bodyStyle={{ whiteSpace: 'nowrap', verticalAlign: 'top' }}></Column>
         </DataTable>
+
+        <CustomPaginator
+          first={first}
+          rows={rows}
+          totalRecords={data?.professionalUsers?.length || 0}
+          onPageChange={(event) => setFirst(event.first)}
+          onRowsChange={(event) => {
+            setRows(event.rows);
+            setFirst(0);
+          }}
+          entityName="doctors"
+          rowsPerPageOptions={[5, 6, 10, 25]}
+        />
       </div>
     </>
   );

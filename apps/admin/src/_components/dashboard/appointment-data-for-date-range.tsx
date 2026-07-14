@@ -24,7 +24,7 @@ const DoctorsOnBoardForDateRange = () => {
   
   return (
     <>
-      <div className="col-12 lg:col-6 xl:col-6">
+      <div className="col-12 md:col-6 lg:col-3 xl:col-3">
         <Card item={cancelledAppointmentItems} />
       </div>
      

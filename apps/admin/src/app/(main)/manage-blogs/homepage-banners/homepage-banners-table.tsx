@@ -3,9 +3,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Toolbar } from 'primereact/toolbar';
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Demo } from '@/types';
 import { Tag } from 'primereact/tag';
 import HomepageBannerForm from '@/src/app/(main)/manage-blogs/homepage-banners/homepage-banner-form';
@@ -15,9 +13,13 @@ import { IHomepageBanner, IHomepageBannerForm } from '@/src/_models/homepage-ban
 import { Image } from 'primereact/image';
 import { HomeBannerType } from '@repo/database';
 import { deleteHomePageBanners } from './homepage-banner-actions';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageBanner[] }) => {
   const emptyHomepageBanner: IHomepageBannerForm = { id: '', order: 0, url: '', active: false, media: null, mediaId: '', usedFor : HomeBannerType.HomeBannerClient };
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const [homepageBannerDialog, setHomepageBannerDialog] = useState(false);
   const [homepageBanner, setHomepageBanner] = useState<IHomepageBannerForm>(emptyHomepageBanner);
   const [selectedHomepageBanners, setSelectedHomepageBanners] = useState<IHomepageBannerForm[] | null>(null);
@@ -47,23 +49,7 @@ const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageB
     dt.current?.exportCSV();
   };
 
-  const leftToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <div className="my-2">
-          <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-        </div>
-      </React.Fragment>
-    );
-  };
 
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-      </React.Fragment>
-    );
-  };
 
   const idBodyTemplate = (rowData: IHomepageBannerForm) => {
     return (
@@ -95,25 +81,12 @@ const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageB
     );
   };
 
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onGlobalFilterChange = (value: string) => {
     let _filters: any = { ...filters };
-
     _filters.global.value = value;
-
     setFilters(_filters);
     setGlobalFilter(value);
   };
-
-  const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Homepage Banners</h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-      </span>
-    </div>
-  );
 
   const activeBodyTemplate = (rowData: IHomepageBanner) => {
     return (
@@ -182,7 +155,14 @@ const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageB
     <div className="grid crud-demo">
       <div className="col-12">
         <div className="card">
-          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+          <TableToolbar
+            newLabel="New Banner"
+            onNew={openNew}
+            onExport={exportCSV}
+            searchValue={globalFilter}
+            onSearchChange={onGlobalFilterChange}
+            searchPlaceholder="Search banners..."
+          />
 
           <DataTable
             stripedRows
@@ -191,16 +171,12 @@ const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageB
             selection={selectedHomepageBanners}
             onSelectionChange={(e) => setSelectedHomepageBanners(e.value as any)}
             dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
+            first={first}
+            rows={rows}
             className="datatable-responsive"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             filters={filters}
             globalFilterFields={['id', 'name']}
             emptyMessage="No homepageBanner found."
-            header={header}
             exportFilename="HomepageBanners"
           >
             <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -211,6 +187,19 @@ const HomepageBannersTable = ({ homepageBanners }: { homepageBanners: IHomepageB
             <Column field="updatedAt" header="Updated" sortable body={updatedAtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
           </DataTable>
+
+          <CustomPaginator
+            first={first}
+            rows={rows}
+            totalRecords={homepageBanners.length}
+            onPageChange={(event) => setFirst(event.first)}
+            onRowsChange={(event) => {
+              setRows(event.rows);
+              setFirst(0);
+            }}
+            entityName="banners"
+            rowsPerPageOptions={[5, 10, 25]}
+          />
 
           <Dialog visible={homepageBannerDialog} style={{ width: '50vw' }} header="HomepageBanner Category Details" modal className="p-fluid" onHide={hideDialog}>
             <HomepageBannerForm homepageBanner={homepageBanner} hideDialog={hideDialog} />

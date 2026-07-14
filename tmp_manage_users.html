@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-error-container": "#93000a",
+                            "surface-container-highest": "#d3e4fe",
+                            "tertiary-container": "#56595a",
+                            "surface-container": "#e5eeff",
+                            "tertiary-fixed-dim": "#c4c7c8",
+                            "on-surface-variant": "#40484b",
+                            "on-error": "#ffffff",
+                            "secondary": "#006879",
+                            "secondary-fixed-dim": "#77d4ea",
+                            "on-tertiary-fixed": "#191c1d",
+                            "on-surface": "#0b1c30",
+                            "surface": "#f8f9ff",
+                            "on-tertiary": "#ffffff",
+                            "tertiary": "#3e4243",
+                            "on-primary": "#ffffff",
+                            "secondary-fixed": "#a8edff",
+                            "surface-tint": "#00898f",
+                            "primary": "#00898f",
+                            "on-secondary-fixed": "#001f26",
+                            "surface-container-lowest": "#ffffff",
+                            "on-primary-fixed-variant": "#154d5e",
+                            "background": "#f8f9ff",
+                            "on-secondary-container": "#006979",
+                            "outline-variant": "#c0c8cc",
+                            "surface-container-high": "#dce9ff",
+                            "primary-fixed-dim": "#9ccee3",
+                            "tertiary-fixed": "#e1e3e4",
+                            "on-background": "#0b1c30",
+                            "inverse-surface": "#213145",
+                            "inverse-primary": "#9ccee3",
+                            "on-primary-fixed": "#001f29",
+                            "surface-variant": "#d3e4fe",
+                            "primary-container": "#00898f",
+                            "error-container": "#ffdad6",
+                            "secondary-container": "#8be7fe",
+                            "on-tertiary-container": "#cdd0d1",
+                            "inverse-on-surface": "#eaf1ff",
+                            "error": "#ba1a1a",
+                            "surface-dim": "#cbdbf5",
+                            "surface-container-low": "#eff4ff",
+                            "surface-bright": "#f8f9ff",
+                            "on-secondary": "#ffffff",
+                            "primary-fixed": "#b9eaff",
+                            "on-secondary-fixed-variant": "#004e5b",
+                            "outline": "#71787c",
+                            "on-primary-container": "#a5d7ec",
+                            "on-tertiary-fixed-variant": "#444748"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "lg": "32px",
+                            "base": "4px",
+                            "xl": "48px",
+                            "md": "24px",
+                            "gutter": "24px",
+                            "container-max": "1440px",
+                            "xs": "8px",
+                            "sm": "16px"
+                        },
+                        "fontFamily": {
+                            "headline-sm": ["Hanken Grotesk"],
+                            "headline-md": ["Hanken Grotesk"],
+                            "body-lg": ["Inter"],
+                            "display-lg": ["Hanken Grotesk"],
+                            "label-caps": ["Inter"],
+                            "body-sm": ["Inter"],
+                            "data-mono": ["JetBrains Mono"],
+                            "body-md": ["Inter"]
+                        },
+                        "fontSize": {
+                            "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                            "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                            "data-mono": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 137, 143, 0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 137, 143, 0.2); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-screen py-md px-sm bg-white border-r border-surface-container-high sticky top-0 w-72 shrink-0 z-50">
+<div class="mb-lg px-sm shrink-0">
+<div class="flex items-center gap-xs">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-none">Shewell</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Admin Portal</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto space-y-4 custom-scrollbar px-sm pb-md">
+<!-- Home -->
+<div>
+<p class="font-label-caps text-[11px] text-on-surface-variant/60 uppercase px-sm mb-2">Home</p>
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+</div>
+<!-- Manage Users -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2 rounded-lg bg-primary/5 text-primary font-semibold transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-body-md text-body-md">Manage Users</span>
+</div>
+<span class="material-symbols-outlined text-[18px] rotate-180">expand_more</span>
+</button>
+<div class="space-y-1 mt-1 pl-md">
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-primary font-semibold bg-primary/10" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span class="font-body-md text-body-md">Admin Users</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Manage Sessions -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-primary transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">event_repeat</span>
+<span class="font-body-md text-body-md">Manage Sessions</span>
+</div>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/collapsible:rotate-180">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Manage Payouts -->
+<div>
+<p class="font-label-caps text-[11px] text-on-surface-variant/60 uppercase px-sm mb-2">Financials</p>
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="font-body-md text-body-md">Payout Requests</span>
+</a>
+</div>
+<!-- Manage Blogs -->
+<div>
+<div class="group/collapsible">
+<button class="w-full flex items-center justify-between px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-primary transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">edit_note</span>
+<span class="font-body-md text-body-md">Manage Blogs</span>
+</div>
+</button>
+</div>
+</div>
+</nav>
+<!-- Sidebar Bottom -->
+<div class="mt-auto space-y-1 pt-sm shrink-0 border-t border-surface-container">
+<div class="flex items-center gap-sm px-sm py-md cursor-pointer hover:bg-surface-container-low transition-colors rounded-lg">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGhEa4-Xs7JH9OLC67PIHDPFeJ10qN1JSk_v0aLZdxEDYfegMrDgtWKlbK7qxj_e88zcyDzNpjXnqKP_ipT4wdyQ-36_tNiFGdloEE_P3mBSrXjobrMc33YzwSQXQi8qg90-Sq6XXgPHci5FokdtA2OzIegIgk8o-KD_CMFg0LKSnqvu4D4KQ9bZTbGUqf9mF-HrXtwITH7n99_WUdX77Wz_DOOkfddl_lLLOoRvhUsiv4DaOeGKOK6Q"/>
+<div class="overflow-hidden">
+<p class="font-body-md text-body-md font-bold text-on-surface leading-tight truncate">Shewell Admin</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase truncate">Healthcare Division</p>
+</div>
+</div>
+<a class="flex items-center gap-sm px-sm py-2 rounded-lg text-on-surface-variant font-medium hover:bg-error/5 hover:text-error transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 min-h-screen flex flex-col bg-[#F9FBFC]">
+<div class="p-xl flex-1 max-w-[1200px] w-full mx-auto">
+<div class="flex items-end justify-between mb-xl">
+<div>
+<h1 class="text-display-lg font-display-lg text-on-surface tracking-tight">Manage Users</h1>
+<p class="text-body-md text-on-surface-variant mt-2 max-w-md">Overview of administrative access and user permissions across the clinical platform.</p>
+</div>
+<nav class="flex gap-2 text-body-sm text-on-surface-variant/70 items-center">
+<span class="hover:text-primary cursor-pointer transition-colors">Dashboard</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Admin Users</span>
+</nav>
+</div>
+<!-- Dashboard Action Bar -->
+<div class="bg-white rounded-xl p-md mb-lg border border-surface-container flex flex-wrap gap-md items-center justify-between shadow-sm">
+<div class="flex gap-sm">
+<button class="bg-primary/10 text-primary px-6 py-2.5 rounded-lg text-body-md font-semibold flex items-center gap-2 hover:bg-primary/20 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                        New User
+                    </button>
+<button class="bg-surface-container-low text-on-surface-variant px-6 py-2.5 rounded-lg text-body-md font-medium flex items-center gap-2 hover:bg-surface-container transition-all active:scale-[0.98] border border-surface-container">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+                        Export Data
+                    </button>
+</div>
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[20px]">search</span>
+<input class="w-full pl-4 pr-12 py-3 rounded-lg border border-surface-container bg-[#F9FBFC] focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary/20 text-body-md transition-all placeholder:text-on-surface-variant/40" placeholder="Search by name, email or role..." type="text"/>
+</div>
+</div>
+<!-- High-Density Data Table -->
+<div class="bg-white rounded-xl border border-surface-container shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F9FBFC] border-b border-surface-container">
+<th class="px-md py-4 text-label-caps font-bold text-on-surface-variant uppercase tracking-wider">
+<button class="flex items-center gap-1 hover:text-primary transition-colors group">
+                                        ID <span class="material-symbols-outlined text-[16px] text-on-surface-variant/30 group-hover:text-primary">unfold_more</span>
+</button>
+</th>
+<th class="px-md py-4 text-label-caps font-bold text-on-surface-variant uppercase tracking-wider">
+<button class="flex items-center gap-1 hover:text-primary transition-colors group">
+                                        Full Name <span class="material-symbols-outlined text-[16px] text-on-surface-variant/30 group-hover:text-primary">unfold_more</span>
+</button>
+</th>
+<th class="px-md py-4 text-label-caps font-bold text-on-surface-variant uppercase tracking-wider">
+<button class="flex items-center gap-1 hover:text-primary transition-colors group">
+                                        Email Address <span class="material-symbols-outlined text-[16px] text-on-surface-variant/30 group-hover:text-primary">unfold_more</span>
+</button>
+</th>
+<th class="px-md py-4 text-label-caps font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-md py-4 text-label-caps font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-md py-5 font-data-mono text-data-mono text-primary font-semibold">#1024</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-bold">RU</div>
+<span class="text-body-md font-semibold text-on-surface">rati ueiwo wer-0</span>
+</div>
+</td>
+<td class="px-md py-5 text-body-md text-on-surface-variant">uio@gmail.com</td>
+<td class="px-md py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase rounded-full border border-emerald-100">
+<span class="w-1 h-1 rounded-full bg-emerald-600"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-md py-5 text-right">
+<button class="p-2 text-on-surface-variant/60 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-md py-5 font-data-mono text-data-mono text-primary font-semibold">#1025</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary text-[10px] font-bold">MJ</div>
+<span class="text-body-md font-semibold text-on-surface">Markus Jensen</span>
+</div>
+</td>
+<td class="px-md py-5 text-body-md text-on-surface-variant">m.jensen@health.org</td>
+<td class="px-md py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase rounded-full border border-emerald-100">
+<span class="w-1 h-1 rounded-full bg-emerald-600"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-md py-5 text-right">
+<button class="p-2 text-on-surface-variant/60 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-md py-5 font-data-mono text-data-mono text-primary font-semibold">#1026</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant text-[10px] font-bold">SL</div>
+<span class="text-body-md font-semibold text-on-surface">Sarah Licht</span>
+</div>
+</td>
+<td class="px-md py-5 text-body-md text-on-surface-variant">s.licht@shewell.com</td>
+<td class="px-md py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-red-50 text-red-700 text-[10px] font-bold uppercase rounded-full border border-red-100">
+<span class="w-1 h-1 rounded-full bg-red-600"></span>
+                                        Inactive
+                                    </span>
+</td>
+<td class="px-md py-5 text-right">
+<button class="p-2 text-on-surface-variant/60 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-md py-4 flex items-center justify-between border-t border-surface-container bg-[#F9FBFC]">
+<p class="text-body-sm text-on-surface-variant/80">
+                        Showing <span class="font-bold text-on-surface">1 to 3</span> of <span class="font-bold text-on-surface">48</span> users
+                    </p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="text-body-sm text-on-surface-variant/80">Rows per page:</span>
+<select class="bg-white border border-surface-container rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:border-primary py-1 pl-2 pr-8 shadow-sm cursor-pointer transition-all">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 hover:bg-white hover:shadow-sm border border-transparent hover:border-surface-container rounded-lg transition-all disabled:opacity-20 disabled:pointer-events-none" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<div class="flex items-center px-1">
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-lg text-body-sm font-bold shadow-sm shadow-primary/20">1</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-lg text-body-sm font-medium transition-all">2</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-lg text-body-sm font-medium transition-all">3</button>
+</div>
+<button class="p-1.5 hover:bg-white hover:shadow-sm border border-transparent hover:border-surface-container rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+    document.querySelectorAll('button, a').forEach(el => {
+        el.addEventListener('mousedown', () => {
+            el.style.transform = 'scale(0.98)';
+        });
+        el.addEventListener('mouseup', () => {
+            el.style.transform = '';
+        });
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = '';
+        });
+    });
+</script>
+</body></html>

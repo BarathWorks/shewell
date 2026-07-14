@@ -1,8 +1,203 @@
-.p-datepicker table td.p-datepicker-today > span.p-highlight{
-    color : white;
-    background-color : #0f766e
-}
-.p-datepicker table td > span.p-highlight{
-    color : white
+/* Comprehensive PrimeReact Datepicker Styling Overrides */
+
+.p-datepicker {
+  background-color: #ffffff !important;
+  border: 1px solid #e5eeff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(11, 28, 48, 0.08) !important;
+  padding: 1rem !important;
+  font-family: 'Inter', sans-serif !important;
+
+  /* Header Styling */
+  .p-datepicker-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5eeff !important;
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    
+    .p-datepicker-title {
+      font-family: 'Hanken Grotesk', sans-serif !important;
+      font-weight: 700 !important;
+      color: #0b1c30 !important;
+      font-size: 15px !important;
+    }
+
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      color: #40484b !important;
+      border-radius: 50% !important;
+      width: 2rem !important;
+      height: 2rem !important;
+      transition: background-color 0.2s !important;
+
+      &:hover {
+        background-color: #eff4ff !important;
+        color: #00898f !important;
+      }
+    }
+  }
+
+  /* Weekday Header Titles */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+
+    th {
+      color: #40484b !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      padding: 0.5rem 0 !important;
+      text-align: center !important;
+    }
+
+    /* Date Cells */
+    td {
+      padding: 2px !important;
+      text-align: center !important;
+
+      span, a, button {
+        border-radius: 50% !important;
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: #0b1c30 !important;
+        background-color: transparent !important;
+        transition: all 0.2s ease-in-out !important;
+        border: none !important;
+        cursor: pointer !important;
+
+        /* Highlighted / Selected Date */
+        &.p-highlight {
+          background-color: #00898f !important;
+          color: #ffffff !important;
+        }
+
+        /* Hover over selectable day */
+        &:hover:not(.p-highlight) {
+          background-color: rgba(0, 137, 143, 0.08) !important;
+          color: #00898f !important;
+        }
+      }
+
+      /* Today highlighting (when not active) */
+      &.p-datepicker-today span:not(.p-highlight),
+      &.p-datepicker-today a:not(.p-highlight) {
+        border: 1px dashed #00898f !important;
+        color: #00898f !important;
+      }
+
+      /* Dates outside current month or disabled */
+      &.p-datepicker-other-month span,
+      &.p-datepicker-other-month a,
+      &.p-disabled span,
+      &.p-disabled a {
+        color: #cbd5e1 !important;
+        opacity: 0.5 !important;
+        background-color: transparent !important;
+        cursor: not-allowed !important;
+      }
+    }
+  }
 }
 
+/* ============================================================
+   Scrollbar — Ultra-minimal, Modern
+   Ghost at rest → crisp teal on hover, 3px pill
+   ============================================================ */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+*:hover {
+  scrollbar-color: rgba(0, 137, 143, 0.45) transparent;
+}
+
+/* Webkit — base (all elements) */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Reveal thumb when parent is hovered */
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 137, 143, 0.4);
+}
+
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 137, 143, 0.72);
+  width: 4px;
+}
+
+/* ── Sidebar: slightly wider for comfortable nav scrolling */
+.layout-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.layout-sidebar:hover {
+  scrollbar-color: rgba(0, 137, 143, 0.35) transparent;
+}
+.layout-sidebar::-webkit-scrollbar { width: 3px; }
+.layout-sidebar::-webkit-scrollbar-track { background: transparent; }
+.layout-sidebar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+.layout-sidebar:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 137, 143, 0.32);
+}
+.layout-sidebar:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 137, 143, 0.6);
+}
+
+/* ── Table horizontal scrollbar — slightly taller for usability */
+.p-datatable-wrapper::-webkit-scrollbar { height: 3px; }
+.p-datatable-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+.p-datatable-wrapper::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+.p-datatable-wrapper:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 137, 143, 0.38);
+}
+.p-datatable-wrapper:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 137, 143, 0.7);
+}
+
+/* ── Dialog / modal inner scroll */
+.p-dialog-content::-webkit-scrollbar { width: 3px; }
+.p-dialog-content::-webkit-scrollbar-track { background: transparent; }
+.p-dialog-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+.p-dialog-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 137, 143, 0.35);
+}
+.p-dialog-content:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 137, 143, 0.65);
+}
