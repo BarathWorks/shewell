@@ -113,16 +113,17 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Address</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6"
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6">
+        <div className="flex flex-col gap-6">
           {/* Country */}
           <div>
-            <UIFormLabel>Country*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Country*</UIFormLabel>
             <Controller
               name="countryId"
               control={control}
@@ -135,7 +136,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                       setValue("stateId", "");
                     }}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                       <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -149,7 +150,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                     </SelectContent>
                   </Select>
                   {errors?.countryId && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.countryId.message}
                     </p>
                   )}
@@ -160,7 +161,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
 
           {/* State */}
           <div>
-            <UIFormLabel>State*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">State*</UIFormLabel>
             <Controller
               name="stateId"
               control={control}
@@ -171,7 +172,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                     onValueChange={field.onChange}
                     disabled={!watchCountryId}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                       <SelectValue
                         placeholder={
                           watchCountryId
@@ -191,7 +192,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                     </SelectContent>
                   </Select>
                   {errors?.stateId && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.stateId.message}
                     </p>
                   )}
@@ -202,7 +203,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
 
           {/* City */}
           <div>
-            <UIFormLabel>City*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">City*</UIFormLabel>
             <Controller
               name="city"
               control={control}
@@ -211,11 +212,13 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                   <UIFormInput
                     type="text"
                     placeholder="Enter your city"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                   {errors?.city && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.city.message}
                     </p>
                   )}
@@ -226,20 +229,20 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
 
           {/* Complete Address */}
           <div>
-            <UIFormLabel>Complete Address*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Complete Address*</UIFormLabel>
             <Controller
               name="completeAddress"
               control={control}
               render={({ field }) => (
                 <>
                   <textarea
-                    className="w-full rounded-md border border-border-color py-3 pl-4 outline-primary placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color"
+                    className="w-full rounded-lg border-none bg-[#f1f5f9] px-4 py-3 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal min-h-[100px]"
                     placeholder="Enter your complete address (min 10 characters)"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
                   />
                   {errors?.completeAddress && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.completeAddress.message}
                     </p>
                   )}
@@ -250,7 +253,7 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
 
           {/* Pincode */}
           <div>
-            <UIFormLabel>Pincode*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Pincode*</UIFormLabel>
             <Controller
               name="pincode"
               control={control}
@@ -259,11 +262,13 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
                   <UIFormInput
                     type="text"
                     placeholder="Enter 6-digit pincode"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                   {errors?.pincode && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.pincode.message}
                     </p>
                   )}
@@ -273,42 +278,31 @@ const AddressForm = ({ countries, existingAddress }: AddressFormProps) => {
           </div>
 
           {/* Submit */}
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-              type="submit"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-sm font-normal sm:text-base">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

@@ -228,20 +228,21 @@ const IdentityDocumentsForm = ({
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Identity & Documents</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6"
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col gap-6">
+          <p className="text-sm text-slate-500 font-sans">
             All fields on this page are optional. You can skip this step.
           </p>
 
           {/* PAN Number */}
           <div>
-            <UIFormLabel>PAN Number</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">PAN Number</UIFormLabel>
             <Controller
               name="panNumber"
               control={control}
@@ -250,13 +251,15 @@ const IdentityDocumentsForm = ({
                   <UIFormInput
                     type="text"
                     placeholder="e.g. ABCDE1234F"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={(e) =>
                       field.onChange(e.target.value.toUpperCase())
                     }
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                   {errors?.panNumber && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.panNumber.message}
                     </p>
                   )}
@@ -267,7 +270,7 @@ const IdentityDocumentsForm = ({
 
           {/* Aadhaar Number */}
           <div>
-            <UIFormLabel>Aadhaar Number</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Aadhaar Number</UIFormLabel>
             <Controller
               name="aadhaarNumber"
               control={control}
@@ -276,11 +279,13 @@ const IdentityDocumentsForm = ({
                   <UIFormInput
                     type="text"
                     placeholder="12-digit Aadhaar number"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                   {errors?.aadhaarNumber && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.aadhaarNumber.message}
                     </p>
                   )}
@@ -291,7 +296,7 @@ const IdentityDocumentsForm = ({
 
           {/* License Number */}
           <div>
-            <UIFormLabel>License Number</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">License Number</UIFormLabel>
             <Controller
               name="licenseNumber"
               control={control}
@@ -300,8 +305,10 @@ const IdentityDocumentsForm = ({
                   <UIFormInput
                     type="text"
                     placeholder="Enter your license number"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                 </>
               )}
@@ -310,7 +317,7 @@ const IdentityDocumentsForm = ({
 
           {/* Upload Aadhaar Card */}
           <div className="w-full">
-            <UIFormLabel>Upload Aadhaar Card</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Upload Aadhaar Card</UIFormLabel>
             <Controller
               control={control}
               name="aadharCard"
@@ -320,23 +327,26 @@ const IdentityDocumentsForm = ({
                     onSelectAadharCard(e, DocumentType.AADHAR_CARD);
                   }}
                   type="file"
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-teal file:text-white hover:file:brightness-95 border border-dashed border-[#c0c8cc] rounded-lg p-2 bg-[#f1f5f9] w-full cursor-pointer h-auto"
                 />
               )}
             />
           </div>
           {aadharCard && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <div
+            <div className="flex items-center justify-between bg-[#f1f5f9] p-3 rounded-lg border border-solid border-slate-200">
+              <button
+                type="button"
                 onClick={() => {
                   downloadDocument({ fileKey: aadharCard.fileKey }).then(
                     (url) => router.push(url!),
                   );
                 }}
-                className="cursor-pointer"
+                className="cursor-pointer font-sans text-sm font-medium text-brand-teal hover:underline text-left flex-grow"
               >
-                Aadhar Card
-              </div>
-              <div
+                📄 Aadhaar Card (Uploaded)
+              </button>
+              <button
+                type="button"
                 onClick={() =>
                   deleteDocumentFromKey(
                     professionalUserId,
@@ -344,16 +354,16 @@ const IdentityDocumentsForm = ({
                     aadharCard.id,
                   )
                 }
-                className="cursor-pointer"
+                className="cursor-pointer p-1.5 hover:bg-red-50 rounded-md transition-colors"
               >
                 <Trash2 className="text-red-500 size-4" />
-              </div>
+              </button>
             </div>
           )}
 
           {/* Upload PAN Card */}
           <div className="w-full">
-            <UIFormLabel>Upload PAN Card</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Upload PAN Card</UIFormLabel>
             <Controller
               control={control}
               name="panCard"
@@ -363,23 +373,26 @@ const IdentityDocumentsForm = ({
                     onSelectPanCard(e, DocumentType.PAN_CARD);
                   }}
                   type="file"
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-teal file:text-white hover:file:brightness-95 border border-dashed border-[#c0c8cc] rounded-lg p-2 bg-[#f1f5f9] w-full cursor-pointer h-auto"
                 />
               )}
             />
           </div>
           {panCard && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <div
+            <div className="flex items-center justify-between bg-[#f1f5f9] p-3 rounded-lg border border-solid border-slate-200">
+              <button
+                type="button"
                 onClick={() => {
                   downloadDocument({ fileKey: panCard.fileKey }).then((url) =>
                     router.push(url!),
                   );
                 }}
-                className="cursor-pointer"
+                className="cursor-pointer font-sans text-sm font-medium text-brand-teal hover:underline text-left flex-grow"
               >
-                Pan Card
-              </div>
-              <div
+                📄 PAN Card (Uploaded)
+              </button>
+              <button
+                type="button"
                 onClick={() =>
                   deleteDocumentFromKey(
                     professionalUserId,
@@ -387,21 +400,21 @@ const IdentityDocumentsForm = ({
                     panCard.id,
                   )
                 }
-                className="cursor-pointer"
+                className="cursor-pointer p-1.5 hover:bg-red-50 rounded-md transition-colors"
               >
                 <Trash2 className="text-red-500 size-4" />
-              </div>
+              </button>
             </div>
           )}
 
           {/* Other Documents (Dynamic) */}
           {documentFields.map((field, index) => (
             <div
-              key={field.documentId}
-              className="flex w-full items-center gap-2"
+              key={field.id}
+              className="flex w-full items-center gap-4"
             >
               <div className="w-full">
-                <UIFormLabel>Upload Document {index + 1}</UIFormLabel>
+                <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Upload Document {index + 1}</UIFormLabel>
                 <Controller
                   control={control}
                   name={`documents.${index}.documentId`}
@@ -415,133 +428,61 @@ const IdentityDocumentsForm = ({
                         );
                       }}
                       type="file"
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-teal file:text-white hover:file:brightness-95 border border-dashed border-[#c0c8cc] rounded-lg p-2 bg-[#f1f5f9] w-full cursor-pointer h-auto"
                     />
                   )}
                 />
               </div>
-              <div className="self-end">
+              <div className="self-end pb-1.5">
                 {index === documentFields.length - 1 ? (
                   <div className="flex gap-2">
                     {index > 0 && (
-                      <svg
+                      <button
+                        type="button"
                         onClick={() => removeDocument(index)}
-                        width="36"
-                        height="36"
-                        viewBox="0 0 36 36"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="cursor-pointer"
+                        className="h-10 w-10 border border-solid border-red-500 text-red-500 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors"
                       >
-                        <rect
-                          x="0.5"
-                          y="0.5"
-                          width="35"
-                          height="35"
-                          rx="5.5"
-                          stroke="#CA0000"
-                        />
-                        <path
-                          d="M10.5 13H12.1667H25.5"
-                          stroke="#CA0000"
-                          strokeWidth="1.25"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M14.6719 13.0003V11.3337C14.6719 10.8916 14.8475 10.4677 15.16 10.1551C15.4726 9.84259 15.8965 9.66699 16.3385 9.66699H19.6719C20.1139 9.66699 20.5378 9.84259 20.8504 10.1551C21.1629 10.4677 21.3385 10.8916 21.3385 11.3337V13.0003M23.8385 13.0003V24.667C23.8385 25.109 23.6629 25.5329 23.3504 25.8455C23.0378 26.1581 22.6139 26.3337 22.1719 26.3337H13.8385C13.3965 26.3337 12.9726 26.1581 12.66 25.8455C12.3475 25.5329 12.1719 25.109 12.1719 24.667V13.0003H23.8385Z"
-                          stroke="#CA0000"
-                          strokeWidth="1.25"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     )}
-                    <svg
+                    <button
+                      type="button"
                       onClick={() => appendDocument({ documentId: "" })}
-                      width="36"
-                      height="36"
-                      viewBox="0 0 36 36"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="cursor-pointer"
+                      className="h-10 w-10 border border-solid border-slate-700 text-slate-700 flex items-center justify-center rounded-lg hover:bg-slate-50 transition-colors font-bold text-lg"
                     >
-                      <rect
-                        x="0.5"
-                        y="0.5"
-                        width="35"
-                        height="35"
-                        rx="5.5"
-                        stroke="#181818"
-                      />
-                      <path
-                        d="M18 12.167V23.8337"
-                        stroke="#121212"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12.1641 18H23.8307"
-                        stroke="#121212"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                      +
+                    </button>
                   </div>
                 ) : (
-                  <svg
+                  <button
+                    type="button"
                     onClick={() => removeDocument(index)}
-                    width="36"
-                    height="36"
-                    viewBox="0 0 36 36"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="cursor-pointer"
+                    className="h-10 w-10 border border-solid border-red-500 text-red-500 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors"
                   >
-                    <rect
-                      x="0.5"
-                      y="0.5"
-                      width="35"
-                      height="35"
-                      rx="5.5"
-                      stroke="#CA0000"
-                    />
-                    <path
-                      d="M10.5 13H12.1667H25.5"
-                      stroke="#CA0000"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M14.6719 13.0003V11.3337C14.6719 10.8916 14.8475 10.4677 15.16 10.1551C15.4726 9.84259 15.8965 9.66699 16.3385 9.66699H19.6719C20.1139 9.66699 20.5378 9.84259 20.8504 10.1551C21.1629 10.4677 21.3385 10.8916 21.3385 11.3337V13.0003M23.8385 13.0003V24.667C23.8385 25.109 23.6629 25.5329 23.3504 25.8455C23.0378 26.1581 22.6139 26.3337 22.1719 26.3337H13.8385C13.3965 26.3337 12.9726 26.1581 12.66 25.8455C12.3475 25.5329 12.1719 25.109 12.1719 24.667V13.0003H23.8385Z"
-                      stroke="#CA0000"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 )}
               </div>
             </div>
           ))}
 
           {documents.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {documents.map((item, index) => (
-                <div key={item.id} className="flex items-center gap-2">
-                  <div
+                <div key={item.id} className="flex items-center justify-between bg-[#f1f5f9] p-3 rounded-lg border border-solid border-slate-200">
+                  <button
+                    type="button"
                     onClick={() => {
                       downloadDocument({ fileKey: item.fileKey }).then(
                         (url) => router.push(url!),
                       );
                     }}
-                    className="cursor-pointer"
+                    className="cursor-pointer font-sans text-sm font-medium text-brand-teal hover:underline text-left flex-grow"
                   >
-                    Document {index + 1}
-                  </div>
-                  <div
+                    📄 Document {index + 1}
+                  </button>
+                  <button
+                    type="button"
                     onClick={() =>
                       deleteDocumentFromKey(
                         professionalUserId,
@@ -549,52 +490,41 @@ const IdentityDocumentsForm = ({
                         item.id,
                       )
                     }
-                    className="cursor-pointer"
+                    className="cursor-pointer p-1.5 hover:bg-red-50 rounded-md transition-colors"
                   >
                     <Trash2 className="text-red-500 size-4" />
-                  </div>
+                  </button>
                 </div>
               ))}
             </div>
           )}
 
           {/* Submit */}
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-              type="submit"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-sm font-normal sm:text-base">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

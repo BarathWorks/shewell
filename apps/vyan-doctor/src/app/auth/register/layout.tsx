@@ -1,114 +1,71 @@
 "use client";
 
 import Link from "next/link";
-
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-
-import TestimonialCarousel from "../logo-swiper";
-import { useSession } from "next-auth/react";
-
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React from "react";
 import StepperRegister from "./stepper-register";
 
-// import SignUpStepper from "../components/stepper";
-// import StepperComponent from "../components/stepper";
-
-const steps = [
-  { title: 'Account Setup' },
-  { title: 'Personal Info' },
-  { title: 'Address' },
-  { title: 'Identity & Documents' },
-  { title: 'Education' },
-  { title: 'Practice Details' },
-  { title: 'Bank Details' },
-]
 const RegisterLayout = ({ children }: { children: React.ReactNode }) => {
- const [step, setStep] = useState<number>(1)
- 
   return (
-    <>
-      <div className="w-full">
-        <div className="mb-8 sm:mb-10 md:mb-12 lg:mb-0">{/* <Header /> */}</div>
-        <div className="container mx-auto px-3 sm:px-4 md:px-8 lg:px-0">
-          {/* 1-s */}
-
-          {/* 2-s */}
-
-          <div className="mt-3 sm:mt-4 md:mt-5 flex flex-col gap-4 sm:gap-5 md:gap-8 lg:gap-12 xl:gap-[60px] 2xl:gap-[198px] lg:flex-row">
-            {/* form */}
-
-            
-            <div className="lg:basis-1/2 lg:self-center">
-
-            <div className="mb-4 sm:mb-6 md:mb-8 text-center font-inter text-lg sm:text-xl md:text-2xl xl:mb-9 2xl:mb-[50px] 2xl:text-3xl font-semibold">
-        Create your free account
-      </div>
-              {/* <StepperComponent/> */}
-              {/* <Suspense>
-                <SessionProvider>{children}</SessionProvider>
-              </Suspense> */}
-              {/* <Stepper  setStep={setStep} steps={steps}/> */}
-              <StepperRegister/>
-            {children}
-            </div>
-
-            {/* text + image */}
-            <div className="flex flex-col items-center lg:self-center lg:order-first lg:basis-1/2">
-              <div className="mb-2 sm:mb-3 md:mb-4 text-center font-poppins text-base sm:text-lg md:text-2xl lg:text-3xl xl:mb-3 xl:text-4xl 2xl:text-[41px] 2xl:leading-[54px] font-bold leading-tight">
-                Provide wellness virtuality{" "}
-              </div>
-              <div className="text-center font-poppins text-xs sm:text-sm md:text-base lg:text-lg xl:text-2xl px-2 sm:px-4 md:px-12 lg:px-0 2xl:px-[150px] font-normal">
-                Provide best services to your client with SheWellCare
-              </div>
-
-              <TestimonialCarousel />
-
-              <div className="hidden md:block">
-                <div className="mb-1 mt-8 sm:mt-10 md:mt-12 lg:mt-[50px] font-inter text-xs sm:text-sm font-normal 2xl:text-base">
-                  By proceeding, you agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-primary">
-                    Terms and Conditions
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy-policy" target="_blank" className="text-primary">
-                    Privacy Policy
-                  </Link>
-                </div>
-                <div className="flex justify-center gap-4 sm:gap-5 md:gap-6">
-                  <Link href={""}>Help</Link>
-                  <Link href={""}>Privacy</Link>
-                  <Link href={""}>Terms</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3-s */}
-
-          <div className=" md:hidden ">
-            <div className="mb-1 mt-[50px] font-inter text-sm font-normal 2xl:text-base">
-              By proceeding, you agree to the{" "}
-              <Link href="#" className="text-primary">
-                Terms and Conditions
-              </Link>{" "}
-              and{" "}
-              <Link href="#" className="text-primary">
-                Privacy Policy
-              </Link>
-            </div>
-            <div className="flex justify-center gap-6">
-              <Link href={""}>Help</Link>
-              <Link href={""}>Privacy</Link>
-              <Link href={""}>Terms</Link>
-            </div>
+    <div className="bg-surface min-h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Left Side: Illustration & Branding */}
+      <section 
+        className="hidden md:flex flex-1 flex-col justify-center items-center bg-surface-container-low p-12 relative overflow-hidden"
+        style={{ background: "radial-gradient(circle at center, #ffffff 0%, #eff4ff 100%)" }}
+      >
+        <div className="z-10 text-center max-w-lg mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 leading-tight mb-4">
+            Provide wellness virtuality
+          </h1>
+          <p className="text-slate-600 text-lg">
+            Provide best services to your client with <span className="font-semibold text-brand-teal">SheWellCare</span>
+          </p>
+        </div>
+        {/* Doctor Illustration */}
+        <div className="z-10 w-full max-w-lg aspect-square relative flex items-center justify-center">
+          <img 
+            className="w-full h-full object-contain" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUw-Prz7hKk6-_sp76ZGq5Na953ol0Boa5yGAgNA7q3Jnas5WyPka6QNYNnBBtuIksNPsXj25B63cj8_ayNM9qRZpBBg7bf9G4hdeQmCGilbtNELb14s6Gb25oZK3Iaan5FhzEHYvKu3k6ZYewuM8ozPv7BLlnnykafLUDHpbhUJuSKLkPIZstX8fyLsjWhFsqBSQStNmTxvI0REMQwfX6NNC6KvR2-uccn-kc4zIjOmo831Jf8BajrA" 
+            alt="Doctor registration illustration"
+          />
+        </div>
+        {/* Footer Links (Left Side) */}
+        <div className="absolute bottom-8 w-full px-8 text-center">
+          <p className="text-xs text-slate-400 mb-2">
+            By proceeding, you agree to the{" "}
+            <Link className="text-brand-teal hover:underline font-semibold" href="/terms" target="_blank">
+              Terms and Conditions
+            </Link>{" "}
+            and{" "}
+            <Link className="text-brand-teal hover:underline font-semibold" href="/privacy-policy" target="_blank">
+              Privacy Policy
+            </Link>
+          </p>
+          <div className="flex justify-center gap-6 text-xs text-slate-400">
+            <Link className="hover:text-brand-teal transition-colors" href="#">Help</Link>
+            <Link className="hover:text-brand-teal transition-colors" href="#">Privacy</Link>
+            <Link className="hover:text-brand-teal transition-colors" href="#">Terms</Link>
           </div>
         </div>
-      </div>
-      <div className="mt-[50px]">{/* <Footer /> */}</div>
-    </>
+        {/* Atmospheric subtle gradient */}
+        <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-[#2c5f71]/5 blur-[120px] rounded-full"></div>
+      </section>
+
+      {/* Right Side: Account Setup Form */}
+      <section className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 bg-surface-container-lowest min-h-screen overflow-y-auto">
+        <div className="w-full max-w-xl">
+          {/* Logo / Header */}
+          <div className="mb-6 text-center md:text-left">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-800">Create your free account</h2>
+          </div>
+          {/* Stepper Progress Bar */}
+          <div className="mb-6">
+            <StepperRegister />
+          </div>
+          {/* Children (Form contents) */}
+          {children}
+        </div>
+      </section>
+    </div>
   );
 };
 

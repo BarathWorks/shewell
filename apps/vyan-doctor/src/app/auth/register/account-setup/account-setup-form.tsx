@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import UIFormLabel from "@repo/ui/src/@/components/form/label";
 import UIFormInput from "@repo/ui/src/@/components/form/input";
 import UIFormPasswordInput from "@repo/ui/src/@/components/form/password-input";
-import { Button } from "@repo/ui/src/@/components/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
@@ -92,15 +91,16 @@ const AccountSetupForm = () => {
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Account Setup</h3>
       <form
         onSubmit={handleSubmit(submitForm, onError)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
+        <div className="flex flex-col gap-6">
           <div>
-            <UIFormLabel>User Name*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">User Name*</UIFormLabel>
             <Controller
               control={control}
               name="userName"
@@ -110,11 +110,13 @@ const AccountSetupForm = () => {
                     <UIFormInput
                       type="text"
                       placeholder="Enter your User Name"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.userName && (
-                      <p className="text-red-500">{errors.userName.message}</p>
+                      <p className="text-red-500 text-sm mt-1">{errors.userName.message}</p>
                     )}
                   </>
                 );
@@ -123,7 +125,7 @@ const AccountSetupForm = () => {
           </div>
 
           <div>
-            <UIFormLabel>Email*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Email*</UIFormLabel>
             <Controller
               name="email"
               control={control}
@@ -132,12 +134,14 @@ const AccountSetupForm = () => {
                   <>
                     <UIFormInput
                       type="email"
-                      {...field}
-                      value={field.value}
+                      value={field.value || ""}
+                      onChange={field.onChange}
                       placeholder="Enter your email id"
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.email && (
-                      <p className="text-red-500">{errors.email.message}</p>
+                      <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
                     )}
                   </>
                 );
@@ -146,7 +150,7 @@ const AccountSetupForm = () => {
           </div>
 
           <div>
-            <UIFormLabel>Password*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Password*</UIFormLabel>
             <Controller
               name="password"
               control={control}
@@ -154,13 +158,13 @@ const AccountSetupForm = () => {
                 return (
                   <>
                     <UIFormPasswordInput
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
                       placeholder="Enter your password"
+                      className="border-none bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.password && (
-                      <div className="text-red-500">
-                        {errors.password.message}
-                      </div>
+                      <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
                     )}
                   </>
                 );
@@ -168,41 +172,31 @@ const AccountSetupForm = () => {
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-sm font-normal sm:text-base">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base  font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

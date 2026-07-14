@@ -155,208 +155,413 @@ const AddressIdentityForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Address Section */}
-      <div className="rounded-lg border p-6 space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Address Details</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Address Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Address Details</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Country *</UIFormLabel>
+              <Controller
+                name="countryId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        {countries.map((country) => (
+                          <SelectItem key={country.id} value={country.id}>
+                            {country.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.countryId && (
+                <p className="text-red-500 text-sm mt-1">{errors.countryId.message}</p>
+              )}
+            </div>
+            
+            <div>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">State *</UIFormLabel>
+              <Controller
+                name="stateId"
+                control={control}
+                render={({ field }) => (
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
+                    disabled={!selectedCountryId || loadingStates}
+                  >
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
+                      <SelectValue placeholder={loadingStates ? "Loading..." : "Select state"} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        {states.map((state) => (
+                          <SelectItem key={state.id} value={state.id}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.stateId && (
+                <p className="text-red-500 text-sm mt-1">{errors.stateId.message}</p>
+              )}
+            </div>
+          </div>
+
           <div>
-            <UIFormLabel>Country *</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">City *</UIFormLabel>
             <Controller
-              name="countryId"
+              name="city"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectGroup>
-                      {countries.map((country) => (
-                        <SelectItem key={country.id} value={country.id}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <UIFormInput
+                  {...field}
+                  placeholder="Enter city"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
               )}
             />
-            {errors.countryId && (
-              <p className="text-red-500 text-sm mt-1">{errors.countryId.message}</p>
+            {errors.city && (
+              <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
             )}
           </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Complete Address *</UIFormLabel>
+            <Controller
+              name="completeAddress"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  className="w-full rounded-lg border-none bg-[#f1f5f9] px-4 py-3 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal min-h-[100px]"
+                  placeholder="Enter complete address"
+                />
+              )}
+            />
+            {errors.completeAddress && (
+              <p className="text-red-500 text-sm mt-1">{errors.completeAddress.message}</p>
+            )}
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Pincode *</UIFormLabel>
+            <Controller
+              name="pincode"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  maxLength={6}
+                  placeholder="Enter 6-digit pincode"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.pincode && (
+              <p className="text-red-500 text-sm mt-1">{errors.pincode.message}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Identity Section */}
+        <div className="space-y-4 pt-4">
+          <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Identity Details</h3>
           
           <div>
-            <UIFormLabel>State *</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">PAN Number</UIFormLabel>
             <Controller
-              name="stateId"
+              name="panNumber"
               control={control}
               render={({ field }) => (
-                <Select 
-                  value={field.value} 
-                  onValueChange={field.onChange}
-                  disabled={!selectedCountryId || loadingStates}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={loadingStates ? "Loading..." : "Select state"} />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectGroup>
-                      {states.map((state) => (
-                        <SelectItem key={state.id} value={state.id}>
-                          {state.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <UIFormInput
+                  {...field}
+                  placeholder="ABCDE1234F"
+                  maxLength={10}
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal uppercase"
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                />
               )}
             />
-            {errors.stateId && (
-              <p className="text-red-500 text-sm mt-1">{errors.stateId.message}</p>
+            {errors.panNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.panNumber.message}</p>
+            )}
+            <p className="text-xs text-slate-500 mt-1 font-sans">Format: 5 letters + 4 digits + 1 letter</p>
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Aadhaar Number</UIFormLabel>
+            <Controller
+              name="aadhaarNumber"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  placeholder="123456789012"
+                  maxLength={12}
+                  type="text"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.aadhaarNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.aadhaarNumber.message}</p>
+            )}
+            <p className="text-xs text-slate-500 mt-1 font-sans">12-digit Aadhaar number</p>
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">License Number (if applicable)</UIFormLabel>
+            <Controller
+              name="licenseNumber"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput 
+                  {...field} 
+                  placeholder="Enter professional license number" 
+        router.push("/auth/register/qualifications?step=3");
+      })
+      .catch((err) => {
+        setLoadingState(false);
+        console.log(err);
+        toast({
+          title: "Failed to save details",
+          description: err.message || "Please try again",
+          variant: "destructive",
+        });
+      });
+  };
+
+  return (
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Address Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Address Details</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Country *</UIFormLabel>
+              <Controller
+                name="countryId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        {countries.map((country) => (
+                          <SelectItem key={country.id} value={country.id}>
+                            {country.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.countryId && (
+                <p className="text-red-500 text-sm mt-1">{errors.countryId.message}</p>
+              )}
+            </div>
+            
+            <div>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">State *</UIFormLabel>
+              <Controller
+                name="stateId"
+                control={control}
+                render={({ field }) => (
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
+                    disabled={!selectedCountryId || loadingStates}
+                  >
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
+                      <SelectValue placeholder={loadingStates ? "Loading..." : "Select state"} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        {states.map((state) => (
+                          <SelectItem key={state.id} value={state.id}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.stateId && (
+                <p className="text-red-500 text-sm mt-1">{errors.stateId.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">City *</UIFormLabel>
+            <Controller
+              name="city"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  placeholder="Enter city"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.city && (
+              <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
+            )}
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Complete Address *</UIFormLabel>
+            <Controller
+              name="completeAddress"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  className="w-full rounded-lg border-none bg-[#f1f5f9] px-4 py-3 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal min-h-[100px]"
+                  placeholder="Enter complete address"
+                />
+              )}
+            />
+            {errors.completeAddress && (
+              <p className="text-red-500 text-sm mt-1">{errors.completeAddress.message}</p>
+            )}
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Pincode *</UIFormLabel>
+            <Controller
+              name="pincode"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  maxLength={6}
+                  placeholder="Enter 6-digit pincode"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.pincode && (
+              <p className="text-red-500 text-sm mt-1">{errors.pincode.message}</p>
             )}
           </div>
         </div>
 
-        <div>
-          <UIFormLabel>City *</UIFormLabel>
-          <Controller
-            name="city"
-            control={control}
-            render={({ field }) => (
-              <UIFormInput {...field} placeholder="Enter city" />
+        {/* Identity Section */}
+        <div className="space-y-4 pt-4">
+          <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">Identity Details</h3>
+          
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">PAN Number</UIFormLabel>
+            <Controller
+              name="panNumber"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  placeholder="ABCDE1234F"
+                  maxLength={10}
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal uppercase"
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                />
+              )}
+            />
+            {errors.panNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.panNumber.message}</p>
             )}
-          />
-          {errors.city && (
-            <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-          )}
+            <p className="text-xs text-slate-500 mt-1 font-sans">Format: 5 letters + 4 digits + 1 letter</p>
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Aadhaar Number</UIFormLabel>
+            <Controller
+              name="aadhaarNumber"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput
+                  {...field}
+                  placeholder="123456789012"
+                  maxLength={12}
+                  type="text"
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.aadhaarNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.aadhaarNumber.message}</p>
+            )}
+            <p className="text-xs text-slate-500 mt-1 font-sans">12-digit Aadhaar number</p>
+          </div>
+
+          <div>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">License Number (if applicable)</UIFormLabel>
+            <Controller
+              name="licenseNumber"
+              control={control}
+              render={({ field }) => (
+                <UIFormInput 
+                  {...field} 
+                  placeholder="Enter professional license number" 
+                  style={{ border: "none" }}
+                  className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
+                />
+              )}
+            />
+            {errors.licenseNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.licenseNumber.message}</p>
+            )}
+          </div>
         </div>
 
-        <div>
-          <UIFormLabel>Complete Address *</UIFormLabel>
-          <Controller
-            name="completeAddress"
-            control={control}
-            render={({ field }) => (
-              <textarea
-                {...field}
-                rows={3}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                placeholder="Enter complete address"
-              />
-            )}
-          />
-          {errors.completeAddress && (
-            <p className="text-red-500 text-sm mt-1">{errors.completeAddress.message}</p>
-          )}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            disabled={loadingState}
+            className="bg-transparent border border-solid border-slate-300 text-slate-700 font-semibold py-3 px-8 rounded-lg hover:bg-slate-50 transition-colors w-full sm:w-[160px]"
+          >
+            Back
+          </button>
+          <button
+            disabled={loadingState}
+            className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+            type="submit"
+          >
+            {loadingState && <LoadingSpinner width="20" height="20" />}
+            {loadingState ? "Saving..." : "Continue to Qualifications"}
+          </button>
         </div>
-
-        <div>
-          <UIFormLabel>Pincode *</UIFormLabel>
-          <Controller
-            name="pincode"
-            control={control}
-            render={({ field }) => (
-              <UIFormInput
-                {...field}
-                maxLength={6}
-                placeholder="Enter 6-digit pincode"
-              />
-            )}
-          />
-          {errors.pincode && (
-            <p className="text-red-500 text-sm mt-1">{errors.pincode.message}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Identity Section */}
-      <div className="rounded-lg border p-6 space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Identity Details</h2>
-        
-        <div>
-          <UIFormLabel>PAN Number</UIFormLabel>
-          <Controller
-            name="panNumber"
-            control={control}
-            render={({ field }) => (
-              <UIFormInput
-                {...field}
-                placeholder="ABCDE1234F"
-                maxLength={10}
-                className="uppercase"
-                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-              />
-            )}
-          />
-          {errors.panNumber && (
-            <p className="text-red-500 text-sm mt-1">{errors.panNumber.message}</p>
-          )}
-          <p className="text-sm text-muted-foreground mt-1">Format: 5 letters + 4 digits + 1 letter</p>
-        </div>
-
-        <div>
-          <UIFormLabel>Aadhaar Number</UIFormLabel>
-          <Controller
-            name="aadhaarNumber"
-            control={control}
-            render={({ field }) => (
-              <UIFormInput
-                {...field}
-                placeholder="123456789012"
-                maxLength={12}
-                type="text"
-              />
-            )}
-          />
-          {errors.aadhaarNumber && (
-            <p className="text-red-500 text-sm mt-1">{errors.aadhaarNumber.message}</p>
-          )}
-          <p className="text-sm text-muted-foreground mt-1">12-digit Aadhaar number</p>
-        </div>
-
-        <div>
-          <UIFormLabel>License Number (if applicable)</UIFormLabel>
-          <Controller
-            name="licenseNumber"
-            control={control}
-            render={({ field }) => (
-              <UIFormInput {...field} placeholder="Enter professional license number" />
-            )}
-          />
-          {errors.licenseNumber && (
-            <p className="text-red-500 text-sm mt-1">{errors.licenseNumber.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="flex gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => router.back()}
-          disabled={loadingState}
-        >
-          Back
-        </Button>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loadingState}
-        >
-          {loadingState ? (
-            <>
-              <LoadingSpinner /> Saving...
-            </>
-          ) : (
-            "Continue to Qualifications"
-          )}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

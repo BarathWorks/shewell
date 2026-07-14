@@ -80,9 +80,9 @@ const ModesForm = ({
   useEffect(() => {
 
     params.set("step", "4")
-    window.history.pushState(null,"", `${pathname}?${params.toString()}` )
-  },[])
-  
+    window.history.pushState(null, "", `${pathname}?${params.toString()}`)
+  }, [])
+
   const onSubmit = (data: z.infer<typeof modeSchema>) => {
     setLoadingState(true);
     // console.log(data);
@@ -117,18 +117,16 @@ const ModesForm = ({
   // }
 
   return (
-    <>
-      {/* <div className="mb-6 text-center  font-inter text-2xl font-semibold md:mb-8  xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
-        Create your free account
-      </div> */}
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Modes</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
+        <div className="flex flex-col gap-6">
           <div>
-            <UIFormLabel>Session Mode</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Session Mode</UIFormLabel>
             <Controller
               control={control}
               name="sessionMode"
@@ -136,21 +134,18 @@ const ModesForm = ({
                 return (
                   <>
                     <Select
-                      // value={field.value}
                       onValueChange={field.onChange}
                       defaultValue={sessionMode || ""}
                     >
-                      <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
+                      <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                         <SelectValue placeholder="Select the Session Mode" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
                         <SelectItem value="Online">Online</SelectItem>
-                        {/* <SelectItem value="Offline">Offline</SelectItem> */}
                       </SelectContent>
                     </Select>
                     {errors && errors.sessionMode && (
-                      <p className="text-red-500">
-                        {" "}
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.sessionMode.message}
                       </p>
                     )}
@@ -160,79 +155,9 @@ const ModesForm = ({
             />
           </div>
 
-          {/* <div className="flex flex-col gap-4 xl:flex-row xl:gap-6">
+          <div className="flex flex-col gap-6 xl:flex-row xl:gap-6">
             <div className="w-full">
-              <UIFormLabel>Session Type</UIFormLabel>
-              <Controller
-                control={control}
-                name="sessionType"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={sessionType || ""}
-                      >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
-                          <SelectValue placeholder="Couple/Single" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="couple">Couple/Family</SelectItem>
-                          <SelectItem value="single">Single</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      {errors && errors.sessionType && (
-                        <p className="text-red-500">
-                          {" "}
-                          {errors.sessionType.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-
-            <div className="w-full">
-              <UIFormLabel>Meeting Type</UIFormLabel>
-              <Controller
-                control={control}
-                name="meetingType"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <Select
-                        value={field.value || "google-meet"}
-                        onValueChange={field.onChange}
-                        //  defaultValue = {meetingType  || "google-meet"}
-                      >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
-                          <SelectValue placeholder="Select Meeting Type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="google-meet">
-                            Google Meet
-                          </SelectItem>
-                          
-                        </SelectContent>
-                      </Select>
-                      {errors && errors.meetingType && (
-                        <p className="text-red-500">
-                          {" "}
-                          {errors.meetingType.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-          </div> */}
-
-          <div className="flex flex-col gap-4 xl:flex-row xl:gap-6">
-            <div className="w-full">
-              <UIFormLabel>To Be Listed As</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">To Be Listed As</UIFormLabel>
               <Controller
                 control={control}
                 name="listing"
@@ -243,7 +168,7 @@ const ModesForm = ({
                         onValueChange={field.onChange}
                         defaultValue={listing || ""}
                       >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
+                        <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                           <SelectValue placeholder="Select an option" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -254,8 +179,7 @@ const ModesForm = ({
                         </SelectContent>
                       </Select>
                       {errors && errors.listing && (
-                        <p className="text-red-500">
-                          {" "}
+                        <p className="text-red-500 text-sm mt-1">
                           {errors.listing.message}
                         </p>
                       )}
@@ -264,115 +188,56 @@ const ModesForm = ({
                 }}
               />
             </div>
-
-            {/* <div className="w-full">
-                <UIFormLabel>Issued Handled</UIFormLabel>
-                <Controller
-                  control={control}
-                  name="issues"
-                  render={({ field }) => {
-                    return (
-                      <>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9]  py-3 pl-4 font-inter  text-sm font-normal text-placeholder-color">
-                            <SelectValue placeholder="Enter issues you handled" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            <SelectItem value="google meet">
-                              Google Meet
-                            </SelectItem>
-                            <SelectItem value="zoom">Zoom</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {errors && errors.issues && (
-                          <p className="text-red-500"> {errors.issues.message}</p>
-                        )}
-                      </>
-                    );
-                  }}
-                />
-              </div> */}
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-              type="submit"
-              // onClick={handleSubmit(onSubmit, errorHandler)}
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-base font-normal">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base  font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-      <div className="mt-[45px] hidden md:block">
-        <div className="mb-1 font-inter text-sm font-normal 2xl:text-base">
+      <div className="mt-8 border-t pt-4">
+        <div className="mb-2 font-sans text-xs text-slate-500">
           By proceeding, you agree to the{" "}
           <Link
             href="#"
-            className="font-inter text-sm font-normal text-primary 2xl:text-base"
+            className="text-brand-teal hover:underline"
           >
             Terms and Conditions
           </Link>{" "}
           and{" "}
           <Link
             href="#"
-            className="font-inter text-sm font-normal text-primary 2xl:text-base"
+            className="text-brand-teal hover:underline"
           >
             Privacy Policy
           </Link>
         </div>
-        <div className="flex items-center gap-6">
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href={""}
-          >
-            Help
-          </Link>
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href={""}
-          >
-            Privacy
-          </Link>
-          <Link
-            className="font-inter text-sm font-normal 2xl:text-base"
-            href={""}
-          >
-            Terms
-          </Link>
+        <div className="flex items-center gap-4 text-xs text-slate-400 font-sans">
+          <Link className="hover:text-slate-600" href={""}>Help</Link>
+          <Link className="hover:text-slate-600" href={""}>Privacy</Link>
+          <Link className="hover:text-slate-600" href={""}>Terms</Link>
         </div>
       </div>
-    </>
-  );
+    </div>)
 };
 
 export default ModesForm;

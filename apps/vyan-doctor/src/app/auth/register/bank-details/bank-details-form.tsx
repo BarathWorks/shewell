@@ -121,16 +121,17 @@ const BankDetailsForm = ({
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Bank Details</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
+        <div className="flex flex-col gap-6">
           {/* Account Holder Name */}
           <div>
-            <UIFormLabel>Account Holder Name</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Account Holder Name</UIFormLabel>
             <Controller
               control={control}
               name="bankAccountHolderName"
@@ -139,11 +140,13 @@ const BankDetailsForm = ({
                   <>
                     <UIFormInput
                       placeholder="Enter account holder name"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.bankAccountHolderName && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.bankAccountHolderName.message}
                       </p>
                     )}
@@ -155,7 +158,7 @@ const BankDetailsForm = ({
 
           {/* Account Number */}
           <div>
-            <UIFormLabel>Account Number</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Account Number</UIFormLabel>
             <Controller
               control={control}
               name="bankAccountNumber"
@@ -164,11 +167,13 @@ const BankDetailsForm = ({
                   <>
                     <UIFormInput
                       placeholder="Enter account number"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.bankAccountNumber && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.bankAccountNumber.message}
                       </p>
                     )}
@@ -179,9 +184,9 @@ const BankDetailsForm = ({
           </div>
 
           {/* Bank Name & Branch */}
-          <div className="flex flex-col gap-4 xl:flex-row xl:gap-6">
+          <div className="flex flex-col gap-6 xl:flex-row xl:gap-6">
             <div className="w-full">
-              <UIFormLabel>Bank Name</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Bank Name</UIFormLabel>
               <Controller
                 control={control}
                 name="bankName"
@@ -190,11 +195,13 @@ const BankDetailsForm = ({
                     <>
                       <UIFormInput
                         placeholder="Enter bank name"
-                        value={field.value}
+                        value={field.value || ""}
                         onChange={field.onChange}
+                        style={{ border: "none" }}
+                        className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                       />
                       {errors && errors.bankName && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 text-sm mt-1">
                           {errors.bankName.message}
                         </p>
                       )}
@@ -204,7 +211,7 @@ const BankDetailsForm = ({
               />
             </div>
             <div className="w-full">
-              <UIFormLabel>Branch Name</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Branch Name</UIFormLabel>
               <Controller
                 control={control}
                 name="bankBranch"
@@ -213,11 +220,13 @@ const BankDetailsForm = ({
                     <>
                       <UIFormInput
                         placeholder="Enter branch name"
-                        value={field.value}
+                        value={field.value || ""}
                         onChange={field.onChange}
+                        style={{ border: "none" }}
+                        className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                       />
                       {errors && errors.bankBranch && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 text-sm mt-1">
                           {errors.bankBranch.message}
                         </p>
                       )}
@@ -230,7 +239,7 @@ const BankDetailsForm = ({
 
           {/* IFSC Code */}
           <div className="w-full">
-            <UIFormLabel>IFSC Code</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">IFSC Code</UIFormLabel>
             <Controller
               control={control}
               name="bankIfscCode"
@@ -238,12 +247,14 @@ const BankDetailsForm = ({
                 return (
                   <>
                     <UIFormInput
-                      placeholder="e.g. SBIN0001234"
-                      value={field.value}
+                      placeholder="e.g. IFSC0001234"
+                      value={field.value || ""}
                       onChange={field.onChange}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.bankIfscCode && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.bankIfscCode.message}
                       </p>
                     )}
@@ -266,16 +277,16 @@ const BankDetailsForm = ({
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
-                      <div className="font-poppins font-normal text-base text-black-300">
+                      <div className="font-sans font-normal text-sm text-slate-600">
                         Have you read{" "}
-                        <Link href="/terms" className="underline">
+                        <Link href="/terms" className="underline text-brand-teal font-medium hover:brightness-95">
                           Terms and Conditions
                         </Link>{" "}
                         ?
                       </div>
                     </div>
                     {errors && errors.termsAndConditions && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.termsAndConditions.message}
                       </p>
                     )}
@@ -285,45 +296,31 @@ const BankDetailsForm = ({
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-4 ">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] sm:w-[325px]"
-              variant="OTP"
-              type="submit"
-              onClick={() => {
-                handleSubmit(onSubmit, errorHandler);
-              }}
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Register"}
-            </Button>
-            <div className=" font-inter text-base font-normal">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base  font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Register"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

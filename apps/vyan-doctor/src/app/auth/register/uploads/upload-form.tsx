@@ -342,381 +342,257 @@ const UploadForm = ({
     }
   };
   return (
-    <>
-      {/* <div className="mb-6 text-center  font-inter text-2xl font-semibold md:mb-8  xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
-        Create your free account
-      </div> */}
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Uploads</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
+        <div className="flex flex-col gap-6">
           {/* upload your image */}
           <div>
-            <UIFormLabel>Upload Your Image</UIFormLabel>
-
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans mb-1">Upload Your Image*</UIFormLabel>
             <Controller
               control={control}
               name="mediaId"
               render={({ field }) => {
                 return (
-                  <>
-                    {" "}
-                    <Input
-                      // value={field.value}
-                      onChange={onSelectImage}
-                      type="file"
-                    />
-                  </>
+                  <Input
+                    onChange={onSelectImage}
+                    type="file"
+                    style={{ border: "none" }}
+                    className="w-full rounded-lg border-none bg-[#f1f5f9] py-2 px-3 font-sans text-sm text-slate-900 focus:bg-[#e2e8f0] file:bg-brand-teal file:text-white file:rounded-lg file:px-3 file:py-1 file:border-0 file:mr-3 file:hover:brightness-95 cursor-pointer file:cursor-pointer"
+                  />
                 );
               }}
             />
           </div>
           {fileUrl && (
-            <div className=" flex aspect-square w-[135px] items-center justify-center  bg-[url('/images/doctor-bg.png')] bg-center bg-no-repeat">
-              {" "}
+            <div className="flex aspect-square w-[135px] items-center justify-center bg-[url('/images/doctor-bg.png')] bg-center bg-no-repeat rounded-full overflow-hidden shadow-sm">
               <div className="w-[116px]">
-                <div className="relative  aspect-square object-cover">
+                <div className="relative aspect-square object-cover">
                   <Image
                     src={imageUrl}
                     alt="doctor-image"
-                    className=" rounded-full  object-cover"
+                    className="rounded-full object-cover"
                     fill={true}
                   />
                 </div>
               </div>
             </div>
-
-            // <Image src={imageUrl!} alt="image-preview" width={150} height={150} />
           )}
 
           {/* upload-your-aadhar */}
           <div className="w-full">
-            <UIFormLabel>Upload Your Aadhar Card</UIFormLabel>
-
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans mb-1">Upload Your Aadhar Card*</UIFormLabel>
             <Controller
               control={control}
               name="aadharCard"
               render={({ field }) => {
                 return (
-                  <>
-                    {" "}
-                    <Input
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        onSelectAadharCard(e, DocumentType.AADHAR_CARD),
-                          console.log("field.value", field.value);
-                      }}
-                      type="file"
-                    />
-                  </>
+                  <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      onSelectAadharCard(e, DocumentType.AADHAR_CARD);
+                    }}
+                    type="file"
+                    style={{ border: "none" }}
+                    className="w-full rounded-lg border-none bg-[#f1f5f9] py-2 px-3 font-sans text-sm text-slate-900 focus:bg-[#e2e8f0] file:bg-brand-teal file:text-white file:rounded-lg file:px-3 file:py-1 file:border-0 file:mr-3 file:hover:brightness-95 cursor-pointer file:cursor-pointer"
+                  />
                 );
               }}
             />
+            {!aadharCard && (
+              <p className="text-red-500 text-sm mt-1">Please upload your Aadhar Card</p>
+            )}
+            {aadharCard && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-teal/10 text-brand-teal font-sans">
+                  <span className="cursor-pointer hover:underline" onClick={() => {
+                    const fileKey = aadharCard.fileKey;
+                    downloadDocument({ fileKey }).then((url) => {
+                      router.push(url!);
+                    });
+                  }}>
+                    Aadhar Card
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      deleteDocumentFromKey(
+                        professionalUserId,
+                        aadharCard.fileKey,
+                        aadharCard.id,
+                      )
+                    }
+                    className="hover:text-red-600 transition-colors"
+                  >
+                    <Trash2 className="size-3" />
+                  </button>
+                </span>
+              </div>
+            )}
           </div>
-
-          {!aadharCard && (
-            <p className="text-red-500">Please upload your Aadhar Card</p>
-          )}
-          {aadharCard && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <div
-                onClick={() => {
-                  const fileKey = aadharCard.fileKey;
-                  downloadDocument({ fileKey }).then((url) => {
-                    router.push(url!);
-                  });
-                }}
-                className="cursor-pointer"
-              >
-                Aadhar Card
-              </div>
-              <div
-                onClick={() =>
-                  deleteDocumentFromKey(
-                    professionalUserId,
-                    aadharCard.fileKey,
-                    aadharCard.id,
-                  )
-                }
-                className="cursor-pointer"
-              >
-                <Trash2 className="text-red-500 size-4" />
-              </div>
-            </div>
-          )}
 
           {/* upload-your-pan */}
           <div className="w-full">
-            <UIFormLabel>Upload Your Pan Card</UIFormLabel>
-
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans mb-1">Upload Your Pan Card*</UIFormLabel>
             <Controller
               control={control}
               name="panCard"
               render={({ field }) => {
                 return (
-                  <>
-                    {" "}
-                    <Input
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        onSelectPanCard(e, DocumentType.PAN_CARD);
-                        console.log("field.value", field.value);
-                      }}
-                      type="file"
-                    />
-                  </>
+                  <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      onSelectPanCard(e, DocumentType.PAN_CARD);
+                    }}
+                    type="file"
+                    style={{ border: "none" }}
+                    className="w-full rounded-lg border-none bg-[#f1f5f9] py-2 px-3 font-sans text-sm text-slate-900 focus:bg-[#e2e8f0] file:bg-brand-teal file:text-white file:rounded-lg file:px-3 file:py-1 file:border-0 file:mr-3 file:hover:brightness-95 cursor-pointer file:cursor-pointer"
+                  />
                 );
               }}
             />
+            {!panCard && (
+              <p className="text-red-500 text-sm mt-1">Please upload your Pan Card</p>
+            )}
+            {panCard && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-teal/10 text-brand-teal font-sans">
+                  <span className="cursor-pointer hover:underline" onClick={() => {
+                    const fileKey = panCard.fileKey;
+                    downloadDocument({ fileKey }).then((url) => {
+                      router.push(url!);
+                    });
+                  }}>
+                    Pan Card
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      deleteDocumentFromKey(
+                        professionalUserId,
+                        panCard.fileKey,
+                        panCard.id,
+                      )
+                    }
+                    className="hover:text-red-600 transition-colors"
+                  >
+                    <Trash2 className="size-3" />
+                  </button>
+                </span>
+              </div>
+            )}
           </div>
-
-          {!panCard && (
-            <p className="text-red-500">Please upload your Pan Card</p>
-          )}
-          {panCard && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <div
-                onClick={() => {
-                  const fileKey = panCard.fileKey;
-                  downloadDocument({ fileKey }).then((url) => {
-                    router.push(url!);
-                  });
-                }}
-                className="cursor-pointer"
-              >
-                Pan Card
-              </div>
-              <div
-                onClick={() =>
-                  deleteDocumentFromKey(
-                    professionalUserId,
-                    panCard.fileKey,
-                    panCard.id,
-                  )
-                }
-                className="cursor-pointer"
-              >
-                <Trash2 className="text-red-500 size-4" />
-              </div>
-            </div>
-          )}
 
           {/* upload your documents */}
           {documentFields.map((field, index) => (
             <div
-              key={field.documentId}
-              className="flex w-full items-center gap-2"
+              key={field.id}
+              className="flex w-full items-center gap-4"
             >
               <div className="w-full">
-                <UIFormLabel>Upload Your Document {index + 1}</UIFormLabel>
-
+                <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans mb-1">Upload Your Document {index + 1}</UIFormLabel>
                 <Controller
                   control={control}
                   name={`documents.${index}.documentId`}
                   render={({ field }) => {
                     return (
-                      <>
-                        {" "}
-                        <Input
-                          // value={field.value}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            onSelectDocument(
-                              e,
-                              index,
-                              DocumentType.OTHER_DOCUMENTS,
-                            ),
-                              console.log("field.value", field.value);
-                          }}
-                          type="file"
-                        />
-                      </>
+                      <Input
+                        onChange={(
+                          e: React.ChangeEvent<HTMLInputElement>,
+                        ) => {
+                          onSelectDocument(
+                            e,
+                            index,
+                            DocumentType.OTHER_DOCUMENTS,
+                          );
+                        }}
+                        type="file"
+                        style={{ border: "none" }}
+                        className="w-full rounded-lg border-none bg-[#f1f5f9] py-2 px-3 font-sans text-sm text-slate-900 focus:bg-[#e2e8f0] file:bg-brand-teal file:text-white file:rounded-lg file:px-3 file:py-1 file:border-0 file:mr-3 file:hover:brightness-95 cursor-pointer file:cursor-pointer"
+                      />
                     );
                   }}
                 />
               </div>
 
               {/* add/remove button */}
-              <div className="self-end">
+              <div className="self-end flex gap-2">
                 {index === documentFields.length - 1 ? (
-                  <div className="flex gap-2 ">
-                    {" "}
+                  <>
                     {index > 0 && (
-                      <svg
+                      <button
+                        type="button"
                         onClick={() => removeDocument(index)}
-                        width="36"
-                        height="36"
-                        viewBox="0 0 36 36"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                        className="p-2.5 rounded-lg border border-solid border-red-200 text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center h-10 w-10"
                       >
-                        <rect
-                          x="0.5"
-                          y="0.5"
-                          width="35"
-                          height="35"
-                          rx="5.5"
-                          stroke="#CA0000"
-                        />
-                        <path
-                          d="M10.5 13H12.1667H25.5"
-                          stroke="#CA0000"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M14.6719 13.0003V11.3337C14.6719 10.8916 14.8475 10.4677 15.16 10.1551C15.4726 9.84259 15.8965 9.66699 16.3385 9.66699H19.6719C20.1139 9.66699 20.5378 9.84259 20.8504 10.1551C21.1629 10.4677 21.3385 10.8916 21.3385 11.3337V13.0003M23.8385 13.0003V24.667C23.8385 25.109 23.6629 25.5329 23.3504 25.8455C23.0378 26.1581 22.6139 26.3337 22.1719 26.3337H13.8385C13.3965 26.3337 12.9726 26.1581 12.66 25.8455C12.3475 25.5329 12.1719 25.109 12.1719 24.667V13.0003H23.8385Z"
-                          stroke="#CA0000"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M16.3281 17.167V22.167"
-                          stroke="#CA0000"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M19.6719 17.167V22.167"
-                          stroke="#CA0000"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                        <Trash2 className="size-5" />
+                      </button>
                     )}
-                    <svg
+                    <button
+                      type="button"
                       onClick={() =>
                         appendDocument({
                           documentId: "",
                         })
                       }
-                      width="36"
-                      height="36"
-                      viewBox="0 0 36 36"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="cursor-pointer"
+                      className="p-2.5 rounded-lg border border-solid border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center h-10 w-10"
                     >
-                      <rect
-                        x="0.5"
-                        y="0.5"
-                        width="35"
-                        height="35"
-                        rx="5.5"
-                        stroke="#181818"
-                      />
-                      <path
-                        d="M18 12.167V23.8337"
-                        stroke="#121212"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12.1641 18H23.8307"
-                        stroke="#121212"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </>
                 ) : (
-                  <svg
+                  <button
+                    type="button"
                     onClick={() => removeDocument(index)}
-                    width="36"
-                    height="36"
-                    viewBox="0 0 36 36"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                    className="p-2.5 rounded-lg border border-solid border-red-200 text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center h-10 w-10"
                   >
-                    <rect
-                      x="0.5"
-                      y="0.5"
-                      width="35"
-                      height="35"
-                      rx="5.5"
-                      stroke="#CA0000"
-                    />
-                    <path
-                      d="M10.5 13H12.1667H25.5"
-                      stroke="#CA0000"
-                      stroke-width="1.25"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M14.6719 13.0003V11.3337C14.6719 10.8916 14.8475 10.4677 15.16 10.1551C15.4726 9.84259 15.8965 9.66699 16.3385 9.66699H19.6719C20.1139 9.66699 20.5378 9.84259 20.8504 10.1551C21.1629 10.4677 21.3385 10.8916 21.3385 11.3337V13.0003M23.8385 13.0003V24.667C23.8385 25.109 23.6629 25.5329 23.3504 25.8455C23.0378 26.1581 22.6139 26.3337 22.1719 26.3337H13.8385C13.3965 26.3337 12.9726 26.1581 12.66 25.8455C12.3475 25.5329 12.1719 25.109 12.1719 24.667V13.0003H23.8385Z"
-                      stroke="#CA0000"
-                      stroke-width="1.25"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M16.3281 17.167V22.167"
-                      stroke="#CA0000"
-                      stroke-width="1.25"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M19.6719 17.167V22.167"
-                      stroke="#CA0000"
-                      stroke-width="1.25"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
+                    <Trash2 className="size-5" />
+                  </button>
                 )}
               </div>
             </div>
           ))}
           {documents.length < 1 && (
-            <p className="text-red-500">Please upload your documents</p>
+            <p className="text-red-500 text-sm mt-1">Please upload your documents</p>
           )}
           {documents.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center ">
+            <div className="flex flex-wrap gap-2 mt-2">
               {documents.map((item, index) => {
                 return (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <div
-                        onClick={() => {
-                          const fileKey = item.fileKey;
-                          downloadDocument({ fileKey }).then((url) => {
-                            router.push(url!);
-                          });
-                        }}
-                        className="cursor-pointer"
-                      >
-                        Document {index + 1}
-                      </div>
-                      <div
-                        onClick={() =>
-                          deleteDocumentFromKey(
-                            professionalUserId,
-                            item.fileKey,
-                            item.id,
-                          )
-                        }
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="text-red-500 size-4" />
-                      </div>
-                    </div>
-                  </>
+                  <span key={item.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-teal/10 text-brand-teal font-sans">
+                    <span className="cursor-pointer hover:underline" onClick={() => {
+                      const fileKey = item.fileKey;
+                      downloadDocument({ fileKey }).then((url) => {
+                        router.push(url!);
+                      });
+                    }}>
+                      Document {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        deleteDocumentFromKey(
+                          professionalUserId,
+                          item.fileKey,
+                          item.id,
+                        )
+                      }
+                      className="hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </span>
                 );
               })}
             </div>
           )}
 
           <div>
-            <UIFormLabel>About You</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans mb-1">About You*</UIFormLabel>
             <Controller
               control={control}
               name="aboutYou"
@@ -724,13 +600,13 @@ const UploadForm = ({
                 return (
                   <>
                     <textarea
-                      className="w-full rounded-md border border-border-color py-3 pl-4 outline-primary  placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color "
-                      placeholder="Write about Youself"
+                      className="w-full rounded-lg border-none bg-[#f1f5f9] px-4 py-3 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal min-h-[120px]"
+                      placeholder="Write about yourself"
                       value={field.value}
                       onChange={field.onChange}
                     />
                     {errors && errors.aboutYou && (
-                      <p className="text-red-500">{errors.aboutYou.message}</p>
+                      <p className="text-red-500 text-sm mt-1">{errors.aboutYou.message}</p>
                     )}
                   </>
                 );
@@ -738,47 +614,31 @@ const UploadForm = ({
             />
           </div>
 
-
-
-          <div className="flex flex-col items-center justify-center gap-4 ">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] sm:w-[325px]"
-              variant="OTP"
-              type="submit"
-              onClick={() => {
-                handleSubmit(onSubmit, errorHandler);
-              }}
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-base font-normal">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base  font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

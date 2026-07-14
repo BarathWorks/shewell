@@ -211,16 +211,17 @@ const PersonalInfoForm = ({
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Personal Info</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
+        <div className="flex flex-col gap-6">
           {/* Upload Profile Photo */}
           <div>
-            <UIFormLabel>Upload Your Photo*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Upload Your Photo*</UIFormLabel>
             <Controller
               control={control}
               name="mediaId"
@@ -231,9 +232,10 @@ const PersonalInfoForm = ({
                     onChange={onSelectImage}
                     type="file"
                     accept="image/*"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-teal file:text-white hover:file:brightness-95 border border-dashed border-[#c0c8cc] rounded-lg p-2 bg-[#f1f5f9] w-full cursor-pointer h-auto"
                   />
                   {errors && errors.mediaId && (
-                    <p className="text-red-500">{errors.mediaId.message}</p>
+                    <p className="text-red-500 text-sm mt-1">{errors.mediaId.message}</p>
                   )}
                 </>
               )}
@@ -255,9 +257,9 @@ const PersonalInfoForm = ({
           )}
 
           {/* First Name & Last Name */}
-          <div className="flex flex-col gap-[18px] lg:flex-row lg:gap-5">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-5">
             <div className="w-full">
-              <UIFormLabel>First Name*</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">First Name*</UIFormLabel>
               <Controller
                 control={control}
                 name="firstName"
@@ -266,12 +268,13 @@ const PersonalInfoForm = ({
                     <UIFormInput
                       type="text"
                       placeholder="Enter your first name"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      className="w-full"
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.firstName && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.firstName.message}
                       </p>
                     )}
@@ -281,7 +284,7 @@ const PersonalInfoForm = ({
             </div>
 
             <div className="w-full">
-              <UIFormLabel>Last Name</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Last Name</UIFormLabel>
               <Controller
                 control={control}
                 name="lastName"
@@ -290,12 +293,13 @@ const PersonalInfoForm = ({
                     <UIFormInput
                       type="text"
                       placeholder="Enter your Last Name"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      className="w-full"
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.lastName && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.lastName.message}
                       </p>
                     )}
@@ -306,9 +310,9 @@ const PersonalInfoForm = ({
           </div>
 
           {/* DOB & Phone */}
-          <div className="flex flex-col gap-4 md:flex-row xl:gap-6 ">
+          <div className="flex flex-col gap-6 md:flex-row xl:gap-6">
             <div className="w-full">
-              <UIFormLabel>Date of Birth*</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Date of Birth*</UIFormLabel>
               <Controller
                 name="dob"
                 control={control}
@@ -316,20 +320,20 @@ const PersonalInfoForm = ({
                   <>
                     <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
+                        <button
+                          type="button"
                           className={cn(
-                            "w-full py-[24px] px-[12px] text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            "w-full py-3 px-4 text-left font-normal border-none bg-[#f1f5f9] rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-[#e2e8f0] hover:bg-[#e2e8f0] flex items-center justify-between h-auto",
+                            !field.value && "text-slate-400",
                           )}
                         >
                           {field.value ? (
                             format(field.value, "PPP")
                           ) : (
-                            <span>Pick a date</span>
+                            <span className="text-slate-400 font-sans text-sm">Pick a date</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
+                          <CalendarIcon className="h-4 w-4 opacity-50 text-slate-500" />
+                        </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-full p-0" align="center">
                         <CustomisedCalendar
@@ -351,7 +355,7 @@ const PersonalInfoForm = ({
                       </PopoverContent>
                     </Popover>
                     {errors && errors.dob && (
-                      <p className="text-red-500">{errors.dob.message}</p>
+                      <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
                     )}
                   </>
                 )}
@@ -359,7 +363,7 @@ const PersonalInfoForm = ({
             </div>
 
             <div className="w-full">
-              <UIFormLabel>Phone Number*</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Phone Number*</UIFormLabel>
               <Controller
                 name="phoneNumber"
                 control={control}
@@ -368,11 +372,13 @@ const PersonalInfoForm = ({
                     <UIFormInput
                       type="tel"
                       placeholder="Enter your Phone Number"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors && errors.phoneNumber && (
-                      <p className="text-red-500">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.phoneNumber.message}
                       </p>
                     )}
@@ -384,7 +390,7 @@ const PersonalInfoForm = ({
 
           {/* Gender */}
           <div>
-            <UIFormLabel>Gender*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Gender*</UIFormLabel>
             <Controller
               name="gender"
               control={control}
@@ -394,7 +400,7 @@ const PersonalInfoForm = ({
                     value={field.value || ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                       <SelectValue placeholder="Select your gender" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -406,7 +412,7 @@ const PersonalInfoForm = ({
                     </SelectContent>
                   </Select>
                   {errors && errors.gender && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.gender.message}
                     </p>
                   )}
@@ -417,23 +423,34 @@ const PersonalInfoForm = ({
 
           {/* Languages */}
           <div>
-            <UIFormLabel>Languages*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Languages*</UIFormLabel>
             <Controller
               name="languages"
               control={control}
               render={({ field }) => (
                 <>
                   <Multiselect
-                    placeholder="Select"
-                    className="text-black"
+                    placeholder="Select Languages"
+                    className="text-slate-900 font-sans"
                     options={languagesOptions}
                     selectedValues={field.value}
                     onSelect={(selectedList) => field.onChange(selectedList)}
                     onRemove={(selectedList) => field.onChange(selectedList)}
                     displayValue="name"
+                    style={{
+                      searchBox: {
+                        border: "none",
+                        backgroundColor: "#f1f5f9",
+                        borderRadius: "8px",
+                        padding: "10px 16px",
+                      },
+                      chips: {
+                        background: "#2c5f71",
+                      }
+                    }}
                   />
                   {errors && errors.languages && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.languages.message}
                     </p>
                   )}
@@ -444,20 +461,20 @@ const PersonalInfoForm = ({
 
           {/* About You */}
           <div>
-            <UIFormLabel>About You*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">About You*</UIFormLabel>
             <Controller
               control={control}
               name="aboutYou"
               render={({ field }) => (
                 <>
                   <textarea
-                    className="w-full rounded-md border border-border-color py-3 pl-4 outline-primary placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color"
+                    className="w-full rounded-lg border-none bg-[#f1f5f9] px-4 py-3 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal min-h-[100px]"
                     placeholder="Write about yourself"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
                   />
                   {errors && errors.aboutYou && (
-                    <p className="text-red-500">{errors.aboutYou.message}</p>
+                    <p className="text-red-500 text-sm mt-1">{errors.aboutYou.message}</p>
                   )}
                 </>
               )}
@@ -465,42 +482,31 @@ const PersonalInfoForm = ({
           </div>
 
           {/* Submit */}
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-              type="submit"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-sm font-normal sm:text-base">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Login - SheWellCare</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Hanken Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2c5f71',
+            surface: '#f8f9ff',
+            'surface-dim': '#cbdbf5',
+            'surface-bright': '#f8f9ff',
+            'surface-container-lowest': '#ffffff',
+            'surface-container-low': '#eff4ff',
+          },
+          fontFamily: {
+            sans: ['Hanken Grotesk', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '8px', // ROUND_EIGHT
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="typography">
+    body {
+      font-family: 'Hanken Grotesk', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style data-purpose="layout-styling">
+    /* Custom styles for the split layout and specific components */
+    .illustration-container {
+      background: radial-gradient(circle at center, #ffffff 0%, #eff4ff 100%);
+    }
+    
+    /* Modern Flat input style override to remove heavy borders */
+    .flat-input {
+      border: none !important;
+      background-color: #f1f5f9; /* Neutral slate-100 style background */
+      transition: background-color 0.2s ease-in-out;
+    }
+    
+    .flat-input:focus {
+      background-color: #e2e8f0;
+      box-shadow: none !important;
+      outline: 2px solid #2c5f71;
+    }
+  </style>
+</head>
+<body class="bg-surface min-h-screen flex items-center justify-center p-4">
+<!-- BEGIN: MainContainer -->
+<main class="max-w-6xl w-full bg-surface-container-lowest rounded-custom overflow-hidden shadow-soft flex flex-col md:flex-row min-h-[600px]" data-purpose="login-wrapper">
+<!-- BEGIN: LeftSection (Illustration & Branding) -->
+<section class="flex-1 illustration-container p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-8" data-purpose="marketing-section">
+<div class="space-y-4 max-w-md">
+<h1 class="text-3xl md:text-4xl font-bold text-slate-800 leading-tight">
+          Provide wellness virtuality
+        </h1>
+<p class="text-slate-600 text-lg">
+          Provide best services to your client with <span class="font-semibold text-primary">SheWellCare</span>
+</p>
+</div>
+<!-- Illustration Wrapper -->
+<div class="relative w-full max-w-sm" data-purpose="illustration">
+<img alt="Professional healthcare login illustration" class="w-full h-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-S8_6gdl7PPSRbB3fc7kivvu7B2PZattG9L4JMgY18j8mU_IW_YxP675l86C63uLYEpt8tKgyJZ3CBCQAqbGPLkdQeDy-vYjSNMQOPobSjmnDBHMr1U5mnovo3vq5S8oY8IaZjQ9GCq0fHmnRD-U1UnTCV8ULRRqRs3wOVFSgSkEApQYRGGgf_3OnSc7n4bGgbCjpS3aL8aB3jnRfaIPdG_u0co62LeM90ePmxZHAQcL_kjTKODSuYbmO8R2BtE6-wG0">
+<!-- Dot Indicators (Carousel Style) -->
+
+</div>
+<!-- Footer Policy Links -->
+<div class="mt-auto pt-8 text-xs text-slate-400 space-y-4">
+<p class="">By proceeding, you agree to the <a class="text-primary hover:underline" href="#">Terms and Conditions</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a></p>
+<div class="flex justify-center space-x-6">
+<a class="hover:text-primary transition-colors" href="#">Help</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</div>
+</section>
+<!-- END: LeftSection -->
+<!-- BEGIN: RightSection (Login Form) -->
+<section class="flex-1 bg-surface-container-lowest p-8 md:p-16 flex flex-col justify-center" data-purpose="form-section">
+<div class="max-w-md w-full mx-auto space-y-8">
+<header class="space-y-2">
+<h2 class="text-2xl font-bold text-slate-800">Login into your account</h2>
+</header>
+<!-- Login Form Container -->
+<form action="#" class="space-y-6" data-purpose="login-form" method="POST">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-slate-700" for="email">Email*</label>
+<input class="flat-input w-full px-4 py-3 rounded-custom text-slate-900 focus:ring-0" id="email" name="email" placeholder="Enter your email id" required="" type="email">
+</div>
+<!-- Password Field -->
+<div class="space-y-2 relative">
+<label class="block text-sm font-medium text-slate-700" for="password">Password*</label>
+<div class="relative">
+<input class="flat-input w-full px-4 py-3 rounded-custom text-slate-900 focus:ring-0 pr-12" id="password" name="password" placeholder="Enter your password" required="" type="password">
+<!-- Password Visibility Toggle Icon -->
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary" type="button">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary text-white font-semibold py-3.5 rounded-custom transition-all shadow-sm active:scale-[0.99] hover:bg-[#006d72]" data-purpose="submit-login" type="submit">
+            Login
+          </button>
+<!-- Navigation to Sign Up -->
+<div class="text-center pt-4">
+<p class="text-sm text-slate-500">
+              Don't have SheWellCare account? 
+              <a class="text-primary font-bold ml-1 inline-flex items-center group" href="#">
+                Create Account 
+                <svg class="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</p>
+</div>
+</form>
+</div>
+</section>
+<!-- END: RightSection -->
+</main>
+<!-- END: MainContainer -->
+<script data-purpose="form-interactivity">
+    // Placeholder for form submission logic or password visibility toggle
+    document.querySelector('[data-purpose="login-form"]').addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log('Login attempt recorded.');
+    });
+  </script>
+
+
+
+
+
+
+</body></html>

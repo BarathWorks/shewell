@@ -32,6 +32,12 @@ const PortalLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+  const isAuthRoute = pathname.startsWith("/auth");
+
+  if (isAuthRoute) {
+    return <>{children}</>;
+  }
+
   // Default layout for public/auth/marketing pages
   return (
     <>

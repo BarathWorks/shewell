@@ -112,29 +112,31 @@ const EducationForm = ({
   };
 
   return (
-    <>
+    <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <h3 className="text-xl font-semibold text-slate-800 mb-6">Education</h3>
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6"
+        className="space-y-6"
       >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6">
+        <div className="flex flex-col gap-6">
           {/* Degree */}
           <div>
-            <UIFormLabel>Designation or Degree*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Designation or Degree*</UIFormLabel>
             <Controller
               name="degree"
               control={control}
               render={({ field }) => (
                 <>
                   <UIFormInput
-                    className="placeholder:text-black"
                     placeholder="Enter your Degree"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.value)}
+                    style={{ border: "none" }}
+                    className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                   />
                   {errors?.degree && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.degree.message}
                     </p>
                   )}
@@ -144,22 +146,23 @@ const EducationForm = ({
           </div>
 
           {/* College & Completion Date */}
-          <div className="flex flex-col gap-4 lg:flex-row xl:gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-5">
             <div className="w-full">
-              <UIFormLabel>College/University Name*</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">College/University Name*</UIFormLabel>
               <Controller
                 name="collegeName"
                 control={control}
                 render={({ field }) => (
                   <>
                     <UIFormInput
-                      className="placeholder:text-black"
                       placeholder="Enter college or university name"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={(e) => field.onChange(e.target.value)}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors?.collegeName && (
-                      <p className="text-red-500 text-sm">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.collegeName.message}
                       </p>
                     )}
@@ -169,7 +172,7 @@ const EducationForm = ({
             </div>
 
             <div className="w-full">
-              <UIFormLabel>Completion Date*</UIFormLabel>
+              <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Completion Date*</UIFormLabel>
               <Controller
                 name="completionDate"
                 control={control}
@@ -177,13 +180,14 @@ const EducationForm = ({
                   <>
                     <UIFormInput
                       type="date"
-                      className="placeholder:text-black"
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={(e) => field.onChange(e.target.value)}
                       max={new Date().toISOString().split("T")[0]}
+                      style={{ border: "none" }}
+                      className="w-full px-4 py-3 rounded-lg bg-[#f1f5f9] placeholder:text-slate-400 placeholder:font-sans text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal"
                     />
                     {errors?.completionDate && (
-                      <p className="text-red-500 text-sm">
+                      <p className="text-red-500 text-sm mt-1">
                         {errors.completionDate.message}
                       </p>
                     )}
@@ -195,7 +199,7 @@ const EducationForm = ({
 
           {/* Displayed Qualification */}
           <div>
-            <UIFormLabel>Qualification to be displayed as*</UIFormLabel>
+            <UIFormLabel className="block text-sm font-medium text-slate-700 font-sans">Qualification to be displayed as*</UIFormLabel>
             <Controller
               control={control}
               name="displayedQualificationId"
@@ -205,7 +209,7 @@ const EducationForm = ({
                     value={field.value || ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-lg border-none bg-[#f1f5f9] py-3 pl-4 pr-10 font-sans text-sm font-normal text-slate-900 focus:bg-[#e2e8f0] focus:ring-0 focus:outline-none focus:outline-2 focus:outline-brand-teal h-auto">
                       <SelectValue placeholder="Qualification to be displayed as" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -220,7 +224,7 @@ const EducationForm = ({
                     </SelectContent>
                   </Select>
                   {errors?.displayedQualificationId && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-sm mt-1">
                       {errors.displayedQualificationId.message}
                     </p>
                   )}
@@ -230,42 +234,31 @@ const EducationForm = ({
           </div>
 
           {/* Submit */}
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-              type="submit"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-base font-normal">
-              Already have a account?{" "}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+            <p className="text-sm text-slate-500 font-sans">
+              Already have an account?{" "}
               <Link
-                className="ml-3 font-poppins text-base font-medium text-primary"
+                className="text-brand-teal font-semibold hover:underline inline-flex items-center gap-1"
                 href="/auth/login"
               >
                 Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
+                <svg className="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                 </svg>
               </Link>
-            </div>
+            </p>
+            <button
+              disabled={loadingState}
+              className="bg-brand-teal text-white font-bold py-3.5 px-8 rounded-lg transition-all shadow-sm active:scale-[0.99] hover:brightness-95 flex items-center justify-center gap-2 w-full sm:w-[160px]"
+              type="submit"
+            >
+              {loadingState && <LoadingSpinner width="20" height="20" />}
+              {loadingState ? "Loading..." : "Next"}
+            </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
