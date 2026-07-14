@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
-import { Calendar } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { InteractiveButton } from "./ui/interactive-button";
 
 export default function UpcomingSessions() {
@@ -35,8 +35,10 @@ export default function UpcomingSessions() {
 
   if (!sessions || sessions.length === 0) {
     return (
-      <section className="flex min-h-[70vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
-        <div className="mb-8 sm:mb-10 text-center">
+      <section className="w-full px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
+
+        {/* Section Header */}
+        <div className="mb-10 sm:mb-12 text-center">
           <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Upcoming Wellness Sessions
           </h2>
@@ -45,25 +47,86 @@ export default function UpcomingSessions() {
           </p>
         </div>
 
-        {/* Empty state */}
-        <div className="flex flex-1 items-center justify-center">
-          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-6 shadow-sm sm:p-10 md:p-16">
-            <div className="mb-6 flex w-full items-center justify-center">
+        {/* Empty state — editorial split layout */}
+        <div className="mx-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 md:flex-row">
+
+          {/* Left — teal panel with illustration */}
+          <div className="relative flex min-h-[200px] w-full flex-shrink-0 flex-col items-center justify-center overflow-hidden bg-[#00898F] px-8 py-10 md:w-[42%] md:py-14">
+            {/* Faint concentric circles — decorative */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-[280px] w-[280px] rounded-full border border-white/10" />
+              <div className="absolute h-[200px] w-[200px] rounded-full border border-white/10" />
+              <div className="absolute h-[120px] w-[120px] rounded-full border border-white/10" />
+            </div>
+            {/* Illustration */}
+            <div className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full bg-white/15 sm:h-32 sm:w-32 md:h-36 md:w-36">
               <img
                 src="/session-calender.png"
-                alt="No upcoming sessions"
-                className="h-40 w-40 object-contain sm:h-48 sm:w-48 md:h-56 md:w-56"
+                alt="No sessions yet"
+                className="h-16 w-16 object-contain sm:h-20 sm:w-20 md:h-22 md:w-22"
               />
             </div>
-            <div className="flex flex-col items-center text-center">
-              <h3 className="mb-4 text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-                New Sessions Coming Soon
-              </h3>
-              <p className="max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed text-gray-600">
-                We're currently scheduling our next round of expert-led
-                pregnancy and health workshops.
-              </p>
+            {/* Small label below */}
+            <p className="relative z-10 mt-4 text-xs font-semibold uppercase tracking-widest text-white/60">
+              Sessions
+            </p>
+          </div>
+
+          {/* Right — content */}
+          <div className="flex flex-1 flex-col justify-center px-7 py-9 sm:px-10 sm:py-10 md:px-12 md:py-12">
+
+            {/* Label */}
+            <span className="mb-3 inline-block w-fit rounded-md bg-[#00898F]/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#00898F]">
+              Coming soon
+            </span>
+
+            <h3 className="mb-3 text-xl sm:text-2xl md:text-3xl font-bold leading-snug text-[#114668]">
+              We're curating your next <br className="hidden sm:block" />
+              wellness experience
+            </h3>
+
+            <p className="mb-6 text-sm sm:text-base leading-relaxed text-gray-500">
+              Our team of specialists is handpicking sessions on prenatal care,
+              nutrition, mental health, and more — designed around what matters
+              most to you.
+            </p>
+
+            {/* Divider */}
+            <div className="mb-6 h-px w-full bg-gray-100" />
+
+            {/* Stats row */}
+            <div className="mb-7 flex items-center gap-6 sm:gap-8">
+              <div>
+                <p className="text-lg font-bold text-[#114668] sm:text-xl">4.9★</p>
+                <p className="text-xs text-gray-400">Avg session rating</p>
+              </div>
+              <div className="h-8 w-px bg-gray-200" />
+              <div>
+                <p className="text-lg font-bold text-[#114668] sm:text-xl">50+</p>
+                <p className="text-xs text-gray-400">Expert specialists</p>
+              </div>
+              <div className="h-8 w-px bg-gray-200" />
+              <div>
+                <p className="text-lg font-bold text-[#114668] sm:text-xl">110+</p>
+                <p className="text-xs text-gray-400">Countries served</p>
+              </div>
             </div>
+
+            {/* CTA */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link href="/counselling">
+                <button className="w-full rounded-xl bg-[#114668] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#0d3554] active:scale-95 sm:w-auto">
+                  Book a 1-on-1 Session
+                </button>
+              </Link>
+              <Link
+                href="/session"
+                className="text-center text-sm text-[#00898F] underline-offset-4 hover:underline sm:text-left"
+              >
+                Browse all sessions →
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
@@ -82,19 +145,40 @@ export default function UpcomingSessions() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Session List */}
+      <div className="flex flex-col gap-4">
         {sessions.map((session) => {
           const startDate = new Date(session.startAt);
-          const month = startDate.toLocaleString("default", { month: "short" });
+          const endDate = new Date(
+            startDate.getTime() + (session.durationInMins ?? 60) * 60 * 1000,
+          );
+          const month = startDate.toLocaleString("default", { month: "short" }).toUpperCase();
           const day = startDate.getDate();
+
+          const formatTime = (d: Date) =>
+            d.toLocaleTimeString("en-IN", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            });
 
           return (
             <div
               key={session.id}
-              className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
+              className="group flex w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#00898F]/20 hover:shadow-md"
             >
-              {/* Header Image */}
-              <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
+              {/* Date badge — left vertical strip */}
+              <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center bg-[#00898F] py-4 sm:w-16">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                  {month}
+                </span>
+                <span className="text-2xl font-extrabold leading-none text-white sm:text-3xl">
+                  {day}
+                </span>
+              </div>
+
+              {/* Thumbnail */}
+              <div className="relative hidden h-auto w-28 flex-shrink-0 overflow-hidden sm:block sm:w-36 md:w-44">
                 {session?.thumbnailMedia?.fileUrl ? (
                   <img
                     src={session.thumbnailMedia.fileUrl}
@@ -102,74 +186,74 @@ export default function UpcomingSessions() {
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                    <Calendar className="h-12 w-12 opacity-50" />
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-50">
+                    <Calendar className="h-8 w-8 text-gray-300" />
                   </div>
                 )}
-
-                {/* Date Ribbon */}
-                <div className="absolute right-3 top-0 flex h-[65px] w-[48px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-2 text-white shadow-md">
-                  <div className="flex flex-col items-center">
-                    <span className="text-[9px] font-bold uppercase tracking-wider opacity-90">
-                      {month}
-                    </span>
-                    <span className="text-lg font-bold leading-none">
-                      {day}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "-10px",
-                      left: 0,
-                      width: "100%",
-                      height: "20px",
-                      backgroundColor: "#1B8A8E",
-                      clipPath: "polygon(0 0, 50% 50%, 100% 0)",
-                    }}
-                  ></div>
-                </div>
+                {/* Recording badge */}
+                {session.isRecordingAvailable && (
+                  <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                    Rec
+                  </span>
+                )}
               </div>
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col p-4 sm:p-5">
-                {/* Tags */}
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded bg-[#E3F6F5] px-2.5 py-1 text-xs font-semibold text-[#1B8A8E]">
-                    {session.language || "English"}
-                  </span>
+              {/* Main content */}
+              <div className="flex flex-1 flex-col justify-center gap-1.5 px-4 py-4 sm:py-3 md:px-5">
+                {/* Tags row */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {session.language && (
+                    <span className="rounded border border-gray-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                      {session.language}
+                    </span>
+                  )}
                   {session.type === "ONLINE" && (
-                    <span className="flex items-center gap-1.5 rounded bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                      Online
+                    <span className="flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-600">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Live Online
+                    </span>
+                  )}
+                  {session.isRecordingAvailable && (
+                    <span className="flex items-center gap-1 rounded border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-500 sm:hidden">
+                      <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                      Recording
                     </span>
                   )}
                 </div>
 
                 {/* Title */}
-                <h3 className="mb-2 line-clamp-2 text-base sm:text-lg font-bold leading-tight text-gray-900">
+                <h3 className="line-clamp-1 text-sm font-bold text-gray-900 sm:text-base md:text-lg">
                   {session.title}
                 </h3>
 
-                <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-500">
-                  A comprehensive session focusing on health and wellness. Join
-                  us to learn from the best experts in the field.
-                </p>
-
-                <div className="flex-1"></div>
-
-                {/* Footer: Price & Action */}
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <div className="flex h-10 min-w-[88px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-sm font-bold text-[#1B8A8E]">
-                    ₹ {Number(session.price).toLocaleString()}
-                  </div>
-
-                  <Link href={`/session/${session.slug}`} className="flex-1">
-                    <button className="flex h-10 w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-4 text-sm font-bold text-white transition-colors hover:bg-[#156f73]">
-                      Register
-                    </button>
-                  </Link>
+                {/* Time */}
+                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>
+                    {formatTime(startDate)} – {formatTime(endDate)} IST
+                  </span>
+                  {session.durationInMins && (
+                    <>
+                      <span className="text-gray-200">·</span>
+                      <span>{session.durationInMins} mins</span>
+                    </>
+                  )}
                 </div>
+              </div>
+
+              {/* Right: price + CTA */}
+              <div className="flex flex-shrink-0 flex-col items-end justify-center gap-2 px-4 py-4 sm:px-5">
+                <span className="text-sm font-bold text-[#114668] sm:text-base">
+                  {Number(session.price) === 0
+                    ? "Free"
+                    : `₹ ${Number(session.price).toLocaleString()}`}
+                </span>
+                <Link href={`/session/${session.slug}`}>
+                  <button className="rounded-lg bg-[#00898F] px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:bg-[#007a80] active:scale-95 sm:text-sm sm:px-5 sm:py-2.5">
+                    Register
+                  </button>
+                </Link>
               </div>
             </div>
           );

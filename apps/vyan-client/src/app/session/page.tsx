@@ -4,7 +4,7 @@ import { api } from "~/trpc/server";
 import { format } from "date-fns";
 import { SessionStatus } from "@repo/database";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type SessionPageProps = {
@@ -126,106 +126,113 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
                 {group.month}
               </h2>
               
-              {/* Mobile & Tablet View: Vertical Stack Layout (Homepage Style Cards) */}
-              <div className="flex flex-col gap-3 xs:gap-3.5 sm:gap-4 md:hidden">
+              {/* Mobile & Tablet: enhanced vertical card */}
+              <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:hidden">
                 {group.sessions.map((session: any) => {
                   const startDate = new Date(session.startAt);
-                  const month = startDate.toLocaleString("default", { month: "short" });
+                  const endDate = session.endAt
+                    ? new Date(session.endAt)
+                    : new Date(startDate.getTime() + 60 * 60 * 1000);
+                  const month = startDate
+                    .toLocaleString("default", { month: "short" })
+                    .toUpperCase();
                   const day = startDate.getDate();
+                  const formatTime = (d: Date) =>
+                    d.toLocaleTimeString("en-IN", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    });
+                  const isFree = Number(session.price) === 0;
 
                   return (
-                    <div
-                      key={session.id}
-                      className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
-                    >
-                      {/* Header Image Area */}
-                      <div className="relative h-40 xs:h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
-                        {session?.thumbnailMedia?.fileUrl ? (
-                          <img
-                            src={session.thumbnailMedia.fileUrl}
-                            alt={session.title}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                            <Calendar className="h-10 xs:h-11 sm:h-12 w-10 xs:w-11 sm:w-12 opacity-50" />
-                          </div>
-                        )}
+                    <Link key={session.id} href={`/session/${session.slug}`} className="block">
+                      <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#00898F]/20 hover:shadow-lg">
 
-                        {/* Date Ribbon */}
-                        <div className="absolute right-3 xs:right-4 top-0 flex h-[60px] xs:h-[65px] sm:h-[70px] w-[45px] xs:w-[48px] sm:w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-1.5 xs:pt-2 text-white shadow-md">
-                          <div className="flex flex-col items-center">
-                            <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90">
+                        {/* Thumbnail */}
+                        <div className="relative h-40 w-full flex-shrink-0 overflow-hidden xs:h-44">
+                          {session?.thumbnailMedia?.fileUrl ? (
+                            <img
+                              src={session.thumbnailMedia.fileUrl}
+                              alt={session.title}
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-gray-50 to-gray-100">
+                              <Calendar className="h-10 w-10 text-gray-300" />
+                              <span className="text-[10px] font-medium uppercase tracking-widest text-gray-300">
+                                Session
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Date ribbon */}
+                          <div className="absolute right-3 top-0 flex w-11 flex-col items-center overflow-hidden rounded-b-xl bg-[#00898F] pb-3 pt-2 text-white shadow-md">
+                            <span className="text-[8px] font-bold uppercase tracking-widest leading-none opacity-70">
                               {month}
                             </span>
-                            <span className="text-base xs:text-lg sm:text-xl font-bold leading-none">
+                            <span className="text-xl font-black leading-tight">
                               {day}
                             </span>
                           </div>
-                          {/* Triangle bottom for ribbon effect */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: "-10px",
-                              left: 0,
-                              width: "100%",
-                              height: "20px",
-                              backgroundColor: "#1B8A8E",
-                              clipPath: "polygon(0 0, 50% 50%, 100% 0)",
-                            }}
-                          ></div>
-                        </div>
-                      </div>
 
-                      {/* Content Area */}
-                      <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5">
-                        {/* Tags */}
-                        <div className="mb-2 xs:mb-3 flex flex-wrap items-center gap-1.5 xs:gap-2">
-                          <span className="rounded bg-[#E3F6F5] px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-[#1B8A8E]">
-                            {session.language || "English"}
-                          </span>
+                          {/* Type badge — top left */}
                           {session.type === "ONLINE" && (
-                            <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-green-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-green-600">
-                              <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-green-500"></span>
-                              Online
-                            </span>
+                            <div className="absolute left-3 top-3">
+                              <span className="flex items-center gap-1 rounded-full bg-green-500/90 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-sm">
+                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                                Live
+                              </span>
+                            </div>
                           )}
                           {session.type === "RECORDING" && (
-                            <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-blue-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-blue-600">
-                              <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-blue-500"></span>
-                              Recording
-                            </span>
+                            <div className="absolute left-3 top-3">
+                              <span className="flex items-center gap-1 rounded-full bg-orange-500/90 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-sm">
+                                <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                                Rec
+                              </span>
+                            </div>
                           )}
                         </div>
 
-                        {/* Title */}
-                        <h3 className="mb-1.5 xs:mb-2 line-clamp-2 text-base xs:text-lg sm:text-xl font-extrabold leading-tight text-gray-900">
-                          {session.title}
-                        </h3>
+                        {/* Content */}
+                        <div className="flex flex-1 flex-col p-3 xs:p-4">
 
-                        {/* Description placeholder */}
-                        <p className="mb-3 xs:mb-4 line-clamp-3 text-xs xs:text-sm leading-relaxed text-gray-500">
-                          A comprehensive session focusing on health and wellness. Join
-                          us to learn from the best experts in the field.
-                        </p>
+                          {/* Language tag */}
+                          {session.language && (
+                            <span className="mb-2 inline-block w-fit rounded border border-[#00898F]/20 bg-[#E8F7F7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#00898F]">
+                              {session.language}
+                            </span>
+                          )}
 
-                        {/* Spacer to push footer down */}
-                        <div className="flex-1"></div>
+                          {/* Title */}
+                          <h3 className="mb-1.5 line-clamp-2 text-sm font-extrabold leading-snug text-gray-900 xs:text-base">
+                            {session.title}
+                          </h3>
 
-                        {/* Footer: Price & Action */}
-                        <div className="mt-3 xs:mt-4 flex items-center justify-between gap-2 xs:gap-3">
-                          <div className="flex h-[36px] xs:h-[40px] sm:h-[42px] min-w-[80px] xs:min-w-[85px] sm:min-w-[90px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-xs xs:text-sm sm:text-base font-bold text-[#1B8A8E]">
-                            ₹ {Number(session.price).toLocaleString()}
+                          {/* Time row */}
+                          <div className="mb-3 flex items-center gap-1 text-[10px] text-gray-400 xs:text-xs">
+                            <Clock className="h-3 w-3 flex-shrink-0" />
+                            <span className="line-clamp-1">
+                              {formatTime(startDate)} – {formatTime(endDate)} IST
+                            </span>
                           </div>
 
-                          <Link href={`/session/${session.slug}`} className="flex-1">
-                            <button className="flex h-[36px] xs:h-[40px] sm:h-[42px] w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-3 xs:px-4 text-xs xs:text-sm sm:text-sm font-bold text-white transition-colors hover:bg-[#156f73] active:scale-[0.98]">
-                              Register
+                          <div className="mt-auto flex items-center gap-2">
+                            {/* Price */}
+                            <span className={`text-sm font-extrabold ${isFree ? "text-[#00898F]" : "text-[#114668]"}`}>
+                              {isFree ? "Free" : `₹${Number(session.price).toLocaleString("en-IN")}`}
+                            </span>
+
+                            {/* Register */}
+                            <button className="ml-auto rounded-xl bg-[#00898F] px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:bg-[#007a80] active:scale-95">
+                              Register →
                             </button>
-                          </Link>
+                          </div>
                         </div>
+
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

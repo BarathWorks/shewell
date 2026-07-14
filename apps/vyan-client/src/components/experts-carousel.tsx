@@ -158,15 +158,20 @@ export default function ExpertsCarousel() {
     if (!data?.topExperts || data.topExperts.length === 0) {
       return EXPERTS_DATA;
     }
-    return data.topExperts.map((doctor) => ({
-      id: doctor.id,
-      name: `${doctor.firstName} ${doctor.lastName}`,
-      role: doctor.displayQualification?.specialization ?? "Specialist",
-      // undefined triggers fallback; avoids broken-image requests
-      image: doctor.media?.fileUrl ?? undefined,
-      userName: doctor.userName,
-    }));
+    return data.topExperts
+      .filter((doctor) => doctor != null)          // drop any null/undefined entries
+      .map((doctor) => ({
+        id: doctor?.id ?? Math.random(),
+        name:
+          doctor?.firstName || doctor?.lastName
+            ? `${doctor?.firstName ?? ""} ${doctor?.lastName ?? ""}`.trim()
+            : undefined,
+        role: doctor?.displayQualification?.specialization ?? "Specialist",
+        image: doctor?.media?.fileUrl ?? undefined, // undefined → fallback avatar
+        userName: doctor?.userName,
+      }));
   }, [data]);
+
 
   const [items, setItems] = useState<ExpertData[]>(expertsData);
   const [isHovered, setIsHovered] = useState(false);
