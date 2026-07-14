@@ -2,15 +2,17 @@
 
 import { IRegistration } from '@/src/_models/registration.model';
 import { PaymentStatus } from '@repo/database';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
-import { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { updateRegistrationPaymentStatus } from './registration-actions';
 import useToastContext from '@/src/_hooks/useToast';
 import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
+import TableToolbar from '@/src/_components/shared/TableToolbar';
 
 interface RegistrationTableProps {
   registrations: IRegistration[];
@@ -21,6 +23,22 @@ const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
   const [loading, setLoading] = useState<string | null>(null);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
+  const dt = useRef<DataTable<any>>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+  });
+
+  const onGlobalFilterChange = (value: string) => {
+    let _filters: any = { ...filters };
+    _filters.global.value = value;
+    setFilters(_filters);
+    setGlobalFilter(value);
+  };
+
+  const exportCSV = () => {
+    dt.current?.exportCSV();
+  };
 
   const paymentStatusOptions = Object.values(PaymentStatus).map((status) => ({
     label: status,
@@ -99,32 +117,45 @@ const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
   };
 
   return (
-    <div className="card">
-      <DataTable
-        value={registrations}
-        first={first}
-        rows={rows}
-        dataKey="id"
-        filterDisplay="menu"
-        emptyMessage="No registrations found."
-      >
-        <Column field="user" header="User" body={userTemplate} sortable style={{ minWidth: '12rem' }} />
-        <Column field="session" header="Session" body={sessionTemplate} sortable style={{ minWidth: '14rem' }} />
-        <Column field="session.price" header="Price" body={priceTemplate} sortable style={{ minWidth: '8rem' }} />
-        <Column field="paymentStatus" header="Payment Status" body={statusTemplate} sortable style={{ minWidth: '10rem' }} />
-        <Column field="createdAt" header="Registered At" body={dateTemplate} sortable style={{ minWidth: '12rem' }} />
-        <Column header="Actions" body={actionTemplate} exportable={false} style={{ minWidth: '12rem' }} />
-      </DataTable>
+    <div className="grid crud-demo">
+      <div className="col-12">
+        <div className="card">
+          <TableToolbar
+            onExport={exportCSV}
+            searchValue={globalFilter}
+            onSearchChange={onGlobalFilterChange}
+            searchPlaceholder="Search registrations..."
+          />
+          <DataTable
+            ref={dt}
+            value={registrations}
+            first={first}
+            rows={rows}
+            dataKey="id"
+            filterDisplay="menu"
+            emptyMessage="No registrations found."
+            filters={filters}
+            globalFilterFields={['user.name', 'user.email', 'session.title', 'paymentStatus']}
+          >
+            <Column field="user" header="User" body={userTemplate} sortable style={{ minWidth: '12rem' }} />
+            <Column field="session" header="Session" body={sessionTemplate} sortable style={{ minWidth: '14rem' }} />
+            <Column field="session.price" header="Price" body={priceTemplate} sortable style={{ minWidth: '8rem' }} />
+            <Column field="paymentStatus" header="Payment Status" body={statusTemplate} sortable style={{ minWidth: '10rem' }} />
+            <Column field="createdAt" header="Registered At" body={dateTemplate} sortable style={{ minWidth: '12rem' }} />
+            <Column header="Actions" body={actionTemplate} exportable={false} style={{ minWidth: '12rem' }} />
+          </DataTable>
 
-      <CustomPaginator
-        first={first}
-        rows={rows}
-        totalRecords={registrations.length}
-        onPageChange={(event) => setFirst(event.first)}
-        onRowsChange={(event) => setRows(event.rows)}
-        entityName="registrations"
-        rowsPerPageOptions={[5, 10, 25, 50]}
-      />
+          <CustomPaginator
+            first={first}
+            rows={rows}
+            totalRecords={registrations.length}
+            onPageChange={(event) => setFirst(event.first)}
+            onRowsChange={(event) => setRows(event.rows)}
+            entityName="registrations"
+            rowsPerPageOptions={[5, 10, 25, 50]}
+          />
+        </div>
+      </div>
     </div>
   );
 };

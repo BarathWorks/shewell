@@ -27,100 +27,88 @@ const FAQ_CONTENT = [
 ];
 
 const ShewellFAQ = () => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState("What We Offer");
+  // Click-to-toggle; first item open by default
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
-  const tabs = ["What We Offer", "Plans & Pricing", "Trust & Safety"];
+  const handleToggle = (index: number) => {
+    setActiveIndex((prev) => (prev === index ? null : index));
+  };
 
   return (
-    <section className="overflow-hidden bg-white px-4 py-8 sm:px-6 sm:py-12 md:px-16 md:py-20 lg:px-[100px]">
+    <section className="overflow-hidden bg-white px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
       <div className="w-full">
-        {/* Title Section */}
-        <div className="mb-8 text-center sm:mb-12 md:mb-16">
-          <h2 className="mb-2 text-2xl font-medium sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
+        {/* Section Header */}
+        <div className="mb-8 sm:mb-10 md:mb-12 text-center">
+          <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Something on Your Mind? Let's Talk.
           </h2>
-          <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
-            No Matter where are - question , doubts (or) curiosity - wire here
-            to listen and help
+          <p className="text-sm sm:text-base md:text-lg text-[#33333399]">
+            No matter where you are — questions, doubts, or curiosity — we're here to listen and help.
           </p>
         </div>
 
-        {/*  Pill Tabs 
-                <div className="flex justify-center gap-3 mb-12">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all border ${
-                                activeTab === tab
-                                    ? "bg-[#167D71] text-white border-[#167D71]"
-                                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
-                            }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div> */}
-
         {/* FAQ List */}
-        <div className="space-y-2 sm:space-y-3 md:space-y-5">
-          {FAQ_CONTENT.map((item, index) => (
-            <motion.div
-              key={index}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              className={`relative overflow-hidden rounded-lg border transition-all duration-300 sm:rounded-xl md:rounded-2xl ${
-                hoveredIndex === index
-                  ? "border-[#167D71] bg-[#00898F] shadow-lg"
-                  : "border-transparent bg-[#F8F9FA]"
-              }`}
-            >
-              {/* Question Row */}
-              <div className="flex cursor-pointer items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4 md:px-10 md:py-7">
-                <span
-                  className={`line-clamp-2 text-xs font-medium transition-colors duration-300 sm:text-sm md:text-[17px] lg:text-lg xl:text-[18px] ${
-                    hoveredIndex === index ? "text-white" : "text-[#0F4946]"
-                  }`}
+        <div className="space-y-2 sm:space-y-3">
+          {FAQ_CONTENT.map((item, index) => {
+            const isOpen = activeIndex === index;
+            return (
+              <div
+                key={index}
+                className={`relative overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl ${
+                  isOpen
+                    ? "border-[#167D71] bg-[#00898F] shadow-lg"
+                    : "border-transparent bg-[#F8F9FA] hover:border-gray-200"
+                }`}
+              >
+                {/* Question Row */}
+                <button
+                  onClick={() => handleToggle(index)}
+                  className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-4 text-left sm:px-6 sm:py-5 md:px-8 md:py-6"
                 >
-                  {item.question}
-                </span>
-
-                {/* Dynamic Icon */}
-                <div
-                  className={`flex-shrink-0 rounded-full border p-1 transition-all duration-300 sm:p-1.5 md:p-2 ${
-                    hoveredIndex === index
-                      ? "rotate-0 border-white  bg-white text-[#167D71]"
-                      : "border-gray-100 bg-white text-[#167D71]"
-                  }`}
-                >
-                  {hoveredIndex === index ? (
-                    <ChevronDown size={16} className="sm:size-5 md:size-6" />
-                  ) : (
-                    <ChevronRight size={16} className="sm:size-5 md:size-6" />
-                  )}
-                </div>
-              </div>
-
-              {/* Hover Content */}
-              <AnimatePresence>
-                {hoveredIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  <span
+                    className={`text-sm sm:text-base md:text-lg font-medium transition-colors duration-300 ${
+                      isOpen ? "text-white" : "text-[#0F4946]"
+                    }`}
                   >
-                    <div className="px-3 pb-3 sm:px-6 sm:pb-4 md:px-10 md:pb-9">
-                      <p className="text-xs leading-relaxed text-white/90 sm:text-sm md:text-[16px] lg:text-lg xl:text-[20px]">
-                        {item.answer}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
+                    {item.question}
+                  </span>
+
+                  {/* Icon */}
+                  <div
+                    className={`flex-shrink-0 rounded-full border p-1.5 transition-all duration-300 sm:p-2 ${
+                      isOpen
+                        ? "border-white bg-white text-[#167D71]"
+                        : "border-gray-200 bg-white text-[#167D71]"
+                    }`}
+                  >
+                    {isOpen ? (
+                      <ChevronDown size={16} className="sm:size-5" />
+                    ) : (
+                      <ChevronRight size={16} className="sm:size-5" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Answer */}
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    >
+                      <div className="px-4 pb-4 sm:px-6 sm:pb-5 md:px-8 md:pb-7">
+                        <p className="text-sm sm:text-base leading-relaxed text-white/90">
+                          {item.answer}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

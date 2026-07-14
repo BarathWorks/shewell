@@ -62,20 +62,13 @@ export default async function RootLayout({
     >
       <body className={"relative font-sans"}>
         <SlowSiteAlert />
-        <div className="sticky top-0 z-40">
+        <div className="flex min-h-screen flex-col bg-white">
           <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
             <TRPCReactProvider>
-              {/* <Header
-                email={session?.user.email!}
-                name={session?.user.name!}
-                categories={categories}
-                wishlistedProLength={
-                  userDetails?.wishlistedProducts.length || 0
-                }
-              /> */}
               <Header />
-              {/* <NewHeader /> */}
-              {children}
+              <main className="flex-1">
+                {children}
+              </main>
               <NewFooter />
               <CardSheet />
             </TRPCReactProvider>

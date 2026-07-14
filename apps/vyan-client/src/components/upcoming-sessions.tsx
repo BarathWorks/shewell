@@ -14,18 +14,18 @@ export default function UpcomingSessions() {
 
   if (isLoading) {
     return (
-      <section className="min-h-screen w-full bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-        <div className="mb-8 text-center">
-          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
+      <section className="w-full bg-gradient-to-b from-white to-gray-50 px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
+        <div className="mb-8 sm:mb-10 text-center">
+          <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Upcoming Wellness Sessions
           </h2>
           <div className="mx-auto h-4 w-1/3 animate-pulse rounded bg-gray-200"></div>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-[450px] animate-pulse rounded-3xl bg-gray-100"
+              className="h-[420px] animate-pulse rounded-3xl bg-gray-100"
             ></div>
           ))}
         </div>
@@ -35,20 +35,19 @@ export default function UpcomingSessions() {
 
   if (!sessions || sessions.length === 0) {
     return (
-      <section className="flex min-h-[80vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-        <div className="mb-8 text-center">
-          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
+      <section className="flex min-h-[70vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
+        <div className="mb-8 sm:mb-10 text-center">
+          <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Upcoming Wellness Sessions
           </h2>
-          <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
+          <p className="text-sm sm:text-base md:text-lg text-[#33333399]">
             Join our expert-led sessions for your pregnancy journey
           </p>
         </div>
 
         {/* Empty state */}
         <div className="flex flex-1 items-center justify-center">
-          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-6 shadow-sm sm:p-10 md:p-16 lg:p-20">
-            {/* Image area */}
+          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-6 shadow-sm sm:p-10 md:p-16">
             <div className="mb-6 flex w-full items-center justify-center">
               <img
                 src="/session-calender.png"
@@ -56,13 +55,11 @@ export default function UpcomingSessions() {
                 className="h-40 w-40 object-contain sm:h-48 sm:w-48 md:h-56 md:w-56"
               />
             </div>
-
-            {/* Content area */}
             <div className="flex flex-col items-center text-center">
-              <h3 className="mb-4 text-xl font-bold text-gray-900 sm:text-2xl md:text-3xl">
+              <h3 className="mb-4 text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                 New Sessions Coming Soon
               </h3>
-              <p className="max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg">
+              <p className="max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed text-gray-600">
                 We're currently scheduling our next round of expert-led
                 pregnancy and health workshops.
               </p>
@@ -74,17 +71,18 @@ export default function UpcomingSessions() {
   }
 
   return (
-    <section className="min-h-fit w-full bg-gradient-to-b from-white to-gray-50 px-4 py-4 sm:min-h-[85vh] sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-      <div className="mb-8 text-center">
-        <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
+    <section className="w-full bg-gradient-to-b from-white to-gray-50 px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
+      {/* Section Header */}
+      <div className="mb-8 sm:mb-10 md:mb-12 text-center">
+        <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
           Upcoming Wellness Sessions
         </h2>
-        <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
+        <p className="text-sm sm:text-base md:text-lg text-[#33333399]">
           Join our expert-led sessions for your pregnancy journey
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {sessions.map((session) => {
           const startDate = new Date(session.startAt);
           const month = startDate.toLocaleString("default", { month: "short" });
@@ -95,8 +93,8 @@ export default function UpcomingSessions() {
               key={session.id}
               className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
             >
-              {/* Header Image Area */}
-              <div className="relative h-40 xs:h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
+              {/* Header Image */}
+              <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
                 {session?.thumbnailMedia?.fileUrl ? (
                   <img
                     src={session.thumbnailMedia.fileUrl}
@@ -105,17 +103,17 @@ export default function UpcomingSessions() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                    <Calendar className="h-10 xs:h-11 sm:h-12 w-10 xs:w-11 sm:w-12 opacity-50" />
+                    <Calendar className="h-12 w-12 opacity-50" />
                   </div>
                 )}
 
                 {/* Date Ribbon */}
-                <div className="absolute right-3 xs:right-4 top-0 flex h-[60px] xs:h-[65px] sm:h-[70px] w-[45px] xs:w-[48px] sm:w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-1.5 xs:pt-2 text-white shadow-md">
+                <div className="absolute right-3 top-0 flex h-[65px] w-[48px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-2 text-white shadow-md">
                   <div className="flex flex-col items-center">
-                    <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90">
+                    <span className="text-[9px] font-bold uppercase tracking-wider opacity-90">
                       {month}
                     </span>
-                    <span className="text-base xs:text-lg sm:text-xl font-bold leading-none">
+                    <span className="text-lg font-bold leading-none">
                       {day}
                     </span>
                   </div>
@@ -133,43 +131,41 @@ export default function UpcomingSessions() {
                 </div>
               </div>
 
-              {/* Content Area */}
-              <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5">
+              {/* Content */}
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
                 {/* Tags */}
-                <div className="mb-2 xs:mb-3 flex flex-wrap items-center gap-1.5 xs:gap-2">
-                  <span className="rounded bg-[#E3F6F5] px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-[#1B8A8E]">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <span className="rounded bg-[#E3F6F5] px-2.5 py-1 text-xs font-semibold text-[#1B8A8E]">
                     {session.language || "English"}
                   </span>
                   {session.type === "ONLINE" && (
-                    <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-green-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-green-600">
-                      <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-green-500"></span>
+                    <span className="flex items-center gap-1.5 rounded bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                       Online
                     </span>
                   )}
                 </div>
 
                 {/* Title */}
-                <h3 className="mb-2 line-clamp-2 text-xl font-extrabold leading-tight text-gray-900">
+                <h3 className="mb-2 line-clamp-2 text-base sm:text-lg font-bold leading-tight text-gray-900">
                   {session.title}
                 </h3>
 
-                {/* Description placeholder logic - ideally fetch from DB if available in summary */}
                 <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-500">
                   A comprehensive session focusing on health and wellness. Join
                   us to learn from the best experts in the field.
                 </p>
 
-                {/* Spacer to push footer down */}
                 <div className="flex-1"></div>
 
                 {/* Footer: Price & Action */}
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  <div className="flex h-[42px] min-w-[90px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-base font-bold text-[#1B8A8E]">
+                  <div className="flex h-10 min-w-[88px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-sm font-bold text-[#1B8A8E]">
                     ₹ {Number(session.price).toLocaleString()}
                   </div>
 
                   <Link href={`/session/${session.slug}`} className="flex-1">
-                    <button className="flex h-[42px] w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-4 text-sm font-bold text-white transition-colors hover:bg-[#156f73]">
+                    <button className="flex h-10 w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-4 text-sm font-bold text-white transition-colors hover:bg-[#156f73]">
                       Register
                     </button>
                   </Link>
@@ -181,18 +177,17 @@ export default function UpcomingSessions() {
       </div>
 
       {/* CTA Button */}
-      <div
-        className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
-        onClick={() => (window.location.href = "/session")}
-      >
-        <div className="order-0 group flex w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] xs:h-16 xs:py-2 sm:h-12 sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-4 md:h-20 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8 xl:h-24">
-          <div className="flex flex-1 justify-center">
-            <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px]">
-              EXPLORE ALL SESSIONS
-            </span>
+      <div className="mt-10 md:mt-14">
+        <Link href="/session">
+          <div className="group flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl bg-[#F2F2F2] px-5 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:rounded-2xl sm:px-6 sm:py-5 md:px-8">
+            <div className="flex flex-1 justify-center">
+              <span className="text-center text-sm sm:text-base md:text-lg font-medium tracking-[0.15em] text-[#00000066] group-hover:text-white">
+                EXPLORE ALL SESSIONS
+              </span>
+            </div>
+            <InteractiveButton as="span" />
           </div>
-          <InteractiveButton />
-        </div>
+        </Link>
       </div>
     </section>
   );
