@@ -14,6 +14,7 @@ import React, { useRef, useState } from 'react';
 import { deleteSession } from './session-actions';
 import SessionForm from './session-form';
 import TableToolbar from '@/src/_components/shared/TableToolbar';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 type SessionTableProps = {
   sessions: ISession[];
@@ -24,6 +25,8 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [sessionDialog, setSessionDialog] = useState(false);
   const [selectedSession, setSelectedSession] = useState<ISession | null>(null);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
 
   // Assuming default status DRAFT, default date now, etc.
   const emptySession: ISession = {
@@ -153,12 +156,9 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
               ref={dt}
               value={sessions}
               dataKey="id"
-              paginator
-              rows={10}
-              rowsPerPageOptions={[5, 10, 25]}
+              first={first}
+              rows={rows}
               className="datatable-responsive"
-              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sessions"
               filters={filters}
               globalFilterFields={['title', 'slug', 'status']}
               emptyMessage="No sessions found."
@@ -172,6 +172,16 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
               <Column header="Registrations" body={registrationCountTemplate} headerStyle={{ minWidth: '12rem' }}></Column>
               <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
             </DataTable>
+
+            <CustomPaginator
+              first={first}
+              rows={rows}
+              totalRecords={sessions.length}
+              onPageChange={(event) => setFirst(event.first)}
+              onRowsChange={(event) => setRows(event.rows)}
+              entityName="sessions"
+              rowsPerPageOptions={[5, 10, 25]}
+            />
 
             <Dialog header="Session Details" modal className="p-fluid" visible={sessionDialog} style={{ width: '50vw' }} onHide={hideDialog}>
               <SessionForm session={session} hideDialog={hideDialog} categories={categories} />

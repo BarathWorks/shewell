@@ -26,6 +26,12 @@ declare module 'next-auth' {
   // }
 }
 
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+  }
+}
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -35,14 +41,22 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/login'
   },
+  session: {
+    strategy: 'jwt'
+  },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id
+    jwt: ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
       }
-    })
+      return token;
+    },
+    session: ({ session, token }) => {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    }
   },
   adapter: PrismaAdapter(db),
   providers: [

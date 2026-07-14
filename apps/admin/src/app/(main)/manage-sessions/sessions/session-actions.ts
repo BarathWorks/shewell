@@ -251,3 +251,74 @@ export const deleteSession = async (ids: string[]) => {
     };
   }
 };
+
+export const updateSessionDetails = async (data: {
+  id: string;
+  meetingLink: string | null;
+  maxBookings: number | null;
+  overview: string | null;
+  thumbnailMediaId: string | null;
+  bannerMediaIds: string[];
+}) => {
+  const session = await getServerSession();
+  if (!session) {
+    return {
+      error: 'Unauthorized'
+    };
+  }
+
+  try {
+    await db.session.update({
+      where: { id: data.id },
+      data: {
+        meetingLink: data.meetingLink || null,
+        maxBookings: data.maxBookings || null,
+        overview: data.overview || null,
+        thumbnailMediaId: data.thumbnailMediaId || null,
+        banners: {
+          deleteMany: {},
+          create: data.bannerMediaIds ? data.bannerMediaIds.map((id) => ({ mediaId: id })) : []
+        }
+      }
+    });
+
+    revalidatePath('/');
+    return {
+      message: 'Session updated successfully'
+    };
+  } catch (error) {
+    console.error('Error updating session details:', error);
+    return {
+      error: 'Failed to update session details'
+    };
+  }
+};
+
+export const approvePayout = async (payoutId: string) => {
+  const session = await getServerSession();
+  if (!session) {
+    return {
+      error: 'Unauthorized'
+    };
+  }
+
+  try {
+    await db.payout.update({
+      where: { id: payoutId },
+      data: {
+        status: 'PAID',
+        paidAt: new Date()
+      }
+    });
+
+    revalidatePath('/');
+    return {
+      message: 'Payout approved successfully'
+    };
+  } catch (error) {
+    console.error('Error approving payout:', error);
+    return {
+      error: 'Failed to approve payout'
+    };
+  }
+};

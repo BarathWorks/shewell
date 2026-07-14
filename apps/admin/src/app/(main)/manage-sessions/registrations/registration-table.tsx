@@ -10,6 +10,7 @@ import { Tag } from 'primereact/tag';
 import { useState } from 'react';
 import { updateRegistrationPaymentStatus } from './registration-actions';
 import useToastContext from '@/src/_hooks/useToast';
+import { CustomPaginator } from '@/src/_components/shared/CustomPaginator';
 
 interface RegistrationTableProps {
   registrations: IRegistration[];
@@ -18,6 +19,8 @@ interface RegistrationTableProps {
 const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
   const { showToast } = useToastContext();
   const [loading, setLoading] = useState<string | null>(null);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
 
   const paymentStatusOptions = Object.values(PaymentStatus).map((status) => ({
     label: status,
@@ -99,14 +102,11 @@ const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
     <div className="card">
       <DataTable
         value={registrations}
-        paginator
-        rows={10}
-        rowsPerPageOptions={[5, 10, 25, 50]}
+        first={first}
+        rows={rows}
         dataKey="id"
         filterDisplay="menu"
         emptyMessage="No registrations found."
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       >
         <Column field="user" header="User" body={userTemplate} sortable style={{ minWidth: '12rem' }} />
         <Column field="session" header="Session" body={sessionTemplate} sortable style={{ minWidth: '14rem' }} />
@@ -115,6 +115,16 @@ const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
         <Column field="createdAt" header="Registered At" body={dateTemplate} sortable style={{ minWidth: '12rem' }} />
         <Column header="Actions" body={actionTemplate} exportable={false} style={{ minWidth: '12rem' }} />
       </DataTable>
+
+      <CustomPaginator
+        first={first}
+        rows={rows}
+        totalRecords={registrations.length}
+        onPageChange={(event) => setFirst(event.first)}
+        onRowsChange={(event) => setRows(event.rows)}
+        entityName="registrations"
+        rowsPerPageOptions={[5, 10, 25, 50]}
+      />
     </div>
   );
 };

@@ -1021,6 +1021,7 @@ model Session {
   meetingLink String?
   language    String      @default("English")
   type        SessionType @default(ONLINE)
+  maxBookings Int?
 
   categoryId String
   category   SessionCategory @relation(fields: [categoryId], references: [id])

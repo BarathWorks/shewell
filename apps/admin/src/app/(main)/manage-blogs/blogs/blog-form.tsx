@@ -27,7 +27,7 @@ type BlogCategoryFormProps = {
 };
 
 const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) => {
-  const fileInputRef = useRef<FileUpload>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingState, setUploadingState] = useState<0 | 1 | 2>(0);
   const [imageUrl, setImageUrl] = useState<string>();
   const { showToast } = useToastContext();
@@ -96,11 +96,11 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
             if (res.ok) {
               setValue('mediaId', id!);
               setImageUrl(fileUrl);
-              fileInputRef.current?.clear();
+              if (fileInputRef.current) fileInputRef.current.value = '';
             }
           })
           .catch(() => {
-            fileInputRef.current?.clear();
+            if (fileInputRef.current) fileInputRef.current.value = '';
           });
       });
     }
@@ -178,20 +178,44 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
     <>
       <form onSubmit={handleSubmit(submitForm)} noValidate={true}>
         <input type="hidden" name="id" value={blog?.id} />
-        {blog.media && blog.media.fileUrl && !imageUrl && <Image src={blog.media.fileUrl} alt="Image" className="relative" width="100" height="auto" preview />}
-        {imageUrl && <Image src={imageUrl} alt="Image" className="relative" width="100" height="auto" preview />}
-        <div className="field mb-2">
-          <FileUpload
-            ref={fileInputRef}
-            mode="basic"
-            accept="image/*"
-            // maxFileSize={1000000}
-            onSelect={onSelectImage}
-            onError={(e) => {
-              console.log(e);
-              // showToast('error', 'Error',);
-            }}
+        <div className="field mb-4">
+          <label className="text-[13px] font-semibold text-on-surface-variant mb-1.5 block">Blog Cover Image</label>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                onSelectImage({ files: [file] } as any);
+              }
+            }} 
+            accept="image/*" 
+            className="hidden" 
           />
+          {imageUrl || (blog.media && blog.media.fileUrl) ? (
+            <div className="relative group w-full max-w-[320px] h-[160px] rounded-xl overflow-hidden border border-outline-variant/60">
+              <img src={imageUrl || blog.media.fileUrl} className="w-full h-full object-cover" alt="Blog cover" />
+              <button 
+                type="button"
+                onClick={() => {
+                  setImageUrl('');
+                  setValue('mediaId', '');
+                }}
+                className="absolute top-1.5 right-1.5 bg-black/60 text-white rounded-full p-1.5 hover:bg-black transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px] block">delete</span>
+              </button>
+            </div>
+          ) : (
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full max-w-[320px] h-[160px] flex flex-col items-center justify-center gap-1.5 border border-dashed border-outline-variant/60 rounded-xl hover:bg-surface/50 hover:border-brand/40 transition-all text-on-surface-variant bg-white"
+            >
+              <span className="material-symbols-outlined text-[24px]">add_photo_alternate</span>
+              <span className="text-[12px] font-medium">Choose Image</span>
+            </button>
+          )}
         </div>
         <div className="field">
           <label htmlFor="name">Blog Category</label>

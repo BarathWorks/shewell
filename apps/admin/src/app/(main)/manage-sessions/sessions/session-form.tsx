@@ -26,8 +26,8 @@ type SessionFormProps = {
 
 const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
   const { showToast } = useToastContext();
-  const thumbnailFileInputRef = useRef<FileUpload>(null);
-  const bannerFileInputRef = useRef<FileUpload>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [bannerUrls, setBannerUrls] = useState<{ id: string; url: string }[]>([]);
@@ -114,8 +114,8 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
       console.error(error);
     } finally {
       setIsUploadingThumbnail(false);
-      if (thumbnailFileInputRef.current) {
-        thumbnailFileInputRef.current.clear();
+      if (thumbnailInputRef.current) {
+        thumbnailInputRef.current.value = '';
       }
     }
   };
@@ -124,7 +124,7 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
     // Check if we already have 2 banners
     if (bannerUrls.length >= 2) {
       showToast('error', 'Error', 'Maximum 2 banners allowed');
-      if (bannerFileInputRef.current) bannerFileInputRef.current.clear();
+      if (bannerInputRef.current) bannerInputRef.current.value = '';
       return;
     }
 
@@ -163,8 +163,8 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
       console.error(error);
     } finally {
       setIsUploadingBanner(false);
-      if (bannerFileInputRef.current) {
-        bannerFileInputRef.current.clear();
+      if (bannerInputRef.current) {
+        bannerInputRef.current.value = '';
       }
     }
   };
@@ -608,73 +608,129 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
           />
         </div>
 
-        {/* Thumbnail Upload */}
-        <div className="field">
-          <label htmlFor="thumbnail">Thumbnail Image</label>
-          <Controller
-            name="thumbnailMediaId"
-            control={control}
-            render={({ field }) => {
-              return (
-                <div>
-                  <FileUpload
-                    ref={thumbnailFileInputRef}
-                    mode="basic"
-                    accept="image/*"
-                    maxFileSize={5000000}
-                    onSelect={onSelectThumbnail}
-                    disabled={isUploadingThumbnail}
-                    chooseLabel={isUploadingThumbnail ? 'Uploading...' : 'Choose Thumbnail'}
-                    auto
-                  />
-                  {thumbnailUrl && (
-                    <div className="mt-2">
-                      <img src={thumbnailUrl} alt="Thumbnail preview" style={{ maxWidth: '200px', maxHeight: '150px' }} />
-                    </div>
-                  )}
-                </div>
-              );
-            }}
-          />
-        </div>
-
-        {/* Banner Upload */}
-        <div className="field">
-          <label htmlFor="banner">Banner Images (Min-Max 2)</label>
-          <Controller
-            name="bannerMediaIds"
-            control={control}
-            rules={{
-              validate: (value) => (value && value.length >= 1) || 'At least 1 banner image is required'
-            }}
-            render={({ field, fieldState }) => {
-              return (
-                <div>
-                  <FileUpload
-                    ref={bannerFileInputRef}
-                    mode="basic"
-                    accept="image/*"
-                    maxFileSize={5000000}
-                    onSelect={onSelectBanner}
-                    disabled={isUploadingBanner || bannerUrls.length >= 2}
-                    chooseLabel={isUploadingBanner ? 'Uploading...' : 'Choose Banners'}
-                    multiple
-                    auto
-                  />
-                  {fieldState.error && <small className="p-error block mt-1">{fieldState.error.message}</small>}
-                  <div className="flex flex-wrap gap-4 mt-2">
-                    {bannerUrls.map((banner) => (
-                      <div key={banner.id} className="relative group">
-                        <img src={banner.url} alt="Banner preview" style={{ width: '200px', height: '120px', objectFit: 'cover', borderRadius: '8px' }} />
-                        <Button type="button" icon="pi pi-times" rounded severity="danger" size="small" className="absolute -top-2 -right-2 p-button-sm" style={{ width: '2rem', height: '2rem' }} onClick={() => removeBanner(banner.id)} />
+        {/* Thumbnail & Banner Upload Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-4" style={{ display: 'grid' }}>
+          {/* Thumbnail Upload */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-on-surface-variant">Thumbnail Image</label>
+            <Controller
+              name="thumbnailMediaId"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <div>
+                    <input 
+                      type="file" 
+                      ref={thumbnailInputRef} 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          onSelectThumbnail({ files: [file] } as any);
+                        }
+                      }} 
+                      accept="image/*" 
+                      className="hidden" 
+                    />
+                    {thumbnailUrl ? (
+                      <div className="relative group w-full h-[88px] rounded-xl overflow-hidden border border-outline-variant/60">
+                        <img src={thumbnailUrl} className="w-full h-full object-cover" alt="Thumbnail preview" />
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setValue('thumbnailMediaId', null);
+                            setThumbnailUrl('');
+                          }}
+                          className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px] block">delete</span>
+                        </button>
                       </div>
-                    ))}
+                    ) : (
+                      <button 
+                        type="button"
+                        onClick={() => thumbnailInputRef.current?.click()}
+                        disabled={isUploadingThumbnail}
+                        className="w-full h-[88px] flex flex-col items-center justify-center gap-1.5 border border-dashed border-outline-variant/60 rounded-xl hover:bg-surface/50 hover:border-brand/40 transition-all text-on-surface-variant bg-white"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">
+                          {isUploadingThumbnail ? 'hourglass_empty' : 'add_photo_alternate'}
+                        </span>
+                        <span className="text-[12px] font-medium">
+                          {isUploadingThumbnail ? 'Uploading...' : 'Choose Image'}
+                        </span>
+                      </button>
+                    )}
                   </div>
-                  {bannerUrls.length < 2 && !isUploadingBanner && <small className="p-text-secondary">You can upload {2 - bannerUrls.length} more image(s)</small>}
-                </div>
-              );
-            }}
-          />
+                );
+              }}
+            />
+          </div>
+
+          {/* Banner Upload */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-[13px] font-semibold text-on-surface-variant">Banner Images</label>
+              <span className="text-[11px] text-outline">Max 2</span>
+            </div>
+            <Controller
+              name="bannerMediaIds"
+              control={control}
+              rules={{
+                validate: (value) => (value && value.length >= 1) || 'At least 1 banner image is required'
+              }}
+              render={({ field, fieldState }) => {
+                return (
+                  <div>
+                    <input 
+                      type="file" 
+                      ref={bannerInputRef} 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          onSelectBanner({ files: [file] } as any);
+                        }
+                      }} 
+                      accept="image/*" 
+                      className="hidden" 
+                    />
+                    <div className="grid grid-cols-2 gap-2 w-full" style={{ display: 'grid' }}>
+                      {bannerUrls.map((banner) => (
+                        <div key={banner.id} className="relative group w-full h-[88px] rounded-xl overflow-hidden border border-outline-variant/60">
+                          <img src={banner.url} className="w-full h-full object-cover" alt="Banner preview" />
+                          <button 
+                            type="button"
+                            onClick={() => removeBanner(banner.id)}
+                            className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[16px] block">delete</span>
+                          </button>
+                        </div>
+                      ))}
+                      {bannerUrls.length < 2 && (
+                        <button 
+                          type="button"
+                          onClick={() => bannerInputRef.current?.click()}
+                          disabled={isUploadingBanner}
+                          className="w-full h-[88px] flex flex-col items-center justify-center gap-1.5 border border-dashed border-outline-variant/60 rounded-xl hover:bg-surface/50 hover:border-brand/40 transition-all text-on-surface-variant bg-white"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">
+                            {isUploadingBanner ? 'hourglass_empty' : 'collections'}
+                          </span>
+                          <span className="text-[12px] font-medium">
+                            {isUploadingBanner ? 'Uploading...' : 'Add Banners'}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                    {fieldState.error && <small className="p-error block mt-1">{fieldState.error.message}</small>}
+                    {bannerUrls.length < 2 && !isUploadingBanner && (
+                      <small className="p-text-secondary mt-1 block">You can upload {2 - bannerUrls.length} more image(s)</small>
+                    )}
+                  </div>
+                );
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex flex-row gap-4 mt-4">

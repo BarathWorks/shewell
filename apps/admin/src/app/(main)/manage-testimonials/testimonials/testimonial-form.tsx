@@ -19,7 +19,7 @@ type TestimonialFormProps = {
   testimonial: ITestimonial;
 };
 const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
-  const fileInputRef = useRef<FileUpload>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingState, setUploadingState] = useState<0 | 1 | 2>(0);
   const [testimonialImageUrl, setTestimonialImageUrl] = useState<string>();
   const [showError, setShowError] = useState<boolean>(false);
@@ -76,11 +76,11 @@ const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
               setValue('mediaId', id!);
               setTestimonialImageUrl(fileUrl);
               setShowError(false)
-              fileInputRef.current?.clear();
+              if (fileInputRef.current) fileInputRef.current.value = '';
             }
           })
           .catch(() => {
-            fileInputRef.current?.clear();
+            if (fileInputRef.current) fileInputRef.current.value = '';
           });
       });
     }
@@ -119,21 +119,45 @@ const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
   return (
     <>
       <form onSubmit={handleSubmit(submitForm)} noValidate={true}>
-      {testimonial.media && testimonial.media.fileUrl && !testimonialImageUrl && <Image src={testimonial.media.fileUrl} alt="Image" className="relative" width="100" height="auto" preview />}
-      {testimonialImageUrl && <Image src={testimonialImageUrl} alt="Image" className="relative" width="100" height="auto" preview />}
-      <div className="field mb-2">
-          <FileUpload
-            ref={fileInputRef}
-            mode="basic"
-            accept="image/*"
-            // maxFileSize={1000000}
-            onSelect={onSelectImage}
-            onError={(e) => {
-              console.log(e);
-              // showToast('error', 'Error',);
-            }}
+        <div className="field mb-4">
+          <label className="text-[13px] font-semibold text-on-surface-variant mb-1.5 block">Testimonial Image</label>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                onSelectImage({ files: [file] } as any);
+              }
+            }} 
+            accept="image/*" 
+            className="hidden" 
           />
-           {showError && <small className = "p-error" >Please upload the image</small>}
+          {testimonialImageUrl || (testimonial.media && testimonial.media.fileUrl) ? (
+            <div className="relative group w-full max-w-[200px] h-[200px] rounded-full overflow-hidden border border-outline-variant/60">
+              <img src={testimonialImageUrl || testimonial.media.fileUrl} className="w-full h-full object-cover" alt="Testimonial preview" />
+              <button 
+                type="button"
+                onClick={() => {
+                  setTestimonialImageUrl('');
+                  setValue('mediaId', '');
+                }}
+                className="absolute top-1.5 right-1.5 bg-black/60 text-white rounded-full p-1.5 hover:bg-black transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px] block">delete</span>
+              </button>
+            </div>
+          ) : (
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full max-w-[200px] h-[200px] flex flex-col items-center justify-center gap-1.5 border border-dashed border-outline-variant/60 rounded-full hover:bg-surface/50 hover:border-brand/40 transition-all text-on-surface-variant bg-white"
+            >
+              <span className="material-symbols-outlined text-[24px]">add_photo_alternate</span>
+              <span className="text-[12px] font-medium text-center px-2">Choose Image</span>
+            </button>
+          )}
+          {showError && <small className="p-error block mt-1">Please upload the image</small>}
         </div>
         {/* {testimonialImageUrl && <Image src={testimonialImageUrl} alt="Image" className="relative" width="150" height="80" preview />} */}
         {/* <div className="field mb-2">

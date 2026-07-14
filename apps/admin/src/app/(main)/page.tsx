@@ -3,11 +3,19 @@ import { db } from '@/src/server/db';
 import DashboardContent from '@/src/_components/dashboard/dashboard-content';
 
 const Dashboard = async () => {
-  // Query actual upcoming sessions from the database
+  // Query actual upcoming and ongoing sessions from the database
   const sessions = await db.session.findMany({
     take: 3,
     orderBy: { startAt: 'asc' },
-    where: { startAt: { gte: new Date() } }
+    where: { endAt: { gte: new Date() } },
+    include: {
+      thumbnailMedia: true,
+      banners: {
+        include: {
+          media: true
+        }
+      }
+    }
   });
 
   // Query actual payout requests from the database
@@ -29,9 +37,21 @@ const Dashboard = async () => {
   const serializedSessions = sessions.map(session => ({
     id: session.id,
     title: session.title,
+    slug: session.slug,
     startAt: session.startAt.toISOString(),
+    endAt: session.endAt.toISOString(),
     price: Number(session.price),
-    meetingLink: session.meetingLink || ''
+    meetingLink: session.meetingLink || '',
+    maxBookings: session.maxBookings,
+    overview: session.overview || '',
+    thumbnailMedia: session.thumbnailMedia ? {
+      id: session.thumbnailMedia.id,
+      fileUrl: session.thumbnailMedia.fileUrl
+    } : null,
+    banners: session.banners.map(b => ({
+      id: b.media.id,
+      fileUrl: b.media.fileUrl
+    }))
   }));
 
   const serializedPayouts = payouts.map(payout => ({
@@ -40,7 +60,7 @@ const Dashboard = async () => {
     amountInCents: payout.amountInCents,
     status: payout.status,
     doctor: {
-      firstName: payout.doctor.firstName,
+      firstName: payout.doctor.firstName || '',
       lastName: payout.doctor.lastName || '',
       email: payout.doctor.email
     }

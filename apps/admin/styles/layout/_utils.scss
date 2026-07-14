@@ -18,6 +18,12 @@
     }
 }
 
+.card-subtle {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--card-shadow);
+}
+
 .p-toast {
     &.p-toast-top-right,
     &.p-toast-top-left,

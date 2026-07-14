@@ -43,6 +43,8 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         newUsers,
         orders,
         users,
+        reviews,
+        payouts,
       ] = await Promise.all([
         // Count only — no need to fetch entire rows
         db.professionalUser.count({
@@ -168,6 +170,16 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
           select: { id: true, name: true, email: true },
           where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
         }),
+
+        db.review.findMany({
+          select: { rating: true },
+          where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
+        }),
+
+        db.payout.findMany({
+          select: { amountInCents: true, status: true },
+          where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
+        }),
       ]);
 
       return {
@@ -180,6 +192,8 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         orders,
         users,
         totalDoctorsOnBoardWithinDateRange,
+        reviews,
+        payouts,
       };
     })
 });
