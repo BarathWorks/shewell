@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import ProfileImageText from "./profile-image-text";
-import { db } from "~/server/db";
 import {
   Tabs,
   TabsContent,
@@ -11,24 +10,18 @@ import {
 import DoctorReview from "./doctor-reviews";
 import SimilarDoctorProfileSlider from "./similar-doctor-profile-slider";
 import AboutDoctor from "./about-doctor";
-import { Button } from "@repo/ui/src/@/components/button";
-import { getServerSession } from "next-auth";
-import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
-import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { boolean, string } from "zod";
 import { useSession } from "next-auth/react";
 import TimeSlots from "./date-with-time-slots";
+
 interface IProfessionalSpecialisation {
-  //   id: string;
   specialization: string;
   active: boolean;
   deletedAt: Date | null;
 }
 
 interface IProfessionalExperience {
-  //   id: string;
   startingYear: string;
   endingYear: string;
   department: string;
@@ -37,9 +30,9 @@ interface IProfessionalExperience {
 }
 
 interface IProfessionalDegree {
-  //   id: string;
   degree: string;
 }
+
 interface IProfile {
   id: string;
   firstName: string | null;
@@ -85,110 +78,104 @@ const CounsellingDoctorProfileContent = ({
 }: IDoctorProfileContent) => {
   const session = useSession();
   const router = useRouter();
-  console.log("profile", profile.googleAccessToken);
-  // if (session.status === "unauthenticated") {
-  //   router.push("/auth/login");
-  // }
-
-  console.log("sessionAtDoctorProfileContent", session);
 
   const cardImage = (
-    <div className="w-[225px]">
-      <div className="relative aspect-square ">
-        <Image
-          src={profile.media?.fileUrl || "/images/fallback-user-profile.png"}
-          alt="feature-card"
-          className=" rounded-full  object-cover"
-          fill={true}
-        />
-      </div>
+    <div className="relative h-full w-full">
+      <Image
+        src={profile.media?.fileUrl || "/images/fallback-user-profile.png"}
+        alt={`Dr. ${profile.firstName || "Doctor"} profile photo`}
+        className="rounded-full object-cover"
+        fill={true}
+      />
     </div>
   );
+
   return (
     <>
-      <div className="bg-[url('/images/header.png')] bg-contain  bg-no-repeat	pt-[120px] sm:pt-[165px] ">
-        <div className="bg-white  md:rounded-t-[50px]">
-          <div className="container mx-auto max-w-full">
-            <div className=" flex flex-col gap-6  pb-8 pt-[18px] md:gap-[30px] md:rounded-t-[50px] md:pb-9 md:pt-5 xl:gap-[32px] xl:pb-[60px] xl:pt-6 2xl:gap-[40px] 2xl:pb-[65px] 2xl:pt-8">
-              {/* div-1 */}
-              {/* profile-image-text-specializaion */}
-              <div>
-                {profile && (
-                  <ProfileImageText
-                    // specialization={specialization}
-                    specialization={profile.ProfessionalSpecializations}
-                    doctorProfile={profile}
-                    cardImage={cardImage}
-                  />
-                )}
-              </div>
-              {/* div-2 */}
-              {/* about-doctor and reviews and available time slots */}
-              <div className="flex flex-col gap-[30px] xl:flex-row 2xl:gap-[45px] ">
-                {/* about-doctor and reviews */}
-                <div className="bg-[#F7FBFC] py-6 md:py-8 xl:basis-[856px] 2xl:basis-[1109px] 2xl:py-10">
-                  <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-8">
-                    <Tabs defaultValue="about-doctor" className="w-full">
-                      <TabsList className="mb-[18px] grid w-full grid-cols-2 md:px-4 2xl:px-8">
-                        <TabsTrigger
-                          className="border-b-primary font-inter text-base font-semibold text-active data-[state=active]:border-b-2 md:text-[20px] md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px] "
-                          value="about-doctor"
-                        >
-                          About Doctor
-                        </TabsTrigger>
-                        <TabsTrigger
-                          className="border-b-primary font-inter text-base font-semibold text-active data-[state=active]:border-b-2 md:text-[20px] md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]"
-                          value="reviews"
-                        >
-                          Reviews
-                        </TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="about-doctor">
-                        <AboutDoctor
-                          aboutEducation={profile?.aboutEducation!}
-                          aboutYou={profile?.aboutYou!}
-                          degrees={degrees}
-                          experience={professionalExperience}
-                        />
-                      </TabsContent>
-                      <TabsContent className="" value="reviews">
-                        <DoctorReview doctorReview={profile.ratings} />
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-                </div>
-                {/* available time slots */}
-                <div
-                  className="flex flex-col gap-5 bg-[#F7FBFC] py-6 md:flex-row md:justify-between md:py-8 xl:basis-[394px] xl:flex-col xl:px-3 2xl:basis-[565px] 2xl:px-6 2xl:py-10
-                  "
-                >
-                  <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-8">
-                    <TimeSlots professionalUserId={profile.id} />
-                  </div>
-                  <div className="xs:w-[280px] md:ml-10 md:min-w-[360px] xl:ml-0">
-                    <div className="relative aspect-[370/339] w-full">
-                      <Image
-                        src="/images/cta.png"
-                        alt=""
-                        fill={true}
-                        className="object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* div-3 */}
-              {/* Similar-Doctor-Profies */}
-              <div>
-                <div className="mb-[18px] font-poppins text-[20px] font-bold leading-8 sm:text-[22px] md:mb-5 md:text-[30px] md:leading-[48px] xl:mb-6 xl:text-[36px] 2xl:text-[40px] 2xl:leading-[52px]">
-                  Similar doctor's profiles
-                </div>
-                <SimilarDoctorProfileSlider
-                  displayQualificationId={profile.displayQualificationId!}
-                  similarDoctorProfileId={profile.id}
+      {/* Page background */}
+      <div className="min-h-screen bg-[#F5F7FA] px-4 py-6 sm:px-6 md:px-8 md:py-8 xl:px-10 xl:py-10">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="flex flex-col gap-5 md:gap-6 xl:gap-7">
+
+            {/* ── Card 1: Profile Header ── */}
+            <div className="rounded-2xl bg-white px-5 py-6 shadow-sm ring-1 ring-gray-100 sm:px-6 md:px-8 md:py-7 xl:px-10 xl:py-8">
+              {profile && (
+                <ProfileImageText
+                  specialization={profile.ProfessionalSpecializations}
+                  doctorProfile={profile}
+                  cardImage={cardImage}
                 />
+              )}
+            </div>
+
+            {/* ── Card grid: About/Reviews + Time Slots ── */}
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:gap-6 2xl:gap-7">
+
+              {/* Left: About + Reviews tabs */}
+              <div className="min-w-0 flex-1 rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+                <Tabs defaultValue="about-doctor" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 rounded-t-2xl border-b border-gray-100 bg-gray-50/80 px-4 py-0 md:px-6">
+                    <TabsTrigger
+                      className="rounded-none border-b-2 border-transparent py-4 font-inter text-base font-semibold text-gray-500 transition-colors data-[state=active]:border-[#00898F] data-[state=active]:text-[#00898F] md:text-lg xl:text-xl"
+                      value="about-doctor"
+                    >
+                      About Doctor
+                    </TabsTrigger>
+                    <TabsTrigger
+                      className="rounded-none border-b-2 border-transparent py-4 font-inter text-base font-semibold text-gray-500 transition-colors data-[state=active]:border-[#00898F] data-[state=active]:text-[#00898F] md:text-lg xl:text-xl"
+                      value="reviews"
+                    >
+                      Reviews
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="about-doctor" className="px-5 py-6 sm:px-6 md:px-8 md:py-7 xl:px-10 xl:py-8">
+                    <AboutDoctor
+                      aboutEducation={profile?.aboutEducation!}
+                      aboutYou={profile?.aboutYou!}
+                      degrees={degrees}
+                      experience={professionalExperience}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="reviews" className="px-5 py-6 sm:px-6 md:px-8 md:py-7 xl:px-10 xl:py-8">
+                    <DoctorReview doctorReview={profile.ratings} />
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              {/* Right: Time Slots + CTA */}
+              <div className="flex w-full flex-col gap-5 xl:w-[380px] xl:shrink-0 2xl:w-[440px]">
+                {/* Time Slots Card */}
+                <div className="rounded-2xl bg-white px-5 py-6 shadow-sm ring-1 ring-gray-100 sm:px-6 md:px-7 md:py-7">
+                  <TimeSlots professionalUserId={profile.id} />
+                </div>
+
+                {/* CTA Image Card */}
+                <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-gray-100">
+                  <div className="relative aspect-[370/339] w-full">
+                    <Image
+                      src="/images/cta.png"
+                      alt="Book a consultation"
+                      fill={true}
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* ── Card 3: Similar Profiles ── */}
+            <div className="rounded-2xl bg-white px-5 py-6 shadow-sm ring-1 ring-gray-100 sm:px-6 md:px-8 md:py-7 xl:px-10 xl:py-8">
+              <h2 className="mb-5 font-poppins text-xl font-bold text-[#1A1A2E] sm:text-2xl md:mb-6 md:text-[28px] xl:text-[32px]">
+                Similar doctor&apos;s profiles
+              </h2>
+              <SimilarDoctorProfileSlider
+                displayQualificationId={profile.displayQualificationId!}
+                similarDoctorProfileId={profile.id}
+              />
+            </div>
+
           </div>
         </div>
       </div>

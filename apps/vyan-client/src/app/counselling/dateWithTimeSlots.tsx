@@ -30,6 +30,7 @@ const DayNavigatorWithTimeSlots = ({
   professionalUserId,
   onSelectDuration,
   onSelectDateTime,
+  onPriceChange,
 }: {
   professionalUserId: string;
   onSelectDuration: (duration: number) => void;
@@ -38,6 +39,7 @@ const DayNavigatorWithTimeSlots = ({
     timeSlots: { startTime: Date; endTime: Date } | null;
     priceInCents: number | null;
   }) => void;
+  onPriceChange?: (price: number) => void;
 }) => {
   const today = startOfToday();
   const [startDate, setStartDate] = useState<Date>(today);
@@ -120,6 +122,12 @@ const DayNavigatorWithTimeSlots = ({
   useEffect(() => {
     refetch();
   }, [selectedDate, refetch]);
+
+  useEffect(() => {
+    if (pricesInCents?.price?.priceInCentsForSingle) {
+      onPriceChange?.(pricesInCents.price.priceInCentsForSingle);
+    }
+  }, [pricesInCents, onPriceChange]);
 
   useEffect(() => {
     if (timeDurationData?.minTimeDuration) {
@@ -206,11 +214,11 @@ const DayNavigatorWithTimeSlots = ({
       </div>
 
       {/* Date Selector Carousel */}
-      <div className="flex items-center gap-2 bg-[#eff4ff] rounded-xl p-1.5 border border-[#c0c8cc]/20">
+      <div className="flex items-center gap-2 bg-[#F4F4F4] rounded-xl p-1.5 border border-[#c0c8cc]/20">
         <button
           onClick={handlePrevDay}
           disabled={isPrevDisabled}
-          className={`p-1.5 hover:bg-[#d3e4fe] rounded-lg transition-colors text-[#40484b] ${isPrevDisabled ? "opacity-30 cursor-not-allowed" : ""}`}
+          className={`p-1.5 hover:bg-gray-200 rounded-lg transition-colors text-[#40484b] ${isPrevDisabled ? "opacity-30 cursor-not-allowed" : ""}`}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6"/>
@@ -226,8 +234,8 @@ const DayNavigatorWithTimeSlots = ({
                 onClick={() => handleDayClick(day)}
                 className={`flex flex-col items-center justify-center min-w-[64px] py-1.5 rounded-lg cursor-pointer transition-colors ${
                   isSelected
-                    ? "bg-[#006879] text-white shadow-sm font-semibold"
-                    : "hover:bg-[#d3e4fe] rounded-lg text-[#40484b]"
+                    ? "bg-[#00898F] text-white shadow-sm font-semibold"
+                    : "hover:bg-gray-200 rounded-lg text-[#40484b]"
                 }`}
               >
                 <span className="text-[9px] font-bold uppercase tracking-wider opacity-90">{format(day, "EEE")}</span>
@@ -239,7 +247,7 @@ const DayNavigatorWithTimeSlots = ({
 
         <button
           onClick={handleNextDay}
-          className="p-1.5 hover:bg-[#d3e4fe] rounded-lg transition-colors text-[#40484b]"
+          className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors text-[#40484b]"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6"/>
@@ -273,8 +281,8 @@ const DayNavigatorWithTimeSlots = ({
                     }
                     className={`py-3 px-4 border text-center text-xs font-semibold rounded-xl transition-all duration-150 active:scale-[0.98] ${
                       isSelected
-                        ? "border-[#006879] bg-[#eff4ff] text-[#006879] font-bold"
-                        : "border-[#c0c8cc] hover:border-[#006879] text-[#40484b] hover:text-[#006879] bg-white hover:shadow-sm"
+                        ? "border-[#00898F] bg-[#E1EBED]/60 text-[#00898F] font-bold shadow-sm"
+                        : "border-[#c0c8cc] hover:border-[#00898F] text-[#40484b] hover:text-[#00898F] bg-white hover:shadow-sm"
                     }`}
                   >
                     {format(timing.startingTime, "h:mm a")} -{" "}

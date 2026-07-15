@@ -50,7 +50,7 @@ const Counselling = () => {
   return (
     <>
       <div className="w-full">
-        <section className="w-full overflow-hidden bg-[#f8f9ff] px-3 py-6 sm:px-4 sm:py-8 md:px-8 md:py-12 lg:px-[100px] lg:py-16">
+        <section className="w-full overflow-hidden bg-[#F8FAFB] px-3 py-6 sm:px-4 sm:py-8 md:px-8 md:py-12 lg:px-[100px] lg:py-16">
           <div className="max-w-8xl mx-auto">
             {/* Section Header */}
             <div className="mb-6 text-center sm:mb-8 md:mb-10 lg:mb-12">

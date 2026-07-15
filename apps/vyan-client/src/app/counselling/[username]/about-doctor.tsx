@@ -37,7 +37,7 @@ const AboutDoctor = ({
       <div className="flex flex-col gap-[18px] md:gap-[30px] xl:gap-[40px]">
         {/* about-me */}
         <div className="flex flex-col gap-2 md:gap-4">
-          <div className="flex items-center gap-2 border-b-[2px] border-gray-100 pb-2">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
             <User className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
             <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
               About me:
@@ -50,7 +50,7 @@ const AboutDoctor = ({
 
         {/* education */}
         <div className="flex flex-col gap-2 md:gap-4">
-          <div className="flex items-center gap-2 border-b-[2px] border-gray-100 pb-2">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
             <GraduationCap className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
             <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
               Education:
@@ -90,7 +90,7 @@ const AboutDoctor = ({
 
         {/* experience */}
         <div className="flex flex-col gap-2 md:gap-4">
-          <div className="flex items-center gap-2 border-b-[2px] border-gray-100 pb-2">
+          <div className="flex items-center gap-2 border-b-[2px] border-[#00898F]/20 pb-2">
             <Briefcase className="h-5 w-5 text-[#00898F] md:h-6 md:w-6" />
             <h3 className="font-poppins text-lg font-semibold text-[#333333] md:text-xl xl:text-2xl">
               Experience:

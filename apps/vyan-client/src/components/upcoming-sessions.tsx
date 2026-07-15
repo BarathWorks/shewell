@@ -38,7 +38,7 @@ export default function UpcomingSessions() {
       <section className="w-full px-4 sm:px-6 md:px-12 lg:px-24 py-12 sm:py-16 md:py-20">
 
         {/* Section Header */}
-        <div className="mb-10 sm:mb-12 text-center">
+        <div className="mb-0 text-center">
           <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Upcoming Wellness Sessions
           </h2>
@@ -47,86 +47,54 @@ export default function UpcomingSessions() {
           </p>
         </div>
 
-        {/* Empty state — editorial split layout */}
-        <div className="mx-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 md:flex-row">
-
-          {/* Left — teal panel with illustration */}
-          <div className="relative flex min-h-[200px] w-full flex-shrink-0 flex-col items-center justify-center overflow-hidden bg-[#00898F] px-8 py-10 md:w-[42%] md:py-14">
-            {/* Faint concentric circles — decorative */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-[280px] w-[280px] rounded-full border border-white/10" />
-              <div className="absolute h-[200px] w-[200px] rounded-full border border-white/10" />
-              <div className="absolute h-[120px] w-[120px] rounded-full border border-white/10" />
-            </div>
+        {/* Empty state — full-width card layout */}
+        <div className="w-full mt-6">
+          <div className="bg-white rounded-[24px] p-6 md:p-10 text-center flex flex-col items-center gap-6 md:gap-8 w-full">
+            
             {/* Illustration */}
-            <div className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full bg-white/15 sm:h-32 sm:w-32 md:h-36 md:w-36">
+            <div className="flex justify-center w-full">
               <img
-                src="/session-calender.png"
-                alt="No sessions yet"
-                className="h-16 w-16 object-contain sm:h-20 sm:w-20 md:h-22 md:w-22"
+                src="https://lh3.googleusercontent.com/aida/AP1WRLsSRQeXDjQSdJo92_Pc-8xzmwoRFaZ3yGKsdKsLGkR34WGmVfOZtFS4Y1ILTHTIN_GehLY3RX9-m_J1jzdIh8Ns_jOP4Neu-Fa4h7HaT5aBMtKUIOI4OHUdaku1b7ACn_liHaSM5DH6RcgTpWDRKLdTfm9mlHPoLdeLH33wsmb1Qky5rsbj9eZODrcrJ2zyLu9hOfpEqzUrYF3NveAl6vC0khjo5e3A_lx_jhj9sx5HsosXuSL-uvvXcgk"
+                alt="Medical calendar illustration"
+                className="w-full max-w-xs h-auto object-cover rounded-2xl"
               />
             </div>
-            {/* Small label below */}
-            <p className="relative z-10 mt-4 text-xs font-semibold uppercase tracking-widest text-white/60">
-              Sessions
-            </p>
-          </div>
 
-          {/* Right — content */}
-          <div className="flex flex-1 flex-col justify-center px-7 py-9 sm:px-10 sm:py-10 md:px-12 md:py-12">
-
-            {/* Label */}
-            <span className="mb-3 inline-block w-fit rounded-md bg-[#00898F]/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#00898F]">
-              Coming soon
-            </span>
-
-            <h3 className="mb-3 text-xl sm:text-2xl md:text-3xl font-bold leading-snug text-[#114668]">
-              We're curating your next <br className="hidden sm:block" />
-              wellness experience
-            </h3>
-
-            <p className="mb-6 text-sm sm:text-base leading-relaxed text-gray-500">
-              Our team of specialists is handpicking sessions on prenatal care,
-              nutrition, mental health, and more — designed around what matters
-              most to you.
-            </p>
-
-            {/* Divider */}
-            <div className="mb-6 h-px w-full bg-gray-100" />
-
-            {/* Stats row */}
-            <div className="mb-7 flex items-center gap-6 sm:gap-8">
-              <div>
-                <p className="text-lg font-bold text-[#114668] sm:text-xl">4.9★</p>
-                <p className="text-xs text-gray-400">Avg session rating</p>
-              </div>
-              <div className="h-8 w-px bg-gray-200" />
-              <div>
-                <p className="text-lg font-bold text-[#114668] sm:text-xl">50+</p>
-                <p className="text-xs text-gray-400">Expert specialists</p>
-              </div>
-              <div className="h-8 w-px bg-gray-200" />
-              <div>
-                <p className="text-lg font-bold text-[#114668] sm:text-xl">110+</p>
-                <p className="text-xs text-gray-400">Countries served</p>
-              </div>
+            {/* Text Content */}
+            <div className="space-y-3">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold leading-snug text-gray-900">
+                No Upcoming Sessions
+              </h3>
+              <p className="text-sm sm:text-base leading-relaxed text-gray-500 max-w-md mx-auto">
+                You don't have any sessions scheduled at the moment. Explore our upcoming sessions or book a consultation with a specialist.
+              </p>
             </div>
 
-            {/* CTA */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/counselling">
-                <button className="w-full rounded-xl bg-[#114668] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#0d3554] active:scale-95 sm:w-auto">
-                  Book a 1-on-1 Session
-                </button>
+            {/* Call to Action Cluster */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full pt-2 justify-center">
+              <Link href="/session" className="w-full sm:flex-1">
+                <div className="group flex w-full cursor-pointer flex-row items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] p-3 h-[60px] transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-[70px] md:h-[80px] md:p-4">
+                  <div className="flex flex-1 justify-center">
+                    <span className="text-center font-poppins text-xs font-semibold uppercase tracking-[0.1em] text-[#00000066] transition-colors duration-300 group-hover:text-white group-active:text-white sm:text-sm md:text-base">
+                      Explore Other Sessions
+                    </span>
+                  </div>
+                  <InteractiveButton as="span" size="large" />
+                </div>
               </Link>
-              <Link
-                href="/session"
-                className="text-center text-sm text-[#00898F] underline-offset-4 hover:underline sm:text-left"
-              >
-                Browse all sessions →
+
+              <Link href="/counselling" className="w-full sm:flex-1">
+                <div className="group flex w-full cursor-pointer flex-row items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] p-3 h-[60px] transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-[70px] md:h-[80px] md:p-4">
+                  <div className="flex flex-1 justify-center">
+                    <span className="text-center font-poppins text-xs font-semibold uppercase tracking-[0.1em] text-[#00000066] transition-colors duration-300 group-hover:text-white group-active:text-white sm:text-sm md:text-base">
+                      Book a Doctor
+                    </span>
+                  </div>
+                  <InteractiveButton as="span" size="large" />
+                </div>
               </Link>
             </div>
-
+            
           </div>
         </div>
       </section>
@@ -165,20 +133,22 @@ export default function UpcomingSessions() {
           return (
             <div
               key={session.id}
-              className="group flex w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#00898F]/20 hover:shadow-md"
+              className="group flex w-full flex-col lg:flex-row items-center p-4 md:p-6 gap-6 bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] h-auto lg:h-[260px] overflow-hidden"
             >
-              {/* Date badge — left vertical strip */}
-              <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center bg-[#00898F] py-4 sm:w-16">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-                  {month}
-                </span>
-                <span className="text-2xl font-extrabold leading-none text-white sm:text-3xl">
-                  {day}
-                </span>
+              {/* Date badge — leftmost vertical strip */}
+              <div
+                className="flex-shrink-0 w-full lg:w-[80px] lg:h-[212px] h-[80px] bg-[#2C5F71] flex flex-row lg:flex-col items-center justify-center text-white rounded-[16px] gap-2 lg:gap-1"
+                style={{ backgroundColor: "rgb(44, 95, 113)", borderRadius: "16px" }}
+              >
+                <span className="text-[16px] lg:text-[18px] font-bold tracking-widest uppercase">{month}</span>
+                <span className="text-[28px] lg:text-[40px] font-bold leading-none">{day}</span>
               </div>
 
-              {/* Thumbnail */}
-              <div className="relative hidden h-auto w-28 flex-shrink-0 overflow-hidden sm:block sm:w-36 md:w-44">
+              {/* Left Module: Thumbnail */}
+              <div
+                className="relative flex-shrink-0 w-full lg:w-[360px] lg:h-[212px] h-[180px] overflow-hidden rounded-[16px] bg-[#F4F4F4]"
+                style={{ borderRadius: "16px" }}
+              >
                 {session?.thumbnailMedia?.fileUrl ? (
                   <img
                     src={session.thumbnailMedia.fileUrl}
@@ -186,74 +156,83 @@ export default function UpcomingSessions() {
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-50">
-                    <Calendar className="h-8 w-8 text-gray-300" />
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#F4F4F4]">
+                    <Calendar className="h-10 w-10 text-gray-300" />
                   </div>
                 )}
-                {/* Recording badge */}
+                {/* Recording overlay badge */}
                 {session.isRecordingAvailable && (
-                  <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                    Rec
+                  <span className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                    REC
                   </span>
                 )}
               </div>
 
-              {/* Main content */}
-              <div className="flex flex-1 flex-col justify-center gap-1.5 px-4 py-4 sm:py-3 md:px-5">
-                {/* Tags row */}
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {session.language && (
-                    <span className="rounded border border-gray-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                      {session.language}
-                    </span>
-                  )}
-                  {session.type === "ONLINE" && (
-                    <span className="flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      Live Online
-                    </span>
-                  )}
-                  {session.isRecordingAvailable && (
-                    <span className="flex items-center gap-1 rounded border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-500 sm:hidden">
-                      <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-                      Recording
-                    </span>
-                  )}
+              {/* Right Module: Content */}
+              <div className="flex flex-col justify-between flex-grow w-full lg:h-[212px] min-w-0 gap-4 lg:gap-2">
+                
+                {/* Top Header Row */}
+                <div className="flex flex-row justify-between items-center w-full">
+                  <div className="flex gap-2">
+                    {/* Language Chip */}
+                    <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center">
+                      <span className="text-[14px] font-normal text-black">{session.language || "English"}</span>
+                    </div>
+                    {/* Mode Chip */}
+                    <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${session.type === "ONLINE" ? "bg-green-500" : "bg-blue-400"}`}></div>
+                      <span className="text-[14px] font-normal text-black">
+                        {session.type === "ONLINE" ? "Online" : "In-Person"}
+                      </span>
+                    </div>
+                    {/* Recording Benefit Chip */}
+                    {session.isRecordingAvailable && (
+                      <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#FFB13D]"></div>
+                        <span className="text-[14px] font-normal text-black">Recording</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Round CTA Button */}
+                  <Link href={`/session/${session.slug}`} className="flex-shrink-0">
+                    <InteractiveButton
+                      as="span"
+                      variant="reverse"
+                      size="large"
+                      className="w-[64px] h-[64px] rounded-[24px] border border-gray-100 shadow-sm flex-shrink-0"
+                    />
+                  </Link>
                 </div>
 
-                {/* Title */}
-                <h3 className="line-clamp-1 text-sm font-bold text-gray-900 sm:text-base md:text-lg">
-                  {session.title}
-                </h3>
-
-                {/* Time */}
-                <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                  <Clock className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span>
-                    {formatTime(startDate)} – {formatTime(endDate)} IST
-                  </span>
-                  {session.durationInMins && (
-                    <>
-                      <span className="text-gray-200">·</span>
-                      <span>{session.durationInMins} mins</span>
-                    </>
-                  )}
+                {/* Main Info */}
+                <div className="flex flex-col gap-1 min-w-0">
+                  <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-medium text-black leading-tight tracking-tight line-clamp-1">
+                    {session.title}
+                  </h2>
+                  <p className="text-[14px] lg:text-[16px] font-normal text-black/70 line-clamp-1">
+                    {session.overview || "No description available."}
+                  </p>
                 </div>
-              </div>
 
-              {/* Right: price + CTA */}
-              <div className="flex flex-shrink-0 flex-col items-end justify-center gap-2 px-4 py-4 sm:px-5">
-                <span className="text-sm font-bold text-[#114668] sm:text-base">
-                  {Number(session.price) === 0
-                    ? "Free"
-                    : `₹ ${Number(session.price).toLocaleString()}`}
-                </span>
-                <Link href={`/session/${session.slug}`}>
-                  <button className="rounded-lg bg-[#00898F] px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:bg-[#007a80] active:scale-95 sm:text-sm sm:px-5 sm:py-2.5">
-                    Register
-                  </button>
-                </Link>
+                {/* Bottom Row: Detail Chips */}
+                <div className="flex flex-row flex-wrap gap-[20px] items-center">
+                  {/* Price Chip */}
+                  <div className="bg-[#E1EBED]/60 border border-[#00898F]/15 hover:bg-[#E1EBED] transition-all duration-300 px-6 py-2 rounded-lg flex items-center">
+                    <span className="text-[20px] lg:text-[22px] font-bold text-[#00898F]" style={{ color: "rgb(0, 137, 143)" }}>
+                      {Number(session.price) === 0 ? "Free" : `₹ ${Number(session.price).toLocaleString("en-IN")}`}
+                    </span>
+                  </div>
+                  {/* Time Chip */}
+                  <div className="bg-[#E1EBED]/60 border border-[#00898F]/15 hover:bg-[#E1EBED] transition-all duration-300 px-4 py-2 rounded-lg flex items-center gap-2 text-[#00898F]">
+                    <Clock className="w-5 h-5 text-[#00898F]" />
+                    <span className="text-[14px] lg:text-[15px] font-semibold text-gray-800">
+                      {formatTime(startDate)} to {formatTime(endDate)} IST
+                    </span>
+                  </div>
+                </div>
+
               </div>
             </div>
           );
@@ -263,13 +242,13 @@ export default function UpcomingSessions() {
       {/* CTA Button */}
       <div className="mt-10 md:mt-14">
         <Link href="/session">
-          <div className="group flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl bg-[#F2F2F2] px-5 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:rounded-2xl sm:px-6 sm:py-5 md:px-8">
+          <div className="group flex w-full cursor-pointer flex-row items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] p-4 h-[90px] transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-[100px] sm:p-5 md:h-[120px] md:p-6">
             <div className="flex flex-1 justify-center">
-              <span className="text-center text-sm sm:text-base md:text-lg font-medium tracking-[0.15em] text-[#00000066] group-hover:text-white">
+              <span className="text-center font-poppins text-lg font-semibold uppercase tracking-[0.2em] text-[#00000066] transition-colors duration-300 group-hover:text-white group-active:text-white sm:text-2xl md:text-[32px] md:leading-[48px]">
                 EXPLORE ALL SESSIONS
               </span>
             </div>
-            <InteractiveButton as="span" />
+            <InteractiveButton as="span" size="xlarge" />
           </div>
         </Link>
       </div>

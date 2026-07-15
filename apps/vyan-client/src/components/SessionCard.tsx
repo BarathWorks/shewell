@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, IndianRupee, Wifi, Video } from "lucide-react";
+import { Calendar, Clock, IndianRupee, Wifi, Video, Globe, Star } from "lucide-react";
+import { InteractiveButton } from "./ui/interactive-button";
 
 interface SessionCardProps {
   imageUrl?: string;
@@ -42,20 +43,21 @@ export const SessionCard: React.FC<SessionCardProps> = ({
 
   return (
     <Link href={detailPath} className="block w-full">
-      <div className="group flex w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#00898F]/25 hover:shadow-lg">
-
-        {/* Date strip */}
-        <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center bg-[#00898F] py-5 sm:w-16">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">
-            {month}
-          </span>
-          <span className="text-2xl font-extrabold leading-none text-white sm:text-3xl">
-            {day}
-          </span>
+      <div className="group flex w-full flex-col lg:flex-row items-center p-4 md:p-6 gap-6 bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] h-auto lg:h-[260px] overflow-hidden">
+        {/* Date badge — leftmost vertical strip */}
+        <div
+          className="flex-shrink-0 w-full lg:w-[80px] lg:h-[212px] h-[80px] bg-[#2C5F71] flex flex-row lg:flex-col items-center justify-center text-white rounded-[16px] gap-2 lg:gap-1"
+          style={{ backgroundColor: "rgb(44, 95, 113)", borderRadius: "16px" }}
+        >
+          <span className="text-[16px] lg:text-[18px] font-bold tracking-widest uppercase">{month}</span>
+          <span className="text-[28px] lg:text-[40px] font-bold leading-none">{day}</span>
         </div>
 
-        {/* Thumbnail */}
-        <div className="relative hidden w-40 flex-shrink-0 overflow-hidden sm:block md:w-48 lg:w-52">
+        {/* Left Module: Thumbnail */}
+        <div
+          className="relative flex-shrink-0 w-full lg:w-[360px] lg:h-[212px] h-[180px] overflow-hidden rounded-[16px] bg-[#F4F4F4]"
+          style={{ borderRadius: "16px" }}
+        >
           {imageUrl && !imgError ? (
             <img
               src={imageUrl}
@@ -64,86 +66,82 @@ export const SessionCard: React.FC<SessionCardProps> = ({
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-50">
-              <Calendar className="h-8 w-8 text-gray-300" />
-              <span className="text-[10px] font-medium uppercase tracking-wider text-gray-300">
-                Session
-              </span>
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#F4F4F4]">
+              <Calendar className="h-10 w-10 text-gray-300" />
             </div>
           )}
           {/* Recording overlay badge */}
           {hasRecording && (
-            <span className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+            <span className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
               REC
             </span>
           )}
         </div>
 
-        {/* Main content */}
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-4 md:px-5 md:py-5">
-          {/* Badges */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="rounded border border-[#00898F]/20 bg-[#E8F7F7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#00898F]">
-              {language}
-            </span>
-            {isOnline && (
-              <span className="flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-600">
-                <Wifi className="h-2.5 w-2.5" />
-                Live Online
-              </span>
-            )}
-            {hasRecording && (
-              <span className="flex items-center gap-1 rounded border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-500 sm:hidden">
-                <Video className="h-2.5 w-2.5" />
-                Recording
-              </span>
-            )}
+        {/* Right Module: Content */}
+        <div className="flex flex-col justify-between flex-grow w-full lg:h-[212px] min-w-0 gap-4 lg:gap-2">
+          
+          {/* Top Header Row */}
+          <div className="flex flex-row justify-between items-center w-full">
+            <div className="flex gap-2">
+              {/* Language Chip */}
+              <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center">
+                <span className="text-[14px] font-normal text-black">{language}</span>
+              </div>
+              {/* Mode Chip */}
+              <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-blue-400"}`}></div>
+                <span className="text-[14px] font-normal text-black">
+                  {isOnline ? "Online" : "In-Person"}
+                </span>
+              </div>
+              {/* Recording Benefit Chip */}
+              {hasRecording && (
+                <div className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-[#FFB13D]"></div>
+                  <span className="text-[14px] font-normal text-black">Recording</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Round CTA Button */}
+            <InteractiveButton
+              as="span"
+              variant="reverse"
+              size="large"
+              className="w-[64px] h-[64px] rounded-[24px] border border-gray-100 shadow-sm flex-shrink-0"
+            />
           </div>
 
-          {/* Title */}
-          <h3 className="line-clamp-1 text-base font-extrabold leading-snug text-gray-900 group-hover:text-[#00898F] transition-colors duration-200 md:text-lg lg:text-xl">
-            {title}
-          </h3>
-
-          {/* Description */}
-          {description && description !== "Session" && (
-            <p className="line-clamp-1 text-xs leading-relaxed text-gray-500 md:text-sm">
-              {description}
+          {/* Main Info */}
+          <div className="flex flex-col gap-1 min-w-0">
+            <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-medium text-black leading-tight tracking-tight line-clamp-1">
+              {title}
+            </h2>
+            <p className="text-[14px] lg:text-[16px] font-normal text-black/70 line-clamp-1">
+              {description && description !== "Session" ? description : "No description available."}
             </p>
-          )}
-
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3 flex-shrink-0" />
-              {timeSlot}
-            </span>
-          </div>
-        </div>
-
-        {/* Right: price + CTA */}
-        <div className="flex flex-shrink-0 flex-col items-end justify-center gap-3 border-l border-gray-100 px-4 py-4 md:px-5 md:min-w-[140px]">
-          {/* Price */}
-          <div className="flex flex-col items-end">
-            {isFree ? (
-              <span className="text-base font-extrabold text-[#00898F] md:text-lg">
-                Free
-              </span>
-            ) : (
-              <span className="flex items-center gap-0.5 text-base font-extrabold text-[#114668] md:text-lg">
-                <IndianRupee className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                {price.toLocaleString("en-IN")}
-              </span>
-            )}
           </div>
 
-          {/* CTA */}
-          <button className="w-full rounded-xl bg-[#00898F] px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:bg-[#007a80] active:scale-95 md:px-5 md:py-2.5 md:text-sm">
-            Register →
-          </button>
-        </div>
+          {/* Bottom Row: Detail Chips */}
+          <div className="flex flex-row flex-wrap gap-[20px] items-center">
+            {/* Price Chip */}
+            <div className="bg-[#E1EBED]/60 border border-[#00898F]/15 hover:bg-[#E1EBED] transition-all duration-300 px-6 py-2 rounded-lg flex items-center">
+              <span className="text-[20px] lg:text-[22px] font-bold text-[#00898F]" style={{ color: "rgb(0, 137, 143)" }}>
+                {isFree ? "Free" : `₹ ${price.toLocaleString("en-IN")}`}
+              </span>
+            </div>
+            {/* Time Chip */}
+            <div className="bg-[#E1EBED]/60 border border-[#00898F]/15 hover:bg-[#E1EBED] transition-all duration-300 px-4 py-2 rounded-lg flex items-center gap-2 text-[#00898F]">
+              <Clock className="w-5 h-5 text-[#00898F]" />
+              <span className="text-[14px] lg:text-[15px] font-semibold text-gray-800">
+                {timeSlot}
+              </span>
+            </div>
+          </div>
 
+        </div>
       </div>
     </Link>
   );

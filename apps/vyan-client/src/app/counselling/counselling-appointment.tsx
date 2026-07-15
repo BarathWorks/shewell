@@ -1,10 +1,10 @@
 "use client";
-import { Button } from "@repo/ui/src/@/components/button";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@repo/ui/src/@/components/hover-card";
+import { InteractiveButton } from "~/components/ui/interactive-button";
 import OnlineAppointment from "./online-appointment";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -65,10 +65,11 @@ const CounsellingAppointment = ({
       <div className="w-full">
         <div className="flex flex-col sm:flex-row gap-4 items-center w-full">
           {/* price */}
-          <div className="flex-1 flex items-center justify-between sm:justify-start gap-3 h-12 px-4 bg-[#eff4ff] border border-[#c0c8cc]/30 rounded-xl w-full sm:w-auto">
-            <span className="text-[#40484b] font-semibold text-[11px] uppercase tracking-wider whitespace-nowrap">Starting from</span>
-            <span className="text-[#006879] font-bold text-xl sm:text-2xl leading-none">
-              ₹{priceInCents ? (priceInCents / 100).toLocaleString("en-IN") : "---"}
+          <div className="flex-1 flex items-center justify-center h-12 px-6 bg-[#E1EBED]/60 border border-[#00898F]/15 hover:bg-[#E1EBED] transition-all duration-300 rounded-xl w-full sm:w-auto">
+            <span className="text-[20px] sm:text-[22px] font-bold text-[#00898F]">
+              {priceInCents !== null && priceInCents !== undefined ? (
+                priceInCents === 0 ? "Free" : `₹ ${(priceInCents / 100).toLocaleString("en-IN")}`
+              ) : "---"}
             </span>
           </div>
 
@@ -76,16 +77,13 @@ const CounsellingAppointment = ({
           <div className="w-full sm:flex-[2]">
             {timeSlot ? (
               <div onClick={() => handleOpenDialogOnlineAppointment()} className="w-full">
-                <Button className="w-full h-12 bg-[#00898F] text-white hover:bg-[#00767a] rounded-xl flex items-center justify-center gap-2 font-semibold transition-all duration-200">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                  <span className="sm:hidden">Book Now</span>
-                  <span className="hidden sm:block">Book Online Appointment</span>
-                </Button>
+                <button className="group flex w-full h-12 cursor-pointer items-center justify-between rounded-xl bg-[#F2F2F2] px-5 py-2 transition-all duration-300 hover:bg-[#00898F] active:bg-[#006e72] hover:shadow-lg border border-[#c0c8cc]/30">
+                  <span className="text-sm font-semibold text-[#00000066] group-hover:text-white transition-colors duration-300 md:text-base">
+                    <span className="sm:hidden">Book Now</span>
+                    <span className="hidden sm:block">Book Online Appointment</span>
+                  </span>
+                  <InteractiveButton as="span" size="medium" />
+                </button>
               </div>
             ) : (
               <HoverCard>
@@ -93,16 +91,13 @@ const CounsellingAppointment = ({
                   <button
                     type="button"
                     disabled
-                    className="w-full h-12 bg-[#006879]/10 text-[#40484b]/70 border border-[#006879]/10 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all duration-200 cursor-not-allowed"
+                    className="group flex w-full h-12 items-center justify-between rounded-xl bg-[#006879]/5 border border-[#006879]/10 px-5 py-2 cursor-not-allowed opacity-60"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                      <line x1="16" y1="2" x2="16" y2="6"/>
-                      <line x1="8" y1="2" x2="8" y2="6"/>
-                      <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                    <span className="sm:hidden">Book Now</span>
-                    <span className="hidden sm:block">Book Online Appointment</span>
+                    <span className="text-sm font-semibold text-[#40484b]/70 md:text-base">
+                      <span className="sm:hidden">Book Now</span>
+                      <span className="hidden sm:block">Book Online Appointment</span>
+                    </span>
+                    <InteractiveButton as="span" size="medium" className="opacity-45" />
                   </button>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-full rounded-2xl border border-gray-100 bg-white p-0 shadow-xl xs:max-w-[300px] sm:max-w-[375px]">

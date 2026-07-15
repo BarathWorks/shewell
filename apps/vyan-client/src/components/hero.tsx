@@ -42,8 +42,8 @@ export default function Hero(): JSX.Element {
           className="w-full sm:w-auto sm:flex-1"
           prefetch={false}
         >
-          <div className="group flex h-14 w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-16 sm:px-5 md:h-[4.5rem] md:px-6">
-            <span className="text-sm font-medium text-[#00000066] group-hover:text-white md:text-base">
+          <div className="group flex h-14 w-full items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-16 sm:px-5 md:h-[4.5rem] md:px-6">
+            <span className="text-sm font-medium text-[#00000066] group-hover:text-white transition-colors duration-300 md:text-base">
               Book Your Consultation
             </span>
             <InteractiveButton as="span" />
@@ -54,8 +54,8 @@ export default function Hero(): JSX.Element {
           className="w-full sm:w-auto sm:flex-1"
           prefetch={false}
         >
-          <div className="group flex h-14 w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-16 sm:px-5 md:h-[4.5rem] md:px-6">
-            <span className="text-sm font-medium text-[#00000066] group-hover:text-white md:text-base">
+          <div className="group flex h-14 w-full items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-16 sm:px-5 md:h-[4.5rem] md:px-6">
+            <span className="text-sm font-medium text-[#00000066] group-hover:text-white transition-colors duration-300 md:text-base">
               Explore Our Sessions
             </span>
             <InteractiveButton as="span" />

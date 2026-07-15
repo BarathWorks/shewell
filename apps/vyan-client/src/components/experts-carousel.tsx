@@ -303,13 +303,13 @@ export default function ExpertsCarousel() {
         {/* CTA */}
         <div className="mt-10 md:mt-14">
           <Link href="/counselling">
-            <div className="group flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl bg-[#F2F2F2] px-5 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:rounded-2xl sm:px-6 sm:py-5 md:px-8">
+            <div className="group flex w-full cursor-pointer flex-row items-center justify-between gap-2.5 rounded-[24px] bg-[#F2F2F2] p-4 h-[90px] transition-all duration-300 ease-in-out hover:bg-[#00898F] active:bg-[#006e72] sm:h-[100px] sm:p-5 md:h-[120px] md:p-6">
               <div className="flex flex-1 justify-center">
-                <span className="text-center text-sm sm:text-base md:text-lg font-medium tracking-[0.15em] text-[#00000066] group-hover:text-white">
+                <span className="text-center font-poppins text-lg font-semibold uppercase tracking-[0.2em] text-[#00000066] transition-colors duration-300 group-hover:text-white group-active:text-white sm:text-2xl md:text-[32px] md:leading-[48px]">
                   BOOK A SESSION WITH OUR EXPERTS
                 </span>
               </div>
-              <InteractiveButton as="span" />
+              <InteractiveButton as="span" size="xlarge" />
             </div>
           </Link>
         </div>

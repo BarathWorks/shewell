@@ -25,35 +25,31 @@ const ProfileImageText = ({
   specialization,
 }: IProfileImageTextProps) => {
   const StarDrawing = (
-    <path d="M15.1533 1.24496C14.6395 0.359428 13.3607 0.359425 12.8468 1.24496L9.2281 7.48137C8.97427 7.91882 8.53553 8.21734 8.03545 8.29287L1.2537 9.31717C0.114654 9.48921 -0.284892 10.9274 0.602182 11.6623L5.6543 15.8479C6.12196 16.2354 6.34185 16.8465 6.22825 17.4431L4.90669 24.3833C4.69778 25.4804 5.8495 26.3328 6.8377 25.8125L13.2236 22.4501C13.7096 22.1941 14.2905 22.1941 14.7766 22.4501L21.1625 25.8125C22.1507 26.3328 23.3024 25.4804 23.0935 24.3833L21.7719 17.4431C21.6583 16.8465 21.8782 16.2354 22.3459 15.8479L27.398 11.6623C28.285 10.9274 27.8855 9.48921 26.7465 9.31717L19.9647 8.29287C19.4646 8.21734 19.0259 7.91882 18.7721 7.48137L15.1533 1.24496Z" />
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   );
   const customStyles = {
     itemShapes: StarDrawing,
-    activeFillColor: "#00898F",
-    inactiveFillColor: "#B5B5B5",
+    activeFillColor: "#006879",
+    inactiveFillColor: "#c0c8cc",
   };
 
   return (
     <>
-      <div className="flex flex-col gap-8 lg:flex-row  lg:justify-between">
+      <div className="flex flex-col gap-8 lg:flex-row lg:justify-between w-full">
         {/* doctor-image and text */}
-        <div className=" lg:self-center ">
+        <div className="lg:self-center">
           {doctorProfile && (
-            <div className="flex flex-col items-center  gap-4 lg:flex-row lg:gap-6  2xl:gap-8">
-              {/* image */}
-
-              <div className="relative flex aspect-square items-center justify-center xs:w-[150px] sm:w-[225px]">
-                {/* Decorative ring */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#00898F]/20 to-[#51AF5A]/20 p-2">
-                  <div className="relative h-full w-full overflow-hidden rounded-full bg-white shadow-lg ring-2 ring-white">
-                    {cardImage}
-                  </div>
+            <div className="flex flex-col items-center md:items-start lg:flex-row gap-4 lg:gap-6 2xl:gap-8">
+              {/* Profile Avatar */}
+              <div className="relative shrink-0 w-28 h-28 md:w-32 md:h-32">
+                <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-[#F4F4F4] flex items-center justify-center shadow-sm">
+                  {cardImage}
                 </div>
               </div>
 
               {/* text */}
-              <div className=" flex flex-col items-center gap-2 lg:items-start ">
-                <h2 className=" font-poppins text-[30px] font-bold leading-[48px] xl:text-[36px] ">
+              <div className="flex flex-col items-center gap-2 lg:items-start">
+                <h2 className="font-poppins text-[30px] font-bold leading-[48px] xl:text-[36px]">
                   Dr. {doctorProfile.firstName || ""}
                 </h2>
                 <div className="font-inter text-[20px] font-normal leading-[30px] text-inactive xl:text-2xl">
@@ -82,26 +78,21 @@ const ProfileImageText = ({
                     month
                   </div>
                 </div>
-                <div className="flex w-full items-center justify-center gap-2 md:justify-start ">
-                  <div className="flex">
+                <div className="flex w-full items-center justify-center md:justify-start gap-2">
+                  <div className="flex items-center gap-2">
                     <Rating
                       className="inline"
                       readOnly={true}
-                      style={{ maxWidth: 95 }}
+                      style={{ maxWidth: 75 }}
                       value={parseFloat(doctorProfile.avgRating || "0")}
                       itemStyles={customStyles}
                     />
 
-                    <div className="border-r border-primary pr-2 font-inter text-sm font-medium text-active 2xl:text-base">
+                    <span className="font-bold text-[#0b1c30] text-sm">
                       {parseFloat(doctorProfile.avgRating || "0").toFixed(1)}
-                    </div>
+                    </span>
                   </div>
-                  <div className="font-inter text-sm font-normal 2xl:text-base">
-                    {doctorProfile?.totalConsultations
-                      ? doctorProfile?.totalConsultations
-                      : 0}{" "}
-                    Consultation
-                  </div>
+                  <span className="text-xs text-gray-500 font-poppins font-medium">• {doctorProfile?.totalConsultations || 0} Consultations</span>
                 </div>
               </div>
             </div>
@@ -111,18 +102,18 @@ const ProfileImageText = ({
         {/* Specialization */}
         {specialization.length > 0 && (
           <div className="lg:basis-[349px] xl:basis-[580px] 2xl:basis-[687px]">
-            <h3 className="mb-3 font-inter text-base font-semibold md:text-lg  xl:text-[20px] xl:leading-[30px] 2xl:text-[28px] 2xl:leading-[38px]">
+            <h3 className="mb-3 font-inter text-base font-semibold md:text-lg xl:text-[20px] xl:leading-[30px] 2xl:text-[28px] 2xl:leading-[38px]">
               Specialization
             </h3>
-            <div className="flex flex-wrap items-center justify-center gap-[14px] px-[60px] md:px-0 lg:justify-start 2xl:gap-[18px]">
+            <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start md:px-0">
               {specialization &&
                 specialization.map((item, index) => {
                   return (
                     <div
-                      className="rounded-full border border-[#00898F]/20 bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-1.5 font-poppins text-xs font-medium text-[#00898F]"
+                      className="bg-[#E1EBED]/60 border border-[#00898F]/15 px-4 py-1.5 rounded-full flex items-center"
                       key={index}
                     >
-                      {item.specialization}
+                      <span className="text-[14px] font-semibold text-[#00898F]">{item.specialization}</span>
                     </div>
                   );
                 })}

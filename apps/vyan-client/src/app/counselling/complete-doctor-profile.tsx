@@ -42,6 +42,7 @@ const CompleteDoctorProfile = ({
     priceInCents: number | null;
   } | null>(null);
   const [duration, setDuration] = useState<number>();
+  const [priceInCents, setPriceInCents] = useState<number | null>(null);
 
   const handleDuration = (value: number) => {
     setDuration(value);
@@ -53,10 +54,14 @@ const CompleteDoctorProfile = ({
     priceInCents: number | null;
   }) => {
     setSelectedDateTime(dateTime);
+    if (dateTime.priceInCents !== null) {
+      setPriceInCents(dateTime.priceInCents);
+    }
   };
 
   useEffect(() => {
     setSelectedDateTime(null);
+    setPriceInCents(null);
   }, [duration]);
 
   const StarDrawing = (
@@ -73,12 +78,12 @@ const CompleteDoctorProfile = ({
 
   return (
     <div className="w-full">
-      <div className="w-full max-w-[600px] mx-auto bg-white rounded-[24px] shadow-lg border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5">
+      <div className="w-full max-w-[600px] mx-auto md:ml-0 md:mr-auto bg-white rounded-[24px] shadow-lg border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5">
         {/* Header Section */}
         <section className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center">
           {/* Profile Avatar */}
           <div className="relative shrink-0 w-28 h-28 md:w-32 md:h-32">
-            <div className="w-full h-full rounded-full border-4 border-[#eff4ff] overflow-hidden bg-[#d3e4fe] flex items-center justify-center shadow-inner">
+            <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-[#F4F4F4] flex items-center justify-center shadow-sm">
               {!imgError && doctorProfile.media?.fileUrl && doctorProfile.media.fileUrl !== "null" && doctorProfile.media.fileUrl !== "undefined" && doctorProfile.media.fileUrl !== "" ? (
                 <Image
                   src={doctorProfile.media.fileUrl}
@@ -119,24 +124,22 @@ const CompleteDoctorProfile = ({
             {/* Language & Expertise Tags */}
             <div className="flex flex-wrap gap-2 pt-1">
               {doctorProfile.languages?.map((item, index) => (
-                <span 
-                  className="px-2.5 py-[3px] border border-[#71787c] rounded-full text-xs font-medium text-gray-600 bg-white"
+                <div 
+                  className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center"
                   key={index}
                 >
-                  {item.language}
-                </span>
+                  <span className="text-[14px] font-normal text-black">{item.language}</span>
+                </div>
               ))}
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
+              
               {specialization &&
                 specialization.map((item, index) => (
-                  <span 
-                    className="px-2.5 py-[3px] bg-[#eff4ff] border border-[#006879]/20 text-[#006879] rounded-full text-xs font-medium"
+                  <div 
+                    className="bg-[#E1EBED]/60 border border-[#00898F]/15 px-4 py-1.5 rounded-full flex items-center"
                     key={index}
                   >
-                    {item.specialization}
-                  </span>
+                    <span className="text-[14px] font-semibold text-[#00898F]">{item.specialization}</span>
+                  </div>
                 ))}
             </div>
             
@@ -161,6 +164,7 @@ const CompleteDoctorProfile = ({
           <DayNavigatorWithTimeSlots
             onSelectDuration={handleDuration}
             onSelectDateTime={handleDateTimeSelect}
+            onPriceChange={setPriceInCents}
             professionalUserId={doctorProfile.id!}
           />
         </section>
@@ -173,7 +177,7 @@ const CompleteDoctorProfile = ({
             professionalUserId={doctorProfile.id!}
             date={selectedDateTime?.date!}
             timeSlots={selectedDateTime?.timeSlots!}
-            priceInCents={selectedDateTime?.priceInCents!}
+            priceInCents={priceInCents!}
           />
         </footer>
       </div>
