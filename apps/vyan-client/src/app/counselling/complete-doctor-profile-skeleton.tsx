@@ -1,58 +1,46 @@
+import React from "react";
+
 const CompleteDoctorProfileSkeleton = () => {
   return (
-    <>
-      <div className="w-full">
-        <div className="flex flex-col gap-6 rounded-md border border-border-300 py-4 xs:px-2 sm:px-3 md:flex-row md:justify-between md:px-[30px] md:py-[30px] xl:flex-col">
-          {/* Left Section */}
-          <div className="flex flex-col gap-[18px]">
-            {/* Image + Text */}
-            <div className="flex gap-4 lg:gap-6 2xl:gap-8">
-              {/* Image */}
-              <div className="flex aspect-square animate-pulse items-center justify-center rounded-full bg-gray-100 xs:w-[116px] sm:w-[138px]"></div>
-              {/* Text */}
-              <div className="flex flex-col gap-1">
-                <div className="h-6 w-32 animate-pulse rounded-md bg-gray-100"></div>
-                <div className="h-4 w-24 animate-pulse rounded-md bg-gray-100"></div>
-                {/* Ratings */}
-                <div className="flex w-full flex-wrap items-center gap-2 md:justify-start">
-                  <div className="h-4 w-16 animate-pulse rounded-md bg-gray-100"></div>
-                  <div className="h-4 w-20 animate-pulse rounded-md bg-gray-100"></div>
-                </div>
-                {/* Button */}
-                <div className="mt-4 h-10 w-32 animate-pulse rounded-md bg-gray-100"></div>
-              </div>
-            </div>
-
-            {/* Specialization */}
-            <div className="flex flex-wrap items-center gap-1 font-inter text-xs font-normal text-inactive md:text-sm">
-              <span className="font-medium text-active">Specialized In: </span>
-              <div className="h-6 w-20 animate-pulse rounded-md bg-gray-100"></div>
-              <div className="h-6 w-16 animate-pulse rounded-md bg-gray-100"></div>
-            </div>
-
-            {/* Languages */}
-            <div className="flex flex-wrap items-center gap-1 font-inter text-xs font-normal text-inactive md:text-sm">
-              <span className="font-medium text-active">Languages: </span>
-              <div className="h-6 w-20 animate-pulse rounded-md bg-gray-100"></div>
-              <div className="h-6 w-16 animate-pulse rounded-md bg-gray-100"></div>
-            </div>
-
-            {/* Available Time Slots */}
-            <div className="mb-6 mt-[18px] md:my-6">
-              <div className="border-b border-primary pb-1 font-inter text-base font-medium 2xl:text-lg">
-                Available Time Slots
-              </div>
-              <div className="h-12 w-full animate-pulse rounded-md bg-gray-100"></div>
-            </div>
+    <div className="w-full">
+      <div className="w-full max-w-[600px] mx-auto bg-white rounded-[24px] shadow-lg border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5">
+        {/* Header Section Placeholder */}
+        <section className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+          {/* Avatar Placeholder */}
+          <div className="relative shrink-0">
+            <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-[#eff4ff] bg-[#d3e4fe]/50 animate-pulse"></div>
           </div>
-
-          {/* Right Section */}
-          <div className="md:self-center xl:self-start">
-            <div className="h-12 w-48 animate-pulse rounded-md bg-gray-100"></div>
+          
+          {/* Doctor Details Placeholder */}
+          <div className="flex-1 space-y-3 w-full">
+            <div className="h-7 w-48 bg-gray-100 rounded animate-pulse"></div>
+            <div className="h-5 w-36 bg-gray-100 rounded animate-pulse"></div>
+            
+            {/* Tags Placeholder */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <div className="h-6 w-16 bg-gray-100 rounded-full animate-pulse"></div>
+              <div className="h-6 w-20 bg-gray-100 rounded-full animate-pulse"></div>
+            </div>
+            
+            {/* Rating Placeholder */}
+            <div className="h-5 w-44 bg-gray-100 rounded animate-pulse"></div>
           </div>
-        </div>
+        </section>
+
+        {/* Availability Section Placeholder */}
+        <section className="space-y-6 border-t border-[#c0c8cc]/30 pt-6">
+          <div className="h-6 w-44 bg-gray-100 rounded animate-pulse"></div>
+          <div className="h-16 w-full bg-[#eff4ff]/50 rounded-xl animate-pulse"></div>
+        </section>
+        
+        {/* Footer Action Section Placeholder */}
+        <footer className="border-t border-[#c0c8cc]/30 pt-6 flex flex-col sm:flex-row gap-4 items-center">
+          <div className="flex-1 h-12 bg-[#eff4ff]/50 rounded-xl animate-pulse w-full sm:w-auto"></div>
+          <div className="w-full sm:flex-[2] h-12 bg-gray-100 rounded-xl animate-pulse"></div>
+        </footer>
       </div>
-    </>
+    </div>
   );
 };
+
 export default CompleteDoctorProfileSkeleton;

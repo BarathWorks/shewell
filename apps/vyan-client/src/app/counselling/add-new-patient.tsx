@@ -136,17 +136,16 @@ const AddNewPatient = ({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-full xs:max-w-[300px] sm:max-w-[393px] p-[30px] lg:max-w-[904px] xl:max-w-[1100px] 2xl:max-w-[1280px] overflow-y-auto h-[90vh]">
-          <div className="mb-[18px] text-center font-inter text-[20px] font-semibold leading-[30px]">
-            Couple Information
-            <span className="text-base font-medium">
-              ( please enter the information of couple for whom you want to book
-              the appointment)
-            </span>
+          <div className="mb-[18px] text-center font-poppins">
+            <h2 className="text-[20px] font-bold leading-tight text-[#0b1c30]">Couple Information</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Please enter the information of the couple for whom you want to book the appointment
+            </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
-              <div className="mb-[12px] font-inter text-base font-semibold text-primary md:text-[18px] md:leading-[28px]">
+              <div className="mb-[12px] font-poppins text-base font-bold text-[#006879] md:text-[18px] md:leading-[28px]">
                 Patient 1
               </div>
               <div className="flex flex-col gap-6">
@@ -259,7 +258,7 @@ const AddNewPatient = ({
                       return (
                         <>
                           <textarea
-                            className="w-full rounded-md border py-3 pl-4 outline-primary  placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color"
+                            className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#006879] focus:border-[#006879] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
                             value={field.value}
                             onChange={field.onChange}
                             placeholder="Type your message here"
@@ -274,17 +273,21 @@ const AddNewPatient = ({
                     }}
                   />
                 </div>
-                {/* Additional Patient */}
-                Additional Patient
+                {/* Additional Patient Header Section */}
+                {fields.length > 0 && (
+                  <div className="mt-6 mb-4 border-t border-gray-100 pt-6">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Additional Partner Details</h3>
+                  </div>
+                )}
                 {fields.map((field, index) => (
-                  <>
-                    <div className="flex justify-between">
-                      <div className="mb-[12px] font-inter text-base font-semibold text-primary md:text-[18px] md:leading-[28px]">
+                  <React.Fragment key={field.id}>
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="font-poppins text-base font-bold text-[#006879] md:text-[18px] md:leading-[28px]">
                         Patient {index + 2}
                       </div>
 
                       <Button
-                        className="w-fit bg-red-600 hover:bg-red-600"
+                        className="px-4 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.97] shadow-sm hover:shadow"
                         type="button"
                         onClick={() => remove(index)}
                       >
@@ -415,7 +418,7 @@ const AddNewPatient = ({
                             return (
                               <>
                                 <textarea
-                                  className="w-full rounded-md border py-3 pl-4 outline-primary  placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color"
+                                  className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#006879] focus:border-[#006879] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
                                   value={field.value}
                                   onChange={field.onChange}
                                   placeholder="Type your message here"
@@ -428,7 +431,7 @@ const AddNewPatient = ({
 
                       {fields.length > 1 && (
                         <Button
-                          className="w-fit bg-red-600 hover:bg-red-600"
+                          className="px-4 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.97] shadow-sm hover:shadow"
                           type="button"
                           onClick={() => remove(index)}
                         >
@@ -436,13 +439,13 @@ const AddNewPatient = ({
                         </Button>
                       )}
                     </div>
-                  </>
+                  </React.Fragment>
                 ))}
               </div>
             </div>
 
             <Button
-              className="mt-4 bg-primary hover:bg-secondary"
+              className="mt-4 bg-white border border-[#006879] hover:bg-[#eff4ff] text-[#006879] rounded-xl font-bold h-11 px-6 shadow-sm active:scale-[0.98] transition-all duration-200"
               type="button"
               onClick={() =>
                 append({
@@ -458,7 +461,7 @@ const AddNewPatient = ({
             </Button>
 
             <Button
-              className="mt-4 w-full bg-secondary hover:bg-secondary "
+              className="mt-6 w-full h-12 bg-[#006879] hover:bg-[#005260] rounded-xl font-bold text-white shadow-md transition-all duration-200 active:scale-[0.98]"
               type="submit"
             >
               Submit

@@ -425,18 +425,22 @@ const OnlineAppointment = ({
             <div className="flex justify-between px-4 pb-4 pt-6 lg:px-[30px] lg:pt-[30px]">
               <div className="flex items-center gap-3 lg:gap-4">
                 {step > 1 && (
-                  <div className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#F5F5F5] px-3 py-1.5 font-inter text-sm font-medium transition-colors hover:bg-gray-200" onClick={() => setStep(step - 1)}>
+                  <div 
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#f5f5f5] px-3 py-1.5 font-inter text-xs font-semibold text-[#40484b] hover:bg-[#006879]/10 hover:text-[#006879] transition-all duration-200 active:scale-[0.97] group" 
+                    onClick={() => setStep(step - 1)}
+                  >
                     <svg
                       width="6"
                       height="10"
                       viewBox="0 0 8 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      className="text-gray-600 group-hover:text-[#006879] transition-colors"
                     >
                       <path
                         d="M7 13L1 7L7 1"
-                        stroke="#121212"
-                        strokeWidth="2"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -539,7 +543,7 @@ const OnlineAppointment = ({
               {step === 2 && (
                 <div className="mr-3 flex justify-end">
                   <Button
-                    className="self-end rounded-md bg-secondary px-[30px] py-2 font-inter text-base font-medium hover:bg-secondary"
+                    className="self-end h-11 rounded-xl bg-[#006879] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#005260] hover:shadow-lg active:scale-[0.98] sm:h-12 sm:px-12 md:h-auto md:py-3"
                     onClick={handleSubmit}
                   >
                     CheckOut

@@ -153,76 +153,52 @@ const CounsellingFilter = ({
   const disabledDays = { before: today };
   return (
     <>
-      <div className="w-full space-y-4 font-poppins sm:space-y-5 md:space-y-6">
-        {/* Search Section */}
-        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="w-full md:max-w-lg">
-            <div className="relative flex w-full items-center gap-2">
-              <input
-                value={searchTherapist}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchTherapist(e.target.value)
-                }
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pl-8 text-xs font-medium text-[#333333] shadow-sm outline-none transition-all placeholder:text-[#999999] hover:border-[#00898F] focus:border-[#00898F] focus:ring-1 focus:ring-[#00898F] sm:rounded-xl sm:px-4 sm:py-2.5 sm:pl-10 sm:text-sm md:rounded-2xl md:px-5 md:py-3 md:pl-12"
-                placeholder="Search by therapist name..."
-                type="text"
-                name="therapist"
+      <div className="w-full space-y-4 font-poppins sm:space-y-5">
+        {/* Row 1: Search — pill style matching filter bar */}
+        <div className="flex w-full items-center justify-start overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
+          <div className="inline-flex w-full items-center gap-3 rounded-2xl bg-[#F5F5F5] px-3 py-2 sm:rounded-xl sm:px-4 sm:py-2.5 md:px-5 md:py-2.5">
+            {/* Search icon */}
+            <svg
+              className="h-4 w-4 shrink-0 text-[#999999] sm:h-4 sm:w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M21 21L15.0001 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999999] sm:left-3.5 md:left-4"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M21 21L15.0001 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <Button
-                className="hidden rounded-lg bg-[#00898F] px-4 py-2 text-xs font-medium text-white hover:bg-[#007a80] sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm md:flex md:px-6 md:py-3"
-                onClick={handleSearch}
-              >
-                Search
-              </Button>
-            </div>
-          </div>
+            </svg>
 
-          {/* Sort Section - kept clean */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs font-medium text-[#666666] sm:text-sm">
-              Sort by:
-            </span>
-            <Select>
-              <SelectTrigger className="w-[120px] rounded-lg border-gray-200 bg-white text-xs font-medium text-[#333333] sm:w-[140px] sm:rounded-xl sm:text-sm md:w-[160px]">
-                <SelectValue placeholder="Price" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg border-gray-100 bg-white p-1 shadow-lg sm:rounded-xl">
-                <SelectItem
-                  className="cursor-pointer rounded-lg px-2 py-1.5 text-xs hover:bg-gray-50 sm:text-sm"
-                  value="asc"
-                >
-                  Low to High
-                </SelectItem>
-                <SelectItem
-                  className="cursor-pointer rounded-lg px-2 py-1.5 text-xs hover:bg-gray-50 sm:text-sm"
-                  value="desc"
-                >
-                  High to Low
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Borderless input */}
+            <input
+              value={searchTherapist}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTherapist(e.target.value)
+              }
+              className="min-w-0 flex-1 border-none bg-transparent text-xs font-medium text-[#333333] outline-none placeholder:text-[#999999] sm:text-sm"
+              placeholder="Search by therapist name..."
+              type="text"
+              name="therapist"
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+
+            {/* Teal Search button — flush inside the pill */}
+            <Button
+              className="shrink-0 rounded-xl bg-[#00898F] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#007a80] sm:px-5 sm:py-2 sm:text-sm"
+              onClick={handleSearch}
+            >
+              Search
+            </Button>
           </div>
         </div>
 
-        {/* Filter Bar - Pill Style matching Session Page */}
-        <div className="flex w-full items-center justify-center overflow-x-auto">
-          <div className="inline-flex w-full flex-wrap items-center gap-2 rounded-2xl bg-[#F5F5F5] px-3 py-2.5 sm:gap-3 sm:rounded-3xl sm:px-4 sm:py-3 md:w-auto md:gap-4 md:px-6 md:py-3">
+        {/* Row 2: Filter Bar (Pill Style, Left Aligned & Scrollable without scrollbar) */}
+        <div className="flex w-full items-center justify-start overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
+          <div className="inline-flex items-center gap-2 rounded-2xl bg-[#F5F5F5] px-3 py-2 sm:gap-3 sm:rounded-xl sm:px-4 sm:py-2.5 md:gap-4 md:px-5 md:py-2.5 whitespace-nowrap">
             {/* Languages Filter */}
             <div>
               <Popover>
@@ -253,7 +229,6 @@ const CounsellingFilter = ({
             <div className="h-4 w-px bg-gray-300 sm:h-5 md:h-6"></div>
 
             {/* Specialization Filter */}
-
             <Popover>
               <PopoverTrigger asChild>
                 <button className="flex items-center gap-1 text-xs text-black hover:text-gray-600 sm:text-sm">
@@ -302,7 +277,6 @@ const CounsellingFilter = ({
               </Dialog>
               <ChevronDown size={12} className="text-[#666666] sm:h-4 sm:w-4" />
             </div>
-
             <div className="h-4 w-px bg-gray-300 sm:h-5 md:h-6"></div>
 
             {/* Clear Filters */}
@@ -312,6 +286,33 @@ const CounsellingFilter = ({
             >
               Clear All
             </button>
+            <div className="h-4 w-px bg-gray-300 sm:h-5 md:h-6"></div>
+
+            {/* Sort by - inside filter pill */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-xs font-medium text-[#666666] sm:text-sm whitespace-nowrap">
+                Sort:
+              </span>
+              <Select>
+                <SelectTrigger className="h-auto border-none bg-transparent p-0 text-xs font-medium text-[#333333] shadow-none outline-none ring-0 focus:ring-0 sm:text-sm [&>svg]:ml-1 [&>svg]:h-3 [&>svg]:w-3">
+                  <SelectValue placeholder="Price" />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg border-gray-100 bg-white p-1 shadow-lg sm:rounded-xl">
+                  <SelectItem
+                    className="cursor-pointer rounded-lg px-2 py-1.5 text-xs hover:bg-gray-50 sm:text-sm"
+                    value="asc"
+                  >
+                    Low to High
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg px-2 py-1.5 text-xs hover:bg-gray-50 sm:text-sm"
+                    value="desc"
+                  >
+                    High to Low
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

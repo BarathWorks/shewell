@@ -40,7 +40,7 @@ const CounsellingCard = ({
               <div className="z-10 flex w-full flex-row gap-2 rounded-[10px] border border-primary from-[#00686C] to-[#6CDD37] pr-6 transition-transform hover:bg-gradient-to-b">
                 <div className="max-h-[262px]">
                   <div className="relative aspect-[130/262] w-[130px]">
-                    {item.media.fileUrl ? (
+                    {item.media.fileUrl && item.media.fileUrl !== "null" && item.media.fileUrl !== "undefined" && item.media.fileUrl !== "" ? (
                       <Image
                         src={item.media.fileUrl}
                         alt={item.name}
