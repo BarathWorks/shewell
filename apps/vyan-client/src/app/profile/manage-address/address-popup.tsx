@@ -11,10 +11,13 @@ import AddressForm from "./address-form";
 import { IAddress, IAddressForm } from "~/models/address.model";
 import { useState } from "react";
 import { useCartStore } from "~/store/cart.store";
+import { Plus, X, MapPinOff } from "lucide-react";
+
 type IAddressPopUp = {
   countries: { id: string; name: string }[];
   addedAddresses: IAddress[];
 };
+
 export default function AddressPopUp({
   countries,
   addedAddresses,
@@ -30,102 +33,83 @@ export default function AddressPopUp({
     mobile: "",
     landmark: "",
     pincode: "",
-    addressType: "",
+    addressType: "Home",
   };
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { cart, setAddress } = useCartStore((state) => {
-    console.log("state is ", state);
-    return {
-      cart: state.cart,
-      setAddress: state.setAddress,
-    };
-  });
+  const { cart, setAddress } = useCartStore((state) => ({
+    cart: state.cart,
+    setAddress: state.setAddress,
+  }));
+
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(
-    cart.address || null,
+    cart.address || null
   );
 
   const handleAddressCreated = () => {
     setIsDialogOpen(false);
   };
+
   const handleSelect = (item: IAddress) => {
     setAddress(item);
-    console.log("now the selected address is", item);
-    console.log("finalllly", cart);
     setSelectedAddress(item);
   };
-  return (
-    <>
-      {addedAddresses.map((item) => (
-        <div
-          onClick={() => handleSelect(item)}
-          className={`cursor-pointer ${selectedAddress?.id === item.id ? "bg-[#DFF1F2]" : ""}`}
-        >
-          <AddressCard key={item.id} values={item} countries={countries} />
-        </div>
-      ))}
-      {/* <Dialog>
-        <DialogTrigger asChild>
-          <div className="cursor-pointer rounded-md border border-dashed border-primary">
-            <div className="flex h-full items-center justify-center text-lg font-medium text-black-400">
-              {"+"} Add new address
-            </div>
-          </div>
-        </DialogTrigger>
-        <DialogContent className="w-11/12 p-[54px] lg:w-9/12 xl:w-1/2">
-          <AddressForm countries={countries} initialValues={emptyForm} />
-        </DialogContent>
-      </Dialog> */}
 
-      <AlertDialog open={isDialogOpen}>
-        <AlertDialogTrigger asChild>
-          <div className="cursor-pointer rounded-xl border border-dashed border-[#00898F] bg-[#F2F7EA] p-6 transition-all hover:bg-[#e6f0db]">
+  return (
+    <div className="flex flex-col gap-5">
+      {addedAddresses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {addedAddresses.map((item) => (
             <div
-              className="flex h-full items-center justify-center gap-2 text-lg font-medium text-[#00898F]"
-              onClick={() => setIsDialogOpen(true)}
+              key={item.id}
+              onClick={() => handleSelect(item)}
+              className={`cursor-pointer rounded-2xl transition-all ${
+                selectedAddress?.id === item.id
+                  ? "ring-2 ring-[#00898F] ring-offset-2"
+                  : ""
+              }`}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 5V19M5 12H19"
-                  stroke="#00898F"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Add new address
+              <AddressCard values={item} countries={countries} />
             </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-8 text-center">
+          <MapPinOff className="h-10 w-10 text-gray-400 mb-2" />
+          <h3 className="font-poppins text-base font-semibold text-gray-700">
+            No Addresses Saved
+          </h3>
+          <p className="font-inter text-xs text-gray-500 max-w-sm mt-1 mb-4">
+            You haven't added any delivery addresses yet. Add one now for faster checkout.
+          </p>
+        </div>
+      )}
+
+      {/* Add New Address Button & Modal */}
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogTrigger asChild>
+          <div
+            onClick={() => setIsDialogOpen(true)}
+            className="group flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#00898F] bg-[#E6F4EE]/40 p-5 transition-all hover:bg-[#E6F4EE]"
+          >
+            <Plus className="h-5 w-5 text-[#00898F] transition-transform group-hover:scale-110" />
+            <span className="font-poppins text-base font-semibold text-[#00898F]">
+              Add New Address
+            </span>
           </div>
         </AlertDialogTrigger>
-        <AlertDialogContent className="h-[90vh] max-h-screen w-[95%] max-w-[800px] overflow-y-auto rounded-3xl p-0 lg:w-4/6 2xl:w-1/2">
-          <div className="p-6 md:p-10">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="font-poppins text-2xl font-semibold text-[#181818]">
-                Add New Address
-              </div>
+
+        <AlertDialogContent className="w-full max-w-[700px] rounded-3xl p-0 max-h-[85vh] overflow-y-auto">
+          <div className="p-6 md:p-8">
+            <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4">
+              <h2 className="font-poppins text-xl font-semibold text-[#181818]">
+                Add New Delivery Address
+              </h2>
               <AlertDialogCancel
-                className="border-none shadow-none hover:bg-transparent"
                 onClick={() => setIsDialogOpen(false)}
+                className="border-none p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
               >
-                <svg
-                  className="size-6"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M18 6L6 18M6 6L18 18"
-                    stroke="#181818"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <X className="h-5 w-5" />
               </AlertDialogCancel>
             </div>
             <AddressForm
@@ -136,6 +120,7 @@ export default function AddressPopUp({
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }
+

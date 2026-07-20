@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,10 +13,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/src/@/components/tabs";
-import ProfileNav from "~/components/profile-nav";
 import Ongoing from "./ongoing";
 import Upcoming from "./upcoming";
-// import Past from "./past";
+import Past from "./past";
+import Cancelled from "./cancelled";
 import {
   Select,
   SelectContent,
@@ -24,10 +25,7 @@ import {
   SelectValue,
 } from "@repo/ui/src/@/components/select";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import Past from "./past";
-import Cancelled from "./cancelled";
-import React from "react";
+import { Calendar, Clock, CheckCircle, XCircle, CalendarDays } from "lucide-react";
 
 enum Duration {
   ONE_WEEK = "1_WEEK",
@@ -36,127 +34,125 @@ enum Duration {
   SIX_MONTHS = "6_MONTHS",
   ONE_YEAR = "1_YEAR",
 }
-const Orders = () => {
+
+const AppointmentsPage = () => {
   const [duration, setDuration] = useState<Duration>(Duration.ONE_WEEK);
+
   const handleDurationChange = (value: Duration) => {
     setDuration(value);
   };
 
-  const session = useSession();
-
   return (
-    <>
-      <div className="w-full bg-[#FBFBFB] font-inter">
-        <div className="container mx-auto">
-          <div className="py-4 md:py-6 xl:py-[28px] 2xl:py-[32px]">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink>Appointments</BreadcrumbLink>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+    <div className="w-full font-inter space-y-6">
+      {/* Breadcrumbs */}
+      <div className="pb-2">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="text-gray-500 hover:text-[#00898F]">
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/profile/appointments" className="text-[#00898F] font-medium">
+                Appointments
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
-          <div className="pb-[32px] lg:pb-[55px] xl:pb-[60px] 2xl:pb-[65px]">
-            <div className="items-start  xl:flex xl:flex-row xl:gap-[46px] 2xl:gap-[60px] ">
-              <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10">
-                <div className="mb-6 flex justify-between font-poppins text-base font-semibold text-[#181818] lg:mb-[30px] lg:text-xl xl:mb-9 xl:text-2xl 2xl:mb-10 2xl:text-[28px] 2xl:leading-[38px]">
-                  <div> Appointments</div>
-                  <div>
-                    <Select
-                      value={duration}
-                      onValueChange={handleDurationChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Past" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value={Duration.ONE_WEEK}>
-                          1 week
-                        </SelectItem>
-                        <SelectItem value={Duration.ONE_MONTH}>
-                          1 month
-                        </SelectItem>
-                        <SelectItem value={Duration.THREE_MONTHS}>
-                          3 months
-                        </SelectItem>
-                        <SelectItem value={Duration.SIX_MONTHS}>
-                          6 months
-                        </SelectItem>
-                        <SelectItem value={Duration.ONE_YEAR}>
-                          1 year
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Tabs defaultValue="Ongoing">
-                    <TabsList className="flex flex-wrap justify-center gap-10 gap-y-5 text-sm font-medium text-[#666666] md:text-base 2xl:text-lg">
-                      <TabsTrigger
-                        className="border-b-primary font-poppins data-[state=active]:border-b-2"
-                        value="Ongoing"
-                      >
-                        Today
-                      </TabsTrigger>
-                      <TabsTrigger
-                        className="border-b-primary font-poppins data-[state=active]:border-b-2"
-                        value="Upcoming"
-                      >
-                        Upcoming
-                      </TabsTrigger>
-                      <TabsTrigger
-                        className="border-b-primary font-poppins data-[state=active]:border-b-2"
-                        value="Past"
-                      >
-                        Past
-                      </TabsTrigger>
-                      <TabsTrigger
-                        className="border-b-primary font-poppins data-[state=active]:border-b-2"
-                        value="Cancelled"
-                      >
-                        Cancelled
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent
-                      value="Ongoing"
-                      className="mt-7 lg:mt-[30px] xl:mt-9 2xl:mt-10"
-                    >
-                      <Ongoing />
-                    </TabsContent>
-                    <TabsContent
-                      value="Upcoming"
-                      className="mt-7 lg:mt-[30px] xl:mt-9 2xl:mt-10"
-                    >
-                      <Upcoming />
-                    </TabsContent>
-
-                    <TabsContent
-                      value="Past"
-                      className="mt-7 lg:mt-[30px] xl:mt-9 2xl:mt-10"
-                    >
-                      <Past duration={duration} />
-                    </TabsContent>
-
-                    <TabsContent
-                      value="Cancelled"
-                      className="mt-7 lg:mt-[30px] xl:mt-9 2xl:mt-10"
-                    >
-                      <Cancelled />
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
+      {/* Main Card Container */}
+      <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 md:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+        {/* Card Title Header */}
+        <div className="mb-8 flex flex-col gap-4 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E6F4EE] text-[#00898F]">
+              <Calendar className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="font-poppins text-xl font-semibold text-[#181818] md:text-2xl">
+                Doctor Appointments
+              </h1>
+              <p className="font-inter text-xs text-[#666666] mt-0.5">
+                View today's sessions, manage upcoming consultations, and view past medical history.
+              </p>
             </div>
           </div>
+
+          {/* Time Filter Select */}
+          <div className="w-full sm:w-44">
+            <Select value={duration} onValueChange={handleDurationChange}>
+              <SelectTrigger className="w-full rounded-xl border-gray-200 bg-gray-50 font-inter text-xs focus:border-[#00898F]">
+                <SelectValue placeholder="Past Duration" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-gray-100 bg-white shadow-md">
+                <SelectItem value={Duration.ONE_WEEK} className="text-xs font-inter">Last 1 Week</SelectItem>
+                <SelectItem value={Duration.ONE_MONTH} className="text-xs font-inter">Last 1 Month</SelectItem>
+                <SelectItem value={Duration.THREE_MONTHS} className="text-xs font-inter">Last 3 Months</SelectItem>
+                <SelectItem value={Duration.SIX_MONTHS} className="text-xs font-inter">Last 6 Months</SelectItem>
+                <SelectItem value={Duration.ONE_YEAR} className="text-xs font-inter">Last 1 Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Tabs Switcher */}
+        <div>
+          <Tabs defaultValue="Ongoing" className="w-full">
+            <TabsList className="mb-6 flex w-full flex-wrap justify-start gap-2 rounded-2xl bg-gray-50 p-1.5 sm:w-fit">
+              <TabsTrigger
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 font-poppins text-sm font-medium text-gray-600 transition-all data-[state=active]:bg-[#00898F] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                value="Ongoing"
+              >
+                <Clock className="h-4 w-4" />
+                Today
+              </TabsTrigger>
+              <TabsTrigger
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 font-poppins text-sm font-medium text-gray-600 transition-all data-[state=active]:bg-[#00898F] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                value="Upcoming"
+              >
+                <CalendarDays className="h-4 w-4" />
+                Upcoming
+              </TabsTrigger>
+              <TabsTrigger
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 font-poppins text-sm font-medium text-gray-600 transition-all data-[state=active]:bg-[#00898F] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                value="Past"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Past
+              </TabsTrigger>
+              <TabsTrigger
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 font-poppins text-sm font-medium text-gray-600 transition-all data-[state=active]:bg-[#00898F] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                value="Cancelled"
+              >
+                <XCircle className="h-4 w-4" />
+                Cancelled
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="Ongoing" className="mt-0 focus-visible:outline-none">
+              <Ongoing />
+            </TabsContent>
+
+            <TabsContent value="Upcoming" className="mt-0 focus-visible:outline-none">
+              <Upcoming />
+            </TabsContent>
+
+            <TabsContent value="Past" className="mt-0 focus-visible:outline-none">
+              <Past duration={duration} />
+            </TabsContent>
+
+            <TabsContent value="Cancelled" className="mt-0 focus-visible:outline-none">
+              <Cancelled />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </>
+    </div>
   );
 };
-export default Orders;
+
+export default AppointmentsPage;
+

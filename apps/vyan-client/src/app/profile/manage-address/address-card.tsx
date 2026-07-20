@@ -1,126 +1,188 @@
 "use client";
-type ICard = {
-  values: IAddressForm;
-  // defaultAddressId: string;
-  // setDefaultAddress: (addressId: string) => void;
-  countries: { id: string; name: string }[];
-};
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from "@repo/ui/src/@/components/dialog";
-import { Button } from "@repo/ui/src/@/components/button";
 
+import { useState } from "react";
+import { Button } from "@repo/ui/src/@/components/button";
 import { toast } from "@repo/ui/src/@/components/use-toast";
 import AddressForm from "./address-form";
 import { IAddressForm } from "~/models/address.model";
-import { useState } from "react";
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/src/@/components/alert-dialog";
 import { deleteAddress } from "./address-actions";
-export default function AddressCard({
-  values,
-  countries,
-  // defaultAddressId,
-  // setDefaultAddress,
-}: ICard) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+import { Edit2, Trash2, Phone, MapPin, Home, Briefcase, Tag, X, Loader2 } from "lucide-react";
+
+type ICard = {
+  values: IAddressForm;
+  countries: { id: string; name: string }[];
+};
+
+export default function AddressCard({ values, countries }: ICard) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleAddressCreated = () => {
-    setIsDialogOpen(false);
+    setIsEditDialogOpen(false);
   };
-  const deletehandler = () => {
-    deleteAddress(values.id!).then((resp) => {
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const resp = await deleteAddress(values.id!);
       if (resp.error) {
-        return toast({
+        toast({
           variant: "destructive",
-          title: resp.error,
+          title: "Delete Failed",
+          description: resp.error,
         });
       } else if (resp.message) {
-        return toast({
-          variant: "default",
-          title: resp.message,
+        toast({
+          title: "Address Removed",
+          description: resp.message,
         });
+        setIsDeleteDialogOpen(false);
       }
-    });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete address.",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const getAddressIcon = (type?: string) => {
+    switch (type?.toLowerCase()) {
+      case "home":
+        return <Home className="h-3.5 w-3.5" />;
+      case "office":
+      case "work":
+        return <Briefcase className="h-3.5 w-3.5" />;
+      default:
+        return <Tag className="h-3.5 w-3.5" />;
+    }
   };
 
   return (
-    <>
-      <div className="relative rounded-xl border border-gray-100 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] md:p-6">
-        <div className="flex gap-4">
-          <div className="flex w-full flex-col gap-3">
-            {/* div-1 */}
-            <div>
-              <div className="mb-1 font-poppins text-lg font-semibold text-[#181818]">
-                {values.name}
-              </div>
-              <div className="flex flex-col gap-1 text-sm text-[#666666] lg:text-base">
-                <div className="font-inter">
-                  <span className="font-medium text-[#333333]">Mobile:</span>{" "}
-                  {values.mobile}
-                </div>
-                <div className="font-inter">
-                  {values.houseNo}, {values.area}, {values.city},{" "}
-                  {values.pincode}
-                </div>
-              </div>
-            </div>
-            {/* div-2 */}
-            <div className="mt-2 flex items-center gap-6">
-              <AlertDialog open={isDialogOpen}>
-                <AlertDialogTrigger>
-                  <div
-                    className="cursor-pointer font-poppins text-sm font-medium text-[#00898F] hover:underline"
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    Edit
-                  </div>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="h-[90vh] w-full overflow-y-auto lg:w-4/6 2xl:w-1/2">
-                  <AddressForm
-                    countries={countries}
-                    initialValues={values}
-                    onAddressCreated={handleAddressCreated}
-                  />
-                  <AlertDialogCancel
-                    className="absolute right-3 top-3 border-none shadow-none hover:bg-transparent"
-                    onClick={() => setIsDialogOpen(false)}
-                  >
-                    <svg
-                      className="size-[13px] md:size-[15px]"
-                      viewBox="0 0 22 22"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M21.0612 18.9387C21.343 19.2205 21.5013 19.6027 21.5013 20.0012C21.5013 20.3997 21.343 20.7819 21.0612 21.0637C20.7794 21.3455 20.3972 21.5038 19.9987 21.5038C19.6002 21.5038 19.218 21.3455 18.9362 21.0637L10.9999 13.125L3.0612 21.0612C2.7794 21.343 2.39721 21.5013 1.9987 21.5013C1.60018 21.5013 1.21799 21.343 0.936196 21.0612C0.654403 20.7794 0.496094 20.3972 0.496094 19.9987C0.496094 19.6002 0.654403 19.218 0.936196 18.9362L8.87494 11L0.938695 3.06122C0.656903 2.77943 0.498594 2.39724 0.498594 1.99872C0.498594 1.60021 0.656903 1.21802 0.938695 0.936225C1.22049 0.654432 1.60268 0.496123 2.0012 0.496123C2.39971 0.496123 2.7819 0.654432 3.0637 0.936225L10.9999 8.87497L18.9387 0.934975C19.2205 0.653182 19.6027 0.494873 20.0012 0.494873C20.3997 0.494873 20.7819 0.653182 21.0637 0.934975C21.3455 1.21677 21.5038 1.59896 21.5038 1.99747C21.5038 2.39599 21.3455 2.77818 21.0637 3.05997L13.1249 11L21.0612 18.9387Z"
-                        fill="black"
-                        fillOpacity="0.4"
-                      />
-                    </svg>{" "}
-                  </AlertDialogCancel>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              <div
-                className="cursor-pointer font-poppins text-sm font-medium text-red-500 hover:underline"
-                onClick={deletehandler}
-              >
-                Delete
-              </div>
-            </div>
+    <div className="relative flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all hover:shadow-md md:p-6">
+      <div className="flex flex-col gap-3">
+        {/* Header: Name + Badge */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <h3 className="font-poppins text-base font-semibold text-[#181818] md:text-lg">
+              {values.name}
+            </h3>
+            {values.addressType && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-[#E6F4EE] px-2.5 py-0.5 font-inter text-xs font-semibold text-[#00898F]">
+                {getAddressIcon(values.addressType)}
+                {values.addressType}
+              </span>
+            )}
           </div>
         </div>
-        <div className="absolute right-5 top-5 rounded-lg bg-gray-100 px-3 py-1 font-inter text-xs font-medium text-gray-600">
-          {values.addressType}
+
+        {/* Address & Phone Details */}
+        <div className="flex flex-col gap-1.5 font-inter text-sm text-[#666666]">
+          <div className="flex items-center gap-2 text-gray-700 font-medium">
+            <Phone className="h-4 w-4 text-gray-400" />
+            <span>{values.mobile}</span>
+          </div>
+
+          <div className="flex items-start gap-2 text-gray-600">
+            <MapPin className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
+            <span>
+              {values.houseNo}, {values.area}, {values.city}, {values.pincode}
+              {values.landmark && ` (Landmark: ${values.landmark})`}
+            </span>
+          </div>
         </div>
       </div>
-    </>
+
+      {/* Card Action Controls */}
+      <div className="mt-5 flex items-center gap-4 border-t border-gray-100 pt-4">
+        {/* Edit Address Dialog */}
+        <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 font-poppins text-xs font-semibold text-[#00898F] hover:underline"
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+              Edit
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-full max-w-[650px] rounded-2xl p-6 max-h-[85vh] overflow-y-auto">
+            <AlertDialogCancel
+              onClick={() => setIsEditDialogOpen(false)}
+              className="absolute right-4 top-4 border-none p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+            >
+              <X className="h-5 w-5" />
+            </AlertDialogCancel>
+            <AddressForm
+              countries={countries}
+              initialValues={values}
+              onAddressCreated={handleAddressCreated}
+            />
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Address Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 font-poppins text-xs font-semibold text-red-500 hover:underline"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-full max-w-[450px] rounded-2xl p-6">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="font-poppins text-lg font-semibold text-[#181818]">
+                Delete Address?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="font-inter text-xs text-[#666666]">
+                Are you sure you want to delete this saved address? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-4 flex gap-2">
+              <AlertDialogCancel
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2 font-poppins text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </AlertDialogCancel>
+              <Button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="rounded-xl bg-red-600 px-4 py-2 font-poppins text-xs font-semibold text-white hover:bg-red-700"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Address"
+                )}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
   );
 }
+

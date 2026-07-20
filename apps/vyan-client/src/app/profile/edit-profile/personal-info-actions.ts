@@ -124,63 +124,77 @@ catch(err)
   
 }
 
-export const verifyOTP=async(data:IEmailChangeForm)=>{
+export const verifyOTP = async (data: IEmailChangeForm) => {
   const session = await getServerAuthSession();
 
-  //finding the logged in user
-  const userDetails=await db.user.findUnique({
-    where:{
-      email:session?.user.email!
-    }
-  })
+  if (!session || !session.user) {
+    return {
+      error: "Unauthorized",
+    };
+  }
 
-  
-   //whether the email already exists
-   const user=await db.user.findUnique({
-    where:{
-      email:data.email
-    }
-   })
+  // finding the logged in user
+  const userDetails = await db.user.findUnique({
+    where: {
+      email: session.user.email!,
+    },
+  });
 
-   if(user)
-   {
-    return{
-      error:"Email already exists . Please try another one"
-    }
-   }
+  if (!userDetails) {
+    return { error: "User not found." };
+  }
 
-   const isCorrectOtp=(data.otp === userDetails?.otp);
+  // check if OTP is expired (15 minutes expiration window)
+  if (!userDetails.otpCreatedAt || !userDetails.otp) {
+    return { error: "No active OTP request found. Please request a new OTP." };
+  }
 
-  if(isCorrectOtp)
-  {
-    try{
+  const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+  const isExpired = Date.now() - new Date(userDetails.otpCreatedAt).getTime() > FIFTEEN_MINUTES_MS;
+  if (isExpired) {
+    return { error: "OTP has expired. Please request a new OTP." };
+  }
+
+  // whether the new email already exists
+  const existingUser = await db.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+
+  if (existingUser && existingUser.id !== userDetails.id) {
+    return {
+      error: "Email already exists. Please try another email address.",
+    };
+  }
+
+  const isCorrectOtp = data.otp.trim() === userDetails.otp.trim();
+
+  if (isCorrectOtp) {
+    try {
       await db.user.update({
-        data:{
-          email:data.email
+        data: {
+          email: data.email,
+          otp: "",
         },
-        where:{
-         id:userDetails.id
-        }
-      })
+        where: {
+          id: userDetails.id,
+        },
+      });
       revalidatePath("/profile/edit-profile");
-      return{
-        message:"Email changed successfully" 
-      }
+      return {
+        message: "Email changed successfully.",
+      };
+    } catch (err) {
+      return {
+        error: "Error in changing email. Please try again.",
+      };
     }
-    catch(err)
-    {
-      return{
-        message:"Error in changing email"
-      }
-    }
-   
   }
 
-  return{
-    error:"Otp doesn't match"
-  }
-
-
-}
+  return {
+    error: "OTP doesn't match. Please check and try again.",
+  };
+};
 
 export default UpdatePersonalInfo;
