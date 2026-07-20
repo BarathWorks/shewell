@@ -18,6 +18,7 @@ import AddPatientUserAction, { IPatientProps } from "./edit-patient-user-action"
 import { useToast } from "@repo/ui/src/@/components/use-toast";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
+import React from "react";
 const schema = z.object({
   firstName: z
     .string({
@@ -213,7 +214,7 @@ const EditPatient = ({
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
-              <div className="mb-[12px] font-poppins text-base font-bold text-[#006879] md:text-[18px] md:leading-[28px]">
+              <div className="mb-[12px] font-poppins text-base font-bold text-[#00898F] md:text-[18px] md:leading-[28px]">
                 Patient 1
               </div>
               <div className="flex flex-col gap-6">
@@ -328,7 +329,7 @@ const EditPatient = ({
                       return (
                         <>
                           <textarea
-                            className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#006879] focus:border-[#006879] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
+                            className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#00898F] focus:border-[#00898F] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
                             value={field.value!}
                             onChange={field.onChange}
                             placeholder="Type your message here"
@@ -349,7 +350,7 @@ const EditPatient = ({
               {fields.map((field, index) => (
                 <React.Fragment key={field.id}>
                   <div className="flex justify-between items-center mb-4">
-                    <div className="font-poppins text-base font-bold text-[#006879] md:text-[18px] md:leading-[28px]">
+                    <div className="font-poppins text-base font-bold text-[#00898F] md:text-[18px] md:leading-[28px]">
                       Patient {index + 2}
                     </div>
                     <Button
@@ -484,7 +485,7 @@ const EditPatient = ({
                           return (
                             <>
                               <textarea
-                                className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#006879] focus:border-[#006879] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
+                                className="w-full rounded-xl border border-gray-200 py-3 pl-4 outline-none focus:ring-2 focus:ring-[#00898F] focus:border-[#00898F] placeholder:font-inter placeholder:text-sm placeholder:text-gray-400 transition-all duration-200 min-h-[90px] resize-y"
                                 value={field.value!}
                                 onChange={field.onChange}
                                 placeholder="Type your message here"
@@ -510,7 +511,7 @@ const EditPatient = ({
             </div>
 
             <Button
-              className="mt-4 bg-white border border-[#006879] hover:bg-[#eff4ff] text-[#006879] rounded-xl font-bold h-11 px-6 shadow-sm active:scale-[0.98] transition-all duration-200"
+              className="mt-4 bg-white border border-[#00898F] hover:bg-[#E1EBED]/60 text-[#00898F] rounded-xl font-bold h-11 px-6 shadow-sm active:scale-[0.98] transition-all duration-200"
               type="button"
               onClick={() =>
                 append({
@@ -526,7 +527,7 @@ const EditPatient = ({
             </Button>
 
             <Button
-              className="mt-6 w-full h-12 bg-[#006879] hover:bg-[#005260] rounded-xl font-bold text-white shadow-md transition-all duration-200 active:scale-[0.98]"
+              className="mt-6 w-full h-12 bg-[#00898F] hover:bg-[#006e72] rounded-xl font-bold text-white shadow-md transition-all duration-200 active:scale-[0.98]"
               type="submit"
             >
               Submit

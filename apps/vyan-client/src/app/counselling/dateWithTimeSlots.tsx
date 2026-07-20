@@ -167,7 +167,7 @@ const DayNavigatorWithTimeSlots = ({
       {/* Header and Duration Selector inline */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Availability Header */}
-        <div className="flex items-center gap-2 text-[#006879]">
+        <div className="flex items-center gap-2 text-[#00898F]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="align-middle">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
@@ -192,10 +192,10 @@ const DayNavigatorWithTimeSlots = ({
                 );
               }}
             >
-              <SelectTrigger className="w-full h-10 rounded-lg border border-[#c0c8cc] bg-white text-sm font-semibold text-[#0b1c30] focus:ring-2 focus:ring-[#006879] hover:border-[#006879] shadow-none">
+              <SelectTrigger className="w-full h-10 rounded-xl border border-[#c0c8cc] bg-white text-sm font-semibold text-[#0b1c30] focus:ring-2 focus:ring-[#00898F] hover:border-[#00898F] shadow-none">
                 <SelectValue placeholder="Duration" />
               </SelectTrigger>
-              <SelectContent className="rounded-lg border border-[#c0c8cc]/30 bg-white shadow-lg">
+              <SelectContent className="rounded-xl border border-[#c0c8cc]/30 bg-white shadow-lg">
                 <SelectGroup>
                   {timeDurationData?.timeDurations.map((durationVal) => (
                     <SelectItem
@@ -281,7 +281,7 @@ const DayNavigatorWithTimeSlots = ({
                     }
                     className={`py-3 px-4 border text-center text-xs font-semibold rounded-xl transition-all duration-150 active:scale-[0.98] ${
                       isSelected
-                        ? "border-[#00898F] bg-[#E1EBED]/60 text-[#00898F] font-bold shadow-sm"
+                        ? "border-[#00898F] bg-[#E1EBED]/70 text-[#00898F] font-bold shadow-sm ring-1 ring-[#00898F]"
                         : "border-[#c0c8cc] hover:border-[#00898F] text-[#40484b] hover:text-[#00898F] bg-white hover:shadow-sm"
                     }`}
                   >

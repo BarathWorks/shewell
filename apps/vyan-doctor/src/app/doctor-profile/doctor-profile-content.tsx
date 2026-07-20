@@ -36,6 +36,7 @@ interface IProfile {
   displayQualificationId: string | null;
   displayQualification: string | undefined;
   ProfessionalSpecializations: IProfessionalSpecialisation[];
+  googleAccessToken?: string | null;
   media: {
     fileUrl: string | null;
   } | null;
@@ -188,7 +189,24 @@ const DoctorProfileContent = ({
             Maintain your clinical details to ensure accurate patient matching.
           </p>
         </div>
-        <div className="flex items-center gap-sm">
+        <div className="flex flex-wrap items-center gap-sm">
+          {profile.googleAccessToken ? (
+            <Link
+              href="/api/google-meet-auth"
+              className="px-lg py-sm border border-emerald-200 text-emerald-600 font-bold rounded-xl hover:bg-emerald-50 transition-colors flex items-center gap-xs"
+            >
+              <span className="material-symbols-outlined text-[20px] text-emerald-600">check_circle</span>
+              Google Connected
+            </Link>
+          ) : (
+            <Link
+              href="/api/google-meet-auth"
+              className="px-lg py-sm border border-outline-variant text-on-surface font-bold rounded-xl hover:bg-surface-container-low transition-colors flex items-center gap-xs"
+            >
+              <span className="material-symbols-outlined text-[20px]">link</span>
+              Connect Google Calendar
+            </Link>
+          )}
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             className="px-lg py-sm border border-red-200 text-red-600 font-bold rounded-xl hover:bg-red-50 transition-colors flex items-center gap-xs"

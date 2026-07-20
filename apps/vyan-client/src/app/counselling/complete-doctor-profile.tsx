@@ -70,7 +70,7 @@ const CompleteDoctorProfile = ({
   
   const customStyles = {
     itemShapes: StarDrawing,
-    activeFillColor: "#006879",
+    activeFillColor: "#00898F",
     inactiveFillColor: "#c0c8cc",
   };
 
@@ -78,7 +78,7 @@ const CompleteDoctorProfile = ({
 
   return (
     <div className="w-full">
-      <div className="w-full max-w-[600px] mx-auto md:ml-0 md:mr-auto bg-white rounded-[24px] shadow-lg border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5">
+      <div className="w-full bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] transition-all duration-300 border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5 flex flex-col justify-between">
         {/* Header Section */}
         <section className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center">
           {/* Profile Avatar */}
@@ -93,7 +93,7 @@ const CompleteDoctorProfile = ({
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <span className="font-poppins text-3xl md:text-4xl font-bold text-[#006879] select-none">
+                <span className="font-poppins text-3xl md:text-4xl font-bold text-[#00898F] select-none">
                   {doctorProfile.firstName ? doctorProfile.firstName.replace(/^Dr\.\s*/i, "")[0]?.toUpperCase() : "D"}
                 </span>
               )}
@@ -108,7 +108,8 @@ const CompleteDoctorProfile = ({
               </h1>
               <Link 
                 href={`/counselling/${doctorProfile.userName}`}
-                className="text-[#006879] hover:opacity-70 transition-opacity flex items-center"
+                title="View full doctor profile"
+                className="p-1 rounded-full text-[#00898F] hover:bg-[#E1EBED] transition-colors flex items-center shrink-0"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="align-middle">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -117,7 +118,7 @@ const CompleteDoctorProfile = ({
               </Link>
             </div>
             
-            <p className="text-[#006879] font-poppins text-base font-semibold leading-tight">
+            <p className="text-[#00898F] font-poppins text-sm sm:text-base font-semibold leading-tight">
               {doctorProfile.displayQualification?.specialization}
             </p>
             
@@ -125,20 +126,21 @@ const CompleteDoctorProfile = ({
             <div className="flex flex-wrap gap-2 pt-1">
               {doctorProfile.languages?.map((item, index) => (
                 <div 
-                  className="bg-[#F4F4F4] px-4 py-1.5 rounded-full flex items-center"
+                  className="bg-[#F4F4F4] px-3.5 py-1 rounded-full flex items-center"
                   key={index}
                 >
-                  <span className="text-[14px] font-normal text-black">{item.language}</span>
+                  <span className="text-[13px] font-normal text-black/80">{item.language}</span>
                 </div>
               ))}
               
               {specialization &&
                 specialization.map((item, index) => (
                   <div 
-                    className="bg-[#E1EBED]/60 border border-[#00898F]/15 px-4 py-1.5 rounded-full flex items-center"
+                    className="bg-[#E1EBED]/60 border border-[#00898F]/15 px-3.5 py-1 rounded-full flex items-center gap-1.5"
                     key={index}
                   >
-                    <span className="text-[14px] font-semibold text-[#00898F]">{item.specialization}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00898F]"></span>
+                    <span className="text-[13px] font-semibold text-[#00898F]">{item.specialization}</span>
                   </div>
                 ))}
             </div>
@@ -154,7 +156,7 @@ const CompleteDoctorProfile = ({
               <span className="font-bold text-[#0b1c30] text-sm">
                 {parseFloat(doctorProfile.avgRating || "0").toFixed(1)}
               </span>
-              <span className="text-xs">• {doctorProfile?.totalConsultations || 0} Consultations</span>
+              <span className="text-xs text-gray-500 font-medium">• {doctorProfile?.totalConsultations || 0} Consultations</span>
             </div>
           </div>
         </section>

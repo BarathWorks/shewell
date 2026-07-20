@@ -204,19 +204,19 @@ const PatientInformation = ({
                 }}
                 className={`flex w-full cursor-pointer justify-between rounded-2xl border p-4 transition-all duration-300 sm:p-5 ${
                   isSelected 
-                    ? "border-[#006879] bg-[#eff4ff] shadow-md ring-1 ring-[#006879]/20" 
-                    : "border-gray-200 bg-white shadow-sm hover:border-[#006879]/50 hover:shadow-md"
+                    ? "border-[#00898F] bg-[#E1EBED]/60 shadow-md ring-1 ring-[#00898F]/20" 
+                    : "border-gray-200 bg-white shadow-sm hover:border-[#00898F]/50 hover:shadow-md"
                 }`}
               >
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div
                       className={`mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border sm:h-5 sm:w-5 ${
-                        isSelected ? "border-[#006879]" : "border-gray-300"
+                        isSelected ? "border-[#00898F]" : "border-gray-300"
                       }`}
                     >
                       {isSelected && (
-                        <div className="h-2 w-2 rounded-full bg-[#006879] sm:h-2.5 sm:w-2.5" />
+                        <div className="h-2 w-2 rounded-full bg-[#00898F] sm:h-2.5 sm:w-2.5" />
                       )}
                     </div>
 
@@ -230,7 +230,7 @@ const PatientInformation = ({
 
                       <div className="mt-1 flex flex-col gap-0.5 text-[11px] leading-tight text-[#0b1c30]/80 sm:gap-1 sm:text-sm lg:text-base">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#006879]/80">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#00898F]">
                             Mobile:
                           </span>
                           {item.phoneNumber}
@@ -239,7 +239,7 @@ const PatientInformation = ({
                           )}
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#006879]/80">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#00898F]">
                             Email:
                           </span>
                           <span className="break-all">{item.email}</span>
@@ -254,7 +254,7 @@ const PatientInformation = ({
                   <div
                     className={`rounded-full px-2.5 py-0.5 font-poppins text-[10px] font-bold uppercase tracking-wider sm:px-3 sm:py-1 sm:text-xs ${
                       item.additionalPatients.length > 0 
-                        ? "bg-[#eff4ff] text-[#006879] border border-[#006879]/10" 
+                        ? "bg-[#E1EBED]/60 text-[#00898F] border border-[#00898F]/15" 
                         : "bg-[#f1f3f5] text-[#495057] border border-gray-200"
                     }`}
                   >
@@ -268,7 +268,7 @@ const PatientInformation = ({
                         handleOnOpenDialogEditPatient();
                         setSelectedPatientId(item.id);
                       }}
-                      className="rounded-full p-2 text-[#006879] transition-colors hover:bg-[#006879]/10"
+                      className="rounded-full p-2 text-[#00898F] transition-colors hover:bg-[#E1EBED]"
                       title="Edit Patient"
                     >
                       <svg
@@ -320,8 +320,8 @@ const PatientInformation = ({
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-[#c0c8cc]/60 rounded-2xl bg-[#eff4ff]/10 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#eff4ff] flex items-center justify-center text-[#006879]">
+          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-[#c0c8cc]/60 rounded-2xl bg-[#E1EBED]/20 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#E1EBED]/60 flex items-center justify-center text-[#00898F]">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="8.5" cy="7" r="4"/>
@@ -340,12 +340,12 @@ const PatientInformation = ({
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mt-10">
         <div
           onClick={() => handleOnOpenDialogAddNewPatient()}
-          className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-[#006879] bg-white px-6 font-poppins text-sm font-bold text-[#006879] transition-all hover:bg-[#eff4ff] hover:shadow-sm active:scale-[0.98] sm:h-12 sm:px-8 md:h-auto md:py-3"
+          className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-[#00898F] bg-white px-6 font-poppins text-sm font-bold text-[#00898F] transition-all hover:bg-[#E1EBED]/60 hover:shadow-sm active:scale-[0.98] sm:h-12 sm:px-8 md:h-auto md:py-3"
         >
           + Add New Patient
         </div>
         <Button
-          className="h-11 rounded-xl bg-[#006879] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#005260] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 sm:h-12 sm:px-12 md:h-auto md:py-3"
+          className="h-11 rounded-xl bg-[#00898F] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#006e72] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 sm:h-12 sm:px-12 md:h-auto md:py-3"
           onClick={onNextStep}
           disabled={!selectPatient}
         >

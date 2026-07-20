@@ -426,7 +426,7 @@ const OnlineAppointment = ({
               <div className="flex items-center gap-3 lg:gap-4">
                 {step > 1 && (
                   <div 
-                    className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#f5f5f5] px-3 py-1.5 font-inter text-xs font-semibold text-[#40484b] hover:bg-[#006879]/10 hover:text-[#006879] transition-all duration-200 active:scale-[0.97] group" 
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#f5f5f5] px-3 py-1.5 font-inter text-xs font-semibold text-[#40484b] hover:bg-[#00898F]/10 hover:text-[#00898F] transition-all duration-200 active:scale-[0.97] group" 
                     onClick={() => setStep(step - 1)}
                   >
                     <svg
@@ -435,7 +435,7 @@ const OnlineAppointment = ({
                       viewBox="0 0 8 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-gray-600 group-hover:text-[#006879] transition-colors"
+                      className="text-gray-600 group-hover:text-[#00898F] transition-colors"
                     >
                       <path
                         d="M7 13L1 7L7 1"
@@ -462,50 +462,6 @@ const OnlineAppointment = ({
             </div>
             {/* right-options */}
             <div className="w-full px-4 lg:basis-[477px] lg:px-0 xl:basis-[657px]">
-              {/* <Button onClick={handleSubmit}>Submit</Button> */}
-              {/* {step === 1 && <AlreadyCustomer />} */}
-              {/* passing callback function to child */}
-              {/* {step === 1 && (
-                <ServiceMode
-                  isActive={step === 1}
-                  onNextStep={() => setStep(step + 1)}
-                  onOptionSelect={handleServiceMode}
-                  priceInCentsForSingle={
-                    appointmentState.selectedPrice?.priceInCents! / 100
-                  }
-                  // initialSelectOption={
-                  //   appointmentState.selectedServiceMode?.title!
-                  // }
-                />
-              )} */}
-              {/* {step === 2 && (
-                <SelectExpert
-                  defaultDoctorId={appointmentState.selectedExpert?.id!}
-                  defaultSpecialisation={
-                    appointmentState.selectedSpecialisation!
-                  }
-                  isActive={step === 2}
-                  onNextStep={() => setStep(step + 1)}
-                  onSelectDoctor={handleExpertSelection}
-                  onSelectSpecialisation={handleSelectedSpecialisation}
-                />
-              )} */}
-              {/* {step === 3 && (
-                <SelectDateTime
-                  defaultDate={appointmentState.selectedDateTime?.date!}
-                  defaultTimeSlots={
-                    appointmentState.selectedDateTime?.timeSlots!
-                  }
-                  defaultDuration={appointmentState.selectedDuration!}
-                  defaultCouple={appointmentState.selectedCouple!}
-                  onPrice={handlePrice}
-                  isActive={step === 3}
-                  onNextStep={() => setStep(step + 1)}
-                  expertId={appointmentState?.selectedExpert?.id!}
-                  onSelectDateTime={handleDateTimeSelection}
-                  onSelectDuration={handleDurationSelection}
-                />
-              )} */}
               {step === 1 && (
                 <PatientInformation
                   expertId={expertId}
@@ -529,11 +485,9 @@ const OnlineAppointment = ({
                   }
                   appointmentDate={appointmentState.selectedDateTime?.date!}
                   appointmentTime={
-                    // appointmentState.selectedDateTime?.timeSlots[0]?.startTime!
                     appointmentState.selectedDateTime?.timeSlots.startTime!
                   }
                   patientName={appointmentState.selectedPatient?.firstName!}
-                  // professionalUserName={appointmentState.selectedExpert.}
                   where={appointmentState.selectedServiceMode?.type!}
                   priceInCents={
                     appointmentState.selectedPrice?.priceInCents! / 100
@@ -543,7 +497,7 @@ const OnlineAppointment = ({
               {step === 2 && (
                 <div className="mr-3 flex justify-end">
                   <Button
-                    className="self-end h-11 rounded-xl bg-[#006879] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#005260] hover:shadow-lg active:scale-[0.98] sm:h-12 sm:px-12 md:h-auto md:py-3"
+                    className="self-end h-11 rounded-xl bg-[#00898F] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#006e72] hover:shadow-lg active:scale-[0.98] sm:h-12 sm:px-12 md:h-auto md:py-3"
                     onClick={handleSubmit}
                   >
                     CheckOut

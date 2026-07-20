@@ -54,7 +54,7 @@ export default function UpcomingSessions() {
             {/* Illustration */}
             <div className="flex justify-center w-full">
               <img
-                src="https://lh3.googleusercontent.com/aida/AP1WRLsSRQeXDjQSdJo92_Pc-8xzmwoRFaZ3yGKsdKsLGkR34WGmVfOZtFS4Y1ILTHTIN_GehLY3RX9-m_J1jzdIh8Ns_jOP4Neu-Fa4h7HaT5aBMtKUIOI4OHUdaku1b7ACn_liHaSM5DH6RcgTpWDRKLdTfm9mlHPoLdeLH33wsmb1Qky5rsbj9eZODrcrJ2zyLu9hOfpEqzUrYF3NveAl6vC0khjo5e3A_lx_jhj9sx5HsosXuSL-uvvXcgk"
+                src="/no_sessions_illustration_clean.svg"
                 alt="Medical calendar illustration"
                 className="w-full max-w-xs h-auto object-cover rounded-2xl"
               />

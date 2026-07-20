@@ -77,12 +77,12 @@ const CounsellingAppointment = ({
           <div className="w-full sm:flex-[2]">
             {timeSlot ? (
               <div onClick={() => handleOpenDialogOnlineAppointment()} className="w-full">
-                <button className="group flex w-full h-12 cursor-pointer items-center justify-between rounded-xl bg-[#F2F2F2] px-5 py-2 transition-all duration-300 hover:bg-[#00898F] active:bg-[#006e72] hover:shadow-lg border border-[#c0c8cc]/30">
-                  <span className="text-sm font-semibold text-[#00000066] group-hover:text-white transition-colors duration-300 md:text-base">
+                <button className="group flex w-full h-12 cursor-pointer items-center justify-between rounded-xl bg-[#00898F] px-5 py-2 transition-all duration-300 hover:bg-[#006e72] active:bg-[#005a5e] shadow-md hover:shadow-lg">
+                  <span className="text-sm font-semibold text-white transition-colors duration-300 md:text-base">
                     <span className="sm:hidden">Book Now</span>
                     <span className="hidden sm:block">Book Online Appointment</span>
                   </span>
-                  <InteractiveButton as="span" size="medium" />
+                  <InteractiveButton as="span" size="medium" variant="reverse" />
                 </button>
               </div>
             ) : (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { InteractiveButton } from "@/components/ui/interactive-button";
@@ -8,6 +8,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { Media } from "@/types/media";
 import { toast } from "@repo/ui/src/@/components/use-toast";
+import React from "react";
 
 const FloatingInput = ({
   type,
@@ -27,13 +28,12 @@ const FloatingInput = ({
   const active = isFocused || isFilled;
 
   return (
-    <div className="relative flex flex-col justify-center w-full h-[60px] bg-[#F1F4F9] border border-[#D8D8D8] rounded-[12px] px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
+    <div className="relative flex flex-col justify-center w-full h-[72px] bg-[#F4F4F4] border border-[#c0c8cc]/40 rounded-xl px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
       <label
-        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${
-          active
-            ? "top-1.5 text-[10px] font-semibold text-[#00898F]"
-            : "top-1/2 -translate-y-1/2 text-[14px] lg:text-[15px] font-normal text-[#333333]"
-        }`}
+        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${active
+          ? "top-2 text-[11px] font-bold tracking-wider text-[#00898F] uppercase"
+          : "top-1/2 -translate-y-1/2 text-[16px] lg:text-[18px] font-normal text-gray-500"
+          }`}
       >
         {label}
       </label>
@@ -43,9 +43,8 @@ const FloatingInput = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full bg-transparent outline-none border-none p-0 font-poppins text-[14px] lg:text-[15px] text-[#333333] transition-all ${
-          active ? "pt-3.5" : "opacity-0"
-        }`}
+        className={`w-full bg-transparent outline-none border-none p-0 font-poppins text-[16px] lg:text-[18px] text-gray-800 transition-all ${active ? "pt-4" : "opacity-0"
+          }`}
         placeholder={isFocused ? placeholder : ""}
       />
     </div>
@@ -67,13 +66,12 @@ const FloatingSelect = ({
   const active = isFocused || value !== "";
 
   return (
-    <div className="relative flex flex-col justify-center w-full h-[60px] bg-[#F1F4F9] border border-[#D8D8D8] rounded-[12px] px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
+    <div className="relative flex flex-col justify-center w-full h-[72px] bg-[#F4F4F4] border border-[#c0c8cc]/40 rounded-xl px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
       <label
-        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${
-          active
-            ? "top-1.5 text-[10px] font-semibold text-[#00898F]"
-            : "top-1/2 -translate-y-1/2 text-[14px] lg:text-[15px] font-normal text-[#333333]"
-        }`}
+        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${active
+          ? "top-2 text-[11px] font-bold tracking-wider text-[#00898F] uppercase"
+          : "top-1/2 -translate-y-1/2 text-[16px] lg:text-[18px] font-normal text-gray-500"
+          }`}
       >
         {label}
       </label>
@@ -82,9 +80,8 @@ const FloatingSelect = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full bg-transparent outline-none border-none p-0 font-poppins text-[14px] lg:text-[15px] text-[#333333] appearance-none transition-all ${
-          active ? "pt-3.5" : "opacity-0"
-        }`}
+        className={`w-full bg-transparent outline-none border-none p-0 font-poppins text-[16px] lg:text-[18px] text-gray-800 appearance-none transition-all ${active ? "pt-4" : "opacity-0"
+          }`}
       >
         <option value="" disabled hidden></option>
         {options.map((opt) => (
@@ -93,7 +90,7 @@ const FloatingSelect = ({
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#006E72]" />
+      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
     </div>
   );
 };
@@ -111,13 +108,12 @@ const FloatingDate = ({
   const active = isFocused || value !== "";
 
   return (
-    <div className="relative flex flex-col justify-center w-full h-[60px] bg-[#F1F4F9] border border-[#D8D8D8] rounded-[12px] px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
+    <div className="relative flex flex-col justify-center w-full h-[72px] bg-[#F4F4F4] border border-[#c0c8cc]/40 rounded-xl px-4 transition-all focus-within:border-[#00898F] focus-within:ring-1 focus-within:ring-[#00898F]">
       <label
-        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${
-          active
-            ? "top-1.5 text-[10px] font-semibold text-[#00898F]"
-            : "top-1/2 -translate-y-1/2 text-[14px] lg:text-[15px] font-normal text-[#333333]"
-        }`}
+        className={`absolute left-4 font-poppins transition-all duration-200 pointer-events-none ${active
+          ? "top-2 text-[11px] font-bold tracking-wider text-[#00898F] uppercase"
+          : "top-1/2 -translate-y-1/2 text-[16px] lg:text-[18px] font-normal text-gray-500"
+          }`}
       >
         {label}
       </label>
@@ -127,11 +123,9 @@ const FloatingDate = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full bg-transparent outline-none border-none p-0 pr-8 font-poppins text-[14px] lg:text-[15px] text-[#333333] transition-all relative z-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer ${
-          active ? "pt-3.5" : "opacity-0 h-full absolute inset-0 pt-0 pl-4"
-        }`}
+        className={`w-full bg-transparent outline-none border-none p-0 font-poppins text-[16px] lg:text-[18px] text-gray-800 transition-all ${active ? "pt-4" : "opacity-0"
+          }`}
       />
-      <Calendar className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#006E72]" />
     </div>
   );
 };
@@ -242,7 +236,7 @@ export const BookingSection = ({
 
   const getStepImage = () => {
     const banner = step === 1 ? banners?.[0]?.media?.fileUrl : banners?.[1]?.media?.fileUrl;
-    return banner || "/images/session/deafult img.png";
+    return banner || "/images/Meditative Pose Close-Up (3).jpg";
   };
 
   // Load Razorpay SDK
@@ -352,7 +346,7 @@ export const BookingSection = ({
   return (
     <section className="w-full bg-white px-4 py-10 sm:px-6 sm:py-14 md:px-10 md:py-16 lg:px-12 xl:px-16">
       <div className="mx-auto max-w-6xl xl:max-w-7xl">
-        <div className="relative flex min-h-[600px] overflow-hidden rounded-3xl shadow-lg   lg:min-h-[680px] lg:flex-row lg:rounded-[40px]">
+        <div className="relative flex min-h-[600px] overflow-hidden rounded-[24px] sm:rounded-[32px] bg-white border border-[#c0c8cc]/30 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] transition-all duration-300 lg:min-h-[680px] lg:flex-row">
 
           {/* ── LEFT IMAGE PANEL ─────────────────────────────────── */}
           {!isRegistered && (
@@ -374,8 +368,8 @@ export const BookingSection = ({
                         className="h-full w-full object-cover object-center"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          if (target.src && !target.src.includes("deafult")) {
-                            target.src = "/images/session/deafult img.png";
+                          if (target.src && !target.src.includes("Meditative")) {
+                            target.src = "/images/Meditative Pose Close-Up (3).jpg";
                           } else {
                             target.style.display = "none";
                             const fallback = target.parentElement?.querySelector(".image-fallback");
@@ -405,7 +399,7 @@ export const BookingSection = ({
 
           {/* ── RIGHT FORM PANEL ──────────────────────────────────── */}
           <div
-            className={` relative z-10 flex w-full items-start shadow-lg justify-center px-4 py-8 sm:px-6 sm:py-10 ${isRegistered ? "" : " shadow-lg lg:ml-[48%] lg:px-10 lg:py-12 xl:px-14"
+            className={`relative z-10 flex w-full items-start justify-center px-4 py-8 sm:px-6 sm:py-10 ${isRegistered ? "" : "lg:ml-[48%] lg:px-10 lg:py-12 xl:px-14"
               }`}
           >
             <motion.div
@@ -421,12 +415,12 @@ export const BookingSection = ({
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="flex flex-col items-center gap-2 rounded-lg border border-[#00898F]/10 bg-[#e6eff1] px-3 py-2.5 shadow-sm sm:flex-row sm:gap-2.5 sm:rounded-2xl sm:px-5 sm:py-3 md:rounded-full md:px-6 lg:px-8"
+                    className="flex flex-col items-center gap-2 rounded-full border border-[#00898F]/15 bg-[#E1EBED]/60 px-6 py-2.5 shadow-sm transition-all duration-300 hover:bg-[#E1EBED] sm:flex-row sm:gap-3"
                   >
-                    <span className="font-poppins text-lg font-bold text-[#00898F] sm:text-xl md:text-2xl lg:text-3xl">
+                    <span className="font-poppins text-xl font-bold text-[#00898F] sm:text-2xl lg:text-3xl">
                       ₹{price}
                     </span>
-                    <span className="font-poppins text-xs font-medium text-gray-700 sm:text-sm md:text-base">
+                    <span className="font-poppins text-xs font-semibold text-gray-700 sm:text-sm uppercase tracking-wide">
                       confirm your seat
                     </span>
                   </motion.div>
@@ -469,36 +463,39 @@ export const BookingSection = ({
 
 
                   {/* ── STEPPER (Page - Navigation) ─────────────────────────────────── */}
-                  <div className="flex flex-row justify-center items-center gap-1 w-full py-4 overflow-x-auto select-none">
+                  <div className="flex flex-row justify-center items-center gap-1.5 w-full py-2 overflow-x-auto">
                     {[
                       { s: 1, label: "Your Details" },
                       { s: 2, label: "About You" },
+                      { s: 3, label: "Payment" },
                     ].map(({ s, label }, idx) => {
                       const isActive = step === s;
+                      const isCompleted = s < step;
                       return (
                         <React.Fragment key={s}>
                           <div className="flex flex-row items-center gap-2 flex-shrink-0">
                             {/* Badges */}
                             <div
-                              onClick={() => { if (s < step) setStep(s as 1 | 2); }}
-                              className={`flex items-center justify-center rounded-full transition-all duration-300 ${
-                                isActive
-                                  ? "w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] bg-[#006E72] text-white font-bold text-[16px] cursor-default"
-                                  : `w-6 h-6 min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] bg-[#E1EBED] text-black font-medium text-[16px] ${s < step ? "cursor-pointer hover:scale-105" : "cursor-default"}`
-                              }`}
+                              onClick={() => { if (s < step) setStep(s as 1 | 2 | 3); }}
+                              className={`flex items-center justify-center rounded-full transition-all duration-300 ${isActive
+                                ? "w-8 h-8 bg-[#00898F] text-white font-bold text-sm shadow-sm cursor-default"
+                                : isCompleted
+                                  ? "w-7 h-7 bg-[#00898F]/15 text-[#00898F] font-bold text-xs cursor-pointer hover:bg-[#00898F]/25"
+                                  : "w-7 h-7 bg-[#F4F4F4] text-gray-500 font-medium text-xs cursor-default"
+                                }`}
                             >
-                              {s}
+                              {isCompleted ? <Check className="w-3.5 h-3.5 text-[#00898F]" /> : s}
                             </div>
                             {/* Text (only active is shown) */}
                             {isActive && (
-                              <span className="font-poppins font-normal text-[20px] leading-[30px] text-black whitespace-nowrap">
+                              <span className="font-poppins font-semibold text-base lg:text-lg text-[#0b1c30] leading-none whitespace-nowrap">
                                 {label}
                               </span>
                             )}
                           </div>
                           {/* Line */}
-                          {idx < 1 && (
-                            <div className="w-[100px] h-[1px] bg-white border-t border-[#000000]/30 mx-2 flex-shrink-0" />
+                          {idx < 2 && (
+                            <div className="w-[30px] sm:w-[50px] md:w-[80px] h-[2px] bg-gray-200 flex-shrink-0" />
                           )}
                         </React.Fragment>
                       );
@@ -546,152 +543,87 @@ export const BookingSection = ({
 
                         {/* STEP 2 — Profile */}
                         {step === 2 && (
-                          <div className="flex flex-col gap-10 w-full py-4">
-                            {/* Option 1 — Planning to get pregnant */}
-                            <div className="flex flex-col gap-6 w-full">
-                              <div className="flex flex-row items-center justify-between w-full h-12">
-                                <span className="font-poppins font-normal text-[20px] leading-[24px] text-[#333333]">
-                                  Are you planning to get pregnant?
-                                </span>
-                                <button
-                                  type="button"
-                                  role="switch"
-                                  aria-checked={isPlanning}
-                                  onClick={() => {
-                                    const nextVal = !isPlanning;
-                                    setIsPlanning(nextVal);
-                                    if (nextVal) {
-                                      setIsPregnant(false);
-                                      setIsNewMom(false);
-                                      setIsOther(false);
-                                    }
-                                  }}
-                                  className={`relative inline-flex h-8 w-[52px] flex-shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors duration-300 focus:outline-none ${isPlanning ? "bg-[#006E72]" : "bg-gray-200"}`}
-                                >
-                                  <span
-                                    className={`block h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300 ${isPlanning ? "translate-x-5" : "translate-x-0"}`}
-                                  />
-                                </button>
-                              </div>
-                            </div>
+                          <div className="space-y-3">
+                            <p className="text-xs font-medium text-gray-400">
+                              Tell us a little about yourself so we can personalise your experience.
+                            </p>
 
-                            {/* Option 2 — Currently Pregnant */}
-                            <div className="flex flex-col gap-6 w-full">
-                              {/* Toggle Row */}
-                              <div className="flex flex-row items-center justify-between w-full h-12">
-                                <span className="font-poppins font-normal text-[20px] leading-[24px] text-[#333333]">
-                                  Are you currently pregnant?
-                                </span>
-                                <button
-                                  type="button"
-                                  role="switch"
-                                  aria-checked={isPregnant}
-                                  onClick={() => {
-                                    const nextVal = !isPregnant;
-                                    setIsPregnant(nextVal);
-                                    if (nextVal) {
-                                      setIsNewMom(false);
-                                      setIsPlanning(false);
-                                      setIsOther(false);
-                                    }
-                                  }}
-                                  className={`relative inline-flex h-8 w-[52px] flex-shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors duration-300 focus:outline-none ${isPregnant ? "bg-[#006E72]" : "bg-gray-200"}`}
-                                >
-                                  <span
-                                    className={`block h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300 ${isPregnant ? "translate-x-5" : "translate-x-0"}`}
-                                  />
-                                </button>
-                              </div>
-
-                              {/* Sub-inputs (Frame 3) */}
-                              {isPregnant && (
-                                <div className="flex flex-col gap-5 w-full">
-                                  <FloatingSelect
-                                    label="Trimester"
-                                    value={formData.trimester}
-                                    onChange={(val) => { setError(null); setFormData({ ...formData, trimester: val }); }}
-                                    options={[
-                                      { value: "first", label: "First (1–12 weeks)" },
-                                      { value: "second", label: "Second (13–26 weeks)" },
-                                      { value: "third", label: "Third (27–40 weeks)" },
-                                    ]}
-                                  />
-                                  <FloatingDate
-                                    label="Expected Due date"
-                                    value={formData.dueDate}
-                                    onChange={(val) => { setError(null); setFormData({ ...formData, dueDate: val }); }}
-                                  />
+                            {/* Toggle helper */}
+                            {(
+                              [
+                                {
+                                  label: "Planning to get pregnant",
+                                  value: isPlanning,
+                                  setter: (v: boolean) => { setIsPlanning(v); if (v) { setIsPregnant(false); setIsNewMom(false); setIsOther(false); } },
+                                  children: null,
+                                },
+                                {
+                                  label: "Currently pregnant",
+                                  value: isPregnant,
+                                  setter: (v: boolean) => { setIsPregnant(v); if (v) { setIsPlanning(false); setIsNewMom(false); setIsOther(false); } },
+                                  children: (
+                                    <div className={`mt-2.5 space-y-2.5 transition-all duration-300 ${isPregnant ? "opacity-100" : "pointer-events-none opacity-30"}`}>
+                                      <FloatingSelect
+                                        label="Select Trimester"
+                                        value={formData.trimester}
+                                        onChange={(val) => { setError(null); setFormData({ ...formData, trimester: val }); }}
+                                        options={[
+                                          { value: "first", label: "First (1–12 weeks)" },
+                                          { value: "second", label: "Second (13–26 weeks)" },
+                                          { value: "third", label: "Third (27–40 weeks)" },
+                                        ]}
+                                      />
+                                      <FloatingDate
+                                        label="Expected Due Date"
+                                        value={formData.dueDate}
+                                        onChange={(val) => { setError(null); setFormData({ ...formData, dueDate: val }); }}
+                                      />
+                                    </div>
+                                  ),
+                                },
+                                {
+                                  label: "New mom",
+                                  value: isNewMom,
+                                  setter: (v: boolean) => { setIsNewMom(v); if (v) { setIsPregnant(false); setIsPlanning(false); setIsOther(false); } },
+                                  children: (
+                                    <div className={`mt-2.5 transition-all duration-300 ${isNewMom ? "opacity-100" : "pointer-events-none opacity-30"}`}>
+                                      <FloatingDate
+                                        label="Baby's Date of Birth"
+                                        value={formData.babyDob}
+                                        onChange={(val) => { setError(null); setFormData({ ...formData, babyDob: val }); }}
+                                      />
+                                    </div>
+                                  ),
+                                },
+                                {
+                                  label: "Other",
+                                  value: isOther,
+                                  setter: (v: boolean) => { setIsOther(v); if (v) { setIsPregnant(false); setIsNewMom(false); setIsPlanning(false); } },
+                                  children: null,
+                                },
+                              ] as { label: string; value: boolean; setter: (v: boolean) => void; children: React.ReactNode }[]
+                            ).map(({ label, value, setter, children }) => (
+                              <div
+                                key={label}
+                                className={`rounded-2xl border px-4 py-3 transition-all duration-200 ${value ? "border-[#00898F]/30 bg-[#E1EBED]/60 shadow-sm" : "border-gray-100 bg-white"}`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-semibold text-gray-800">{label}</span>
+                                  <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={value}
+                                    onClick={() => setter(!value)}
+                                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-300 focus:outline-none ${value ? "bg-[#00898F]" : "bg-gray-200"}`}
+                                  >
+                                    <span
+                                      className={`block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${value ? "translate-x-5" : "translate-x-0"}`}
+                                    />
+                                  </button>
                                 </div>
-                              )}
-                            </div>
-
-                            {/* Option 3 — New Mom */}
-                            <div className="flex flex-col gap-6 w-full">
-                              {/* Toggle Row */}
-                              <div className="flex flex-row items-center justify-between w-full h-12">
-                                <span className="font-poppins font-normal text-[20px] leading-[24px] text-[#333333]">
-                                  Are you a new mom?
-                                </span>
-                                <button
-                                  type="button"
-                                  role="switch"
-                                  aria-checked={isNewMom}
-                                  onClick={() => {
-                                    const nextVal = !isNewMom;
-                                    setIsNewMom(nextVal);
-                                    if (nextVal) {
-                                      setIsPregnant(false);
-                                      setIsPlanning(false);
-                                      setIsOther(false);
-                                    }
-                                  }}
-                                  className={`relative inline-flex h-8 w-[52px] flex-shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors duration-300 focus:outline-none ${isNewMom ? "bg-[#006E72]" : "bg-gray-200"}`}
-                                >
-                                  <span
-                                    className={`block h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300 ${isNewMom ? "translate-x-5" : "translate-x-0"}`}
-                                  />
-                                </button>
+                                {children}
                               </div>
-
-                              {/* Sub-inputs */}
-                              {isNewMom && (
-                                <div className="w-full">
-                                  <FloatingDate
-                                    label="Baby's Date of Birth"
-                                    value={formData.babyDob}
-                                    onChange={(val) => { setError(null); setFormData({ ...formData, babyDob: val }); }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Option 4 — Other */}
-                            <div className="flex flex-col gap-6 w-full">
-                              <div className="flex flex-row items-center justify-between w-full h-12">
-                                <span className="font-poppins font-normal text-[20px] leading-[24px] text-[#333333]">
-                                  Other
-                                </span>
-                                <button
-                                  type="button"
-                                  role="switch"
-                                  aria-checked={isOther}
-                                  onClick={() => {
-                                    const nextVal = !isOther;
-                                    setIsOther(nextVal);
-                                    if (nextVal) {
-                                      setIsPregnant(false);
-                                      setIsNewMom(false);
-                                      setIsPlanning(false);
-                                    }
-                                  }}
-                                  className={`relative inline-flex h-8 w-[52px] flex-shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors duration-300 focus:outline-none ${isOther ? "bg-[#006E72]" : "bg-gray-200"}`}
-                                >
-                                  <span
-                                    className={`block h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300 ${isOther ? "translate-x-5" : "translate-x-0"}`}
-                                  />
-                                </button>
-                              </div>
-                            </div>
+                            ))}
                           </div>
                         )}
                       </motion.div>
@@ -714,13 +646,15 @@ export const BookingSection = ({
                     </div>
                   )}
 
-                  {/* ── ENHANCED DIVIDER ─────────────────────────── */}
-                  <div className="relative py-2.5 w-full flex items-center">
-                    <div className="flex-grow border-t border-gray-100" />
-                    <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest text-[#00898F]/50 select-none">
-                      checkout
-                    </span>
-                    <div className="flex-grow border-t border-gray-100" />
+                  {/* ── DIVIDER ─────────────────────────────────── */}
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-gray-100" />
+                    <div className="flex gap-1">
+                      {[0, 1, 2].map((i) => (
+                        <div key={i} className={`h-1.5 w-1.5 rounded-full ${i === 1 ? "bg-[#00898F]/50" : "bg-[#00898F]/20"}`} />
+                      ))}
+                    </div>
+                    <div className="h-px flex-1 bg-gray-100" />
                   </div>
 
                   {/* ── CTA ─────────────────────────────────────── */}
@@ -739,16 +673,16 @@ export const BookingSection = ({
                           handleBooking();
                         }
                       }}
-                      className="group flex w-full cursor-pointer items-center justify-between rounded-[24px] bg-[#F2F2F2] px-5 py-4 transition-all duration-300 hover:bg-[#00898F] active:bg-[#006e72] hover:shadow-lg"
+                      className="group flex w-full cursor-pointer items-center justify-between rounded-xl bg-[#00898F] px-5 py-4 transition-all duration-300 hover:bg-[#006e72] active:bg-[#005a5e] shadow-md hover:shadow-lg"
                     >
-                      <span className="text-sm font-semibold text-[#00000066] group-hover:text-white transition-colors duration-300 md:text-base">
+                      <span className="text-sm font-semibold text-white transition-colors duration-300 md:text-base">
                         {isProcessing
                           ? "Processing…"
                           : step === 2
                             ? "Proceed to Pay"
                             : "Continue"}
                       </span>
-                      <InteractiveButton as="span" />
+                      <InteractiveButton as="span" variant="reverse" />
                     </div>
                   )}
 

@@ -25,9 +25,9 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   }}
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
                     isCompleted
-                      ? "cursor-pointer bg-[#006879] text-white shadow-sm"
+                      ? "cursor-pointer bg-[#00898F] text-white shadow-sm"
                       : isActive
-                        ? "border-2 border-[#006879] bg-[#eff4ff] text-[#006879] shadow-sm font-bold"
+                        ? "border-2 border-[#00898F] bg-[#E1EBED]/60 text-[#00898F] shadow-sm font-bold"
                         : "border-2 border-[#c0c8cc] bg-white text-[#c0c8cc]"
                   }`}
                 >
@@ -44,7 +44,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                 {/* Connector line between steps */}
                 {index < steps.length - 1 && !isActive && (
                   <div
-                    className={`h-[2px] w-6 shrink-0 rounded-full sm:w-8 ${isCompleted ? "bg-[#006879]" : "bg-[#c0c8cc]/30"}`}
+                    className={`h-[2px] w-6 shrink-0 rounded-full sm:w-8 ${isCompleted ? "bg-[#00898F]" : "bg-[#c0c8cc]/30"}`}
                   />
                 )}
               </div>
@@ -66,7 +66,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                 {index < steps.length - 1 && (
                   <div className="absolute left-[17px] top-9 z-0 h-10 w-[2px] rounded-full bg-[#c0c8cc]/20">
                     <div
-                      className="h-full rounded-full bg-[#006879] transition-all duration-500"
+                      className="h-full rounded-full bg-[#00898F] transition-all duration-500"
                       style={{ height: isCompleted ? "100%" : "0%" }}
                     />
                   </div>
@@ -79,9 +79,9 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   }}
                   className={`relative z-10 mb-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${
                     isCompleted
-                      ? "cursor-pointer border-[#006879] bg-[#006879] text-white shadow-sm"
+                      ? "cursor-pointer border-[#00898F] bg-[#00898F] text-white shadow-sm"
                       : isActive
-                        ? "border-[#006879] bg-[#eff4ff] text-[#006879] shadow-sm ring-4 ring-[#006879]/10"
+                        ? "border-[#00898F] bg-[#E1EBED]/60 text-[#00898F] shadow-sm ring-4 ring-[#00898F]/10"
                         : "cursor-not-allowed border-[#c0c8cc] bg-white text-[#c0c8cc]"
                   }`}
                 >
@@ -97,7 +97,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   <p
                     className={`text-sm font-semibold leading-tight transition-colors ${
                       isActive
-                        ? "text-[#006879] font-bold"
+                        ? "text-[#00898F] font-bold"
                         : isCompleted
                           ? "text-[#0b1c30]"
                           : "text-gray-400"
@@ -106,10 +106,10 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                     {item.title}
                   </p>
                   {isActive && (
-                    <p className="mt-0.5 text-xs text-[#006879] font-medium">In progress</p>
+                    <p className="mt-0.5 text-xs text-[#00898F] font-medium">In progress</p>
                   )}
                   {isCompleted && (
-                    <p className="mt-0.5 text-xs text-green-600 font-medium">Completed</p>
+                    <p className="mt-0.5 text-xs text-[#00898F] font-medium">Completed</p>
                   )}
                 </div>
               </div>

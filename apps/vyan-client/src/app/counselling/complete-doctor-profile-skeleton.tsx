@@ -3,7 +3,7 @@ import React from "react";
 const CompleteDoctorProfileSkeleton = () => {
   return (
     <div className="w-full">
-      <div className="w-full max-w-[600px] mx-auto md:ml-0 md:mr-auto bg-white rounded-[24px] shadow-lg border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5">
+      <div className="w-full bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-[#c0c8cc]/30 p-5 md:p-6 space-y-5 flex flex-col justify-between">
         {/* Header Section Placeholder */}
         <section className="flex flex-col md:flex-row gap-6 items-start md:items-center">
           {/* Avatar Placeholder */}
