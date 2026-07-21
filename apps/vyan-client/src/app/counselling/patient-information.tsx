@@ -258,7 +258,7 @@ const PatientInformation = ({
                         : "bg-[#f1f3f5] text-[#495057] border border-gray-200"
                     }`}
                   >
-                    {item.additionalPatients.length > 0 ? "Couple" : "Single"}
+                    {item.additionalPatients.length > 0 ? "Couple" : "Individual"}
                   </div>
 
                   <div className="flex items-center gap-3">

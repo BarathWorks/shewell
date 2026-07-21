@@ -56,7 +56,7 @@ export default function UpcomingSessions() {
               <img
                 src="/no_sessions_illustration_clean.svg"
                 alt="Medical calendar illustration"
-                className="w-full max-w-xs h-auto object-cover rounded-2xl"
+                className="h-44 w-44 sm:h-52 sm:w-52 md:h-60 md:w-60 object-contain drop-shadow-sm transition-transform duration-500 hover:scale-105"
               />
             </div>
 

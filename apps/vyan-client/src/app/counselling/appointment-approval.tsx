@@ -133,7 +133,7 @@ const AppointmentApproval = ({
                   : "bg-[#f1f3f5] text-[#495057] border-gray-200"
               }`}
             >
-              {isCouple ? "Couple" : "Single"}
+              {isCouple ? "Couple" : "Individual"}
             </span>
           }
           icon={
@@ -185,7 +185,7 @@ const AppointmentApproval = ({
           <div>
             <p className="font-bold text-[#0b1c30]">Payment Details</p>
             <p className="text-xs text-gray-500">
-              {isCouple ? "Couple" : "Single"} therapy · Virtual appointment
+              {isCouple ? "Couple" : "Individual"} therapy · Virtual appointment
             </p>
           </div>
         </div>

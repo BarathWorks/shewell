@@ -146,7 +146,7 @@ const AddNewPatient = ({
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
               <div className="mb-[12px] font-poppins text-base font-bold text-[#00898F] md:text-[18px] md:leading-[28px]">
-                Patient 1
+                Client 1
               </div>
               <div className="flex flex-col gap-6">
                 <div className="flex w-full flex-col gap-6 lg:flex-row">
@@ -283,7 +283,7 @@ const AddNewPatient = ({
                   <React.Fragment key={field.id}>
                     <div className="flex justify-between items-center mb-4">
                       <div className="font-poppins text-base font-bold text-[#00898F] md:text-[18px] md:leading-[28px]">
-                        Patient {index + 2}
+                        Client {index + 2}
                       </div>
 
                       <Button
@@ -457,7 +457,7 @@ const AddNewPatient = ({
                 })
               }
             >
-              Add Patient
+              Add Client
             </Button>
 
             <Button

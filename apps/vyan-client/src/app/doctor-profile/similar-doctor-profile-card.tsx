@@ -62,8 +62,9 @@ const SimilarDoctorProfileCard = ({
             <div className="relative h-full w-full overflow-hidden rounded-full bg-white shadow-lg ring-2 ring-white">
               <Image
                 src={
-                  doctorProfile.media?.fileUrl ||
-                  "/images/fallback-user-profile.png"
+                  doctorProfile.media?.fileUrl && doctorProfile.media.fileUrl !== "null" && doctorProfile.media.fileUrl !== "undefined" && doctorProfile.media.fileUrl !== ""
+                    ? doctorProfile.media.fileUrl
+                    : "/default_doctor_avatar.svg"
                 }
                 alt="feature-card"
                 className="rounded-full object-cover transition-transform duration-300 group-hover:scale-105"

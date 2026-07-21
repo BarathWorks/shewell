@@ -56,7 +56,7 @@ const AlreadyCustomer = () => {
                     <RadioGroupItem value="already-a-customer" />
                     <div className="flex-col gap-1">
                       <Label className="font-inter text-base font-medium">
-                        Already a existing patient of counseling?
+                        Already a existing Client of counseling?
                       </Label>
                       <div className="font-inter text-sm font-normal text-[#64748B]">
                         Get a offline appointment with vyan's premium membership

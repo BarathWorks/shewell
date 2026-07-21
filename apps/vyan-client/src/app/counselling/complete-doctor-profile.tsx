@@ -93,9 +93,12 @@ const CompleteDoctorProfile = ({
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <span className="font-poppins text-3xl md:text-4xl font-bold text-[#00898F] select-none">
-                  {doctorProfile.firstName ? doctorProfile.firstName.replace(/^Dr\.\s*/i, "")[0]?.toUpperCase() : "D"}
-                </span>
+                <Image
+                  src="/default_doctor_avatar.svg"
+                  alt="default-doctor-profile"
+                  className="w-full h-full object-cover"
+                  fill={true}
+                />
               )}
             </div>
           </div>

@@ -110,7 +110,7 @@ const Upcoming = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="font-poppins text-base font-semibold text-[#181818] md:text-lg">
-                        {item.patient.additionalPatients.length > 0 ? "Couple" : "Single"} Therapy
+                        {item.patient.additionalPatients.length > 0 ? "Couple" : "Individual"} Therapy
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-[#E6F4EE] px-2.5 py-0.5 font-inter text-xs font-semibold text-[#00898F]">
                         <Video className="h-3.5 w-3.5" />

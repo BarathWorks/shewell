@@ -64,6 +64,10 @@ const WhyShewell = dynamic(() => import("~/components/why-shewell"), {
   ssr: false,
 });
 
+const StatsSection = dynamic(() => import("~/components/stats-section"), {
+  ssr: false,
+});
+
 const ShewellFAQ = dynamic(() => import("~/components/shewell-faq"), {
   ssr: false,
 });
@@ -82,6 +86,7 @@ const HomePage = async () => {
         {/* <ProductsGrid /> */}
         <Partners />
         <WhyShewell />
+        <StatsSection />
         <ShewellFAQ />
       </div>
     </>

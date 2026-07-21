@@ -1,43 +1,47 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="64" y1="48" x2="448" y2="448" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#E8F8F7"/>
-      <stop offset="1" stop-color="#F7FBFB"/>
-    </linearGradient>
-    <linearGradient id="card" x1="116" y1="112" x2="396" y2="404" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#F4F8F8"/>
-    </linearGradient>
-  </defs>
+  <!-- Outer Rounded Square Backdrop (Soft Teal Tint) -->
+  <rect width="512" height="512" rx="64" fill="#EBF5F5"/>
 
-  <rect x="24" y="24" width="464" height="464" rx="56" fill="url(#bg)"/>
+  <!-- Calendar Main Body Container -->
+  <rect x="130" y="128" width="252" height="264" rx="36" fill="#F4F9F9" stroke="#00898F" stroke-width="12"/>
 
-  <rect x="108" y="96" width="296" height="312" rx="28" fill="url(#card)" stroke="#CDE9E7" stroke-width="4"/>
-  <rect x="108" y="96" width="296" height="72" rx="28" fill="#1B8A8E"/>
+  <!-- Calendar Top Header Bar (Shewell Brand Teal) -->
+  <path d="M130 164C130 144.118 146.118 128 166 128H346C365.882 128 382 144.118 382 164V196H130V164Z" fill="#00898F"/>
 
-  <rect x="150" y="72" width="18" height="48" rx="9" fill="#1B8A8E"/>
-  <rect x="344" y="72" width="18" height="48" rx="9" fill="#1B8A8E"/>
+  <!-- Ring Binder Hooks (Dark Shewell Teal) -->
+  <rect x="176" y="110" width="18" height="50" rx="9" fill="#006C70" stroke="#EBF5F5" stroke-width="4"/>
+  <rect x="318" y="110" width="18" height="50" rx="9" fill="#006C70" stroke="#EBF5F5" stroke-width="4"/>
 
-  <circle cx="168" cy="214" r="16" fill="#DDF1EF"/>
-  <circle cx="224" cy="214" r="16" fill="#DDF1EF"/>
-  <circle cx="280" cy="214" r="16" fill="#DDF1EF"/>
-  <circle cx="336" cy="214" r="16" fill="#DDF1EF"/>
+  <!-- Grid Dots (Row 1) -->
+  <circle cx="192" cy="232" r="11" fill="#006C70"/>
+  <circle cx="234" cy="232" r="11" fill="#006C70"/>
+  <circle cx="276" cy="232" r="11" fill="#006C70"/>
+  <circle cx="318" cy="232" r="11" fill="#006C70"/>
 
-  <circle cx="168" cy="268" r="16" fill="#DDF1EF"/>
-  <circle cx="224" cy="268" r="16" fill="#DDF1EF"/>
-  <circle cx="280" cy="268" r="16" fill="#DDF1EF"/>
-  <circle cx="336" cy="268" r="16" fill="#DDF1EF"/>
+  <!-- Grid Dots (Row 2) -->
+  <circle cx="192" cy="272" r="11" fill="#006C70"/>
+  <circle cx="234" cy="272" r="11" fill="#006C70"/>
+  <circle cx="276" cy="272" r="11" fill="#006C70"/>
+  <circle cx="318" cy="272" r="11" fill="#006C70"/>
 
-  <circle cx="168" cy="322" r="16" fill="#DDF1EF"/>
-  <circle cx="224" cy="322" r="16" fill="#DDF1EF"/>
-  <circle cx="280" cy="322" r="16" fill="#DDF1EF"/>
+  <!-- Grid Dots (Row 3) -->
+  <circle cx="192" cy="312" r="11" fill="#006C70"/>
+  <circle cx="234" cy="312" r="11" fill="#006C70"/>
+  <circle cx="276" cy="312" r="11" fill="#006C70"/>
 
-  <circle cx="332" cy="334" r="62" fill="#E9F6F5" stroke="#B8E2DF" stroke-width="6"/>
-  <circle cx="332" cy="334" r="36" stroke="#1B8A8E" stroke-width="8"/>
-  <line x1="356" y1="358" x2="387" y2="389" stroke="#1B8A8E" stroke-width="10" stroke-linecap="round"/>
+  <!-- Magnifying Glass with Chart Overlay -->
+  <g transform="translate(268, 276)">
+    <!-- Lens Circle Background -->
+    <circle cx="44" cy="44" r="36" fill="#D8EFEF" stroke="#006C70" stroke-width="10"/>
 
-  <circle cx="84" cy="120" r="10" fill="#BFE8E5"/>
-  <circle cx="428" cy="404" r="10" fill="#BFE8E5"/>
-  <circle cx="450" cy="146" r="6" fill="#CFEFEB"/>
-  <circle cx="64" cy="392" r="6" fill="#CFEFEB"/>
+    <!-- Chart Line & Nodes inside Lens -->
+    <path d="M22 48 L32 40 L44 48 L62 32" stroke="#006C70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="22" cy="48" r="4" fill="#006C70"/>
+    <circle cx="32" cy="40" r="4" fill="#006C70"/>
+    <circle cx="44" cy="48" r="4" fill="#006C70"/>
+    <circle cx="62" cy="32" r="4" fill="#006C70"/>
+
+    <!-- Handle -->
+    <line x1="68" y1="68" x2="88" y2="88" stroke="#006C70" stroke-width="12" stroke-linecap="round"/>
+  </g>
 </svg>

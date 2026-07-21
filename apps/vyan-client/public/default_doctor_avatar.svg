@@ -1,0 +1,26 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="avatarBg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EBF7F7"/>
+      <stop offset="1" stop-color="#D4EEEE"/>
+    </linearGradient>
+    <linearGradient id="doctorGrad" x1="64" y1="64" x2="192" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00898F"/>
+      <stop offset="1" stop-color="#006C70"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="128" cy="128" r="128" fill="url(#avatarBg)"/>
+
+  <!-- Head -->
+  <circle cx="128" cy="96" r="40" fill="url(#doctorGrad)"/>
+
+  <!-- Torso & Shoulders -->
+  <path d="M48 216C48 171.817 83.8172 136 128 136C172.183 136 208 171.817 208 216V224H48V216Z" fill="url(#doctorGrad)"/>
+
+  <!-- V-Neck Collar & Stethoscope Detail -->
+  <path d="M112 136L128 164L144 136" stroke="#EBF7F7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M96 148C96 172 160 172 160 148" stroke="#EBF7F7" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="128" cy="180" r="7" fill="#EBF7F7"/>
+</svg>
