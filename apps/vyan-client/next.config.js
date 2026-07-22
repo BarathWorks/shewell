@@ -44,6 +44,10 @@ const config = {
       },
       {
         protocol: "https",
+        hostname: "shewell-prod-asset-758645618919-ap-south-1-an.s3.ap-south-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
         hostname: "shewell-temporary.s3.ap-south-1.amazonaws.com",
       },
       {

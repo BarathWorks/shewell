@@ -2,6 +2,7 @@
 
 import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
+import { getDownloadPresignedUrl } from "~/(main)/upload-image-actions";
 
 export async function getDoctorProfile() {
   const session = await getServerSession();
@@ -20,11 +21,26 @@ export async function getDoctorProfile() {
         media: {
           select: {
             fileUrl: true,
+            fileKey: true,
           },
         },
       },
     });
-    return doctor;
+
+    if (!doctor) return null;
+
+    let mediaUrl = doctor.media?.fileUrl || null;
+    if (doctor.media?.fileKey) {
+      const signedUrl = await getDownloadPresignedUrl(doctor.media.fileKey);
+      if (signedUrl) {
+        mediaUrl = signedUrl;
+      }
+    }
+
+    return {
+      ...doctor,
+      media: doctor.media ? { fileUrl: mediaUrl } : null,
+    };
   } catch (error) {
     console.error("Failed to fetch doctor profile for header", error);
     return null;

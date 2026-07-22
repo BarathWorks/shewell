@@ -634,6 +634,7 @@ import { api } from "~/trpc/react";
 import TimeSlots from "./date-with-time-slots";
 import React from "react";
 import CounsellingDoctorProfileContent from "./counselling-doctor-profile-user-content";
+import { getPrivateFileUrl } from "@repo/aws";
 
 
 
@@ -692,6 +693,7 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
       media: {
         select: {
           fileUrl: true,
+          fileKey: true,
         },
       },
     },
@@ -700,12 +702,18 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
     },
   });
 
-  // if (!profile) {
-  //   redirect("/auth/login");
-  // }
-
   if(!profile){
     return
+  }
+
+  let mediaUrl: string | null = profile.media?.fileUrl || null;
+  if (profile.media?.fileKey) {
+    try {
+      const signedUrl = await getPrivateFileUrl(profile.media.fileKey);
+      if (signedUrl) mediaUrl = signedUrl;
+    } catch (e) {
+      console.error("Error signing URL for doctor profile:", e);
+    }
   }
 
   // converting the decimal avgrating to string avgrating
@@ -714,6 +722,7 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
     ...profile,
     avgRating: profile?.avgRating?.toString() || "",
     displayQualification: profile.displayQualification?.specialization,
+    media: profile.media ? { fileUrl: mediaUrl } : null,
   };
 
   const professionalExperience = await db.professionalExperience.findMany({

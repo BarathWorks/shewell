@@ -7,60 +7,58 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { addSeconds } from 'date-fns/addSeconds';
 
-const s3 = new S3({
-  // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-  // endpoint: process.env.S3_SPACES_URL!,
-  region: process.env.AWS_REGION!,
-  // region: process.env.S3_UPLOAD_REGION! || "blr1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+const getS3Client = () => {
+  return new S3({
+    region: process.env.AWS_REGION || process.env.S3_UPLOAD_REGION || "ap-south-1",
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || process.env.S3_UPLOAD_KEY!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || process.env.S3_UPLOAD_SECRET!,
+    },
+  });
+};
 
 export const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
-  // console.log('AWS_REGION', process.env.AWS_REGION!)
-  // console.log('AWS_ACCESS_KEY_ID', process.env.AWS_ACCESS_KEY_ID!)
-  // console.log('AWS_SECRET_ACCESS_KEY', process.env.AWS_SECRET_ACCESS_KEY!)
-  // console.log('AWS_BUCKET', process.env.AWS_BUCKET!)
+  const bucket = process.env.AWS_BUCKET || process.env.S3_UPLOAD_BUCKET;
   const fileParams = {
-    Bucket: process.env.AWS_BUCKET,
+    Bucket: bucket,
     Key: key,
     ContentType: "text",
     Expires: addSeconds(new Date(), 600),
     ACL: isPublic ? ObjectCannedACL.public_read : ObjectCannedACL.private,
   };
-  // try {
-    const command = new PutObjectCommand(fileParams);
-    const url = await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
-    // console.log(url);
-    return url;
-  // } catch (err) {
-  //   console.log(err);
-  //   return;
-  // }
+  const command = new PutObjectCommand(fileParams);
+  const url = await getSignedUrl(getS3Client(), command, { expiresIn: 10 * 60 });
+  return url;
 };
 
 export const getPublicFileUrl = (key: string) => {
-  const imageUrl = `https://${process.env.S3_UPLOAD_BUCKET}.s3.${process.env.S3_UPLOAD_REGION}.amazonaws.com/${key}`;
+  const bucket = process.env.AWS_BUCKET || process.env.S3_UPLOAD_BUCKET;
+  const region = process.env.AWS_REGION || process.env.S3_UPLOAD_REGION || "ap-south-1";
+  const imageUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
   if (!imageUrl) {
     throw Error("Image not Found");
   }
+  return imageUrl;
 };
 
 export const getPrivateFileUrl = async (key: string) => {
+  if (!key) return null;
+  const bucket = process.env.AWS_BUCKET || process.env.S3_UPLOAD_BUCKET;
+  if (!bucket) {
+    console.error("Missing AWS_BUCKET or S3_UPLOAD_BUCKET environment variable.");
+    return null;
+  }
   const fileParams = {
-    Bucket: process.env.AWS_BUCKET,
+    Bucket: bucket,
     Key: key,
   };
   try {
-    // console.log("Bucket check",process.env.AWS_BUCKET)
     const command = new GetObjectCommand(fileParams);
-    const url = await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
+    const url = await getSignedUrl(getS3Client(), command, { expiresIn: 60 * 60 });
     return url;
   } catch (err) {
-    console.log('BUCKET',err, key, process.env.AWS_REGION, process.env.AWS_BUCKET);
-    return;
+    console.log('BUCKET', err, key, process.env.AWS_REGION, process.env.AWS_BUCKET);
+    return null;
   }
 };
 

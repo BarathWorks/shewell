@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import { LogOut } from "lucide-react";
 import PersonalInfoUserAction from "../edit-profile/personal-info/personal-info-user-action";
 import EditQualificationUserAction from "../edit-profile/qualification/qualification-user-action";
 import SpecializationUserAction from "../edit-profile/specialization/specialization-user-action";
+import uploadProfessionalUserImage from "~/(main)/upload-image-actions";
 
 interface IProfessionalSpecialisation {
   id: string;
@@ -69,6 +70,12 @@ const DoctorProfileContent = ({
   const [aboutEducation, setAboutEducation] = useState(profile.aboutEducation || "");
   const [displayQualificationId, setDisplayQualificationId] = useState(profile.displayQualificationId || "");
 
+  // Media state
+  const [mediaId, setMediaId] = useState<string | undefined>(undefined);
+  const [profilePicUrl, setProfilePicUrl] = useState<string | null>(profile.media?.fileUrl || null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Dynamic Lists state
   const [degrees, setDegrees] = useState<IProfessionalDegree[]>(
     initialDegrees.length > 0 ? initialDegrees : [{ degree: "" }]
@@ -86,6 +93,54 @@ const DoctorProfileContent = ({
 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  // Handle profile image upload
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setMessage(null);
+
+    try {
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileKey = `professionalUser/${profile.id}/profile-${Date.now()}.${fileExt}`;
+
+      const resp = await uploadProfessionalUserImage(
+        profile.id,
+        fileKey,
+        file.name,
+        file.type
+      );
+
+      if (!resp || "error" in resp || !resp.presignedUrl) {
+        throw new Error(resp && "error" in resp ? String(resp.error) : "Failed to generate upload URL");
+      }
+
+      const uploadRes = await fetch(resp.presignedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (uploadRes.ok) {
+        setMediaId(resp.id);
+        setProfilePicUrl(resp.fileUrl);
+        setMessage({ text: "Profile picture uploaded! Click 'Save Changes' to save your profile.", type: "success" });
+      } else {
+        throw new Error("Failed to upload image file to storage");
+      }
+    } catch (err: any) {
+      console.error("Profile picture upload error:", err);
+      setMessage({ text: err.message || "Failed to upload profile picture", type: "error" });
+    } finally {
+      setUploadingImage(false);
+      if (event.target) event.target.value = "";
+    }
+  };
 
   // Degrees handers
   const handleAddDegree = () => {
@@ -143,12 +198,13 @@ const DoctorProfileContent = ({
     setMessage(null);
 
     try {
-      // 1. Save Personal & Bio Info
+      // 1. Save Personal & Bio Info (including updated profile photo if uploaded)
       await PersonalInfoUserAction({
         fullName: firstName,
         phoneNumber,
         bio: aboutYou,
         displayQualificationId,
+        mediaId,
       });
 
       // 2. Save Academic Degrees & Experience
@@ -259,11 +315,26 @@ const DoctorProfileContent = ({
               <img
                 alt={firstName}
                 className="w-32 h-32 rounded-full object-cover border-4 border-surface-container-low"
-                src={profile.media?.fileUrl || "/images/fallback-user-profile.png"}
+                src={profilePicUrl || "/images/fallback-user-profile.png"}
               />
-              <button className="absolute bottom-1 right-1 bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                title="Upload Profile Picture"
+                className="absolute bottom-1 right-1 bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform disabled:opacity-50 cursor-pointer"
+              >
+                <span className={`material-symbols-outlined text-[18px] ${uploadingImage ? "animate-spin" : ""}`}>
+                  {uploadingImage ? "sync" : "photo_camera"}
+                </span>
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
             </div>
             <div className="w-full space-y-md">
               <div>

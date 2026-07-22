@@ -18,6 +18,7 @@ import { api } from "~/trpc/react";
 import TimeSlots from "./date-with-time-slots";
 import React from "react";
 import DoctorProfileContent from "./doctor-profile-content";
+import { getDownloadPresignedUrl } from "~/(main)/upload-image-actions";
 
 interface IDoctorProfileProps {
   doctorProfile: {
@@ -68,6 +69,7 @@ const DoctorProfile = async () => {
       media: {
         select: {
           fileUrl: true,
+          fileKey: true,
         },
       },
       ratings: {
@@ -101,6 +103,14 @@ const DoctorProfile = async () => {
     return;
   }
 
+  let mediaUrl: string | null = profile.media?.fileUrl || null;
+  if (profile.media?.fileKey) {
+    const signedUrl = await getDownloadPresignedUrl(profile.media.fileKey);
+    if (signedUrl) {
+      mediaUrl = signedUrl;
+    }
+  }
+
   // converting the decimal avgrating to string avgrating
   // if the profile is array, then i will use map just like did in products
   const profileObj = {
@@ -108,6 +118,7 @@ const DoctorProfile = async () => {
     firstName: `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim(),
     avgRating: profile?.avgRating?.toString() || "",
     displayQualification: profile.displayQualification?.specialization,
+    media: profile.media ? { fileUrl: mediaUrl } : null,
   };
 
   const professionalExperience = await db.professionalExperience.findMany({

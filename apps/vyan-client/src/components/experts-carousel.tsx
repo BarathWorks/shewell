@@ -165,7 +165,7 @@ export default function ExpertsCarousel() {
   const { data, isLoading } = api.topExperts.getTopExperts.useQuery();
 
   const expertsData = useMemo<ExpertData[]>(() => {
-    const fetchedDbExperts: ExpertData[] = (data?.topExperts ?? [])
+    return (data?.topExperts ?? [])
       .filter((doctor) => doctor != null)
       .map((doctor) => ({
         id: doctor?.id ?? Math.random(),
@@ -183,19 +183,6 @@ export default function ExpertsCarousel() {
             : undefined,
         userName: doctor?.userName,
       }));
-
-    if (fetchedDbExperts.length === 0) {
-      return EXPERTS_DATA;
-    }
-
-    // If DB returns fewer than 5 experts, combine with sample fallback experts so the 5-avatar arc visual layout is fully populated
-    if (fetchedDbExperts.length < 5) {
-      const remainingNeeded = 9 - fetchedDbExperts.length;
-      const samplePadding = EXPERTS_DATA.slice(0, remainingNeeded);
-      return [...fetchedDbExperts, ...samplePadding];
-    }
-
-    return fetchedDbExperts;
   }, [data]);
 
 

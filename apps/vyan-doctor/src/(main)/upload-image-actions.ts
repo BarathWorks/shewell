@@ -2,30 +2,49 @@
 
 import { db } from '~/server/db';
 import { getServerSession } from 'next-auth';
-import { ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
 import { env } from '~/env';
 
-const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType: string = 'application/octet-stream') => {
-  const s3 = new S3({
-    // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    // endpoint: process.env.S3_SPACES_URL!,
-    region: env.AWS_REGION! || "blr1",
-    // region: process.env.S3_UPLOAD_REGION! || "blr1",
+const getS3Client = () => {
+  return new S3({
+    region: env.AWS_REGION || process.env.S3_UPLOAD_REGION || "ap-south-1",
     credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID! || "AKIAV66644JW66644",
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY! || "AKIAV66644JW66644"
-    }
+      accessKeyId: env.AWS_ACCESS_KEY_ID || process.env.S3_UPLOAD_KEY!,
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY || process.env.S3_UPLOAD_SECRET!,
+    },
   });
+};
+
+const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType: string = 'application/octet-stream') => {
+  const bucket = env.AWS_BUCKET || process.env.S3_UPLOAD_BUCKET;
   const fileParams = {
-    Bucket: env.AWS_BUCKET  || "vyan-doctor"  ,
+    Bucket: bucket,
     Key: key,
     ContentType: contentType,
-    // Expires: addSeconds(new Date(), 600),
   };
   const command = new PutObjectCommand(fileParams);
-  return await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
+  return await getSignedUrl(getS3Client(), command, { expiresIn: 10 * 60 });
+};
+
+export const getDownloadPresignedUrl = async (key: string, expiresInSeconds: number = 3600) => {
+  if (!key) return null;
+  const bucket = env.AWS_BUCKET || process.env.S3_UPLOAD_BUCKET;
+  if (!bucket) {
+    console.error("Missing AWS_BUCKET or S3_UPLOAD_BUCKET environment variable.");
+    return null;
+  }
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+    return await getSignedUrl(getS3Client(), command, { expiresIn: expiresInSeconds });
+  } catch (error) {
+    console.error("Error generating presigned GET URL:", error);
+    return null;
+  }
 };
 
 const uploadProfessionalUserImage = async (professionalUserId : string,fileKey: string,fileName: string, mimeType: string, comments: string = '') => {
@@ -36,9 +55,7 @@ const uploadProfessionalUserImage = async (professionalUserId : string,fileKey: 
       error: 'Unauthorized'
     };
   }
-  // const key = `media/${new Date().getTime()}-${fileName}`;
   const key = fileKey;
- 
   
   const fileUrl = await getFileUrlFromKey(key);
   try{
@@ -55,23 +72,16 @@ const uploadProfessionalUserImage = async (professionalUserId : string,fileKey: 
           }
         }
       },
-  //  where : {
-  //   // id : mediaId,
-  //   professionalUser : {
-  //     id : professionalUserId
-  //   }
-  //  }
     });
     console.log("before uploading")
     const url = await getUploadPresignedUrl(key, true, mimeType);
+    const presignedGetUrl = await getDownloadPresignedUrl(key);
     console.log("after uploading", url)
-    // revalidatePath("/auth/register/uploads")
-    // revalidatePath('/admin/media');
   
     return {
       id: media.id,
       key,
-      fileUrl,
+      fileUrl: presignedGetUrl || fileUrl,
       presignedUrl: url
     };
   }

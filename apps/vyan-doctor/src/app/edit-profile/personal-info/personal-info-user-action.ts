@@ -10,6 +10,7 @@ export interface IPersonalInfo {
   // alternativeNumber: string;
   displayQualificationId?: string;
   bio?: string;
+  mediaId?: string;
   // id: string
 }
 const PersonalInfoUserAction = async ({
@@ -18,7 +19,7 @@ const PersonalInfoUserAction = async ({
   // alternativeNumber,
   displayQualificationId,
   bio,
-  // id
+  mediaId,
 }: IPersonalInfo) => {
   const session = await getServerSession();
   // console.log("bhu", session?.user.id);
@@ -77,6 +78,7 @@ const PersonalInfoUserAction = async ({
         phoneNumber: phoneNumber,
         aboutYou: bio,
         displayQualificationId: displayQualificationId,
+        ...(mediaId ? { mediaId } : {}),
       },
     });
 
