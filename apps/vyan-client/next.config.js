@@ -52,6 +52,10 @@ const config = {
       },
       {
         protocol: "https",
+        hostname: "shewell-dev.s3.ap-south-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
         hostname: "bucket.s3.india.amazonaws.com",
       },
     ],

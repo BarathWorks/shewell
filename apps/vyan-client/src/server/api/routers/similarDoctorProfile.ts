@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { getPrivateFileUrl } from "@repo/aws";
+
 export const similarDoctorProfileRouter = createTRPCRouter({
   similarDoctorProfile: publicProcedure
     .input(
@@ -11,17 +13,6 @@ export const similarDoctorProfileRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { displayQualificationId, similarDoctorProfileId } = input;
-      // if (!session) {
-      //   throw new Error("Unauthorised");
-      // }
-      // if (!session.user.email) {
-      //   throw new Error("Unauthorised");
-      // }
-      // const professionalUser = await db.professionalUser.findFirst({
-      //   where: {
-      //     email: session.user.email,
-      //   },
-      // });
 
       const similarDoctorProfiles = await db.professionalUser.findMany({
         select: {
@@ -43,6 +34,7 @@ export const similarDoctorProfileRouter = createTRPCRouter({
           media: {
             select: {
               fileUrl: true,
+              fileKey: true,
             },
           },
           languages: {
@@ -61,15 +53,28 @@ export const similarDoctorProfileRouter = createTRPCRouter({
         },
       });
 
-      //   const specialisations = await db.professionalSpecializations.findMany({
-      //     where : {
-      //         prof
-      //     }
-      //   })
+      const profilesWithSignedUrls = await Promise.all(
+        similarDoctorProfiles.map(async (doctor) => {
+          let signedUrl = doctor.media?.fileUrl || null;
+          if (doctor.media?.fileKey) {
+            try {
+              const url = await getPrivateFileUrl(doctor.media.fileKey);
+              if (url) signedUrl = url;
+            } catch (e) {
+              console.error("Error signing URL for doctor avatar:", e);
+            }
+          }
+          return {
+            ...doctor,
+            media: doctor.media
+              ? {
+                  fileUrl: signedUrl,
+                }
+              : null,
+          };
+        })
+      );
 
-      //   console.log("meetingsForADayRange", meetingsForADayRange),
-      // unAvailableDays,
-      //   professionalUser;
-      return { similarDoctorProfiles };
+      return { similarDoctorProfiles: profilesWithSignedUrls };
     }),
 });

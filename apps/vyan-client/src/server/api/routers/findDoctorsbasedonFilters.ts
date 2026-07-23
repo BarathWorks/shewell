@@ -2,6 +2,7 @@ import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Prisma } from "@repo/database";
+import { getPrivateFileUrl } from "@repo/aws";
 
 export const findDoctorRouter = createTRPCRouter({
   findDoctor: publicProcedure
@@ -138,7 +139,7 @@ export const findDoctorRouter = createTRPCRouter({
             totalConsultations: true,
             userName: true,
             media: {
-              select: { fileUrl: true },
+              select: { fileUrl: true, fileKey: true },
             },
             ProfessionalSpecializations: {
               select: { specialization: true },
@@ -154,6 +155,28 @@ export const findDoctorRouter = createTRPCRouter({
         db.professionalUser.count({ where: whereCondition }),
       ]);
 
-      return { professionalUsers, total };
+      const usersWithSignedUrls = await Promise.all(
+        professionalUsers.map(async (user) => {
+          let signedUrl = user.media?.fileUrl || null;
+          if (user.media?.fileKey) {
+            try {
+              const url = await getPrivateFileUrl(user.media.fileKey);
+              if (url) signedUrl = url;
+            } catch (e) {
+              console.error("Error signing URL for doctor avatar:", e);
+            }
+          }
+          return {
+            ...user,
+            media: user.media
+              ? {
+                  fileUrl: signedUrl,
+                }
+              : null,
+          };
+        })
+      );
+
+      return { professionalUsers: usersWithSignedUrls, total };
     }),
 });
