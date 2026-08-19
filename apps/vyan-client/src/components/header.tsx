@@ -64,17 +64,10 @@ export function Header() {
                 <div className="w-48 rounded-md bg-white shadow-lg">
                   <Link
                     href="/shefit"
-                    className="block rounded-t-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
+                    className="block rounded-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
                     onClick={() => setIsMoreOpen(false)}
                   >
                     SheFit
-                  </Link>
-                  <Link
-                    href="/products"
-                    className="block rounded-b-md px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-[#f3f4f6]"
-                    onClick={() => setIsMoreOpen(false)}
-                  >
-                    Products
                   </Link>
                 </div>
               </div>
@@ -184,16 +177,6 @@ export function Header() {
                   }}
                 >
                   SheFit
-                </Link>
-                <Link
-                  href="/products"
-                  className="rounded-md px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-[#1A8191] hover:text-white sm:px-4 sm:py-3 sm:text-base"
-                  onClick={() => {
-                    setIsMoreOpen(false);
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Products
                 </Link>
               </div>
             )}

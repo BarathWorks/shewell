@@ -3,8 +3,6 @@ import Image from "next/image";
 import SignUpSlider from "./register/register-slider";
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
-import Header from "~/components/shared/header";
-import Footer from "~/components/shared/footer";
 import { Suspense } from "react";
 import { Pagination, Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";

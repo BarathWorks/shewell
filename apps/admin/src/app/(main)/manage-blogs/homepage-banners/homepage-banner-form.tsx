@@ -6,7 +6,6 @@ import { Button } from 'primereact/button';
 import SubmitButton from '@/src/_components/shared/submit-button';
 import React, { useEffect, useRef, useState } from 'react';
 import useToastContext from '@/src/_hooks/useToast';
-import { ICategory } from '@/src/_models/category.model';
 import { Dropdown } from 'primereact/dropdown';
 import { FileUpload, FileUploadSelectEvent } from 'primereact/fileupload';
 import { Image } from 'primereact/image';

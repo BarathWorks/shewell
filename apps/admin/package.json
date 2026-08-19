@@ -15,7 +15,6 @@
     "@aws-sdk/s3-request-presigner": "3.428.0",
     "@next-auth/prisma-adapter": "^1.0.7",
     "@repo/database": "workspace:*",
-    "@repo/shiprocket": "workspace:*",
     "@tanstack/react-query": "^4.36.1",
     "@trpc/client": "^10.45.2",
     "@trpc/next": "^10.45.2",

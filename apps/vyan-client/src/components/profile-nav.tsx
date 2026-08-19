@@ -15,17 +15,11 @@ import ProfileNavChild from "./profile-nav-child";
 import { Button } from "@repo/ui/src/@/components/button";
 import { signOut } from "next-auth/react";
 import { redirect, usePathname, useRouter } from "next/navigation";
-import { useCartStore } from "~/store/cart.store";
 const profile = [
   {
     path: "/profile/edit-profile",
     img: "/icons/profile-nav/profile-nav.svg",
     title: "Edit Profile",
-  },
-  {
-    path: "/profile/manage-address",
-    img: "/icons/profile-nav/profile-add.svg",
-    title: "Manage Addresses",
   },
   {
     path: "/profile/notification",
@@ -34,12 +28,6 @@ const profile = [
   },
 ];
 const account = [
-  {
-    path: "/profile/orders",
-    img: "/icons/profile-account/profile-ord.svg",
-    title: "Orders",
-  },
-
   {
     path: "/profile/appointments",
     img: "/icons/profile-account/profile-cal.svg",
@@ -56,11 +44,6 @@ const ProfileNav = ({ email, name }: { email: string; name: string }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { emptyCart } = useCartStore((state) => {
-    return {
-      emptyCart: state.emptyCart,
-    };
-  });
   return (
     <>
       <div className="w-full xl:w-[343px] 2xl:w-[375px]">
@@ -161,7 +144,6 @@ const ProfileNav = ({ email, name }: { email: string; name: string }) => {
               className="w-full rounded-xl border border-gray-200 bg-white py-[14px] font-poppins font-medium text-black shadow-sm transition-all hover:bg-primary hover:text-white hover:shadow-md"
               onClick={() => {
                 signOut({ redirect: false }).then(() => router.push("/"));
-                emptyCart();
               }}
             >
               Logout

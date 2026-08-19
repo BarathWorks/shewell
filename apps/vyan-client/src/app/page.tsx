@@ -45,10 +45,6 @@ const ExpertsCarousel = dynamic(() => import("~/components/experts-carousel"), {
   ssr: false,
 });
 
-const ProductsGrid = dynamic(() => import("~/components/products-grid"), {
-  ssr: false,
-});
-
 const UpcomingSessions = dynamic(
   () => import("~/components/upcoming-sessions"),
   {
@@ -79,7 +75,6 @@ const HomePage = async () => {
 
         <UpcomingSessions />
         <ExpertsCarousel />
-        {/* <ProductsGrid /> */}
         <Partners />
         <WhyShewell />
         <ShewellFAQ />

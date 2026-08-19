@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { getServerSession } from 'next-auth';
-import { BookAppointmentStatus, OrderStatus } from '@repo/database';
+import { BookAppointmentStatus } from '@repo/database';
 import { endOfDay, formatISO, startOfDay } from 'date-fns';
 import { db } from '../../db';
 export const noOfOnlineAppointmentsRouter = createTRPCRouter({
@@ -39,9 +39,7 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         totalDoctorsOnBoardWithinDateRange,
         totalAppointmentsWithCountAndPrice,
         cancelledAppointments,
-        productCardAvg,
         newUsers,
-        orders,
         users,
       ] = await Promise.all([
         // Count only — no need to fetch entire rows
@@ -105,64 +103,10 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
           },
         }),
 
-        db.order.aggregate({
-          where: {
-            orderPlaced: { lte: updatedEndDate, gte: updatedStartDate },
-            status: { in: [OrderStatus.PAYMENT_SUCCESSFUL, OrderStatus.DELIVERED] },
-          },
-          _avg: { totalInCent: true },
-        }),
-
         db.user.count({
           where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
         }),
 
-        db.order.findMany({
-          select: {
-            id: true,
-            status: true,
-            totalInCent: true,
-            orderPlaced: true,
-            address: true,
-            lineItems: {
-              select: {
-                id: true,
-                quantity: true,
-                perUnitPriceInCent: true,
-                totalInCent: true,
-                productVariant: {
-                  select: {
-                    id: true,
-                    name: true,
-                    priceInCents: true,
-                    product: {
-                      select: {
-                        id: true,
-                        name: true,
-                        media: {
-                          select: {
-                            mediaId: true,
-                            imageAltText: true,
-                            comment: true,
-                            media: { select: { id: true, fileKey: true, fileUrl: true } },
-                          },
-                          take: 1,
-                          orderBy: { order: 'asc' },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          take: 10,
-          orderBy: { orderPlaced: 'desc' },
-          where: {
-            orderPlaced: { lte: updatedEndDate, gte: updatedStartDate },
-            status: { in: [OrderStatus.DELIVERED, OrderStatus.PAYMENT_SUCCESSFUL] },
-          },
-        }),
 
         db.user.findMany({
           select: { id: true, name: true, email: true },
@@ -175,9 +119,7 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         totalDoctorsOnBoard,
         totalAppointmentsWithCountAndPrice,
         cancelledAppointments,
-        productCardAvg,
         newUsers,
-        orders,
         users,
         totalDoctorsOnBoardWithinDateRange,
       };

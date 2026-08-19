@@ -8,7 +8,6 @@ const navigationItems = [
   { label: "Service", hasDropdown: true, href: "#" },
   { label: "Book experts", hasDropdown: false, href: "/counselling" },
   { label: "Sessions", hasDropdown: false, href: "/session" },
-  { label: "Product", hasDropdown: false, href: "/products" },
   { label: "SheFit", hasDropdown: false, href: "/shefit" },
   { label: "Blog", hasDropdown: false, href: "/blogs" },
 ];

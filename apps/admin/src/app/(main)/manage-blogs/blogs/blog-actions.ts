@@ -3,7 +3,6 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { ICategory } from '@/src/_models/category.model';
 import { getServerSession } from 'next-auth';
 import { IBlogCategory } from '@/src/_models/blog-category.model';
 import { IBlogForm } from '@/src/_models/blog.model';

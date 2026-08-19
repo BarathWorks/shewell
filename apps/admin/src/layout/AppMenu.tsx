@@ -108,47 +108,12 @@ const AppMenu = () => {
       ]
     },
     {
-      label: 'Manage Product / Orders',
+      label: 'Manage Media',
       items: [
-        // {
-        //   label: 'Brands',
-        //   icon: 'pi pi-amazon',
-        //   to: '/manage-products/brands'
-        // },
-        // {
-        //   label: 'Currencies',
-        //   icon: 'pi pi-dollar',
-        //   to: '/manage-products/currencies'
-        // },
-        {
-          label: 'Categories',
-          icon: 'pi pi-user',
-          to: '/manage-products/categories'
-        },
-        {
-          label: 'Products',
-          icon: 'pi pi-gift',
-          to: '/manage-products/products'
-        },
         {
           label: 'Media',
           icon: 'pi pi-image',
           to: '/manage-products/media'
-        },
-        {
-          label: 'Coupons',
-          icon: 'pi pi-ticket',
-          to: '/manage-products/coupons'
-        },
-        {
-          label: 'Orders',
-          icon: 'pi pi-box',
-          to: '/manage-products/orders'
-        },
-        {
-          label: 'Inventory',
-          icon: 'pi pi-box',
-          to: '/manage-products/inventory'
         }
       ]
     },

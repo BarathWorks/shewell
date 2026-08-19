@@ -1,7 +1,5 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { productRouter } from "./routers/product";
-import { searchProductRouter } from "./routers/searchProduct";
 import { searchSpecializationRouter } from "./routers/searchSpecialization";
 import { searchExpertRouter } from "./routers/selectExpert";
 import { searchPatientRouter } from "./routers/searchPatient";
@@ -23,8 +21,6 @@ import { searchLanguagesRouter } from "./routers/findLanguages";
 import { searchCancelledAppointmentsRouter } from "./routers/findCancelledAppointment";
 import { findPriceForCoupleRouter } from "./routers/findPriceForCouple";
 import { similarDoctorProfileRouter } from "./routers/similarDoctorProfile";
-import { wishlistedRouter } from "./routers/wishlistedProducts";
-import { cartRouter } from "./routers/cart";
 import { sessionRouter } from "./routers/session";
 import { getTopExpertsRouter } from "./routers/getTopExperts";
 
@@ -35,8 +31,6 @@ import { getTopExpertsRouter } from "./routers/getTopExperts";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
-  products: productRouter,
-  searchProduct: searchProductRouter,
   searchSpecialization: searchSpecializationRouter,
   searchExpert: searchExpertRouter,
   searchPatient: searchPatientRouter,
@@ -58,8 +52,6 @@ export const appRouter = createTRPCRouter({
   searchPatientForEdit: searchPatientForEditRouter,
   searchLanguages: searchLanguagesRouter,
   similarDoctorProfile: similarDoctorProfileRouter,
-  wishlisted: wishlistedRouter,
-  cart: cartRouter,
   session: sessionRouter,
   topExperts: getTopExpertsRouter,
 });

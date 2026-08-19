@@ -55,7 +55,6 @@
     "zustand": "^4.5.5",
     "@repo/ui": "workspace:*",
     "@repo/database": "workspace:*",
-    "@repo/shiprocket": "workspace:*",
     "@repo/mail": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/eslint-config": "workspace:*",

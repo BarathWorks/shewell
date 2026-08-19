@@ -4,7 +4,6 @@ import { Toaster } from "@repo/ui/src/@/components/toaster";
 import { Header } from "~/components/header";
 import NewFooter from "~/components/new-footer";
 import ClientSessionProvider from "./client-session-provider";
-import CardSheet from "~/components/card-sheet";
 import { TRPCReactProvider } from "~/trpc/react";
 import { getServerAuthSession } from "~/server/auth";
 
@@ -77,7 +76,6 @@ export default async function RootLayout({
               {/* <NewHeader /> */}
               {children}
               <NewFooter />
-              <CardSheet />
             </TRPCReactProvider>
           </ClientSessionProvider>
         </div>

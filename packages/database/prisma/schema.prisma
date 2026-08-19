@@ -17,16 +17,11 @@ model User {
   phoneNumber          String
   otp                  String
   otpCreatedAt         DateTime?
-  coupon               Coupon[]
   notification         Notification[]
   verifiedAt           DateTime?
   ageGreaterThan18     Boolean
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
-  reviews              Review[]
-  wishlistedProducts   Product[]
-  addresses            Address[]
-  Order                Order[]
   patient              Patient[]
   appointments         BookAppointment[]
   deletedAt            DateTime?
@@ -76,30 +71,6 @@ model Notification {
 //   userId      String?
 // }
 
-model Address {
-  id          String    @id @default(cuid())
-  name        String
-  mobile      String
-  houseNo     String
-  area        String
-  city        String
-  country     Country   @relation(fields: [countryId], references: [id])
-  countryId   String
-  state       State     @relation(fields: [stateId], references: [id])
-  stateId     String
-  landmark    String
-  pincode     String
-  addressType String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String
-  orders      Order[]
-
-  @@index([deletedAt])
-}
-
 model BlogCategory {
   id              String    @id @default(cuid())
   name            String
@@ -139,97 +110,6 @@ model Blog {
   @@index([deletedAt])
 }
 
-enum OrderStatus {
-  CART
-  PAYMENT_SUCCESSFUL
-  PAYMENT_PENDING
-  PAYMMENT_FAILED
-  OUT_FOR_DELIVERY
-  CANCELLED
-  RETURNED
-  DELIVERED
-}
-
-model Order {
-  id                     String      @id @default(cuid())
-  user                   User        @relation(fields: [userId], references: [id])
-  userId                 String
-  status                 OrderStatus
-  discountInCent         Int?
-  expectedDelivery       DateTime?
-  subTotalInCent         Int
-  taxesInCent            Int
-  deliveryFeesInCent     Int
-  totalInCent            Int
-  coupon                 Coupon?     @relation(fields: [couponId], references: [id])
-  couponId               String?
-  lineItems              LineItem[]
-  address                Address     @relation(fields: [addressId], references: [id])
-  addressId              String
-  razorpay_order_id      String?
-  razorpay_payment_id    String?
-  razorpay_signature     String?
-  orderPlaced            DateTime
-  height                 Decimal?    @db.Decimal(9, 2)
-  breadth                Decimal?    @db.Decimal(9, 2)
-  weight                 Decimal?    @db.Decimal(9, 2)
-  length                 Decimal?    @db.Decimal(9, 2)
-  shiprocket_order_id    String?
-  shiprocket_shipment_id String?
-  razorpay_refund_id     String?
-  cancelledDate          DateTime?
-
-  @@index([userId])
-  @@index([status])
-  @@index([orderPlaced])
-  @@index([userId, status])
-}
-
-model AppConfig {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Coupon {
-  id           String     @id @default(cuid())
-  code         String     @unique
-  amount       Int
-  isPercent    Boolean
-  description  String
-  newUser      Boolean
-  createdAt    DateTime   @default(now())
-  expiresAt    DateTime
-  numberOfTime Int
-  categories   Category[]
-  products     Product[]
-  users        User[]
-  orders       Order[]
-
-  updatedAt DateTime  @updatedAt
-  active    Boolean
-  deletedAt DateTime?
-
-  @@index([deletedAt])
-}
-
-model LineItem {
-  id                 String         @id @default(cuid())
-  order              Order          @relation(fields: [orderId], references: [id])
-  orderId            String
-  productVariant     ProductVariant @relation(fields: [productVariantId], references: [id])
-  productVariantId   String
-  perUnitPriceInCent Int
-  quantity           Int
-  subTotalInCent     Int
-  discountInCent     Int
-  totalInCent        Int
-
-  @@index([orderId])
-  @@index([productVariantId])
-}
 
 model Country {
   id                    String                @id @default(cuid())
@@ -250,21 +130,8 @@ model Country {
   updatedAt             DateTime              @updatedAt
   states                State[]
   cities                City[]
-  addresses             Address[]
   professionalAddresses ProfessionalAddress[]
   active                Boolean               @default(false)
-}
-
-model AvailablePincodes {
-  id        String    @id @default(cuid())
-  pincode   String
-  state     State?    @relation(fields: [stateId], references: [id])
-  stateId   String?
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([deletedAt])
 }
 
 model ProfessionalUser {
@@ -626,11 +493,9 @@ model State {
   qualifications        ProfessionalQualifications[]
   cities                City[]
   stateCode             String
-  addresses             Address[]
   professionalAddresses ProfessionalAddress[]
   country               Country                      @relation(fields: [countryId], references: [id])
   countryId             String
-  AvailablePincodes     AvailablePincodes[]
 }
 
 model City {
@@ -676,8 +541,6 @@ model Media {
   createdAt                    DateTime                                   @default(now())
   updatedAt                    DateTime                                   @updatedAt
   // Products  Product[]
-  Category                     Category[]
-  products                     MediaOnProducts[]
   blogs                        Blog[]
   professionalUser             ProfessionalUser?
   // ProfessionalPersonalInformation ProfessionalPersonalInformation[]
@@ -709,146 +572,6 @@ model Document {
   type               DocumentType?
 }
 
-model Product {
-  id               String            @id @default(cuid())
-  name             String
-  slug             String
-  description      String
-  shortDescription String
-  avgRating        Decimal
-  totalReviews     Int
-  bestSeller       Boolean           @default(false)
-  seoTitle         String?
-  seoDescription   String?
-  seoKeywords      String[]          @default([])
-  productBenefits  ProductBenefit[]
-  productVariants  ProductVariant[]
-  productStats     ProductStats[]
-  active           Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  deletedAt        DateTime?
-  // media           Media?            @relation(fields: [mediaId], references: [id])
-  // mediaId         String?
-  category         Category          @relation(fields: [categoryId], references: [id])
-  categoryId       String
-  productCategory  ProductCategory?
-  media            MediaOnProducts[]
-  userWishlisted   User[]
-  review           Review[]
-  coupon           Coupon[]
-  faq              FAQ[]
-
-  @@index([categoryId])
-  @@index([deletedAt])
-  @@index([active])
-  @@index([slug])
-}
-
-model FAQ {
-  id        String  @id @default(cuid())
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-  question  String
-  answer    String
-  order     Int     @default(0)
-}
-
-model ProductBenefit {
-  id        String    @id @default(cuid())
-  benefit   String
-  product   Product   @relation(fields: [productId], references: [id])
-  productId String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-}
-
-model ProductVariant {
-  id                       String                   @id @default(cuid())
-  sku                      String? // SKU should be unique when set for a product variant.
-  name                     String
-  priceInCents             Int
-  discountInCents          Int?
-  discountInPercentage     Int?
-  discountEndDate          DateTime?
-  product                  Product?                 @relation(fields: [productId], references: [id])
-  productId                String
-  createdAt                DateTime                 @default(now())
-  updatedAt                DateTime                 @updatedAt
-  deletedAt                DateTime?
-  lineItems                LineItem[]
-  productVariantInventory  ProductVariantInventory?
-  productVariantInventoyId String?
-
-  @@index([productId])
-  @@index([deletedAt])
-}
-
-model ProductVariantInventory {
-  id                             String                          @id @default(cuid())
-  incoming                       Int                             @default(0) // Quantities that are incoming.
-  unavailable                    Int                             @default(0) // Inventory that is not available for sale or commited to an order
-  available                      Int                             @default(0) // Inventory in store that can be sold
-  onHand                         Int                             @default(0) // The total amount of inventory at a location. This is the sum of available, committed and unavailable items.
-  commited                       Int                             @default(0) // Inventory that is part of an unfullfilled order
-  productVariant                 ProductVariant                  @relation(fields: [productVariantId], references: [id])
-  productVariantId               String                          @unique
-  productVariantInventoryUpdates ProductVariantInventoryUpdate[]
-}
-
-model ProductVariantInventoryUpdate {
-  id                        String                            @id @default(cuid())
-  quantity                  Int
-  reason                    String
-  updateType                ProductVariantInventoryUpdateType
-  updateBy                  AdminUser                         @relation(fields: [updateById], references: [id])
-  updateById                String
-  productVariantInventory   ProductVariantInventory           @relation(fields: [productVariantInventoryId], references: [id])
-  productVariantInventoryId String
-}
-
-enum ProductVariantInventoryUpdateType {
-  ADJUST_AVAILABLE
-  MOVE_TO_UNAVAILABLE
-  ADJUST_ON_HAND
-}
-
-model ProductStats {
-  id        String    @id @default(cuid())
-  title     String
-  stat      String
-  product   Product   @relation(fields: [productId], references: [id])
-  productId String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-}
-
-model Category {
-  id               String     @id @default(cuid())
-  name             String
-  active           Boolean    @default(false)
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  deletedAt        DateTime?
-  slug             String
-  order            Int?       @unique
-  products         Product[]
-  parentCategory   Category?  @relation("CategorySelf", fields: [parentCategoryId], references: [id])
-  parentCategoryId String?
-  childCategories  Category[] @relation("CategorySelf")
-  media            Media?     @relation(fields: [mediaId], references: [id])
-  mediaId          String?
-  coupon           Coupon[]
-
-  @@index([deletedAt])
-}
-
-enum ProductCategory {
-  MOTHER
-  CHILD
-}
 
 model AdminUser {
   id                             String                          @id @default(cuid())
@@ -858,42 +581,7 @@ model AdminUser {
   active                         Boolean                         @default(false)
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
-  productVariantInventoryUpdates ProductVariantInventoryUpdate[]
   initiatedPayouts               Payout[]
-}
-
-model MediaOnProducts {
-  order        Int
-  imageAltText String?
-  comment      String?
-  product      Product  @relation(fields: [productId], references: [id])
-  productId    String
-  media        Media    @relation(fields: [mediaId], references: [id])
-  mediaId      String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@id([mediaId, productId])
-  @@index([productId])
-}
-
-model Review {
-  id        String   @id @default(cuid())
-  rating    String
-  review    String
-  approved  Boolean  @default(false)
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean? @default(false)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  @@index([productId])
-  @@index([userId])
-  @@index([approved])
 }
 
 enum userType {
