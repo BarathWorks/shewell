@@ -313,7 +313,7 @@ const Upcoming = () => {
                             setCancelAppointmentId(item.id),
                             setCancelExpertId(item.professionalUser.id),
                             setCancelEventId(item.meeting?.id)
-                          setCancelAppointmentStartingTime(item.startingTime)
+                          setCancelAppointmentStartingTime(new Date(item.startingTime))
                           handleCancelDialog()
                         }}
                         className="bg-white px-4 py-2 font-inter text-sm font-medium text-[#CA0000] hover:bg-white"
@@ -327,7 +327,7 @@ const Upcoming = () => {
 
                         <Button
                           onClick={() => {
-                            setRescheduleAppointmentDate(item.startingTime),
+                            setRescheduleAppointmentDate(new Date(item.startingTime)),
                               setRescheduleAppointmentId(item.id);
                             setRescheduleExpertId(item.professionalUser.id);
                             setRescheduleEventId(item.meeting?.id);

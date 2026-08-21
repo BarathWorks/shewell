@@ -1,4 +1,10 @@
-'use server'
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 import Image from "next/image";
 import CounsellingCard from "~/components/counselling-card";
 import FeatureCard from "~/components/features-card";

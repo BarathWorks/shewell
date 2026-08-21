@@ -3,11 +3,11 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { IMedia } from '@/src/_models/media.model';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createMedia = async (data: IMedia) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -24,18 +24,23 @@ export const createMedia = async (data: IMedia) => {
     comments: z.string().nullable()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     fileKey,
     fileUrl,
     comments,
     mimeType
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.media.create({
     data: {
@@ -53,7 +58,7 @@ export const createMedia = async (data: IMedia) => {
 };
 
 export const updateMedia = async (data: IMedia) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -71,13 +76,24 @@ export const updateMedia = async (data: IMedia) => {
     comments: z.string().nullable()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     fileKey,
     fileUrl,
     comments,
     mimeType
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.media.update({
     where: {

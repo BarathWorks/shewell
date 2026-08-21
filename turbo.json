@@ -1,10 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [
         "DATABASE_URL",
         "NEXTAUTH_URL",
@@ -18,20 +25,54 @@
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
         "AWS_REGION",
-        "AWS_BUCKET"
+        "AWS_BUCKET",
+        "DIRECT_URL",
+        "RAZORPAY_KEY_ID",
+        "SKIP_ENV_VALIDATION",
+        "NEXT_PUBLIC_RAZORPAY_KEY_ID",
+        "NEXT_PUBLIC_USER",
+        "NEXT_PUBLIC_PROFESSIONAL",
+        "NEXT_PUBLIC_GST",
+        "NEXT_PUBLIC_PLATFORM_FEE",
+        "NEXT_PUBLIC_AWS_URL_PREFIX",
+        "NEXT_PUBLIC_APP_NAME",
+        "RAZORPAY_WEBHOOK_SECRET",
+        "CRON_SECRET",
+        "LOG_LEVEL",
+        "SLOW_QUERY_MS",
+        "VERCEL",
+        "VERCEL_URL",
+        "VERCEL_ENV"
       ]
     },
     "prisma:generate": {
       "cache": false,
       "dependsOn": [],
-      "inputs": ["packages/database/prisma/schema.prisma"]
+      "inputs": [
+        "packages/database/prisma/schema.prisma"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [],
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
     }
   }
 }

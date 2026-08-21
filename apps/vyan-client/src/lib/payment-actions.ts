@@ -1,5 +1,5 @@
 "use server";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 import { revalidatePath } from "next/cache";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -11,7 +11,15 @@ interface IRazorPayDetails {
   razorpay_signature: string;
 }
 
-export const createRazorpayOrder = async ({
+/**
+ * Internal only — deliberately NOT exported.
+ *
+ * Every export in a `"use server"` module is a public HTTP endpoint. While this was
+ * exported, anyone could call it with an arbitrary `amount` and mint a Razorpay
+ * order for ₹1, with no authentication at all. Callers inside this module pass an
+ * amount already derived from the database.
+ */
+const createRazorpayOrder = async ({
   amount,
   currency,
   receipt,
@@ -72,9 +80,9 @@ interface ISessionBookingData {
 export const createSessionOrder = async (bookingData: ISessionBookingData) => {
   let messageError: string | null = null;
  
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
  
-  if (!session) {
+  if (!session?.user?.id) {
     return {
       error: "Sign in to proceed",
     };
@@ -82,7 +90,7 @@ export const createSessionOrder = async (bookingData: ISessionBookingData) => {
  
   const user = await db.user.findFirst({
     where: {
-      email: session.user.email!,
+      id: session.user.id,
     },
   });
  
@@ -106,13 +114,32 @@ export const createSessionOrder = async (bookingData: ISessionBookingData) => {
           title: true,
           slug: true,
           maxBookings: true,
+          status: true,
+          startAt: true,
+          type: true,
         },
       });
- 
+
       if (!details) {
         throw new Error("Session not found.");
       }
- 
+
+      // `registerForSession` validated both of these; this path — the one that
+      // actually takes money — validated neither, so a customer could be charged
+      // for a draft session or one that had already started.
+      if (details.status !== "PUBLISHED") {
+        throw new Error("This session is not open for booking.");
+      }
+
+      // Recordings stay purchasable after their nominal start; live sessions do not.
+      if (details.type === "ONLINE" && details.startAt <= new Date()) {
+        throw new Error("This session has already started.");
+      }
+
+      if (Number(details.price) <= 0) {
+        throw new Error("This session is not priced for booking.");
+      }
+
       // Check Capacity
       if (details.maxBookings) {
         const activeRegistrations = await tx.sessionRegistration.count({
@@ -229,12 +256,10 @@ export const verifySessionPayment = async ({
   razorpay_payment_id,
   razorpay_signature,
 }: IRazorPayDetails) => {
-  const session = await getServerSession();
-  const user = await db.user.findFirst({
-    where: {
-      email: session?.user.email || "",
-    },
-  });
+  const session = await getServerAuthSession();
+  const user = session?.user?.id
+    ? await db.user.findFirst({ where: { id: session.user.id } })
+    : null;
 
   if (!user) {
     return {
@@ -261,16 +286,39 @@ export const verifySessionPayment = async ({
   });
 
   const orderDetails = await razorpayInstance.orders.fetch(razorpay_order_id);
-  console.log("Order details for session:", orderDetails);
 
-  if (!orderDetails.amount_paid) {
+  // Must be fully paid, not merely non-zero.
+  if (orderDetails.status !== "paid") {
     return {
       message: "Payment not completed",
     };
   }
 
   try {
-    // Update SessionRegistration status
+    // What the registration was reserved at, so the captured amount can be checked
+    // against it. A valid signature proves the payment is real, not that it was for
+    // the right amount.
+    const pending = await db.sessionRegistration.findFirst({
+      where: { razorpayOrderId: razorpay_order_id, userId: user.id },
+      select: { id: true, amountPaid: true, paymentStatus: true },
+    });
+
+    if (!pending) {
+      return { message: "Registration not found for this order" };
+    }
+
+    const expectedInPaise = Math.round(Number(pending.amountPaid) * 100);
+    if (Number(orderDetails.amount_paid) !== expectedInPaise) {
+      console.error("verifySessionPayment: amount mismatch", {
+        registrationId: pending.id,
+        expectedInPaise,
+        amountPaid: orderDetails.amount_paid,
+      });
+      return { message: "Payment amount does not match the booking" };
+    }
+
+    // Only transition a registration that is not already completed, so a replayed
+    // request cannot re-run the confirmation email.
     const registration = await db.sessionRegistration.updateMany({
       data: {
         paymentStatus: "COMPLETED",
@@ -280,8 +328,15 @@ export const verifySessionPayment = async ({
       where: {
         razorpayOrderId: razorpay_order_id,
         userId: user.id,
+        paymentStatus: { not: "COMPLETED" },
       },
     });
+
+    if (registration.count === 0) {
+      // Already completed by an earlier call or the webhook. Previously this path
+      // still reported success without having changed anything.
+      return { message: "Payment already verified", success: true };
+    }
 
     // Get session details for revalidation
     const sessionReg = await db.sessionRegistration.findFirst({

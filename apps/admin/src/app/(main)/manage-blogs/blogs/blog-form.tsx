@@ -1,4 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { Checkbox } from 'primereact/checkbox';
@@ -26,6 +27,7 @@ type BlogCategoryFormProps = {
 };
 
 const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) => {
+  const router = useRouter();
   const fileInputRef = useRef<FileUpload>(null);
   const [uploadingState, setUploadingState] = useState<0 | 1 | 2>(0);
   const [imageUrl, setImageUrl] = useState<string>();
@@ -66,6 +68,11 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
         }
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })
@@ -85,6 +92,12 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
         setUploadingState(1);
         uploadProductImage(image.name, image.type)
           .then(async (resp) => {
+            // The server rejects unsupported file types; surface that instead of
+            // destructuring an error object into undefined ids.
+            if ('error' in resp) {
+              setUploadingState(0);
+              return;
+            }
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: 'PUT',
@@ -433,7 +446,11 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
               render={({ field }) => {
                 return (
                   <div className="flex gap-2">
-                    <Checkbox checked={field.value} {...field} onChange={(v) => setValue('active', v.checked!)} />
+                    <Checkbox
+                      inputId="active"
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(!!e.checked)}
+                    />
 
                     <label htmlFor="active">Active</label>
                   </div>
@@ -449,7 +466,11 @@ const BlogForm = ({ blog, blogCategories, hideDialog }: BlogCategoryFormProps) =
               render={({ field }) => {
                 return (
                   <div className="flex gap-2">
-                    <Checkbox checked={field.value!} {...field} onChange={(v) => setValue('popularBlog', v.checked!)} />
+                    <Checkbox
+                      inputId="popularBlog"
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(!!e.checked)}
+                    />
 
                     <label htmlFor="popularBlog">Popular Blog</label>
                   </div>

@@ -1,17 +1,17 @@
 
 import { db } from "~/server/db";
 import RegisterOTPForm from "./verify-otp-form";
-import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import VerifyOTPForm from "./verify-otp-form";
+import { getServerAuthSession } from "~/server/auth";
 
 interface Props {
   searchParams: { email?: string };
 }
 
 const RegisterOTP = async ({ searchParams }: Props) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   const email = searchParams.email || session?.user?.email;
 
   let user = null;

@@ -2,12 +2,12 @@
 
 import { ITestimonial } from '@/src/_models/testimonial.model';
 import { db } from '@/src/server/db';
-import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createTestimonial = async (data: ITestimonial) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -23,18 +23,24 @@ export const createTestimonial = async (data: ITestimonial) => {
     mediaId: z.string(),
     avgRating: z.string(),
   });
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     name,
     title,
     active,
     mediaId,
     avgRating,
   });
-  if (!isValidData) {
+
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid Data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
   await db.testimonials.create({
     data: {
       name: name,
@@ -52,7 +58,7 @@ export const createTestimonial = async (data: ITestimonial) => {
 };
 
 export const updateTestimonial = async (data: ITestimonial) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -69,18 +75,24 @@ export const updateTestimonial = async (data: ITestimonial) => {
     mediaId: z.string(),
     avgRating: z.string(),
   });
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     name,
     title,
     active,
     mediaId,
     avgRating
   });
-  if (!isValidData) {
+
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid Data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
   await db.testimonials.update({
     where: {
       id: id
@@ -101,7 +113,7 @@ export const updateTestimonial = async (data: ITestimonial) => {
 };
 
 export const deleteTestimonials = async(ids : string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
   if(!session){
   return  {
     error : "Unauthorised"

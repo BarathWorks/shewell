@@ -3,11 +3,11 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { IBlogCategory } from '@/src/_models/blog-category.model';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createBlogCategory = async (data: IBlogCategory) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -25,17 +25,22 @@ export const createBlogCategory = async (data: IBlogCategory) => {
     slug: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     name,
     active,
     slug
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 try{
   await db.blogCategory.create({
     data: {
@@ -59,7 +64,7 @@ catch (e) {
 }
 
 export const updateBlogCategory = async (data: IBlogCategory) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -76,12 +81,23 @@ export const updateBlogCategory = async (data: IBlogCategory) => {
     slug: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     name,
     active,
     slug
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 try{
   await db.blogCategory.update({
     where: {
@@ -108,7 +124,7 @@ try{
 
 
 export const deleteBlogCategories = async(ids : string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {

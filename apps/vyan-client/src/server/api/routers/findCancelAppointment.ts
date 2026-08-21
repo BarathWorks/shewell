@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   format,
   startOfMonth,
@@ -14,7 +14,7 @@ import {
 } from "date-fns";
 import { BookAppointmentStatus } from "@repo/database";
 export const searchCancelAppointmentsRouter = createTRPCRouter({
-  searchCancelAppointments: publicProcedure
+  searchCancelAppointments: protectedProcedure
     .input(
       z.object({
         date: z.date(),
@@ -30,7 +30,7 @@ export const searchCancelAppointmentsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { date, timeRange } = input;
 
-      const user = { id: ctx.session?.user?.id };
+      const user = { id: ctx.session.user.id };
 
       // Calculate start and end dates based on the time range
       const yesterday = subDays(startOfDay(date), 1);

@@ -3,6 +3,9 @@ import { db } from "~/server/db";
 import { hash } from "bcrypt";
 import { generateOtp } from "~/lib/utils";
 import { sendEmail } from "@repo/mail";
+import { z } from "zod";
+import { consumeRateLimit } from "@repo/database";
+import { logger } from "@repo/observability";
 
 export interface ISignUpFields {
   name: string;
@@ -23,6 +26,44 @@ const RegisterUserAction = async ({
   phoneNumber,
   age,
 }: ISignUpFields): Promise<ActionResult> => {
+  // There was no server-side validation here at all — a one-character password was
+  // accepted, and the email was never checked or normalised.
+  const parsed = z
+    .object({
+      name: z.string().trim().min(1, "Name is required").max(120),
+      email: z.string().trim().toLowerCase().email("Enter a valid email address"),
+      password: z.string().min(8, "Password must be at least 8 characters"),
+      phoneNumber: z.string().trim().min(6, "Enter a valid phone number").max(20),
+      age: z.boolean(),
+    })
+    .safeParse({ name, email, password, phoneNumber, age });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message ?? "Please check the details entered",
+    };
+  }
+
+  ({ name, email, password, phoneNumber, age } = parsed.data);
+
+  // Unbounded, this creates PendingUser rows and mails an arbitrary address on
+  // demand.
+  const limit = await consumeRateLimit(db, {
+    scope: "register:signup",
+    subject: email,
+    limit: 5,
+    windowSeconds: 5 * 60,
+  });
+
+  if (!limit.allowed) {
+    logger.warn("register.signup_rate_limited", { source: "auth", route: "register" });
+    return {
+      success: false,
+      error: `Too many attempts. Please try again in ${Math.ceil(limit.retryAfterSeconds / 60)} minute(s).`,
+    };
+  }
+
   // Check if a verified user already exists
   const existingVerifiedUser = await db.user.findFirst({
     where: {
@@ -71,14 +112,44 @@ const RegisterUserAction = async ({
       `,
     };
 
-    await sendEmail(emailBodySendGrid);
+    // The PendingUser above is already written by this point, so a mail-provider
+    // failure must not be reported as "Failed Signup" — the account exists, and
+    // telling the user otherwise sends them round the loop again (where the
+    // upsert quietly rotates their OTP a second time).
+    try {
+      await sendEmail(emailBodySendGrid);
+    } catch (mailError) {
+      logger.error("register.otp_mail_failed", {
+        source: "auth",
+        route: "RegisterUserAction",
+        error: mailError,
+      });
+
+      // Dev only — an OTP in a production log is a credential in a log.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[dev] Email delivery failed. Registration OTP for ${pendingUser.email}: ${otp}`,
+        );
+        return { success: true, message: "OTP sent to your email" };
+      }
+
+      return {
+        success: false,
+        error:
+          "Your account was created, but we could not send the code. Please use “Resend OTP”.",
+      };
+    }
 
     return {
       success: true,
       message: "OTP sent to your email",
     };
   } catch (error) {
-    console.error("Failed SignUp", error);
+    logger.error("register.failed", {
+      source: "auth",
+      route: "RegisterUserAction",
+      error,
+    });
     return { success: false, error: "Failed Signup" };
   }
 };

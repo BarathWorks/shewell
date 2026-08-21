@@ -59,6 +59,12 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             (op.direction === "down" && op.result instanceof Error),
         }),
         httpBatchLink({
+          // The server does set `transformer: superjson` on initTRPC (see
+          // src/server/api/trpc.ts), and it demonstrably works at runtime — the
+          // appointment procedures take `z.date()` inputs, which only survive the
+          // wire with superjson active. The AppRouter type nonetheless fails to
+          // surface the transformer flag to the client link under tRPC 11.0.0.
+          // @ts-expect-error AppRouter type does not expose the configured transformer
           transformer: SuperJSON,
           url: getBaseUrl() + "/api/trpc",
           headers: () => {

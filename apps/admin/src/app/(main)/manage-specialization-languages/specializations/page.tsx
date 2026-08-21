@@ -5,8 +5,11 @@ import { db } from '@/src/server/db';
 
 import { Skeleton } from 'primereact/skeleton';
 import SpecializationTable from './specialization-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 const SpecializationPage = async () => {
+  await requireAdminPage('doctor:read');
+
   const specializations = await db.professionalSpecializations.findMany({
     select: {
       id: true,

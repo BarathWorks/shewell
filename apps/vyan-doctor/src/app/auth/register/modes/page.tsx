@@ -1,9 +1,10 @@
 import { db } from "~/server/db"
 import ModesForm from "./modes-form"
 import { getServerSession } from "next-auth"
+import { getServerAuthSession } from "~/server/auth";
 
 const Modes = async() => {
-    const session = await getServerSession()
+    const session = await getServerAuthSession()
     if(!session){
         throw new Error("Unauthorised")
     }

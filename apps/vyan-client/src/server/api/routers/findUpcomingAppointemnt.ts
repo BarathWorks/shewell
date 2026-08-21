@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   format,
   startOfMonth,
@@ -66,7 +66,7 @@ type IGoogleCalenderEvent = {
   ];
 };
 export const searchUpcomingAppointmentsRouter = createTRPCRouter({
-  searchUpcomingAppointments: publicProcedure
+  searchUpcomingAppointments: protectedProcedure
     .input(
       z.object({
         date: z.date(),
@@ -75,7 +75,7 @@ export const searchUpcomingAppointmentsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { date } = input;
 
-      const user = { id: ctx.session?.user?.id };
+      const user = { id: ctx.session.user.id };
 
       const startDate = startOfDay(addDays(new Date(date), 1));
       const endDate = addDays(startDate, 7);

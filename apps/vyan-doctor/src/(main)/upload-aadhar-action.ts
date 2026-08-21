@@ -1,70 +1,84 @@
 'use server';
 
 import { db } from '~/server/db';
-import { getServerSession } from 'next-auth';
-import { ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { getServerAuthSession } from '~/server/auth';
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
 import { DocumentType } from '@repo/database';
-const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType: string = 'application/octet-stream') => {
-  const s3 = new S3({
-    // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    // endpoint: process.env.S3_SPACES_URL!,
+
+const s3Client = () =>
+  new S3({
     region: process.env.AWS_REGION!,
-    // region: process.env.S3_UPLOAD_REGION! || "blr1",
     credentials: {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
     }
   });
-  const fileParams = {
+
+const getUploadPresignedUrl = async (key: string, contentType: string = 'application/octet-stream') => {
+  const command = new PutObjectCommand({
     Bucket: process.env.AWS_BUCKET,
     Key: key,
-    ContentType: contentType,
-    // Expires: addSeconds(new Date(), 600),
-  };
-  const command = new PutObjectCommand(fileParams);
-  return await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
+    ContentType: contentType
+  });
+  return await getSignedUrl(s3Client(), command, { expiresIn: 10 * 60 });
 };
 
-const uploadAadharAction = async (professionalUserId : string,fileKey: string,fileName: string, mimeType: string ,  type : DocumentType) => {
-  const session = await getServerSession();
+/**
+ * Builds the S3 key from the authenticated practitioner's id. The key is never taken
+ * from the caller: an attacker-supplied key let any logged-in user mint a presigned
+ * PUT for an arbitrary object in the bucket.
+ */
+const buildDocumentKey = (professionalUserId: string, fileName: string) => {
+  const safeName = (fileName || 'file').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100);
+  return `professionalUser/${professionalUserId}/documents/${new Date().getTime()}-${safeName}`;
+};
 
-  if (!session) {
+const uploadAadharAction = async (
+  _professionalUserId: string,
+  _fileKey: string,
+  fileName: string,
+  mimeType: string,
+  type: DocumentType
+) => {
+  const session = await getServerAuthSession();
+
+  if (!session?.user?.id) {
     return {
       error: 'Unauthorized'
     };
   }
-  // const key = `media/${new Date().getTime()}-${fileName}`;
-  const key = fileKey;
-  const fileUrl = await getFileUrlFromKey(key);
+
+  // `_professionalUserId` and `_fileKey` are accepted for signature compatibility but
+  // deliberately ignored — both were caller-controlled and are now derived from the session.
+  const professionalUserId = session.user.id;
+  const key = buildDocumentKey(professionalUserId, fileName);
+  const fileUrl = getFileUrlFromKey(key);
 
   await db.document.deleteMany({
-    where : {
-        professionalUserId : professionalUserId,
-        type : type
+    where: {
+      professionalUserId: professionalUserId,
+      type: type
     }
-  })
+  });
+
   const document = await db.document.create({
     data: {
       fileKey: key,
-      // fileUrl,
-      // comments,
       mimeType,
-      professionalUserId : professionalUserId,
-      type : type
+      professionalUserId: professionalUserId,
+      type: type
     }
   });
-  const url = await getUploadPresignedUrl(key, false, mimeType);
-  revalidatePath("/auth/register/identity-documents")
-  // revalidatePath('/admin/media');
+  const url = await getUploadPresignedUrl(key, mimeType);
+  revalidatePath('/auth/register/identity-documents');
 
   return {
     id: document.id,
     key,
     fileUrl,
-    presignedUrl: url,
-    
+    presignedUrl: url
   };
 };
 
@@ -72,65 +86,61 @@ export const getFileUrlFromKey = (key: string) => {
   return `https://${process.env.AWS_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 };
 
-export const deleteDocumentFromKey = async (professionalUserId : string, key: string, documentId : string) => {
-  const session = await getServerSession();
+export const deleteDocumentFromKey = async (_professionalUserId: string, _key: string, documentId: string) => {
+  const session = await getServerAuthSession();
 
-  if (!session) {
+  if (!session?.user?.id) {
     return {
       error: 'Unauthorized'
     };
   }
-  await db.document.delete({
-    where : {
+  const professionalUserId = session.user.id;
+
+  // Resolve the key from our own records instead of trusting the caller, so a crafted
+  // key cannot delete an arbitrary object from the bucket.
+  const document = await db.document.findFirst({
+    where: {
       id: documentId,
-      professionalUserId : professionalUserId
-    }
-  })
-  revalidatePath("auth/register/identity-documents")
-  if (!key) {
-    return;
-  }
-  const s3 = new S3({
-    // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    // endpoint: process.env.S3_SPACES_URL!,
-    region: process.env.AWS_REGION!,
-    // region: process.env.S3_UPLOAD_REGION! || "blr1",
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+      professionalUserId: professionalUserId
     }
   });
 
-  const fileParams = {
+  if (!document) {
+    return {
+      error: 'Not found'
+    };
+  }
+
+  await db.document.delete({
+    where: {
+      id: document.id
+    }
+  });
+  revalidatePath('/auth/register/identity-documents');
+
+  if (!document.fileKey) {
+    return;
+  }
+
+  return s3Client().deleteObject({
     Bucket: process.env.AWS_BUCKET,
-    Key: key
-  };
-  return s3.deleteObject(fileParams);
+    Key: document.fileKey
+  });
 };
 
 export const DocumentErrorThenUploadFailed = async (documentId: string) => {
-  // const session = await getServerSession();
+  const session = await getServerAuthSession();
 
-  // if (!session) {
-  //   return {
-  //     error: 'Unauthorized'
-  //   };
-  // }
-
-  const s3 = new S3({
-    // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    // endpoint: process.env.S3_SPACES_URL!,
-    region: process.env.AWS_REGION!,
-    // region: process.env.S3_UPLOAD_REGION! || "blr1",
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
-    }
-  });
+  if (!session?.user?.id) {
+    return {
+      error: 'Unauthorized'
+    };
+  }
 
   const document = await db.document.findFirst({
     where: {
-      id: documentId
+      id: documentId,
+      professionalUserId: session.user.id
     }
   });
 
@@ -138,17 +148,16 @@ export const DocumentErrorThenUploadFailed = async (documentId: string) => {
     return;
   }
 
-  const fileParams = {
-    Bucket: process.env.AWS_BUCKET,
-    Key: document.fileKey
-  };
-
   try {
-    await s3.getObject(fileParams);
+    await s3Client().getObject({
+      Bucket: process.env.AWS_BUCKET,
+      Key: document.fileKey
+    });
   } catch (e) {
-    await db.media.delete({
+    // The upload never landed in S3, so drop the orphaned Document row.
+    await db.document.delete({
       where: {
-        id: documentId
+        id: document.id
       }
     });
   }

@@ -7,6 +7,10 @@ node_modules
 
 # Local env files
 .env
+# Backups of env files carry the same live credentials as the originals.
+.env.bak
+*.env.bak
+.env.local.bak
 .env.local
 .env.development.local
 .env.test.local
@@ -39,4 +43,11 @@ yarn-error.log*
 vyan/
 .env*.local
 
-/adminuser.csv/
+# Data exports. The trailing slash on the previous entry (`/adminuser.csv/`) made
+# it a DIRECTORY pattern, so the file it was meant to ignore was never ignored —
+# which is how a live admin password hash reached the repository history.
+adminuser.csv
+*.csv
+
+# Local Vercel env push config (may carry secret overrides)
+scripts/vercel-env.config.json

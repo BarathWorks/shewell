@@ -20,10 +20,17 @@ import Reschedule from "./reschedulte";
 import Rebook from "./rebook";
 import React from "react";
 import AppointmentSkeleton from "./appointment-skeleton";
+/**
+ * Optional throughout, matching what the tRPC query actually returns.
+ *
+ * These fields were declared required while the serialised router output carries
+ * them as optional — the mismatch that `ignoreBuildErrors` was hiding. The JSX
+ * already reads each one defensively.
+ */
 interface IAdditionalPatients {
-  firstName: string;
-  phoneNumber: string;
-  email: string;
+  firstName?: string;
+  phoneNumber?: string;
+  email?: string;
 }
 const date = new Date();
 const Cancelled = () => {

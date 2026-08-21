@@ -1,11 +1,12 @@
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 
 export const getTopExpertsRouter = createTRPCRouter({
   getTopExperts: publicProcedure.query(async () => {
     const topExperts = await db.professionalUser.findMany({
       where: {
-        AND: [{ isapproved: true }, { deletedAt: null }],
+        ...PUBLIC_DOCTOR,
       },
       select: {
         id: true,

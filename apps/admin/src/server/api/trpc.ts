@@ -13,6 +13,8 @@ import { ZodError } from 'zod';
 
 import { getServerAuthSession } from '@/src/server/auth';
 import { db } from '@/src/server/db';
+import type { AdminPermission } from '@repo/database';
+import { requireAdminTrpc } from '@/src/server/authz';
 
 /**
  * 1. CONTEXT
@@ -88,14 +90,35 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  console.log('session', ctx.session, ctx.session?.user);
-  // if (!ctx.session || !ctx.session.user) {
-  //   throw new TRPCError({ code: 'UNAUTHORIZED' });
-  // }
+  // This check was commented out. Combined with the middleware matcher excluding
+  // `api`, every "protected" admin procedure — including initiatePayout — was
+  // reachable with no session at all.
+  //
+  // `user.id` must be present, not just `user`: a missing id becomes `undefined`
+  // in a Prisma `where` clause, which drops the filter instead of matching nothing.
+  if (!ctx.session?.user?.id) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
+
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session?.user }
+      session: { ...ctx.session, user: ctx.session.user }
     }
   });
 });
+
+/**
+ * Procedure gated on a specific admin capability.
+ *
+ * The role is resolved from the database inside `requireAdminTrpc`, not read off
+ * the session token, so a demoted or deactivated admin loses access immediately
+ * rather than when their 30-day JWT expires.
+ *
+ * Usage: `adminProcedure('payout:write').mutation(...)`
+ */
+export const adminProcedure = (permission: AdminPermission) =>
+  protectedProcedure.use(async ({ ctx, next }) => {
+    const admin = await requireAdminTrpc(permission);
+    return next({ ctx: { ...ctx, admin } });
+  });

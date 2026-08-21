@@ -14,7 +14,9 @@ type SessionPageProps = {
     minPrice?: string;
     maxPrice?: string;
     sortBy?: "price-asc" | "price-desc";
-    status?: "CANCELLED" | "COMPLETED" | "DRAFT" | "PUBLISHED";
+    // `status` is no longer accepted. It was read from the query string and
+    // forwarded to the router, so `/session?status=DRAFT` listed unpublished
+    // sessions to anyone who typed it. The listing shows published sessions.
     startDate?: string;
     endDate?: string;
     isOnlyOnline?: string;
@@ -42,7 +44,6 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
     : undefined;
 
   const sortBy = searchParams.sortBy;
-  const status = searchParams.status || undefined;
   const trimester = searchParams.trimester || undefined;
   const startDate = searchParams.startDate;
   const endDate = searchParams.endDate;
@@ -56,7 +57,6 @@ export default async function SessionsPage({ searchParams }: SessionPageProps) {
       minPrice,
       maxPrice,
       sortBy,
-      status,
       startDate,
       endDate,
       isOnlyOnline,

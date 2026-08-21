@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "~/server/db";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IModesProps {
   sessionMode: string;
@@ -18,7 +18,7 @@ const ModesUserAction = async ({
   sessionMode,
   listing,
 }: IModesProps): Promise<ActionResult> => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session?.user?.email) {
     return { success: false, error: "Unauthorised user" };
   }

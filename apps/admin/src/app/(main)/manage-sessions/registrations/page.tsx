@@ -3,8 +3,11 @@ export const dynamic = 'force-dynamic';
 import { db } from '@/src/server/db';
 import RegistrationTable from './registration-table';
 import { Card } from 'primereact/card';
+import { requireAdminPage } from '@/src/server/authz';
 
 const RegistrationsPage = async () => {
+  await requireAdminPage('session:read');
+
   const registrations = await db.sessionRegistration.findMany({
     include: {
       user: {

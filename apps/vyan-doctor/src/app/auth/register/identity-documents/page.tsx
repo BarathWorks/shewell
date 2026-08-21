@@ -1,12 +1,12 @@
 import { db } from "~/server/db";
 import { redirect } from "next/navigation";
 import IdentityDocumentsForm from "./identity-documents-form";
-import { getServerSession } from "next-auth";
 import { DocumentType } from "@repo/database";
 import React from "react";
+import { getServerAuthSession } from "~/server/auth";
 
 const IdentityDocumentsPage = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session?.user?.email) {
     redirect("/auth/login");

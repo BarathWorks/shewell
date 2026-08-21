@@ -4,8 +4,11 @@ import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';
 import React, { Suspense } from 'react';
 import SessionTable from './session-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 const Sessions = async () => {
+  await requireAdminPage('session:read');
+
   // Fetch sessions and categories in parallel
   const [sessions, categories] = await Promise.all([
     db.session.findMany({

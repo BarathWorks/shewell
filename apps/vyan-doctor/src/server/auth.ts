@@ -13,6 +13,9 @@ import { db } from "./db";
 // import { ReceiptText } from "lucide-react";
 import Email from "next-auth/providers/email";
 import { compare } from "bcrypt";
+import { authCookies } from "~/lib/auth-cookies";
+import { consumeRateLimit, resetRateLimit } from "@repo/database";
+import type { PrismaClient } from "@repo/database";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -36,6 +39,7 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+  cookies: authCookies,
   pages: {
     signIn: "/auth/login",
    
@@ -46,7 +50,6 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     session: async ({ session, user }) => {
-      console.log("session check callback", session, user);
       const userAuth = await db.professionalUser.findFirst({
         where: {
           email: {
@@ -64,7 +67,9 @@ export const authOptions: NextAuthOptions = {
     },
   },
 
-  adapter: PrismaAdapter(db),
+  adapter: // `db` is an extended client: `$extends` strips `$on`/`$use` from the type,
+  // though every model delegate the adapter uses is still present at runtime.
+  PrismaAdapter(db as unknown as PrismaClient),
   providers: [
     CredentialsProvider({
       id: "CredentialsVyanDoctor",
@@ -86,7 +91,27 @@ export const authOptions: NextAuthOptions = {
         if (!credentials) {
           return null;
         }
-// console.log("Credentials", credentials.email)
+
+        // Password guessing against this portal was completely unbounded. The
+        // client app already limits to 10 attempts per 15 minutes and the admin
+        // panel to 5; this endpoint — which fronts the accounts holding patient
+        // records, identity documents and bank details — had no limit at all.
+        //
+        // Each attempt also runs a bcrypt comparison, so an unbounded endpoint is a
+        // cheap way to burn server CPU as well as a way in.
+        const attempt = await consumeRateLimit(db, {
+          scope: "login:doctor",
+          subject: credentials.email,
+          limit: 10,
+          windowSeconds: 15 * 60,
+        });
+
+        if (!attempt.allowed) {
+          throw new Error(
+            "Too many sign-in attempts. Please try again shortly.",
+          );
+        }
+
         const professionalUser = await db.professionalUser.findFirst({
           select: {
             id: true,
@@ -94,12 +119,13 @@ export const authOptions: NextAuthOptions = {
             passwordHash: true,
           },
           where: {
-            email: credentials.email,
-            deletedAt : null
+            // Matched case-insensitively, as the session callback and the admin
+            // portal already do. Addresses are stored lowercase at registration, so
+            // a differently-cased sign-in previously failed for no visible reason.
+            email: { equals: credentials.email, mode: "insensitive" },
+            deletedAt: null,
           },
         });
-
-        console.log("login request", professionalUser, credentials.email);
 
         if (!professionalUser) {
           return null;
@@ -115,7 +141,11 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) {
           return null;
         }
-        console.log("user find", professionalUser);
+
+        // Clear the budget on success, so a legitimate practitioner who mistyped a
+        // few times is not still counted against.
+        await resetRateLimit(db, "login:doctor", credentials.email);
+
         return {
           id: professionalUser.id + "",
           email: professionalUser.email,

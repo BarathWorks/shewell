@@ -1,4 +1,5 @@
 import SubmitButton from '@/src/_components/shared/submit-button';
+import { useRouter } from 'next/navigation';
 import useToastContext from '@/src/_hooks/useToast';
 import { ISessionCategory } from '@/src/_models/session-category.model';
 import { Trimester } from '@repo/database';
@@ -15,6 +16,7 @@ type SessionCategoryFormProps = {
 };
 
 const SessionCategoryForm = ({ hideDialog, sessionCategory }: SessionCategoryFormProps) => {
+  const router = useRouter();
     const { showToast } = useToastContext();
     const { control, handleSubmit } = useForm<ISessionCategory>({
         defaultValues: sessionCategory
@@ -36,7 +38,12 @@ const SessionCategoryForm = ({ hideDialog, sessionCategory }: SessionCategoryFor
 
                 if (resp.message) {
                     showToast('success', 'Successful', resp.message);
-                    hideDialog();
+                    // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
+          hideDialog();
                 }
             })
             .catch((err) => {

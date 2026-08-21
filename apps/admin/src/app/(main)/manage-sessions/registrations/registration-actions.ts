@@ -2,11 +2,11 @@
 
 import { db } from '@/src/server/db';
 import { PaymentStatus } from '@repo/database';
-import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const updateRegistrationPaymentStatus = async (registrationId: string, paymentStatus: PaymentStatus) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('session:write');
 
   if (!session) {
     return {
@@ -33,7 +33,7 @@ export const updateRegistrationPaymentStatus = async (registrationId: string, pa
 };
 
 export const getRegistrations = async (filters?: { sessionId?: string; paymentStatus?: PaymentStatus; startDate?: Date; endDate?: Date }) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('session:read');
 
   if (!session) {
     return {

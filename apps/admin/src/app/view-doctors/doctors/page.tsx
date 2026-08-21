@@ -4,7 +4,6 @@
 
 
 import { env } from '@/env';
-import { db } from '@/src/server/db';
 import { apiClient } from '@/src/trpc/react';
 import { format } from 'date-fns';
 import Link from 'next/link';

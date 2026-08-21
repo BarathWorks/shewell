@@ -1,0 +1,11 @@
+{
+  "name": "@repo/observability",
+  "version": "0.0.0",
+  "description": "Structured logging, error capture and error-code helpers shared by all apps",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

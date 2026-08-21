@@ -3,8 +3,11 @@ export const revalidate = 0;
 import React, { Suspense } from 'react';
 import { Skeleton } from 'primereact/skeleton';
 import PayoutsTable from './payouts-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 const ManagePayouts = async () => {
+  await requireAdminPage('payout:read');
+
   return (
     <div className="p-4 md:p-6">
       <div className="mb-6">

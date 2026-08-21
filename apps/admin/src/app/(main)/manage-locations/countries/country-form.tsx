@@ -1,4 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
@@ -14,6 +15,7 @@ type CurrencyFormProps = {
 };
 
 const CountryForm = ({ country, hideDialog }: CurrencyFormProps) => {
+  const router = useRouter();
   const { showToast } = useToastContext();
   const {
     control,
@@ -44,6 +46,11 @@ const CountryForm = ({ country, hideDialog }: CurrencyFormProps) => {
         }
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })

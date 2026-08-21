@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IAddressProps {
   countryId: string;
@@ -13,7 +13,7 @@ interface IAddressProps {
 }
 
 export default async function AddressUserAction(data: IAddressProps) {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session?.user?.email) {
     throw new Error("Unauthorized - Please login");

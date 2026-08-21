@@ -4,8 +4,11 @@ import React, { Suspense } from 'react';
 import { db } from '@/src/server/db';
 import CountriesTable from './countries-table';
 import { Skeleton } from 'primereact/skeleton';
+import { requireAdminPage } from '@/src/server/authz';
 
 const Countries = async () => {
+  await requireAdminPage('content:read');
+
   const countries = await db.country.findMany({
     select: {
       id: true,

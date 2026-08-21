@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 export interface IPersonalInfo {
   fullName: string;
@@ -20,8 +20,16 @@ const PersonalInfoUserAction = async ({
   bio,
     // id
 }: IPersonalInfo) => {
-  const session = await getServerSession();
-  // console.log("bhu", session?.user.id);
+  const session = await getServerAuthSession();
+
+  // The session was fetched and never checked. This only failed closed by accident:
+  // `email: undefined` in a `update`'s unique `where` makes Prisma throw rather
+  // than match everything, so an unauthenticated call errored instead of editing
+  // someone's profile. That is luck, not a guard — an `updateMany` here would have
+  // dropped the filter and rewritten every practitioner.
+  if (!session?.user?.id || !session.user.email) {
+    return { error: "Unauthorized" };
+  }
 
   // ProfessionalUserId during the session
   // const professionalUserId = await db.professionalUser.findFirst({
@@ -65,7 +73,8 @@ const PersonalInfoUserAction = async ({
 
     await db.professionalUser.update({
         where: {
-          email: session?.user.email!,
+          // Resolved from the session, and now guaranteed present by the check above.
+          email: session.user.email,
         },
         data: {
           firstName: fullName,

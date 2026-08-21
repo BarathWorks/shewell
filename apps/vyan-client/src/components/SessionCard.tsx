@@ -38,8 +38,7 @@ export const SessionCard: React.FC<SessionCardProps> = ({
   const month = dateObj.toLocaleString("default", { month: "short" });
   const day = dateObj.getDate();
 
-  return (
-    <Link href={detailPath}>
+  const card = (
       <div className="group relative mx-auto flex w-full max-w-full flex-col items-stretch gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F] hover:shadow-xl md:flex-row md:items-center md:gap-6 md:p-6 lg:max-w-[1440px] 2xl:max-w-[1920px]">
         {/* Date Box - Top on Mobile, Left on Desktop */}
         <div className="flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 text-white shadow-md md:h-24 md:w-20 md:flex-col">
@@ -112,16 +111,20 @@ export const SessionCard: React.FC<SessionCardProps> = ({
         </div>
 
         {/* Action Button - Full width on mobile, Auto on desktop */}
-        <div className="flex flex-col items-center justify-center border-t border-gray-100 pt-4 md:items-end md:border-none md:pt-0">
-          {detailPath && (
-            <Link href={detailPath} className="w-full md:w-auto">
-              <InteractiveButton />
-            </Link>
-          )}
+        {/* NOT a <Link>. The whole card is already wrapped in one pointing at the
+            same href, and an <a> inside an <a> is invalid HTML — React refuses to
+            hydrate it, discards the server-rendered markup and re-renders the
+            entire page on the client. That showed up as a hydration error on
+            /session and made the page visibly slower to settle. */}
+        <div className="flex w-full flex-col items-center justify-center border-t border-gray-100 pt-4 md:w-auto md:items-end md:border-none md:pt-0">
+          <InteractiveButton />
         </div>
       </div>
-    </Link>
   );
+
+  // `detailPath` is optional and `Link` requires a string href, so only wrap when
+  // there is somewhere to go.
+  return detailPath ? <Link href={detailPath}>{card}</Link> : card;
 };
 
 const InfoChip = ({

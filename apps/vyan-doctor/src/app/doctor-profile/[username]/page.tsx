@@ -11,7 +11,6 @@ import DoctorReview from "../doctor-reviews";
 import SimilarDoctorProfileSlider from "../similar-doctor-profile-slider";
 import AboutDoctor from "../about-doctor";
 import { Button } from "@repo/ui/src/@/components/button";
-import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -19,6 +18,7 @@ import TimeSlots from "../date-with-time-slots";
 import React from "react";
 import DoctorProfileContent from "../doctor-profile-content";
 import DoctorProfileContentUsername from "./doctor-profile-content-username";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IDoctorProfileProps {
   doctorProfile: {
@@ -33,7 +33,7 @@ interface IDoctorProfileProps {
 }
 
 const DoctorProfile = async ({ params }: { params: { username: string } }) => {
-  //   const session = await getServerSession();
+  //   const session = await getServerAuthSession();
   // console.log("bhu", session?.user.email);
   // const {data} = session
 

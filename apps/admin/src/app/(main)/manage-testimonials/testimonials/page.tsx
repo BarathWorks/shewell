@@ -4,7 +4,10 @@ import React, { Suspense } from 'react';
 import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';
 import TestimonialTable from './testimonial-table';
+import { requireAdminPage } from '@/src/server/authz';
 const Testimonials = async () => {
+  await requireAdminPage('content:read');
+
   const testimonials = await db.testimonials.findMany({
     select: {
       id: true,

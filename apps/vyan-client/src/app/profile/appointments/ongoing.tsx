@@ -323,11 +323,11 @@ useEffect(() => {
                   {item.status === BookAppointmentStatus.CANCELLED ||
                   item.status === BookAppointmentStatus.CANCELLED_WITH_REFUND
                     ? " "
-                    : item.endingTime > currentTime && (
+                    : new Date(item.endingTime) > currentTime && (
                         <div className="flex flex-col gap-[10px] lg:flex-row lg:items-center lg:justify-between">
                           <div className="flex justify-between lg:gap-8">
 
-                            {item.startingTime > currentTime && (
+                            {new Date(item.startingTime) > currentTime && (
                               <Button
                                 onClick={() => {
                                   
@@ -335,7 +335,7 @@ useEffect(() => {
                                     setCancelExpertId(item.professionalUser.id),
                                     setCancelEventId(item.meeting?.id),
                                     setCancelAppointmentStartingTime(
-                                      item.startingTime,
+                                      new Date(item.startingTime),
                                     );
                                   handleCancelDialog();
                                 }}
@@ -345,13 +345,13 @@ useEffect(() => {
                               </Button>
                             )}
                             <div>
-                              {item.startingTime > currentTime && (
+                              {new Date(item.startingTime) > currentTime && (
                                 <>
                                   <Button
                                     onClick={() => {
                                       
                                       setRescheduleAppointmentDate(
-                                        item.startingTime,
+                                        new Date(item.startingTime),
                                       ),
                                         setRescheduleAppointmentId(item.id);
                                       setRescheduleExpertId(
@@ -373,7 +373,7 @@ useEffect(() => {
                               )}
                             </div>
                           </div>
-                          {item.startingTime > currentTime && (
+                          {new Date(item.startingTime) > currentTime && (
                             <div className="font-inter text-[10px] font-medium leading-[12px] text-[#CA0000] md:text-xs lg:order-first ">
                               *Cancellation of appointment can be done before 2
                               hrs of booked time
@@ -386,7 +386,7 @@ useEffect(() => {
                   {item.status === BookAppointmentStatus.CANCELLED ||
                   item.status === BookAppointmentStatus.CANCELLED_WITH_REFUND
                     ? ""
-                    : item.endingTime > currentTime   && (
+                    : new Date(item.endingTime) > currentTime   && (
                         <Link
                           className="flex items-center justify-center gap-2 rounded-md border-2 border-primary py-1 text-primary "
                           href={item.meeting?.hangoutLink || ""}

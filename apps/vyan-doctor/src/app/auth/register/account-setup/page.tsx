@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth";
 import AccountSetupForm from "./account-setup-form";
 import { redirect } from "next/navigation";
+import { getServerAuthSession } from "~/server/auth";
 
 const AccountSetup = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (session) {
     redirect("/");
   }

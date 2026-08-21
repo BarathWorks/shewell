@@ -14,16 +14,26 @@ export const env = createEnv({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     NEXTAUTH_SECRET: process.env.NODE_ENV === 'production' ? z.string() : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
-      // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
-      // Since NextAuth.js automatically uses the VERCEL_URL if present.
-      (str) => process.env.VERCEL_URL ?? str,
-      // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string() : z.string().url()
+      // An explicitly configured NEXTAUTH_URL wins.
+      //
+      // This previously read `process.env.VERCEL_URL ?? str`, which prefers the
+      // per-deployment Vercel hostname over the custom domain the site actually
+      // runs on — so OAuth callbacks and the links built from NEXTAUTH_URL
+      // (password resets, the Google connect redirect) pointed at a URL the user
+      // never visits. VERCEL_URL is the fallback, not the override, and it carries
+      // no scheme so it has to be prefixed.
+      (str) =>
+        str ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
+      z.string().url(),
     ),
     // SENDGRID_API_KEY: z.string(),
     // SHIP_ROCKET_AUTH_KEY: z.string(),
     // SHIPROCKET_PASSWORD: z.string(),
     // SHIPROCKET_EMAIL: z.string(),
+    // Used by the admin password-reset action via @repo/mail.
+    SENDGRID_API_KEY: z.string(),
+    FROM_EMAIL: z.string().email(),
     AWS_ACCESS_KEY_ID : z.string(),
     AWS_SECRET_ACCESS_KEY : z.string(),
     AWS_REGION : z.string(),
@@ -53,6 +63,8 @@ export const env = createEnv({
     // SHIP_ROCKET_AUTH_KEY: process.env.SHIP_ROCKET_AUTH_KEY,
     // SHIPROCKET_PASSWORD: process.env.SHIPROCKET_PASSWORD,
     // SHIPROCKET_EMAIL: process.env.SHIPROCKET_EMAIL,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    FROM_EMAIL: process.env.FROM_EMAIL,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_REGION: process.env.AWS_REGION,

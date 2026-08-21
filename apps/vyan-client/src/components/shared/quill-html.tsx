@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "~/lib/utils";
+import { sanitizeRichText } from "~/lib/sanitize";
 import "quill/dist/quill.snow.css";
 
 const QuillHtml = ({
@@ -12,7 +13,8 @@ const QuillHtml = ({
   return (
     <div
       className={cn("", className)}
-      dangerouslySetInnerHTML={{ __html: body }}
+      // Sanitised, not raw: this markup is author-supplied.
+      dangerouslySetInnerHTML={{ __html: sanitizeRichText(body) }}
     ></div>
   );
 };

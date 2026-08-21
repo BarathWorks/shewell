@@ -1,14 +1,21 @@
 
-import { getServerSession } from "next-auth";
 import ProfileNav from "~/components/profile-nav";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
 
 export default async function OrdersPage({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
+
+  // Same undefined-filter hazard as the pages below: guard before querying.
+  if (!session?.user?.id) {
+    redirect("/auth/login");
+  }
+
   const userDetails = await db.user.findFirst({
     select: {
       id: true,
@@ -17,8 +24,8 @@ export default async function OrdersPage({
       name: true,
     },
     where: {
-      email: session?.user.email!,
-      deletedAt:null,
+      id: session.user.id,
+      deletedAt: null,
     },
   });
   return (

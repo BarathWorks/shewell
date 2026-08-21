@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/src/server/api/trpc';
+import { createTRPCRouter, adminProcedure } from '@/src/server/api/trpc';
 import { db } from '@/src/server/db';
 
 export const mediaRouter = createTRPCRouter({
-  getAll: protectedProcedure
+  getAll: adminProcedure('content:read')
     .input(
       z.object({
         limit: z.number().optional(),

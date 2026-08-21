@@ -1,11 +1,17 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { updateEvent } from "~/lib/create-event";
+import { BookAppointmentStatus } from "@repo/database";
+import { format } from "date-fns";
+import { sendEmail } from "@repo/mail";
+import { getAppointmentRescheduleEmailTemplate } from "~/lib/email-templates";
+import { logger } from "@repo/observability";
 
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
+
 interface IRescheduleDetails {
   startingTime: Date;
   endingTime: Date;
@@ -14,189 +20,240 @@ interface IRescheduleDetails {
   eventId?: string;
 }
 
+/**
+ * Moves one of the caller's own appointments to a new time.
+ *
+ * This checked only that *a* session existed and then updated
+ * `where: { id: appointmentId }`. With no `userId` in the filter, any signed-in
+ * user could rewrite any other patient's appointment to any time they liked — and
+ * the action then emailed that patient to confirm the change they had not made.
+ *
+ * Three things are now enforced:
+ *
+ *   - **Ownership**, in the `where` rather than checked afterwards.
+ *   - **A slot-conflict check**, inside the same transaction as the write. There
+ *     was none at all, so a reschedule could land on a time the practitioner had
+ *     already sold to somebody else — the one invariant the booking path is careful
+ *     about.
+ *   - **The practitioner id comes from the row**, not from the request. It was
+ *     previously taken from the caller and passed to the calendar update.
+ */
 const RescheduleAction = async ({
   startingTime,
   endingTime,
   appointmentId,
   eventId,
-  professionalUserId,
 }: IRescheduleDetails) => {
-  const session = await getServerSession();
-  if (!session) {
-    return {
-      error: "Unauthorised",
-    };
+  const session = await getServerAuthSession();
+  if (!session?.user?.id) {
+    return { error: "Unauthorised" };
   }
 
-  const formSchema = z.object({
-    startingTime: z.date(),
-    endingTime: z.date(),
-    appointmentId: z.string(),
-  });
+  const userId = session.user.id;
 
-  const isValid = formSchema.safeParse({
-    startingTime,
-    endingTime,
-    appointmentId,
-  });
+  const parsed = z
+    .object({
+      startingTime: z.coerce.date(),
+      endingTime: z.coerce.date(),
+      appointmentId: z.string().min(1),
+    })
+    .safeParse({ startingTime, endingTime, appointmentId });
 
-  if (!isValid) {
-    return {
-      error: "Invalid data",
-    };
+  if (!parsed.success) {
+    return { error: "Invalid data" };
   }
 
-  console.log("🔄 Reschedule Action: Starting reschedule", {
-    appointmentId,
-    eventId,
-    professionalUserId,
-    startingTime,
-    endingTime,
-  });
+  const newStart = parsed.data.startingTime;
+  const newEnd = parsed.data.endingTime;
+
+  // Ordering and forward-dating were never checked, so an appointment could be
+  // moved to end before it starts, or into the past.
+  if (newEnd.getTime() <= newStart.getTime()) {
+    return { error: "The end time must be after the start time" };
+  }
+
+  if (newStart.getTime() <= Date.now()) {
+    return { error: "Please choose a time in the future" };
+  }
+
+  let appointment;
 
   try {
-    // First get appointment details
-    const appointment = await db.bookAppointment.findUnique({
-      where: { id: appointmentId },
-      select: {
-        startingTime: true, // Fetch original starting time
-        endingTime: true,   // Fetch original ending time
-        patient: {
+    appointment = await db.$transaction(
+      async (tx) => {
+        // Scoped to the caller. An appointment id alone must not be enough.
+        const existing = await tx.bookAppointment.findFirst({
+          where: { id: appointmentId, userId },
           select: {
-            firstName: true,
-            lastName: true,
-            email: true,
+            id: true,
+            startingTime: true,
+            endingTime: true,
+            status: true,
+            planName: true,
+            description: true,
+            professionalUserId: true,
+            patient: {
+              select: { firstName: true, lastName: true, email: true },
+            },
+            professionalUser: {
+              select: { firstName: true, lastName: true, email: true },
+            },
           },
-        },
-        planName: true,
-        description: true,
-      },
-    });
-
-    if (!appointment) {
-      throw new Error("Appointment not found");
-    }
-
-    // Update the database
-    await db.bookAppointment.update({
-      data: {
-        startingTime: startingTime,
-        endingTime: endingTime,
-      },
-      where: {
-        id: appointmentId,
-      },
-    });
-    console.log("✅ Reschedule Action: Database updated");
-
-    // Then try to update Google Calendar event
-    if (eventId && professionalUserId) {
-      try {
-        console.log("🔄 Reschedule Action: Updating Google Calendar event");
-        const patientName = `${appointment.patient.firstName} ${appointment.patient.lastName || ""}`.trim();
-        const response = await updateEvent({
-          professionalUserId,
-          eventId,
-          newStartTime: startingTime,
-          newEndTime: endingTime,
-          patientName,
-          patientEmail: appointment.patient.email,
-          planName: appointment.planName,
-          description: appointment.description || "",
         });
 
-        // Update meeting details in database
-        await db.bookAppointment.update({
-          data: {
-            meeting: response,
-          },
+        if (!existing) {
+          throw new RescheduleError("Appointment not found");
+        }
+
+        if (existing.status !== BookAppointmentStatus.PAYMENT_SUCCESSFUL) {
+          throw new RescheduleError("This appointment cannot be rescheduled");
+        }
+
+        // The practitioner must actually be free then. Excludes this appointment,
+        // and ignores cancelled rows the way the booking path does.
+        const clash = await tx.bookAppointment.findFirst({
           where: {
-            id: appointmentId,
+            professionalUserId: existing.professionalUserId,
+            startingTime: newStart,
+            id: { not: existing.id },
+            status: {
+              notIn: [
+                BookAppointmentStatus.CANCELLED,
+                BookAppointmentStatus.CANCELLED_WITH_REFUND,
+              ],
+            },
           },
+          select: { id: true },
         });
-        console.log("✅ Reschedule Action: Google Calendar event updated");
-      } catch (calendarError) {
-        console.error("❌ Reschedule Action: Calendar update failed", calendarError);
-        // Don't fail the reschedule if calendar update fails - database is already updated
-        // But we should probably notify the user
-      }
-    } else {
-      console.log("⚠️ Reschedule Action: No eventId or professionalUserId - skipping calendar update");
+
+        if (clash) {
+          throw new RescheduleError(
+            "That time is no longer available. Please choose another.",
+          );
+        }
+
+        const moved = await tx.bookAppointment.updateMany({
+          where: {
+            id: existing.id,
+            userId,
+            status: BookAppointmentStatus.PAYMENT_SUCCESSFUL,
+          },
+          data: { startingTime: newStart, endingTime: newEnd },
+        });
+
+        if (moved.count === 0) {
+          throw new RescheduleError("This appointment cannot be rescheduled");
+        }
+
+        return existing;
+      },
+      // Serializable, matching the booking path: the conflict check and the write
+      // have to see the same world.
+      { timeout: 10000, isolationLevel: "Serializable" },
+    );
+  } catch (error) {
+    if (error instanceof RescheduleError) {
+      return { error: error.message };
     }
+    logger.error("appointment.reschedule_failed", {
+      source: "client-action",
+      route: "RescheduleAction",
+      userId,
+      error,
+    });
+    return { error: "Appointment cannot be rescheduled" };
+  }
 
-    revalidatePath("/profile/appointments");
+  // ── Side effects. None of these may undo the reschedule, which has committed.
 
-    // Send reschedule notification emails
+  const professionalUserId = appointment.professionalUserId;
+
+  if (eventId && professionalUserId) {
     try {
-      const { sendEmail } = await import("@repo/mail");
-      const { getAppointmentRescheduleEmailTemplate } = await import("~/lib/email-templates");
-      const { format } = await import("date-fns");
+      const patientName =
+        `${appointment.patient.firstName} ${appointment.patient.lastName ?? ""}`.trim();
 
-      // Get the updated appointment with full details
-      const updatedAppointment = await db.bookAppointment.findUnique({
-        where: { id: appointmentId },
-        include: {
-          patient: {
-            select: {
-              firstName: true,
-              email: true,
-            },
-          },
-          professionalUser: {
-            select: {
-              firstName: true,
-              lastName: true,
-              email: true,
-            },
-          },
-        },
+      const response = await updateEvent({
+        professionalUserId,
+        eventId,
+        newStartTime: newStart,
+        newEndTime: newEnd,
+        patientName,
+        patientEmail: appointment.patient.email,
+        planName: appointment.planName,
+        description: appointment.description ?? "",
       });
 
-      if (updatedAppointment) {
-        const oldTime = `${format(appointment.startingTime!, "hh:mm a")} - ${format(appointment.endingTime!, "hh:mm a")}`;
-        const newTime = `${format(startingTime, "hh:mm a")} - ${format(endingTime, "hh:mm a")}`;
-        const doctorName = `${updatedAppointment.professionalUser.firstName} ${updatedAppointment.professionalUser.lastName || ""}`.trim();
-
-        // Email to patient
-        const patientEmailTemplate = getAppointmentRescheduleEmailTemplate({
-          userName: updatedAppointment.patient.firstName,
-          userEmail: updatedAppointment.patient.email!,
-          doctorName: doctorName,
-          oldDate: appointment.startingTime!,
-          newDate: startingTime,
-          oldTime: oldTime,
-          newTime: newTime,
-          planName: updatedAppointment.planName || "Appointment",
-        });
-
-        await sendEmail({
-          from: process.env.FROM_EMAIL!,
-          to: [updatedAppointment.patient.email!],
-          subject: patientEmailTemplate.subject,
-          html: patientEmailTemplate.html,
-        });
-
-        // Email to doctor
-        if (updatedAppointment.professionalUser.email) {
-          await sendEmail({
-            from: process.env.FROM_EMAIL!,
-            to: [updatedAppointment.professionalUser.email],
-            subject: `📅 Appointment Rescheduled - ${updatedAppointment.patient.firstName}`,
-            html: patientEmailTemplate.html.replace(updatedAppointment.patient.firstName, doctorName),
-          });
-        }
-      }
-    } catch (emailError) {
-      console.error("Failed to send reschedule emails:", emailError);
-      // Don't fail the reschedule if email fails
+      await db.bookAppointment.updateMany({
+        where: { id: appointment.id, userId },
+        data: { meeting: response },
+      });
+    } catch (calendarError) {
+      logger.warn("appointment.reschedule_calendar_failed", {
+        source: "client-action",
+        appointmentId: appointment.id,
+        error: calendarError,
+      });
     }
-
-    return {
-      message: "Appointment has been rescheduled",
-    };
-  } catch (error) {
-    console.error("❌ Reschedule Action: Failed", error);
-    throw new Error("Appointment cannot be rescheduled");
   }
+
+  try {
+    const doctorName =
+      `${appointment.professionalUser.firstName ?? ""} ${appointment.professionalUser.lastName ?? ""}`.trim() ||
+      "your practitioner";
+
+    const oldTime = `${format(appointment.startingTime, "hh:mm a")} - ${format(appointment.endingTime, "hh:mm a")}`;
+    const newTime = `${format(newStart, "hh:mm a")} - ${format(newEnd, "hh:mm a")}`;
+
+    const emailTemplate = getAppointmentRescheduleEmailTemplate({
+      userName: appointment.patient.firstName,
+      userEmail: appointment.patient.email,
+      doctorName,
+      oldDate: appointment.startingTime,
+      newDate: newStart,
+      oldTime,
+      newTime,
+      planName: appointment.planName || "Appointment",
+    });
+
+    await sendEmail({
+      from: process.env.FROM_EMAIL!,
+      to: [appointment.patient.email],
+      subject: emailTemplate.subject,
+      html: emailTemplate.html,
+    });
+
+    if (appointment.professionalUser.email) {
+      await sendEmail({
+        from: process.env.FROM_EMAIL!,
+        to: [appointment.professionalUser.email],
+        subject: `Appointment rescheduled - ${appointment.patient.firstName}`,
+        html: emailTemplate.html.replace(
+          appointment.patient.firstName,
+          doctorName,
+        ),
+      });
+    }
+  } catch (emailError) {
+    logger.error("appointment.reschedule_email_failed", {
+      source: "client-action",
+      appointmentId: appointment.id,
+      error: emailError,
+    });
+  }
+
+  revalidatePath("/profile/appointments");
+
+  logger.info("appointment.rescheduled", {
+    source: "client-action",
+    userId,
+    appointmentId: appointment.id,
+  });
+
+  return { message: "Appointment has been rescheduled" };
 };
+
+/** Carries a message meant for the customer, distinct from an unexpected failure. */
+class RescheduleError extends Error {}
+
 export default RescheduleAction;

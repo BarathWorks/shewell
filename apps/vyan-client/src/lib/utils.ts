@@ -44,15 +44,32 @@ export const createTimeDateSeconds = (
   return setSeconds(setMinutes(setHours(date, hour), minute), 0);
 };
 
+/**
+ * Generates a login OTP.
+ *
+ * `Math.random` is a predictable PRNG and must never produce a credential: given a
+ * few observed values its internal state can be recovered and subsequent codes
+ * predicted, which for an OTP means signing in as somebody else. Uses the platform
+ * CSPRNG instead.
+ *
+ * Rejection sampling keeps the digits uniform — taking a raw byte modulo 10 would
+ * make 0–5 more likely than 6–9 (256 is not a multiple of 10).
+ */
 export const generateOtp = () => {
   const OTP_LENGTH = 6;
-  const digits = "0123456789";
+  const MAX_UNBIASED = 250; // largest multiple of 10 below 256
   let otp = "";
-  for (let i = 0; i < OTP_LENGTH; i++) {
-    const randomIndex = Math.floor(Math.random() * digits.length);
-    otp += digits[randomIndex];
+
+  while (otp.length < OTP_LENGTH) {
+    const bytes = new Uint8Array(OTP_LENGTH);
+    globalThis.crypto.getRandomValues(bytes);
+    for (let i = 0; i < bytes.length && otp.length < OTP_LENGTH; i++) {
+      const b = bytes[i]!;
+      if (b < MAX_UNBIASED) otp += String(b % 10);
+    }
   }
-  return String(otp);
+
+  return otp;
 };
 
 export function filterAvailableTimeSlots(

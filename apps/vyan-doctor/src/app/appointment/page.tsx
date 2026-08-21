@@ -4,13 +4,13 @@ import DateNavigationMeeting from "./date-navigation-meeting";
 import TimePicker from "react-time-picker";
 import FullCalendarPage from "./full-calendar";
 import { db } from "~/server/db";
-import { getServerSession } from "next-auth";
 import { useState } from "react";
 import React from "react";
 import { format } from "date-fns";
 import { TZDate } from "@date-fns/tz";
+import { getServerAuthSession } from "~/server/auth";
 const Appointment = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session) {
     return;
   }

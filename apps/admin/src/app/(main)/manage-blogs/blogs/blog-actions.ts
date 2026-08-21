@@ -3,12 +3,12 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { IBlogCategory } from '@/src/_models/blog-category.model';
 import { IBlogForm } from '@/src/_models/blog.model';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createBlog = async (data: IBlogForm) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -33,7 +33,7 @@ export const createBlog = async (data: IBlogForm) => {
     shortDescription: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     title,
     body,
     author,
@@ -48,11 +48,16 @@ export const createBlog = async (data: IBlogForm) => {
     shortDescription
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   try {
     await db.blog.create({
@@ -84,7 +89,7 @@ export const createBlog = async (data: IBlogForm) => {
 };
 
 export const updateBlog = async (data: IBlogForm) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -110,7 +115,7 @@ export const updateBlog = async (data: IBlogForm) => {
     shortDescription: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     title,
     body,
@@ -125,6 +130,17 @@ export const updateBlog = async (data: IBlogForm) => {
     seoKeywords,
     shortDescription
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   const updatedBlog = await db.blog.update({
     where: {
@@ -155,7 +171,7 @@ export const updateBlog = async (data: IBlogForm) => {
 };
 
 export const deleteBlogs = async (ids: string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {

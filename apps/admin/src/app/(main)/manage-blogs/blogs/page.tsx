@@ -2,8 +2,11 @@ export const revalidate = 0;
 
 import { db } from '@/src/server/db';
 import BlogsTable from '@/src/app/(main)/manage-blogs/blogs/blogs-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 const BlogsPage = async () => {
+  await requireAdminPage('content:read');
+
   const blogCategories = await db.blogCategory.findMany({
     select: {
       id: true,

@@ -1,14 +1,26 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 const DeletePatient = async ({ patientId }: { patientId: string }) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
+
+  // Server actions are POST endpoints reachable without a session. Without this
+  // guard `session?.user.email` is undefined, Prisma drops the filter, and
+  // `findFirst` returns the first user in the table — so an unauthenticated caller
+  // acts as whoever that happens to be.
+  if (!session?.user?.id) {
+    return {
+      error: "Unauthorized",
+    };
+  }
+
   const user = await db.user.findFirst({
     where: {
-      email: session?.user.email!,
+      id: session.user.id,
+      deletedAt: null,
     },
   });
   if (!user) {

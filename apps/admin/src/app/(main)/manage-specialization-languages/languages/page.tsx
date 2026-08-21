@@ -5,9 +5,12 @@ import { db } from '@/src/server/db';
 
 import { Skeleton } from 'primereact/skeleton';
 import LanguageTable from './language-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 
 const LanguagesPage = async () => {
+  await requireAdminPage('doctor:read');
+
   const languages = await db.professionalLanguages.findMany({
     select: {
       id: true,

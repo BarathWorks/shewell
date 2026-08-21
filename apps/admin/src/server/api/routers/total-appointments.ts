@@ -1,21 +1,11 @@
 import { z } from 'zod';
 
-import { createTRPCRouter, publicProcedure } from '../trpc';
-import { getServerSession } from 'next-auth';
+import { createTRPCRouter, adminProcedure } from '../trpc';
 import { BookAppointmentStatus } from '@repo/database';
 import { endOfDay, formatISO, startOfDay } from 'date-fns';
 import { db } from '../../db';
 export const totalOnlineAppointmentsRouter = createTRPCRouter({
-  totalOnlineAppointments: publicProcedure.query(async () => {
-    const session = await getServerSession();
-    console.log('session', session);
-    if (!session) {
-      throw new Error('Unauthorised');
-    }
-    if (!session.user.email) {
-      throw new Error('Unauthorised');
-    }
-
+  totalOnlineAppointments: adminProcedure('appointment:read').query(async () => {
     const professionalUsers = await db.professionalUser.findMany({
       select: {
         id: true,
@@ -50,8 +40,19 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
         },
         identity: {
           select: {
-            panNumber: true,
-            aadhaarNumber: true,
+            // PAN and Aadhaar are deliberately NOT selected.
+            //
+            // This procedure is gated on `appointment:read`, which SUPPORT holds —
+            // so a read-only support agent could pull every practitioner's full
+            // Aadhaar and PAN number from the dashboard. That is the same exposure
+            // `payout:read` was withheld from SUPPORT to prevent, arriving through
+            // a different door.
+            //
+            // The screen shows whether identity has been verified and, for the
+            // licence, which registration a practitioner practises under. Neither
+            // needs the government identifiers themselves; anyone who genuinely
+            // needs those should be looking at the practitioner's own record with a
+            // role that permits it.
             licenseNumber: true,
             isVerified: true
           }
@@ -79,7 +80,9 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       },
       orderBy: {
         createdAt: 'desc'
-      }
+      },
+      // Bounded until this list is paged server-side; it feeds /view-doctors.
+      take: 500
     });
 
     const appointmentDataForTable = await db.bookAppointment.findMany({
@@ -119,7 +122,9 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       },
       orderBy: {
         startingTime: 'desc'
-      }
+      },
+      // The dashboard shows *recent* appointments; it never needed the whole table.
+      take: 100
     });
     const totalDoctorsOnBoard = await db.professionalUser.aggregate({
       _count: {
@@ -145,5 +150,25 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       totalAppointmentsWithCountAndPrice,
       professionalUsers
     };
+  }),
+
+  /**
+   * Headline counts for the dashboard cards.
+   *
+   * Split out because the cards previously called `totalOnlineAppointments`, which
+   * loads every practitioner (deeply nested) and every appointment in order to
+   * display two numbers — on the first page an admin sees.
+   */
+  summary: adminProcedure('appointment:read').query(async () => {
+    const [totalDoctorsOnBoard, totalAppointmentsWithCountAndPrice] = await Promise.all([
+      db.professionalUser.aggregate({ _count: { id: true } }),
+      db.bookAppointment.aggregate({
+        _sum: { priceInCents: true },
+        _count: { id: true },
+        where: { status: BookAppointmentStatus.PAYMENT_SUCCESSFUL }
+      })
+    ]);
+
+    return { totalDoctorsOnBoard, totalAppointmentsWithCountAndPrice };
   })
 });

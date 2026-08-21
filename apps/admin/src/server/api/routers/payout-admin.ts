@@ -7,14 +7,16 @@
  * - System creates Payout + links AppointmentPaymentPayout rows atomically
  */
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/src/server/api/trpc';
+import { createTRPCRouter, adminProcedure } from '@/src/server/api/trpc';
 import { TRPCError } from '@trpc/server';
+import { recordAudit } from '@/src/server/audit';
+import { maskBankDetails } from '@/src/server/mask';
 
 export const payoutAdminRouter = createTRPCRouter({
   /**
    * List all doctors with their available balance for admin selection
    */
-  listDoctorsWithBalance: protectedProcedure
+  listDoctorsWithBalance: adminProcedure('payout:read')
     .input(
       z.object({
         search: z.string().optional()
@@ -50,53 +52,60 @@ export const payoutAdminRouter = createTRPCRouter({
             }
           }
         },
-        orderBy: { firstName: 'asc' }
+        orderBy: { firstName: 'asc' },
+        // Bounded: this endpoint previously returned every practitioner row.
+        take: 200
       });
 
-      // Calculate available balance for each doctor
-      const doctorsWithBalance = await Promise.all(
-        doctors.map(async (doctor) => {
-          const totalEarningsResult = await ctx.db.appointmentPayment.aggregate({
-            where: {
-              doctorId: doctor.id,
-              paymentStatus: 'COMPLETED'
-            },
-            _sum: {
-              doctorShareInCents: true
-            }
-          });
+      if (doctors.length === 0) return [];
 
-          const totalPayoutsResult = await ctx.db.appointmentPaymentPayout.aggregate({
-            where: {
-              appointmentPayment: {
-                doctorId: doctor.id
-              }
-            },
-            _sum: {
-              amountUsedInCents: true
-            }
-          });
+      const doctorIds = doctors.map((d) => d.id);
 
-          const totalEarnings = totalEarningsResult._sum.doctorShareInCents ?? 0;
-          const totalPayouts = totalPayoutsResult._sum.amountUsedInCents ?? 0;
-
-          return {
-            ...doctor,
-            availableBalanceInCents: totalEarnings - totalPayouts,
-            totalEarningsInCents: totalEarnings,
-            totalPaidOutInCents: totalPayouts
-          };
+      // Two grouped aggregates for the whole page, rather than two per doctor.
+      // The previous version issued 2N queries inside Promise.all — 201 round
+      // trips for 100 doctors, each one waiting on the connection pool.
+      const [earningsByDoctor, payoutRows] = await Promise.all([
+        ctx.db.appointmentPayment.groupBy({
+          by: ['doctorId'],
+          where: { doctorId: { in: doctorIds }, paymentStatus: 'COMPLETED' },
+          _sum: { doctorShareInCents: true }
+        }),
+        // Paid-out amounts live on the link rows, which carry the per-appointment
+        // amount used; grouped back to a doctor via the parent payment.
+        ctx.db.appointmentPaymentPayout.findMany({
+          where: { appointmentPayment: { doctorId: { in: doctorIds } } },
+          select: { amountUsedInCents: true, appointmentPayment: { select: { doctorId: true } } }
         })
-      );
+      ]);
 
-      return doctorsWithBalance;
+      const earnings = new Map(earningsByDoctor.map((r) => [r.doctorId, r._sum.doctorShareInCents ?? 0]));
+
+      const payouts = new Map<string, number>();
+      for (const row of payoutRows) {
+        const id = row.appointmentPayment.doctorId;
+        payouts.set(id, (payouts.get(id) ?? 0) + row.amountUsedInCents);
+      }
+
+      return doctors.map((doctor) => {
+        const totalEarnings = earnings.get(doctor.id) ?? 0;
+        const totalPayouts = payouts.get(doctor.id) ?? 0;
+        return {
+          // Account numbers, IFSC codes and UPI handles are masked before they
+          // leave the server. This list previously returned full bank details for
+          // every practitioner on the page.
+          ...maskBankDetails(doctor),
+          availableBalanceInCents: totalEarnings - totalPayouts,
+          totalEarningsInCents: totalEarnings,
+          totalPaidOutInCents: totalPayouts
+        };
+      });
     }),
 
   /**
    * Get detailed payout info for a specific doctor:
    * earnings summary, bank details, and payout history
    */
-  getDoctorPayoutDetails: protectedProcedure
+  getDoctorPayoutDetails: adminProcedure('payout:read')
     .input(
       z.object({
         doctorId: z.string()
@@ -229,7 +238,7 @@ export const payoutAdminRouter = createTRPCRouter({
       });
 
       return {
-        doctor,
+        doctor: maskBankDetails(doctor),
         earnings: {
           totalAppointments: totalEarningsResult._count,
           totalRevenueInCents: totalEarningsResult._sum.totalAmountInCents ?? 0,
@@ -252,7 +261,7 @@ export const payoutAdminRouter = createTRPCRouter({
    * 3. Creates AppointmentPaymentPayout linking rows (FIFO)
    * 4. If insufficient balance → rolls back
    */
-  initiatePayout: protectedProcedure
+  initiatePayout: adminProcedure('payout:write')
     .input(
       z.object({
         doctorId: z.string(),
@@ -264,10 +273,31 @@ export const payoutAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { doctorId, amountInCents, transactionRef, notes } = input;
 
-      // Get admin ID from session
-      const adminUser = ctx.session?.user;
+      // Verified against the database by `adminProcedure`, not read from the
+      // session token — this id is the audit record of who moved the money.
+      const adminUser = ctx.admin;
 
-      return await ctx.db.$transaction(async (tx) => {
+      const result = await ctx.db.$transaction(async (tx) => {
+        // 0. Serialise payouts for this doctor.
+        //
+        // Steps 1–5 are a read-modify-write over the doctor's earnings: read the
+        // balance, decide it is sufficient, then write a Payout against it. Under
+        // Prisma's default READ COMMITTED that is a check-then-act race — two
+        // payouts submitted at the same moment (two admins, or one double-clicked
+        // form) each aggregate the same rows, each see the full balance, and each
+        // pass the check. Wrapping it in a transaction alone does not prevent this;
+        // nothing was locked.
+        //
+        // Taking a row lock on the doctor makes concurrent payouts for that doctor
+        // queue behind one another, so the second one reads the balance the first
+        // has already spent. Locking the doctor rather than the earnings rows also
+        // covers the case where the second payout would draw on earnings the first
+        // did not touch.
+        //
+        // The session-booking path already does exactly this before its capacity
+        // check; the path that moves money had no equivalent.
+        await tx.$executeRaw`SELECT id FROM "ProfessionalUser" WHERE id = ${doctorId} FOR UPDATE`;
+
         // 1. Calculate available balance INSIDE the transaction
         const totalEarningsResult = await tx.appointmentPayment.aggregate({
           where: {
@@ -320,7 +350,9 @@ export const payoutAdminRouter = createTRPCRouter({
             doctorId,
             amountInCents,
             status: 'PAID',
-            initiatedByAdminId: adminUser?.id ?? 'system',
+            // No 'system' fallback: an unattributable payout is worse than a
+            // failed one, and `adminProcedure` guarantees an id is present.
+            initiatedByAdminId: adminUser.id,
             paidAt: new Date(),
             transactionRef: transactionRef ?? null,
             notes: notes ?? null
@@ -372,12 +404,30 @@ export const payoutAdminRouter = createTRPCRouter({
           newAvailableBalance: availableBalance - amountInCents
         };
       });
+
+      // Written after the transaction commits: an entry claiming money moved must
+      // not survive a rolled-back payout.
+      await recordAudit({
+        actor: ctx.admin,
+        action: 'payout.initiated',
+        entity: 'Payout',
+        entityId: result.payout.id,
+        summary: `Paid ${amountInCents} paise to doctor ${doctorId}`,
+        metadata: {
+          doctorId,
+          amountInCents,
+          transactionRef: transactionRef ?? null,
+          linkedEarnings: result.linkedEarnings.length
+        }
+      });
+
+      return result;
     }),
 
   /**
    * Get all payouts with optional status filter
    */
-  getAllPayouts: protectedProcedure
+  getAllPayouts: adminProcedure('payout:read')
     .input(
       z.object({
         status: z.enum(['INITIATED', 'PROCESSING', 'PAID', 'FAILED']).optional(),
@@ -449,7 +499,7 @@ export const payoutAdminRouter = createTRPCRouter({
    * Mark a payout as failed (e.g., bank transfer bounced)
    * Links remain for audit trail
    */
-  markPayoutFailed: protectedProcedure
+  markPayoutFailed: adminProcedure('payout:write')
     .input(
       z.object({
         payoutId: z.string(),
@@ -481,19 +531,41 @@ export const payoutAdminRouter = createTRPCRouter({
       // The amounts will be freed up for future payouts since we calculate balance dynamically
       // BUT we need to delete the linking records so the balance becomes available again
       await ctx.db.$transaction(async (tx) => {
-        // Delete the payout links so the balance is freed
-        await tx.appointmentPaymentPayout.deleteMany({
-          where: { payoutId }
-        });
+        // Same lock as `initiatePayout`, and for the same reason: this changes the
+        // doctor's available balance by releasing linked earnings, so it must not
+        // interleave with a payout that is mid-way through reading that balance.
+        await tx.$executeRaw`SELECT id FROM "ProfessionalUser" WHERE id = ${payout.doctorId} FOR UPDATE`;
 
-        // Update payout status
-        await tx.payout.update({
-          where: { id: payoutId },
+        // Only transition a payout that is still PAID, so two concurrent calls
+        // cannot both delete links and both append a failure note.
+        const claimed = await tx.payout.updateMany({
+          where: { id: payoutId, status: 'PAID' },
           data: {
             status: 'FAILED',
             notes: reason ? `${payout.notes ?? ''}\nFailed: ${reason}`.trim() : payout.notes
           }
         });
+
+        if (claimed.count === 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'This payout has already been marked failed.'
+          });
+        }
+
+        // Delete the payout links so the balance is freed
+        await tx.appointmentPaymentPayout.deleteMany({
+          where: { payoutId }
+        });
+      });
+
+      await recordAudit({
+        actor: ctx.admin,
+        action: 'payout.marked_failed',
+        entity: 'Payout',
+        entityId: payoutId,
+        summary: 'Payout marked failed; balance restored',
+        metadata: { reason: reason ?? null }
       });
 
       return {

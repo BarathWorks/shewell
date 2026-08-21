@@ -11,7 +11,13 @@
     "lint": "turbo lint",
     "database:migration:dev": "cd packages/database && pnpx prisma migrate dev",
     "database:migration:prod": "cd packages/database && pnpx prisma migrate deploy && pnpx prisma generate",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "turbo test",
+    "test:security": "pnpm --filter @repo/testing test:security",
+    "typecheck": "turbo typecheck",
+    "clean": "node -e \"const fs=require('fs');for(const d of ['apps/admin/.next','apps/vyan-client/.next','apps/vyan-doctor/.next','.turbo','apps/admin/.turbo','apps/vyan-client/.turbo','apps/vyan-doctor/.turbo'])fs.rmSync(d,{recursive:true,force:true});console.log('cleaned build output')\"",
+    "build:clean": "pnpm clean && turbo build",
+    "dev:clean": "bash scripts/dev.sh"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -30,13 +36,11 @@
     "@tanstack/react-table": "^8.20.5",
     "axios": "^1.7.7",
     "date-fns-tz": "^3.2.0",
-    
     "embla-carousel-autoplay": "^8.3.0",
     "fs": "0.0.1-security",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.365.0",
     "multiselect-react-dropdown": "^2.0.25",
-    
     "react-day-picker": "^8.10.1",
     "recharts": "^2.12.7"
   }

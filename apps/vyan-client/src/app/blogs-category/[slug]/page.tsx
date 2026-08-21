@@ -1,4 +1,10 @@
-"use server";
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
@@ -8,6 +14,16 @@ import BlogCard from "~/app/(blogs)/blog-card";
 import { format } from "date-fns";
 import RecentBlog from "../recent-blogs";
 import QuillHtml from "~/components/shared/quill-html";
+
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
 
 const Blogs = async ({ params }: { params: { slug: string } }) => {
   const blogCategories = await db.blogCategory.findMany({

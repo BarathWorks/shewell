@@ -1,10 +1,10 @@
 import { db } from "~/server/db";
 import PracticeDetailsForm from "./practice-details-form";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { getServerAuthSession } from "~/server/auth";
 
 const PracticeDetailsPage = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session?.user?.email) {
     redirect("/auth/login");
   }

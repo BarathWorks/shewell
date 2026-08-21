@@ -7,12 +7,12 @@ import {
   BreadcrumbSeparator,
 } from "@repo/ui/src/@/components/breadcrumb";
 
-import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
 import { format } from "date-fns";
+import { getServerAuthSession } from "~/server/auth";
 
 export default async function Notification() {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session) {
     return;
   }

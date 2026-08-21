@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 export interface IDegree {
   // id: string;
   degree: string;
@@ -29,7 +29,7 @@ async function EditQualificationUserAction({
 }: IQualification) {
   return db.$transaction(
     async (tx) => {
-      const session = await getServerSession();
+      const session = await getServerAuthSession();
       if(!session){
         throw new Error("Unauthorised")
       }

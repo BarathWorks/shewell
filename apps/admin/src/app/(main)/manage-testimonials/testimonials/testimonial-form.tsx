@@ -1,4 +1,5 @@
 import SubmitButton from '@/src/_components/shared/submit-button';
+import { useRouter } from 'next/navigation';
 import { ITestimonial } from '@/src/_models/testimonial.model';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
@@ -19,6 +20,7 @@ type TestimonialFormProps = {
   testimonial: ITestimonial;
 };
 const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
+  const router = useRouter();
   const fileInputRef = useRef<FileUpload>(null);
   const [uploadingState, setUploadingState] = useState<0 | 1 | 2>(0);
   const [testimonialImageUrl, setTestimonialImageUrl] = useState<string>();
@@ -65,6 +67,12 @@ const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
         setUploadingState(1);
         uploadProductImage(image.name, image.type)
           .then(async (resp) => {
+            // The server rejects unsupported file types; surface that instead of
+            // destructuring an error object into undefined ids.
+            if ('error' in resp) {
+              setUploadingState(0);
+              return;
+            }
             const { id, fileUrl, presignedUrl } = resp;
             const requestOptions = {
               method: 'PUT',
@@ -106,6 +114,11 @@ const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
 
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })
@@ -233,7 +246,10 @@ const TestimonialForm = ({ hideDialog, testimonial }: TestimonialFormProps) => {
             render={({ field }) => {
               return (
                 <div className="flex gap-2">
-                  <Checkbox checked={field.value} {...field} />
+                  <Checkbox
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(!!e.checked)}
+                  />
                   <label htmlFor="active">Active</label>
                 </div>
               );

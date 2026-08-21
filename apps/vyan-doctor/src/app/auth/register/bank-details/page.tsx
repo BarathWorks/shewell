@@ -1,10 +1,10 @@
 import { db } from "~/server/db";
 import BankDetailsForm from "./bank-details-form";
-import { getServerSession } from "next-auth";
 import React from "react";
+import { getServerAuthSession } from "~/server/auth";
 
 const BankDetails = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session) {
     return;
   }

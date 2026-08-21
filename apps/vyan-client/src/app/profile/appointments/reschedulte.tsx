@@ -280,9 +280,17 @@ const Reschedule = ({
     return slot;
   };
 
+  // Normalised to real Dates: superjson returns them as Dates at runtime, but the
+  // AppRouter type infers strings under tRPC 11.0.0, and `filterAvailableTimeSlots`
+  // does date arithmetic on these values.
+  const bookedSlots = (data?.bookedSlots ?? []).map((slot) => ({
+    startingTime: new Date(slot.startingTime!),
+    endingTime: new Date(slot.endingTime!),
+  }));
+
   const filteredBookedSlotsFromTimeSlots = filterAvailableTimeSlots(
     timeSlots,
-    data?.bookedSlots ?? [],
+    bookedSlots,
   );
 
   return (

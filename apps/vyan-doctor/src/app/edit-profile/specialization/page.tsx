@@ -1,46 +1,42 @@
-"use server";
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 
 import { db } from "~/server/db";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-import { cn } from "~/app/lib/utils";
-import { Button } from "@repo/ui/src/@/components/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@repo/ui/src/@/components/command";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@repo/ui/src/@/components/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/src/@/components/popover";
-import { toast } from "@repo/ui/src/@/components/use-toast";
 import SpecializationForm from "./specialization-form";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
+
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
 const Specialization = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
+
+  // Middleware gates /edit-profile, but a page must still establish who it is
+  // rendering for: an undefined id here would have gone straight into the query.
+  if (!session?.user?.id) {
+    redirect("/auth/login");
+  }
+
   const preSpecialisations = await db.professionalUser.findUnique({
     select: {
       ProfessionalSpecializations: true,
     },
     where: {
-      email: session?.user.email!,
+      id: session.user.id,
     },
   });
 

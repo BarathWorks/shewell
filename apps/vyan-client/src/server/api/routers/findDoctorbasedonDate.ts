@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 import { Prisma } from "@repo/database";
 export const DoctorRouter = createTRPCRouter({
   Doctor: publicProcedure
@@ -36,6 +37,7 @@ export const DoctorRouter = createTRPCRouter({
               date: date,
             },
           },
+          ...PUBLIC_DOCTOR,
         },
       });
       console.log("professionalUserbasedonDate", professionalUser);

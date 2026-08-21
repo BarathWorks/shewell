@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 import { BookAppointmentStatus, Day } from "@repo/database";
 import { createTimeDate, filterAvailableTimeSlots } from "~/lib/utils";
 import { getHours, getMinutes, format } from "date-fns";
@@ -26,9 +27,12 @@ export const searchTimeSlotsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { date, expertId } = input;
-      const professionalUser = await db.professionalUser.findUnique({
+      // The sharp end of the approval gate: this is what a booking page calls to
+      // decide whether a slot exists. `findFirst`, not `findUnique` — the latter
+      // only accepts unique fields, and we are filtering on more than the id.
+      const professionalUser = await db.professionalUser.findFirst({
         select: { id: true },
-        where: { id: expertId },
+        where: { id: expertId, ...PUBLIC_DOCTOR },
       });
       if (!professionalUser) {
         return { timeSlots: [], bookedSlots: [] };

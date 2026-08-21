@@ -7,6 +7,7 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -15,15 +16,31 @@ export const env = createEnv({
         ? z.string()
         : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
-      // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
-      // Since NextAuth.js automatically uses the VERCEL_URL if present.
-      (/** @type {any} */ str) => process.env.VERCEL_URL ?? str,
-      // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string() : z.string().url()
+      // An explicitly configured NEXTAUTH_URL wins.
+      //
+      // This previously read `process.env.VERCEL_URL ?? str`, which prefers the
+      // per-deployment Vercel hostname over the custom domain the site actually
+      // runs on — so OAuth callbacks and the links built from NEXTAUTH_URL
+      // (password resets, the Google connect redirect) pointed at a URL the user
+      // never visits. VERCEL_URL is the fallback, not the override, and it carries
+      // no scheme so it has to be prefixed.
+      (/** @type {any} */ str) =>
+        str ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
+      z.string().url(),
     ),
     SENDGRID_API_KEY : z.string(),
 
     RAZORPAY_KEY_SECRET:z.string(),
+
+    // Both of these are read directly by route handlers that fail closed when they
+    // are absent — the webhook rejects every delivery, and the cleanup cron refuses
+    // to run. Declared here so that a production deploy missing them fails at build
+    // with a named variable, rather than going quietly inert in production.
+    RAZORPAY_WEBHOOK_SECRET:
+      process.env.NODE_ENV === "production" ? z.string() : z.string().optional(),
+    CRON_SECRET:
+      process.env.NODE_ENV === "production" ? z.string() : z.string().optional(),
 
     FROM_EMAIL : z.string(),
     GOOGLE_CLIENT_SECRET : z.string(),
@@ -51,11 +68,14 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     SENDGRID_API_KEY : process.env.SENDGRID_API_KEY,
     RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET,
+    RAZORPAY_WEBHOOK_SECRET:process.env.RAZORPAY_WEBHOOK_SECRET,
+    CRON_SECRET:process.env.CRON_SECRET,
     NEXT_PUBLIC_RAZORPAY_KEY_ID:process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     FROM_EMAIL : process.env.FROM_EMAIL,
     GOOGLE_CLIENT_SECRET : process.env.GOOGLE_CLIENT_SECRET,
@@ -74,7 +94,9 @@ export const env = createEnv({
    * useful for Docker builds.
    */
   // skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION || process.env.VERCEL === "1",
+  // Do NOT skip on Vercel. Skipping there turns a missing variable into a silent
+  // runtime failure on every request instead of a loud, fixable build failure.
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.

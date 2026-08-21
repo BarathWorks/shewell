@@ -1,0 +1,82 @@
+name: CI
+
+# There was no CI at all, and no test suite — so every defect in the audit
+# reached production unchallenged, and nothing would notice if one came back.
+on:
+  push:
+    branches: [main, remove-ecommerce]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Enough to satisfy the env schemas at build time. No real credential belongs
+  # in this file; anything genuinely secret comes from repository secrets.
+  SKIP_ENV_VALIDATION: "1"
+
+jobs:
+  verify:
+    name: typecheck · test · build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: shewell_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shewell_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/shewell_test
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shewell_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8.9.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @repo/database exec prisma generate
+
+      # `migrate deploy` rather than `db push`, so the partial unique index in
+      # 20260821000000_unique_active_appointment_slot is actually applied — the
+      # slot-integrity tests depend on it and `db push` would skip it.
+      - name: Apply migrations
+        run: pnpm --filter @repo/database exec prisma migrate deploy
+
+      # Runs first: it is seconds long and catches the whole class of regression
+      # the audit was about, so a failure here should not wait on a build.
+      - name: Security invariants
+        run: pnpm --filter @repo/testing exec vitest run tests/security-invariants.test.ts
+
+      - name: Unit and end-to-end tests
+        run: pnpm --filter @repo/testing test
+
+      - name: Typecheck
+        run: |
+          pnpm --filter vyan-client exec tsc --noEmit
+          pnpm --filter vyan-doctor exec tsc --noEmit
+          pnpm --filter admin exec tsc --noEmit
+
+      - name: Build
+        run: pnpm build

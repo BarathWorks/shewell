@@ -93,7 +93,10 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.session || !ctx.session.user?.id) {
+    // `user.id` must be present, not just `user`. A missing id silently becomes
+    // `undefined` in a Prisma `where` clause, which drops the filter entirely and
+    // returns every row instead of none.
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

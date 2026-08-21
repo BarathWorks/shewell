@@ -32,6 +32,14 @@ const bankDetailsSchema = z.object({
     .string({ required_error: "Please enter IFSC code" })
     .min(1, "Please enter IFSC code")
     .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format (e.g. SBIN0001234)"),
+  // Optional, but the admin payouts screen reads it when deciding whether a
+  // practitioner can be paid, so it has to be capturable somewhere.
+  bankUpiId: z
+    .string()
+    .trim()
+    .regex(/^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/, "Invalid UPI ID (e.g. name@bank)")
+    .optional()
+    .or(z.literal("")),
   termsAndConditions: z.literal(true, {
     errorMap: () => ({
       message: "You must read terms and conditions before submitting the details",
@@ -46,6 +54,7 @@ const BankDetailsForm = ({
   bankName,
   bankBranch,
   bankIfscCode,
+  bankUpiId,
 }: {
   professionalUserId: string;
   bankAccountHolderName: string;
@@ -53,6 +62,7 @@ const BankDetailsForm = ({
   bankName: string;
   bankBranch: string;
   bankIfscCode: string;
+  bankUpiId: string;
 }) => {
   const {
     handleSubmit,
@@ -65,6 +75,7 @@ const BankDetailsForm = ({
       bankName,
       bankBranch,
       bankIfscCode,
+      bankUpiId,
     },
     resolver: zodResolver(bankDetailsSchema),
   });
@@ -96,9 +107,23 @@ const BankDetailsForm = ({
       bankName: data.bankName,
       bankBranch: data.bankBranch,
       bankIfscCode: data.bankIfscCode,
+      bankUpiId: data.bankUpiId,
     })
       .then((resp) => {
         setLoadingState(false);
+        // These actions report failure by RETURNING `{ success: false, error }`
+        // rather than throwing, so the `.catch` below never sees it. Without this
+        // check a failed save showed a success toast and advanced to the next
+        // registration step, silently discarding what the practitioner entered.
+        if (!resp?.success) {
+          toast({
+            title: "Could not save",
+            description: resp?.error ?? "Please try again",
+            variant: "destructive",
+          });
+          return;
+        }
+
         console.log("BankDetails", resp?.message);
         toast({
           title: "Successfully Registered",
@@ -245,6 +270,31 @@ const BankDetailsForm = ({
                     {errors && errors.bankIfscCode && (
                       <p className="text-red-500">
                         {errors.bankIfscCode.message}
+                      </p>
+                    )}
+                  </>
+                );
+              }}
+            />
+          </div>
+
+          {/* UPI ID */}
+          <div className="w-full">
+            <UIFormLabel>UPI ID (optional)</UIFormLabel>
+            <Controller
+              control={control}
+              name="bankUpiId"
+              render={({ field }) => {
+                return (
+                  <>
+                    <UIFormInput
+                      placeholder="e.g. name@bank"
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                    />
+                    {errors && errors.bankUpiId && (
+                      <p className="text-red-500">
+                        {errors.bankUpiId.message}
                       </p>
                     )}
                   </>

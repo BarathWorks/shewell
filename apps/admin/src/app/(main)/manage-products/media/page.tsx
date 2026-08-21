@@ -4,8 +4,11 @@ import React, { Suspense } from 'react';
 import { db } from '@/src/server/db';
 import MediaTable from './media-table';
 import { Skeleton } from 'primereact/skeleton';
+import { requireAdminPage } from '@/src/server/authz';
 
 const Media = async () => {
+  await requireAdminPage('content:read');
+
   const media = await db.media.findMany({
     select: {
       id: true,

@@ -62,7 +62,11 @@
 //   }
 // }
 
-"use server";
+// NOTE: this module is imported by server actions but is not one itself.
+// It previously carried a "use server" directive here (valid, since only
+// comments preceded it), which turned every export into a callable endpoint —
+// including `getAccessToken`, which returns a practitioner's Google OAuth
+// access token for whatever id it is handed.
 import { NextRequest, NextResponse } from "next/server";
 import { getGoogleCalendarClient } from "../lib/google-calendar";
 import { getSession } from "next-auth/react";

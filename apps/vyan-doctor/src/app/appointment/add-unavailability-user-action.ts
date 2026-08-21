@@ -1,14 +1,14 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 async function AddUnavailabilityUserAction(dates: Date[]) {
   return db.$transaction(
     async (tx) => {
       console.log("datesforunavailabilityDay", dates);
-      const session = await getServerSession();
+      const session = await getServerAuthSession();
       if (!session) {
         throw new Error("Login to continue")
       }

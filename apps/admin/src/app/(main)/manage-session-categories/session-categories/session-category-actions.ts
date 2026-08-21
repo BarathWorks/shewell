@@ -3,12 +3,12 @@
 import { ISessionCategory } from '@/src/_models/session-category.model';
 import { db } from '@/src/server/db';
 import { Trimester } from '@repo/database';
-import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createSessionCategory = async (data: ISessionCategory) => {
-    const session = await getServerSession();
+    const session = await requireAdminSession('session:write');
 
     if (!session) {
         return {
@@ -23,18 +23,22 @@ export const createSessionCategory = async (data: ISessionCategory) => {
         trimester: z.nativeEnum(Trimester),
     });
 
-    const isValidData = Schema.safeParse({
+    const parsedInput = Schema.safeParse({
         name,
         slug,
         trimester,
     });
 
-    if (!isValidData.success) {
-        return {
-            error: 'Invalid Data',
-            details: isValidData.error.flatten()
-        };
-    }
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
     try {
         await db.sessionCategory.create({
@@ -61,7 +65,7 @@ export const createSessionCategory = async (data: ISessionCategory) => {
 };
 
 export const updateSessionCategory = async (data: ISessionCategory) => {
-    const session = await getServerSession();
+    const session = await requireAdminSession('session:write');
 
     if (!session) {
         return {
@@ -81,18 +85,22 @@ export const updateSessionCategory = async (data: ISessionCategory) => {
         trimester: z.nativeEnum(Trimester),
     });
 
-    const isValidData = Schema.safeParse({
+    const parsedInput = Schema.safeParse({
         name,
         slug,
         trimester,
     });
 
-    if (!isValidData.success) {
-        return {
-            error: 'Invalid Data',
-            details: isValidData.error.flatten()
-        };
-    }
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
     try {
         await db.sessionCategory.update({
@@ -122,7 +130,7 @@ export const updateSessionCategory = async (data: ISessionCategory) => {
 };
 
 export const deleteSessionCategory = async (ids: string[]) => {
-    const session = await getServerSession();
+    const session = await requireAdminSession('session:write');
     if (!session) {
         return {
             error: "Unauthorised"

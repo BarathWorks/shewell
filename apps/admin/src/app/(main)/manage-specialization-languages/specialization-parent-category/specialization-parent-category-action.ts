@@ -3,8 +3,8 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { IState } from '@/src/_models/state.model';
+import { requireAdminSession } from '@/src/server/authz';
 interface ISpecialization {
   id: string;
   name: string;
@@ -12,7 +12,7 @@ interface ISpecialization {
   mediaId: string;
 }
 export const createSpecialisation = async (data: ISpecialization) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('doctor:write');
 
   if (!session) {
     throw new Error('Unauthorised');
@@ -27,17 +27,22 @@ export const createSpecialisation = async (data: ISpecialization) => {
     mediaId: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     name,
     active,
     mediaId
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
  try{
   await db.professionalSpecializationParentCategory.create({
@@ -69,7 +74,7 @@ export const createSpecialisation = async (data: ISpecialization) => {
 };
 
 export const updateSpecialisation = async (data: ISpecialization) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('doctor:write');
 
   if (!session) {
     return {
@@ -87,12 +92,23 @@ export const updateSpecialisation = async (data: ISpecialization) => {
     mediaId: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     name,
     active,
     mediaId
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
  try{
   await db.professionalSpecializationParentCategory.update({
@@ -130,7 +146,7 @@ catch(error){
  }
 
 export const deleteSpecializations = async (ids: string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('doctor:write');
 
   if (!session) {
     throw new Error('Unauthorised');

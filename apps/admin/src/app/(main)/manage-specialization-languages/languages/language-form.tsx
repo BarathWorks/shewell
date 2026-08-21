@@ -1,4 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
@@ -24,6 +25,7 @@ type CurrencyFormProps = {
 };
 
 const LanguageForm = ({ language, hideDialog }: CurrencyFormProps) => {
+  const router = useRouter();
   const { showToast } = useToastContext();
   const {
     control,
@@ -56,6 +58,11 @@ const LanguageForm = ({ language, hideDialog }: CurrencyFormProps) => {
         // }
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })
@@ -105,7 +112,11 @@ const LanguageForm = ({ language, hideDialog }: CurrencyFormProps) => {
               render={({ field }) => {
                 return (
                   <div className="flex gap-2">
-                    <Checkbox checked={field.value} {...field} onChange={(v) => setValue('active', v.checked!)} />
+                    <Checkbox
+                      inputId="active"
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(!!e.checked)}
+                    />
 
                     <label htmlFor="active">Active</label>
                   </div>

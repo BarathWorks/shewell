@@ -5,11 +5,11 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    
     "db:seed": "pnpm run db:seed:admin && pnpm run db:seed:country",
     "db:seed:admin": "npx ts-node prisma/seed-admin.ts",
     "db:seed:country": "npx ts-node prisma/seed-country-state.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:seed:demo": "npx ts-node --compiler-options '{\"module\":\"commonjs\"}' prisma/seed-demo.ts"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",

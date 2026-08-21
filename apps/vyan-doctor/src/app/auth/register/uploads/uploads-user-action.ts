@@ -1,8 +1,8 @@
 "use server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IUploadsProps {
   aboutYou: string;
@@ -25,7 +25,7 @@ const UploadsUserAction = async ({
   aadharCard,
   panCard,
 }: IUploadsProps): Promise<ActionResult> => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session?.user?.email) {
     return { success: false, error: "Unauthorised user" };
   }

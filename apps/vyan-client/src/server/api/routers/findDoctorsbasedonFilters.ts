@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 import { Prisma } from "@repo/database";
 
 export const findDoctorRouter = createTRPCRouter({
@@ -23,10 +24,7 @@ export const findDoctorRouter = createTRPCRouter({
       const { specialisationId, date, languageIds, time, inputSearch, take, skip } = input;
 
       // Always filter approved, non-deleted doctors first (uses indexes)
-      const andConditions: Prisma.ProfessionalUserWhereInput[] = [
-        { isapproved: true },
-        { deletedAt: null },
-      ];
+      const andConditions: Prisma.ProfessionalUserWhereInput[] = [PUBLIC_DOCTOR];
 
       // Search conditions
       if (inputSearch) {

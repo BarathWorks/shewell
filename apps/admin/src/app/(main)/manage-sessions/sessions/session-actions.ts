@@ -3,9 +3,9 @@
 import { ISession } from '@/src/_models/session.model';
 import { db } from '@/src/server/db';
 import { SessionStatus, SessionType } from '@repo/database';
-import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { requireAdminSession } from '@/src/server/authz';
 
 const createSessionSchema = (type?: SessionType) => {
   return z
@@ -54,7 +54,7 @@ const createSessionSchema = (type?: SessionType) => {
 };
 
 export const createSession = async (data: ISession) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('session:write');
 
   if (!session) {
     return {
@@ -69,7 +69,7 @@ export const createSession = async (data: ISession) => {
 
   const Schema = createSessionSchema(type);
 
-  const isValidData = Schema.safeParse({
+  const parsedInput = Schema.safeParse({
     title,
     slug,
     startAt,
@@ -87,13 +87,16 @@ export const createSession = async (data: ISession) => {
     maxBookings: maxBookings || null
   });
 
-
-  if (!isValidData.success) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid Data',
-      details: isValidData.error.flatten()
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   try {
     await db.session.create({
@@ -134,7 +137,7 @@ export const createSession = async (data: ISession) => {
 };
 
 export const updateSession = async (data: ISession) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('session:write');
 
   if (!session) {
     return {
@@ -155,7 +158,7 @@ export const updateSession = async (data: ISession) => {
 
   const Schema = createSessionSchema(type);
 
-  const isValidData = Schema.safeParse({
+  const parsedInput = Schema.safeParse({
     title,
     slug,
     startAt,
@@ -173,13 +176,16 @@ export const updateSession = async (data: ISession) => {
     maxBookings: maxBookings || null
   });
 
-
-  if (!isValidData.success) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid Data',
-      details: isValidData.error.flatten()
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   try {
     // For simplicity, delete existing banners and recreate
@@ -226,7 +232,7 @@ export const updateSession = async (data: ISession) => {
 };
 
 export const deleteSession = async (ids: string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('session:write');
   if (!session) {
     return {
       error: 'Unauthorised'

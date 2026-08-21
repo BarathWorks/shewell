@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 type IAppointmentPrice = {
   appointmentPrice: {
@@ -13,7 +13,7 @@ type IAppointmentPrice = {
   }[];
 };
 const SetPriceUserAction = async ({ appointmentPrice }: IAppointmentPrice) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if(!session){
     throw new Error("Unauthorised")
   }

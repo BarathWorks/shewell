@@ -23,7 +23,9 @@
 
 import { ComingSoon } from "~/components/coming-soon";
 
-export const shefit= () => {
+// Not exported: Next.js restricts which names a page module may export,
+// and an extra one fails the build once type checking is enabled.
+const shefit = () => {
 return (
   <div className="flex h-screen w-full flex-col items-center justify-center mb-10">
 

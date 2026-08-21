@@ -1,11 +1,11 @@
 import { db } from "~/server/db";
 import { redirect } from "next/navigation";
 import AddressIdentityForm from "./address-identity-form";
-import { getServerSession } from "next-auth";
 import React from "react";
+import { getServerAuthSession } from "~/server/auth";
 
 const AddressIdentityPage = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session?.user?.email) {
     redirect("/auth/login");

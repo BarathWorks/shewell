@@ -1,9 +1,9 @@
 import { db } from "~/server/db";
 import PricesForm from "./prices-form";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 
 const Prices = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   const professionalUser = await db.professionalUser.findUnique({
     where: {
       email: session?.user.email!,

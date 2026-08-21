@@ -1,11 +1,11 @@
 'use server';
 
 import { db } from '@/src/server/db';
-import { getServerSession } from 'next-auth';
 import { ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
 import { env } from '@/env';
+import { requireAdminSession } from '@/src/server/authz';
 
 const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
   console.log('env in upload blog image action', env);
@@ -31,7 +31,7 @@ const getUploadPresignedUrl = async (key: string, isPublic: boolean) => {
 };
 
 const uploadBlogImage = async (blogId: string, fileKey: string, fileName: string, mimeType: string, comments: string = '') => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -99,7 +99,7 @@ export const getFileUrlFromKey = (key: string) => {
 };
 
 export const deleteImageFromKey = async (key: string) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -110,11 +110,24 @@ export const deleteImageFromKey = async (key: string) => {
   if (!key) {
     return;
   }
+
+  // The key is resolved from our own Media rows rather than trusted from the
+  // caller. Accepting an arbitrary key let any content editor delete any object in
+  // the bucket — which also holds practitioner Aadhaar and PAN scans under
+  // `professionalUser/`.
+  const media = await db.media.findFirst({
+    where: { fileKey: key },
+    select: { fileKey: true }
+  });
+
+  if (!media) {
+    return {
+      error: 'Not found'
+    };
+  }
+
   const s3 = new S3({
-    // forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    // endpoint: process.env.S3_SPACES_URL!,
     region: env.AWS_REGION!,
-    // region: process.env.S3_UPLOAD_REGION! || "blr1",
     credentials: {
       accessKeyId: env.AWS_ACCESS_KEY_ID!,
       secretAccessKey: env.AWS_SECRET_ACCESS_KEY!
@@ -123,13 +136,14 @@ export const deleteImageFromKey = async (key: string) => {
 
   const fileParams = {
     Bucket: env.AWS_BUCKET,
-    Key: key
+    Key: media.fileKey
   };
+
   return s3.deleteObject(fileParams);
 };
 
 export const mediaErrorThenUploadFailed = async (mediaId: string) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {

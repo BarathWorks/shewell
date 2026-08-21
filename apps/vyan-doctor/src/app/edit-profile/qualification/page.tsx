@@ -1,9 +1,9 @@
 import { db } from "~/server/db";
 import QualificationForm from "./qualification-form";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 
 const Qualificaiton = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if(!session){
     throw new Error("Unauthorised")
   }

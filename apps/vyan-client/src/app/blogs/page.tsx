@@ -1,4 +1,10 @@
-"use server";
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 import Image from "next/image";
 import Link from "next/link";
 // import BlogCard from "~/components/blog-card";
@@ -6,9 +12,20 @@ import { format } from "date-fns";
 import { redirect } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
+import { cachedPublicRead, CACHE_SECONDS, CACHE_TAGS } from "~/lib/cached";
 import BlogCategories from "./blog-categories";
 import BlogCard from "../(blogs)/blog-card";
 import QuillHtml from "~/components/shared/quill-html";
+
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
 const blogCredentials = [
   {
     src: "/images/blogs/blog1.png",
@@ -75,77 +92,74 @@ const blogCredentials = [
   },
 ];
 
+/**
+ * The blog index is identical for every visitor, so it is read through the Next
+ * data cache instead of the database on each request.
+ *
+ * Two problems were compounding here. The three queries ran as sequential
+ * `await`s — three full round trips, one after another, to a database ~130ms away
+ * — and they ran on every single page view. Measured warm, in a production build,
+ * for a page showing one blog post: 3.3 seconds.
+ *
+ * They now run concurrently, and the whole result is cached. Nothing below is
+ * scoped to a session, which is the precondition for caching it at all — see the
+ * rule in `~/lib/cached`.
+ */
+const getBlogIndex = cachedPublicRead(
+  async () => {
+    const [blogCategories, blogs, popularBlogs] = await Promise.all([
+      db.blogCategory.findMany({
+        select: { id: true, name: true, slug: true },
+        where: { active: true, deletedAt: null },
+      }),
+
+      db.blog.findMany({
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          body: true,
+          createdAt: true,
+          shortDescription: true,
+          author: true,
+          media: { select: { id: true, fileUrl: true } },
+          category: { select: { id: true, name: true, slug: true } },
+        },
+        where: { active: true, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        // Bounded: this returned every published post.
+        take: 30,
+      }),
+
+      db.blog.findMany({
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          body: true,
+          createdAt: true,
+          author: true,
+          shortDescription: true,
+          media: { select: { id: true, fileUrl: true } },
+          category: { select: { id: true, name: true, slug: true } },
+        },
+        where: { active: true, popularBlog: true, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }),
+    ]);
+
+    return { blogCategories, blogs, popularBlogs };
+  },
+  ["blog-index"],
+  {
+    revalidate: CACHE_SECONDS.content,
+    tags: [CACHE_TAGS.blogs, CACHE_TAGS.blogCategories],
+  },
+);
+
 const Blogs = async ({ params }: { params: { slug: string } }) => {
-  const blogCategories = await db.blogCategory.findMany({
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-    },
-    where: {
-      active: true,
-      deletedAt: null,
-    },
-  });
-
-  console.log("blogCategories", blogCategories);
-
-  const blogs = await db.blog.findMany({
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      body: true,
-      createdAt: true,
-      shortDescription :true,
-      author: true,
-      media: {
-        select: {
-          id: true,
-          fileUrl: true,
-        },
-      },
-      category: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-        },
-      },
-    },
-    where: {
-      active: true,
-    },
-  });
-  const popularBlogs = await db.blog.findMany({
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      body: true,
-      createdAt: true,
-      author: true,
-      shortDescription: true,
-      media: {
-        select: {
-          id: true,
-          fileUrl: true,
-        },
-      },
-      category: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-        },
-      },
-    },
-    where: {
-      active: true,
-      popularBlog: true,
-    },
-  });
-  // console.log("blogs", blogs[0]);
+  const { blogCategories, blogs, popularBlogs } = await getBlogIndex();
 
   // contain all the blogs except the first one
   const [blog, ...BlogsExceptFirstOne] = blogs;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 export const findDoctorWithoutFilterRouter = createTRPCRouter({
   findDoctorWithoutFilter: publicProcedure
     .input(
@@ -12,8 +13,7 @@ export const findDoctorWithoutFilterRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const professionalUser = await db.professionalUser.findMany({
         where: {
-          isapproved: true,
-          deletedAt: null,
+          ...PUBLIC_DOCTOR,
         },
         select: {
           id: true,

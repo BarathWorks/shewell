@@ -4,8 +4,11 @@ import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';
 import React, { Suspense } from 'react';
 import SessionCategoryTable from './session-category-table';
+import { requireAdminPage } from '@/src/server/authz';
 
 const SessionCategories = async () => {
+  await requireAdminPage('session:read');
+
     const sessionCategories = await db.sessionCategory.findMany({
         orderBy: {
             updatedAt: 'desc'

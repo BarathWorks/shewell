@@ -3,12 +3,12 @@
 import { db } from "~/server/db";
 
 // import { IAvailability } from "~/models/availability.model";
-import { getServerSession } from "next-auth";
 import { Day } from "@repo/database";
 import { setHours, setMinutes } from "date-fns";
 import { createTime } from "../lib/utils";
 import { revalidatePath } from "next/cache";
 import { TZDate } from "@date-fns/tz";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IAvailability {
   availability: {
@@ -21,7 +21,7 @@ interface IAvailability {
   }[];
 }
 const AppointmentUserAction = async (availabilities: IAvailability) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session) {
     throw new Error("Unauthorised");
   }

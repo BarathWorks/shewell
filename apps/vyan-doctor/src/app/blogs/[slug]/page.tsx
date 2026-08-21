@@ -6,6 +6,7 @@ import { Button } from "@repo/ui/src/@/components/button";
 import { db } from "~/server/db";
 import BlogCategories from "../blog-categories";
 import { format } from "date-fns";
+import { sanitizeRichText } from "~/lib/sanitize";
 
 const Blogs = async ({ params }: { params: { slug: string } }) => {
   const blog = await db.blog.findUnique({
@@ -105,7 +106,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
                   </h1>
                   <p
                     className="ql-snow ql-editor mb-2 font-inter text-base leading-6 text-black"
-                    dangerouslySetInnerHTML={{ __html: blog?.body! }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeRichText(blog?.body) }}
                   >
                     {/* {blog?.body} */}
                   </p>

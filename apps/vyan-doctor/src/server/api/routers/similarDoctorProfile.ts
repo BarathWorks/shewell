@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 export const similarDoctorProfileRouter = createTRPCRouter({
   similarDoctorProfile: publicProcedure
     .input(
@@ -12,7 +12,7 @@ export const similarDoctorProfileRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { displayQualificationId, similarDoctorProfileId } = input;
-      const session = await getServerSession();
+      const session = await getServerAuthSession();
       console.log("session", session);
       if (!session) {
         throw new Error("Unauthorised");

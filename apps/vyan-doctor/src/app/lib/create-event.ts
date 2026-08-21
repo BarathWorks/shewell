@@ -63,7 +63,9 @@
 // }
 
 
-"use server";
+// NOTE: this module is imported by server code but is not a server-action
+// module. It carried a "use server" directive here — valid, since only comments
+// precede it — which turned `CreateEvent` into a callable public endpoint.
 import { NextRequest, NextResponse } from "next/server";
 import { getGoogleCalendarClient } from "../lib/google-calendar";
 import { getSession } from "next-auth/react";

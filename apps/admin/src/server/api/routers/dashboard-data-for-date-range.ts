@@ -1,12 +1,11 @@
 import { z } from 'zod';
 
-import { createTRPCRouter, publicProcedure } from '../trpc';
-import { getServerSession } from 'next-auth';
+import { createTRPCRouter, adminProcedure } from '../trpc';
 import { BookAppointmentStatus } from '@repo/database';
 import { endOfDay, formatISO, startOfDay } from 'date-fns';
 import { db } from '../../db';
 export const noOfOnlineAppointmentsRouter = createTRPCRouter({
-  noOfOnlineAppointments: publicProcedure
+  noOfOnlineAppointments: adminProcedure('appointment:read')
     .input(
       z.object({
         startDate: z.date(),
@@ -15,15 +14,6 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { startDate, endDate } = input;
-      const session = await getServerSession();
-      console.log('session', session);
-      if (!session) {
-        throw new Error('Unauthorised');
-      }
-      if (!session.user.email) {
-        throw new Error('Unauthorised');
-      }
-
       const updatedStartDate = formatISO(startDate);
       const updatedEndDate = formatISO(endOfDay(endDate));
 
@@ -73,6 +63,9 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
           },
           where: appointmentDateWhere,
           orderBy: { startingTime: 'desc' },
+          // Recent-appointments panel. Unbounded, this grew with the whole business
+          // on the first screen an admin loads.
+          take: 100,
         }),
 
         // BUG FIX: was missing the date filter entirely
@@ -111,6 +104,10 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
         db.user.findMany({
           select: { id: true, name: true, email: true },
           where: { createdAt: { lte: updatedEndDate, gte: updatedStartDate } },
+          orderBy: { createdAt: 'desc' },
+          // The count beside this list comes from `newUsers`; this is only the
+          // preview, so it does not need every signup in the range.
+          take: 50,
         }),
       ]);
 

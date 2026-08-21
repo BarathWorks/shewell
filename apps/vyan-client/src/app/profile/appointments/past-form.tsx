@@ -65,6 +65,13 @@ const PastForm = ({
       professionalUserId,
     })
       .then((resp) => {
+        // The action returns `{ error }` on a rejected review and `{ message }` on
+        // success. Reading only `message` meant every rejection showed an empty
+        // toast — which is what hid the fact that this never worked at all.
+        if (resp?.error) {
+          toast({ description: resp.error, variant: "destructive" });
+          return;
+        }
         toast({
           description: resp?.message,
           variant: "default",

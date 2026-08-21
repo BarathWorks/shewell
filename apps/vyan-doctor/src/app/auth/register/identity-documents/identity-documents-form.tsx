@@ -209,8 +209,20 @@ const IdentityDocumentsForm = ({
         licenseNumber: data.licenseNumber || undefined,
       });
       setLoadingState(false);
+
+      // Reports failure by returning `{ success: false }` rather than throwing, so
+      // the catch below never sees it.
+      if (!resp?.success) {
+        toast({
+          title: "Could not save",
+          description: resp?.error ?? "Please try again",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        description: resp?.message,
+        description: resp.message,
         variant: "default",
       });
       router.push(`/auth/register/education/?step=5`);

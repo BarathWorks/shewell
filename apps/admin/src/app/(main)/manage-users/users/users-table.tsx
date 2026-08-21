@@ -1,164 +1,149 @@
 'use client';
+
+import React, { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
-import { Toolbar } from 'primereact/toolbar';
-import React, { ChangeEvent, useRef, useState } from 'react';
-import { Demo } from '@/types';
-import UserForm from '@/src/app/(main)/manage-users/users/user-form';
-import { IUser } from '@/src/_models/user.model';
 import { Tag } from 'primereact/tag';
-import { FilterMatchMode } from 'primereact/api';
+import { Toast } from 'primereact/toast';
+import { format } from 'date-fns';
 
-const UsersTable = ({ users }: { users: { id: string; email: string; firstName: string; middleName: string | null; lastName: string | null; accountType: string }[] }) => {
-  const emptyUser: IUser = { id: '', email: '', firstName: '', middleName: '', lastName: '', accountType: 'normal', active: false, password: '' };
-  const [userDialog, setUserDialog] = useState(false);
-  const [user, setUser] = useState<typeof emptyUser>(emptyUser);
-  const [selectedUsers, setSelectedUsers] = useState(null);
-  const [filters, setFilters] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-  });
-  const [globalFilter, setGlobalFilter] = useState('');
-  const dt = useRef<DataTable<any>>(null);
+import { IUser } from '@/src/_models/user.model';
+import { deactivateUser, restoreUser } from './user-actions';
 
-  const openNew = () => {
-    setUser({ ...emptyUser });
-    setUserDialog(true);
+/**
+ * Customer accounts — read-only, with the ability to disable and restore.
+ *
+ * There is no create or edit here on purpose: customers register themselves and
+ * verify by OTP, and editing a patient's own details from an admin screen is not
+ * something this product should offer. The previous version of this table sat on
+ * top of actions whose database writes were commented out, so it reported success
+ * without changing anything.
+ */
+const UsersTable = ({ users }: { users: IUser[] }) => {
+  const router = useRouter();
+  const toast = useRef<Toast>(null);
+  const [search, setSearch] = useState('');
+  const [pending, setPending] = useState<IUser | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const notify = (result: { message?: string; error?: string }) => {
+    if (result.error) {
+      toast.current?.show({ severity: 'error', summary: 'Not done', detail: result.error, life: 5000 });
+    } else {
+      toast.current?.show({ severity: 'success', summary: 'Done', detail: result.message, life: 3000 });
+      router.refresh();
+    }
   };
 
-  const hideDialog = () => {
-    setUserDialog(false);
+  const confirm = async () => {
+    if (!pending) return;
+    setBusy(true);
+    try {
+      const action = pending.deletedAt ? restoreUser : deactivateUser;
+      notify(await action({ id: pending.id }));
+    } finally {
+      setBusy(false);
+      setPending(null);
+    }
   };
 
-  const editUser = (user: typeof emptyUser) => {
-    setUser({ ...user });
-    setUserDialog(true);
+  const statusBody = (row: IUser) => {
+    if (row.deletedAt) return <Tag severity="danger" value="Disabled" />;
+    if (!row.verifiedAt) return <Tag severity="warning" value="Unverified" />;
+    return <Tag severity="success" value="Active" />;
   };
 
-  const exportCSV = () => {
-    dt.current?.exportCSV();
-  };
+  const joinedBody = (row: IUser) => format(new Date(row.createdAt), 'd MMM yyyy');
 
-  const leftToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        <div className="my-2">
-          <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-        {/*<FileUpload mode="basic" accept="image/*" maxFileSize={1000000} chooseLabel="Import" className="mr-2 inline-block" />*/}
-        <Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-      </React.Fragment>
-    );
-  };
-
-  const idBodyTemplate = (rowData: Demo.Product) => {
-    return (
-      <>
-        <span className="p-column-title">Id</span>
-        {rowData.id}
-      </>
-    );
-  };
-
-  const nameBodyTemplate = (rowData: Demo.Product) => {
-    return (
-      <>
-        <span className="p-column-title">Name</span>
-        {rowData.firstName} {rowData.middleName} {rowData.lastName}
-      </>
-    );
-  };
-
-  const emailBodyTemplate = (rowData: Demo.Product) => {
-    return (
-      <>
-        <span className="p-column-title">Name</span>
-        {rowData.email}
-      </>
-    );
-  };
-
-  const actionBodyTemplate = (rowData: typeof emptyUser) => {
-    return (
-      <>
-        <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editUser(rowData)} />
-      </>
-    );
-  };
-
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let _filters: any = { ...filters };
-
-    _filters.global.value = value;
-
-    setFilters(_filters);
-    setGlobalFilter(value);
-  };
+  const actionsBody = (row: IUser) => (
+    <Button
+      icon={row.deletedAt ? 'pi pi-refresh' : 'pi pi-ban'}
+      label={row.deletedAt ? 'Restore' : 'Disable'}
+      severity={row.deletedAt ? 'secondary' : 'danger'}
+      text
+      size="small"
+      onClick={() => setPending(row)}
+    />
+  );
 
   const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Users</h5>
+    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+      <h5 className="m-0">Customers</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
+        <InputText
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
+          placeholder="Search name, email or phone"
+        />
       </span>
     </div>
   );
-
-  const activeBodyTemplate = (rowData: Demo.Product) => {
-    return (
-      <>
-        <span className="p-column-title">Active</span>
-        {rowData.active ? <Tag severity="success">Yes</Tag> : <Tag severity="danger">No</Tag>}
-      </>
-    );
-  };
 
   return (
     <div className="grid crud-demo">
       <div className="col-12">
         <div className="card">
-          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+          <Toast ref={toast} />
 
           <DataTable
-            stripedRows
-            ref={dt}
             value={users}
-            selection={selectedUsers}
-            onSelectionChange={(e) => setSelectedUsers(e.value as any)}
             dataKey="id"
             paginator
             rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            className="datatable-responsive"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-            filters={filters}
-            globalFilterFields={['id', 'name', 'email']}
-            emptyMessage="No users found."
+            rowsPerPageOptions={[10, 25, 50]}
+            globalFilter={search}
+            globalFilterFields={['name', 'email', 'phoneNumber']}
             header={header}
-            exportFilename="Users"
+            emptyMessage="No customers yet."
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
           >
-            <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="email" header="Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="active" header="Active" sortable body={activeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
+            <Column field="name" header="Name" sortable headerStyle={{ minWidth: '12rem' }}></Column>
+            <Column field="email" header="Email" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+            <Column field="phoneNumber" header="Phone" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="registrationCount" header="Sessions" sortable headerStyle={{ minWidth: '7rem' }}></Column>
+            <Column field="createdAt" header="Joined" sortable body={joinedBody} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column header="Status" body={statusBody} headerStyle={{ minWidth: '8rem' }}></Column>
+            <Column body={actionsBody} headerStyle={{ minWidth: '9rem' }}></Column>
           </DataTable>
 
-          <Dialog visible={userDialog} style={{ width: '70vw' }} header="User Details" modal className="p-fluid" onHide={hideDialog}>
-            <UserForm user={user} hideDialog={hideDialog} />
+          <Dialog
+            visible={!!pending}
+            style={{ width: '420px' }}
+            header={pending?.deletedAt ? 'Restore customer' : 'Disable customer'}
+            modal
+            onHide={() => setPending(null)}
+            footer={
+              <>
+                <Button label="Cancel" icon="pi pi-times" text onClick={() => setPending(null)} disabled={busy} />
+                <Button
+                  label={pending?.deletedAt ? 'Restore' : 'Disable'}
+                  icon="pi pi-check"
+                  severity={pending?.deletedAt ? 'success' : 'danger'}
+                  loading={busy}
+                  onClick={confirm}
+                />
+              </>
+            }
+          >
+            <p className="m-0">
+              {pending?.deletedAt ? (
+                <>
+                  <strong>{pending?.name}</strong> will be able to sign in again.
+                </>
+              ) : (
+                <>
+                  <strong>{pending?.name}</strong> will no longer be able to sign in. Their bookings
+                  and payment history are kept.
+                </>
+              )}
+            </p>
           </Dialog>
         </div>
       </div>

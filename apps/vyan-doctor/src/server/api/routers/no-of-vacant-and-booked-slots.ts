@@ -5,6 +5,7 @@ import { db } from "~/server/db";
   import { createTRPCRouter, publicProcedure } from "../trpc";
   import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { getServerAuthSession } from "~/server/auth";
   export const noOfVacantAndBookesSlotsRouter = createTRPCRouter({
     noOfVacantAndBookedSlots: publicProcedure
       .input(
@@ -17,7 +18,7 @@ import { z } from "zod";
         const { month, year } = input;
   
         // Validate the session
-        const session = await getServerSession();
+        const session = await getServerAuthSession();
         console.log("Session at Vacant and Booked Slots:", session);
   
         if (!session || !session.user.email) {

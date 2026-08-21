@@ -14,6 +14,24 @@ import { ReceiptText } from "lucide-react";
 import Email from "next-auth/providers/email";
 import { compare } from "bcrypt";
 import router from "next/router";
+import { authCookies } from "~/lib/auth-cookies";
+import crypto from "crypto";
+import { consumeRateLimit, resetRateLimit } from "@repo/database";
+import type { PrismaClient } from "@repo/database";
+
+/** Attempts allowed against one account before the code is burned. */
+const MAX_OTP_ATTEMPTS = 5;
+const OTP_LOCKOUT_MINUTES = 5;
+const OTP_VALIDITY_MS = 5 * 60 * 1000;
+
+/** Constant-time compare; rejects an empty stored code outright. */
+function otpMatches(expected: string | null | undefined, received: string | null | undefined) {
+  if (!expected || !received) return false;
+  const a = Buffer.from(String(expected), "utf8");
+  const b = Buffer.from(String(received), "utf8");
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -50,6 +68,7 @@ declare module "next-auth/jwt" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+  cookies: authCookies,
   pages: {
     signIn: "/auth/login",
   },
@@ -77,7 +96,9 @@ export const authOptions: NextAuthOptions = {
     },
   },
 
-  adapter: PrismaAdapter(db),
+  adapter: // `db` is an extended client: `$extends` strips `$on`/`$use` from the type,
+  // though every model delegate the adapter uses is still present at runtime.
+  PrismaAdapter(db as unknown as PrismaClient),
   providers: [
     CredentialsProvider({
       id: "CrendentialsVyanClient",
@@ -98,6 +119,17 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials) {
           return null;
+        }
+
+        // Password guessing was previously unbounded against this endpoint.
+        const attempt = await consumeRateLimit(db, {
+          scope: "login:password",
+          subject: credentials.email,
+          limit: 10,
+          windowSeconds: 5 * 60,
+        });
+        if (!attempt.allowed) {
+          throw new Error("Too many sign-in attempts. Please try again shortly.");
         }
 
         // PERFORMANCE: Run both queries in parallel instead of sequentially
@@ -143,6 +175,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        await resetRateLimit(db, "login:password", credentials.email);
+
         return {
           id: user.id,
           name: user.name,
@@ -175,6 +209,19 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        // A six-digit code is 1e6 possibilities; unbounded, it is guessable well
+        // inside its five-minute life. This is the real sign-in path, so the limit
+        // has to live here and not only in the pre-check action.
+        const attempt = await consumeRateLimit(db, {
+          scope: "login:otp",
+          subject: credentials.email,
+          limit: 20,
+          windowSeconds: 5 * 60,
+        });
+        if (!attempt.allowed) {
+          throw new Error("Too many attempts. Please request a new OTP later.");
+        }
+
         // PERFORMANCE: Run both queries in parallel instead of sequentially
         const [isDoctorAccount, user] = await Promise.all([
           db.professionalUser.findFirst({
@@ -190,6 +237,8 @@ export const authOptions: NextAuthOptions = {
               name: true,
               otp: true,
               otpCreatedAt: true,
+              otpAttempts: true,
+              otpLockedUntil: true,
             },
             where: {
               email: credentials.email,
@@ -208,27 +257,57 @@ export const authOptions: NextAuthOptions = {
           throw new Error("User not found");
         }
 
-        // Verify OTP
-        if (user.otp !== credentials.otp) {
-          throw new Error("Invalid OTP");
+        if (user.otpLockedUntil && user.otpLockedUntil > new Date()) {
+          const minutes = Math.ceil((user.otpLockedUntil.getTime() - Date.now()) / 60000);
+          throw new Error(
+            `Too many incorrect attempts. Please try again in ${minutes} minute(s).`,
+          );
         }
 
-        // Check OTP expiry (5 minutes)
-        if (user.otpCreatedAt) {
-          const otpAge = Date.now() - new Date(user.otpCreatedAt).getTime();
-          const FIVE_MINUTES = 5 * 60 * 1000;
-          if (otpAge > FIVE_MINUTES) {
-            throw new Error("OTP has expired. Please request a new one.");
-          }
-        } else {
+        // Expiry first: a cleared code has `otpCreatedAt = null` and must not be
+        // treated as a wrong guess.
+        const issuedAt = user.otpCreatedAt ? new Date(user.otpCreatedAt).getTime() : 0;
+        if (!issuedAt || Date.now() - issuedAt > OTP_VALIDITY_MS) {
           throw new Error("OTP has expired. Please request a new one.");
         }
 
-        // Clear OTP after successful verification
+        // Constant-time, and an empty stored code never matches — a plain `!==`
+        // would accept an empty submission against a cleared code.
+        if (!otpMatches(user.otp, credentials.otp)) {
+          const attempts = user.otpAttempts + 1;
+          const exhausted = attempts >= MAX_OTP_ATTEMPTS;
+
+          await db.user.update({
+            where: { id: user.id },
+            data: {
+              otpAttempts: attempts,
+              // Burn the code as well as locking out; otherwise it stays guessable
+              // once the lockout expires.
+              ...(exhausted
+                ? {
+                    otpLockedUntil: new Date(Date.now() + OTP_LOCKOUT_MINUTES * 60 * 1000),
+                    otp: "",
+                    otpCreatedAt: null,
+                  }
+                : {}),
+            },
+          });
+
+          throw new Error(
+            exhausted
+              ? `Too many incorrect attempts. Please request a new OTP in ${OTP_LOCKOUT_MINUTES} minutes.`
+              : "Invalid OTP",
+          );
+        }
+
+        // Single use: clear the code and the counters.
         await db.user.update({
-          where: { email: credentials.email },
-          data: { otp: "", otpCreatedAt: null },
+          where: { id: user.id },
+          data: { otp: "", otpCreatedAt: null, otpAttempts: 0, otpLockedUntil: null },
         });
+
+        await resetRateLimit(db, "login:otp", credentials.email);
+        await resetRateLimit(db, "otp:send", credentials.email);
 
         return {
           id: user.id,

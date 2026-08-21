@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 import { Prisma } from "@repo/database";
 export const searchExpertRouter = createTRPCRouter({
   searchExpert: publicProcedure
@@ -13,7 +14,8 @@ export const searchExpertRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { specialization, languageIds } = input;
      
-      let whereCondition : Prisma.ProfessionalUserWhereInput = {}
+      // Seeded with the public gate so every branch below inherits it.
+      let whereCondition : Prisma.ProfessionalUserWhereInput = { ...PUBLIC_DOCTOR }
 
       if(input.specialization){
         whereCondition={
@@ -41,6 +43,8 @@ export const searchExpertRouter = createTRPCRouter({
         }
       }
       const experts = await db.professionalUser.findMany({
+      // Bounded: this listing grows with every practitioner onboarded.
+      take: 200,
       select : {
         id : true,
         aboutEducation : true,

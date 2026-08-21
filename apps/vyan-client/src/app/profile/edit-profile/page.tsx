@@ -1,4 +1,10 @@
-"use server";
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,20 +21,41 @@ import {
 import ProfileNav from "~/components/profile-nav";
 import ManagePasswordForm from "./manage-password-form";
 import { db } from "~/server/db";
-import { getServerSession } from "next-auth";
 import PersonalInformationForm from "./personal-information-form";
+import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
+
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
 
 const EditProfile = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
+
+  // Without this guard `session?.user.id` is undefined, Prisma drops the filter,
+  // and `findFirst` returns whichever user happens to be first in the table —
+  // rendering a stranger's profile to whoever is signed in.
+  if (!session?.user?.id) {
+    redirect("/auth/login");
+  }
+
   const userDetails = await db.user.findFirst({
     select: {
       email: true,
       phoneNumber: true,
       name: true,
-      passwordHash: true,
+      // `passwordHash` was selected here and reached the rendered HTML. Nothing on
+      // this page needs it.
     },
     where: {
-      email: session?.user.email!,
+      id: session.user.id,
+      deletedAt: null,
     },
   });
 

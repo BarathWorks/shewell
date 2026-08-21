@@ -1,32 +1,14 @@
-import { Metadata } from 'next';
-import Layout from '../../layout/layout';
+import { requireAdminPage } from '@/src/server/authz';
 
-interface AppLayoutProps {
-  children: React.ReactNode;
-}
-
-export const viewport = {
-  initialScale: 1,
-  width: 'device-width'
+/**
+ * Gates every route under /view-doctors.
+ *
+ * The pages here are client components, so the guard cannot live inside them —
+ * it goes in this server layout instead, which runs before any of them render.
+ */
+const ViewDoctorsLayout = async ({ children }: { children: React.ReactNode }) => {
+  await requireAdminPage('doctor:read');
+  return <>{children}</>;
 };
 
-export const metadata: Metadata = {
-  title: 'Shewell Admin',
-  description: 'Admin panel for Shewell web and mobile app.',
-  robots: { index: false, follow: false },
-  // openGraph: {
-  //   type: 'website',
-  //   title: 'Flexit Admin',
-  //   url: 'https://sakai.primereact.org/',
-  //   description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
-  //   images: ['https://www.primefaces.org/static/social/sakai-react.png'],
-  //   ttl: 604800
-  // },
-  icons: {
-    icon: '/favicon.ico'
-  }
-};
-
-export default function AppLayout({ children }: AppLayoutProps) {
-  return <Layout>{children}</Layout>;
-}
+export default ViewDoctorsLayout;

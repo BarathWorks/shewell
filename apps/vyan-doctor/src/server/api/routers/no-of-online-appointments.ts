@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import { BookAppointmentStatus } from "@repo/database";
 import { endOfDay, formatISO, startOfDay } from "date-fns";
+import { getServerAuthSession } from "~/server/auth";
 export const noOfOnlineAppointmentsRouter = createTRPCRouter({
   noOfOnlineAppointments: publicProcedure
     .input(
@@ -14,7 +14,7 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { startDate, endDate } = input;
-      const session = await getServerSession();
+      const session = await getServerAuthSession();
       console.log("session", session);
       if (!session) {
         throw new Error("Unauthorised");

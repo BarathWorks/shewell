@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '~/server/db';
-import { getServerSession } from 'next-auth';
+import { getServerAuthSession } from '~/server/auth';
 import { ObjectCannedACL, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache';
@@ -27,16 +27,26 @@ const getUploadPresignedUrl = async (key: string, isPublic: boolean, contentType
   return await getSignedUrl(s3, command, { expiresIn: 10 * 60 });
 };
 
-const uploadPanAction = async (professionalUserId : string,fileKey: string,fileName: string, mimeType: string ,  type : DocumentType) => {
-  const session = await getServerSession();
 
-  if (!session) {
+/**
+ * Built from the authenticated practitioner's id — never from the caller, which
+ * previously allowed minting a presigned PUT for any object in the bucket.
+ */
+const buildOwnedKey = (professionalUserId: string, prefix: string, fileName: string) => {
+  const safeName = (fileName || 'file').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100);
+  return `professionalUser/${professionalUserId}/${prefix}/${new Date().getTime()}-${safeName}`;
+};
+
+const uploadPanAction = async (_professionalUserId : string,_fileKey: string,fileName: string, mimeType: string ,  type : DocumentType) => {
+  const session = await getServerAuthSession();
+
+  if (!session?.user?.id) {
     return {
       error: 'Unauthorized'
     };
   }
-  // const key = `media/${new Date().getTime()}-${fileName}`;
-  const key = fileKey;
+  const professionalUserId = session.user.id;
+  const key = buildOwnedKey(professionalUserId, 'documents', fileName);
   const fileUrl = await getFileUrlFromKey(key);
 
   await db.document.deleteMany({
@@ -73,7 +83,7 @@ export const getFileUrlFromKey = (key: string) => {
 };
 
 export const deleteDocumentFromKey = async (professionalUserId : string, key: string, documentId : string) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session) {
     return {
@@ -109,7 +119,7 @@ export const deleteDocumentFromKey = async (professionalUserId : string, key: st
 };
 
 export const DocumentErrorThenUploadFailed = async (documentId: string) => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session) {
     return {

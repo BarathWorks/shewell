@@ -1,0 +1,24 @@
+{
+  "_comment": [
+    "Copy to scripts/vercel-env.config.json and fill in. That file is gitignored.",
+    "Domains must be the real production origins with no trailing slash:",
+    "NEXTAUTH_URL must exactly match the origin the app is served from, or",
+    "sign-in redirects break and the session cookie is rejected."
+  ],
+  "domains": {
+    "client": "https://www.shewellofficial.com",
+    "doctor": "https://doctor.shewellofficial.com",
+    "admin": "https://admin.shewellofficial.com"
+  },
+  "vercelProjects": {
+    "client": "shewell-client",
+    "doctor": "shewell-doctor",
+    "admin": "shewell-admin"
+  },
+  "secretsFrom": "apps/admin/.env.local",
+  "overrides": {
+    "NEXT_PUBLIC_GST": "18",
+    "NEXT_PUBLIC_PLATFORM_FEE": "10",
+    "LOG_LEVEL": "info"
+  }
+}

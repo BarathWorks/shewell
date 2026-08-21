@@ -55,7 +55,7 @@
 
 //     },
 //     where: {
-//       userName: params.userName,
+//       userName,
 //     },
 //   });
 
@@ -292,7 +292,8 @@ import AboutDoctor from "../about-doctor";
 import { Button } from "@repo/ui/src/@/components/button";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { PUBLIC_DOCTOR } from "~/server/api/bookable";
 import { api } from "~/trpc/react";
 import TimeSlots from "../date-with-time-slots";
 import React from "react";
@@ -301,7 +302,18 @@ import DoctorProfileContent from "./doctor-profile-content-username";
 
 
 
-const DoctorProfile = async ({ params }: { params: { username: string } }) => {
+// The segment is `[userName]`, so Next supplies `params.userName`. This read
+// `params.username` — a different key, and therefore always `undefined`. Prisma
+// drops an `undefined` filter rather than matching nothing, so the lookup fell
+// back to "any doctor" and every URL under /doctor-profile/* rendered the same
+// practitioner's profile regardless of the name in the address bar.
+const DoctorProfile = async ({ params }: { params: { userName: string } }) => {
+  // Next's App Router hands route segments over still percent-encoded, and these
+  // userNames contain spaces ("Gowtham K" arrives as "Gowtham%20K"), so an exact
+  // match never succeeded. This was masked until now: the lookup read the wrong
+  // params key, and Prisma drops an `undefined` filter rather than matching
+  // nothing, so any URL quietly resolved to whichever practitioner came first.
+  const userName = decodeURIComponent(params.userName);
   //   const session = await getServerSession();
   // console.log("bhu", session?.user.email);
   // const {data} = session
@@ -373,13 +385,19 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
         },
       },
     },
+    // Gated by the same rule as every other public practitioner route: an
+    // unapproved or soft-deleted profile is not reachable by direct link.
     where: {
-      userName: params.username,
+      userName,
+      ...PUBLIC_DOCTOR,
     },
   });
 
+  // 404, not a login redirect: whether an account exists is not something an
+  // anonymous visitor should be able to infer, and signing in would not reveal an
+  // unapproved profile either.
   if (!profile) {
-    redirect("/auth/login");
+    notFound();
   }
 
   // converting the decimal avgrating to string avgrating

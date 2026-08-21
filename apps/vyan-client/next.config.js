@@ -6,13 +6,18 @@ await import("./src/env.js");
 /** @type {import('next').NextConfig} */
 const config = {
   typescript: {
-    ignoreBuildErrors: true,
+    // Type errors fail the build. The systematic mismatch this was hiding is fixed:
+    // components declared hand-written prop types with required fields while the
+    // serialised tRPC output carries them as optional, and several date fields were
+    // compared as strings because tRPC 11.0.0 does not surface the configured
+    // superjson transformer in the AppRouter type.
+    ignoreBuildErrors: false,
   },
   eslint: {
+    // Left on: lint findings here are style-level and not worth blocking a deploy.
     ignoreDuringBuilds: true,
   },
-  transpilePackages: ["@repo/ui"],
-  allowedDevOrigins: ["144.24.147.193"],
+  transpilePackages: ["@repo/ui", "@repo/observability", "@repo/database"],
 
   // Production optimizations
   reactStrictMode: true,
@@ -25,6 +30,54 @@ const config = {
             exclude: ["error", "warn"],
           }
         : false,
+  },
+
+
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            // Content-Security-Policy. The header set was otherwise complete —
+            // frame-options, nosniff, HSTS, referrer, permissions — but had no CSP,
+            // which is the one control that bounds what injected script can do.
+            //
+            // 'unsafe-inline'/'unsafe-eval' on script-src is required by Next 14's
+            // inline bootstrap and dev overlay; tightening that needs per-request
+            // nonces, which is a larger change than this pass. The value here still
+            // pins *where* script may come from, which is what stops an injected
+            // tag from loading a remote payload or beaconing data out.
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "base-uri 'self'",
+              "object-src 'none'",
+              "frame-ancestors 'self'",
+              "form-action 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.amazonaws.com https://*.razorpay.com",
+              "connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com",
+              "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
   },
 
   // Optimize images
@@ -58,9 +111,9 @@ const config = {
 
   experimental: {
     optimizePackageImports: ["@repo/ui", "lucide-react", "framer-motion"],
+    // Enables src/instrumentation.ts (opt-in on Next 14).
+    instrumentationHook: true,
   },
-
-  output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
 
   // ✅ Fix for url.parse() deprecation warning
   webpack: (config) => {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "~/server/db";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   format,
   startOfMonth,
@@ -14,7 +14,7 @@ import {
 } from "date-fns";
 import { BookAppointmentStatus } from "@repo/database";
 export const searchCancelledAppointmentsRouter = createTRPCRouter({
-  searchCancelledAppointments: publicProcedure
+  searchCancelledAppointments: protectedProcedure
     // .input(
     //   z.object({
     //     date: z.date(),
@@ -30,7 +30,7 @@ export const searchCancelledAppointmentsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       //   const { date, timeRange } = input;
 
-      const user = { id: ctx.session?.user?.id };
+      const user = { id: ctx.session.user.id };
 
       // Calculate start and end dates based on the time range
       //   const yesterday = subDays(startOfDay(date), 1);
@@ -91,6 +91,12 @@ export const searchCancelledAppointmentsRouter = createTRPCRouter({
               ],
             },
           },
+          // The date filter above is commented out, so this returned a customer's
+          // entire cancellation history unbounded. Most recent first, capped.
+          orderBy: {
+            startingTime: "desc",
+          },
+          take: 100,
         });
         console.log("cancelledAppointments", cancelledAppointments);
         return { cancelledAppointments };

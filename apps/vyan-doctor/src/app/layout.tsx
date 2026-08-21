@@ -8,8 +8,9 @@ import { SessionProvider } from "next-auth/react";
 import Footer from "./components/shared/footer";
 import DoctorHeader from "./components/shared/doctor-header/doctor-header";
 import ClientSessionProvider from "./components/client-session-provider";
-import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
+import { safeValue } from "@repo/observability";
+import { getServerAuthSession } from "~/server/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,9 +24,16 @@ export const metadata = {
 };
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await getServerSession();
-  const specialisationParentCategories =
-    await db.professionalSpecializationParentCategory.findMany({
+  // Every one of these runs on every route. Unwrapped, a single database hiccup in
+  // the layout blanked the entire app; each now degrades independently to an empty
+  // result so the page around it still renders.
+  const session = await safeValue("layout:session", () => getServerAuthSession(), null, {
+    source: "root-layout",
+  });
+  const specialisationParentCategories = await safeValue(
+    "layout:specialisationParentCategories",
+    () =>
+      db.professionalSpecializationParentCategory.findMany({
       select: {
         id: true,
         name: true,
@@ -39,22 +47,30 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
           },
         },
       },
-      where: {
-        active: true,
-      },
-    });
+        where: {
+          active: true,
+        },
+      }),
+    [],
+    { source: "root-layout" }
+  );
 
-  const specializations = await db.professionalSpecializations.findMany({
-    select: {
-      id: true,
-      specialization: true,
-    },
-    where: {
-      
-      active: true,
-    },
-    take : 4
-  });
+  const specializations = await safeValue(
+    "layout:specializations",
+    () =>
+      db.professionalSpecializations.findMany({
+        select: {
+          id: true,
+          specialization: true,
+        },
+        where: {
+          active: true,
+        },
+        take: 4,
+      }),
+    [],
+    { source: "root-layout" }
+  );
 
   return (
     <html lang="en">

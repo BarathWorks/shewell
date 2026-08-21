@@ -93,7 +93,19 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  // `user.id` must be present, not just `user`.
+  //
+  // The session callback only assigns `user.id` when it finds a matching, non
+  // soft-deleted ProfessionalUser — so a deleted or mismatched account still yields
+  // a `user` object, with `id` undefined. The type augmentation declares `id` as
+  // `string`, which hides that from the compiler entirely.
+  //
+  // That matters because every procedure downstream puts this value straight into a
+  // Prisma `where`, and Prisma *drops* a filter whose value is `undefined` rather
+  // than matching nothing. A missing id would therefore widen a query scoped to
+  // "my appointments" into one that returns everybody's. The client and admin apps
+  // already check the id for this reason; this app did not.
+  if (!ctx.session?.user?.id) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

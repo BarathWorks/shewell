@@ -1,4 +1,10 @@
-"use server";
+// Server Component. Deliberately carries no directive.
+//
+// This file began with `"use server"`, which does not mean "this is a server
+// component" — components in the App Router are server-side by default. What it
+// means is "every export in this module is a Server Action", so the page component
+// itself became a callable POST endpoint that ran its queries for anyone who
+// invoked it.
 
 {
   /*old ui components*/
@@ -6,7 +12,9 @@
 // import Header from "~/components/shared/header";
 // import News from "./(news)/news";
 // import KeyFeatures from "./(key-features)/key-features";
-import dynamic from "next/dynamic";
+// Aliased: `dynamic` is also the name of the route-segment config export
+// below, and the two collide.
+import nextDynamic from "next/dynamic";
 // import Blogs from "./(blogs)/blogs";
 // import Subscribe from "./(subscirbe)/subscribe";
 // import Footer from "~/components/shared/footer";
@@ -21,46 +29,56 @@ import dynamic from "next/dynamic";
 // import { Header as NewHeader } from "~/components/header";
 import Hero from "~/components/hero";
 
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
+
 // Lazy load below-the-fold components with no SSR for better performance
-const WellnessCircle = dynamic(() => import("~/components/wellness-circle"), {
+const WellnessCircle = nextDynamic(() => import("~/components/wellness-circle"), {
   ssr: false,
 });
 
-const ServicesCarousel = dynamic(
+const ServicesCarousel = nextDynamic(
   () => import("~/components/services-carousel"),
   {
     ssr: false,
   },
 );
 
-const PlatformSection = dynamic(() => import("~/components/platform-section"), {
+const PlatformSection = nextDynamic(() => import("~/components/platform-section"), {
   ssr: false,
 });
 
-const PregnancyStages = dynamic(() => import("~/components/pregnancy-stages"), {
+const PregnancyStages = nextDynamic(() => import("~/components/pregnancy-stages"), {
   ssr: false,
 });
 
-const ExpertsCarousel = dynamic(() => import("~/components/experts-carousel"), {
+const ExpertsCarousel = nextDynamic(() => import("~/components/experts-carousel"), {
   ssr: false,
 });
 
-const UpcomingSessions = dynamic(
+const UpcomingSessions = nextDynamic(
   () => import("~/components/upcoming-sessions"),
   {
     ssr: false,
   },
 );
 
-const Partners = dynamic(() => import("~/components/partners"), {
+const Partners = nextDynamic(() => import("~/components/partners"), {
   ssr: false,
 });
 
-const WhyShewell = dynamic(() => import("~/components/why-shewell"), {
+const WhyShewell = nextDynamic(() => import("~/components/why-shewell"), {
   ssr: false,
 });
 
-const ShewellFAQ = dynamic(() => import("~/components/shewell-faq"), {
+const ShewellFAQ = nextDynamic(() => import("~/components/shewell-faq"), {
   ssr: false,
 });
 

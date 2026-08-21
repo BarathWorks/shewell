@@ -5,31 +5,39 @@ import "@smastrom/react-rating/style.css";
 import Link from "next/link";
 import Image from "next/image";
 
+/**
+ * Shaped to match what the tRPC query actually returns.
+ *
+ * Every field here was previously declared required while the serialised router
+ * output carries them as optional. The component already reads each one
+ * defensively with `?.`, so the mismatch was purely at the type level — but it was
+ * invisible while `ignoreBuildErrors` was on.
+ */
 interface IDoctorProfileProps {
   doctorProfile: {
     firstName?: string | null;
-    displayQualification: {
-      id: string;
-      specialization: string;
+    displayQualification?: {
+      id?: string;
+      specialization?: string;
     } | null;
     avgRating?: string | null;
-    professionalUserAppointmentPrices:
+    professionalUserAppointmentPrices?:
       | {
-          priceInCentsForSingle: number | null;
-          priceInCentsForCouple: number | null;
+          priceInCentsForSingle?: number | null;
+          priceInCentsForCouple?: number | null;
         }[]
       | null;
     totalConsultations?: number | null;
-    userName: string | null;
-    media: {
-      fileUrl: string | null;
+    userName?: string | null;
+    media?: {
+      fileUrl?: string | null;
     } | null;
-    languages: {
-      language: string;
+    languages?: {
+      language?: string;
     }[];
   };
   specialization: {
-    specialization: string;
+    specialization?: string;
   }[];
 }
 

@@ -5,9 +5,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+
 
 model User {
   id                   String                @id @default(cuid())
@@ -17,6 +19,10 @@ model User {
   phoneNumber          String
   otp                  String
   otpCreatedAt         DateTime?
+  // Brute-force protection. A 6-digit OTP is only 1e6 possibilities, so without a
+  // bounded attempt count it can be guessed well inside the 5-minute validity.
+  otpAttempts          Int                   @default(0)
+  otpLockedUntil       DateTime?
   notification         Notification[]
   verifiedAt           DateTime?
   ageGreaterThan18     Boolean
@@ -43,6 +49,11 @@ model PendingUser {
   ageGreaterThan18 Boolean  @default(false)
   otp              String
   otpExpiresAt     DateTime // OTP expires after this time
+  /// Brute-force protection, mirroring the login OTP flow. A 6-digit code is only
+  /// 1e6 possibilities, so without a bounded attempt count it is guessable well
+  /// inside its five-minute life.
+  otpAttempts      Int      @default(0)
+  otpLockedUntil   DateTime?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
@@ -306,6 +317,19 @@ model BookAppointment {
   @@index([startingTime])
   @@index([userId, status])
   @@index([userId, status, startingTime])
+  // Payment confirmation and the Razorpay webhook both look an appointment up by
+  // order id. Unindexed, every payment callback was a full table scan.
+  @@index([razorpayOrderId])
+
+  /// A partial unique index on ("professionalUserId", "startingTime") — excluding
+  /// cancelled rows — is created by the migration
+  /// `20260821000000_unique_active_appointment_slot`. It is what actually makes
+  /// double-booking impossible; the application check alone does not survive the
+  /// cancel-then-late-webhook sequence.
+  ///
+  /// It lives in raw SQL because Prisma cannot express a partial index, and it is
+  /// therefore INVISIBLE to schema diffing: `prisma migrate dev` will offer to drop
+  /// it as drift. Keep it. If a reset is unavoidable, re-apply that migration.
 }
 
 model Comment {
@@ -579,6 +603,9 @@ model AdminUser {
   email                          String                          @unique
   passwordHash                   String
   active                         Boolean                         @default(false)
+  /// Least privilege by default: promotion is a deliberate act.
+  role                           AdminRole                       @default(SUPPORT)
+  auditEntries                   AdminAuditLog[]
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
   initiatedPayouts               Payout[]
@@ -710,6 +737,11 @@ model Session {
   language    String      @default("English")
   type        SessionType @default(ONLINE)
 
+  // Column already exists in the database via migration
+  // 20260326171106_add_max_bookings_to_session; the model field was never committed,
+  // so every query selecting it failed at runtime.
+  maxBookings Int?
+
   categoryId String
   category   SessionCategory @relation(fields: [categoryId], references: [id])
 
@@ -764,6 +796,8 @@ model SessionRegistration {
   @@index([userId])
   @@index([sessionId])
   @@index([paymentStatus])
+  // Same reason as BookAppointment: the webhook resolves a registration by order id.
+  @@index([razorpayOrderId])
 }
 
 // ============================================
@@ -879,4 +913,72 @@ model ProfessionalIdentity {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+/// Durable, fixed-window rate limiting.
+///
+/// Serverless instances do not share memory, so an in-process counter would reset
+/// on every cold start and be trivially bypassed by parallel requests. Keeping the
+/// counter in Postgres makes the limit hold across every instance.
+model RateLimit {
+  id          String   @id @default(cuid())
+  /// Scope plus subject, e.g. "otp:send:user@example.com" or "login:1.2.3.4".
+  key         String   @unique
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+  /// When the current window ends; rows past this are reset or swept.
+  expiresAt   DateTime
+
+  @@index([expiresAt])
+}
+
+/// Admin capability tiers.
+///
+/// Previously every AdminUser could do everything, including initiating payouts and
+/// creating further admins. Least privilege is the default: a new admin can read,
+/// and nothing more, until deliberately promoted.
+enum AdminRole {
+  /// Full access, including managing other admins.
+  SUPER_ADMIN
+  /// Day-to-day operations: users, practitioners, sessions, appointments.
+  OPERATIONS
+  /// Payouts and financial records.
+  FINANCE
+  /// Blogs, banners, testimonials, categories.
+  CONTENT
+  /// Read-only.
+  SUPPORT
+}
+
+/// Append-only record of consequential admin actions.
+///
+/// Previously the only trace of any admin action was `Payout.initiatedByAdminId`.
+/// Approving a practitioner, disabling a customer, changing a colleague's role and
+/// deleting content all happened with no record of who or when — which for a
+/// product holding identity documents and patient data is not defensible.
+///
+/// Rows are never updated or deleted by the application.
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  /// Who acted. Kept as a relation so the actor can be named in the UI.
+  actorId    String
+  /// Denormalised so the entry still reads correctly if the account is later removed.
+  actorEmail String
+  /// Dotted event name, e.g. "admin.role_changed" or "doctor.approved".
+  action     String
+  /// Model the action touched, e.g. "AdminUser".
+  entity     String
+  entityId   String?
+  /// One line a human can read without decoding metadata.
+  summary    String?
+  /// Before/after values. Must never carry secrets or patient detail.
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor AdminUser @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@index([action])
 }

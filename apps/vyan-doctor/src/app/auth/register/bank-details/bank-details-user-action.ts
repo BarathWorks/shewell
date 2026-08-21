@@ -1,8 +1,8 @@
 "use server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface IBankDetailsProps {
   bankAccountHolderName: string;
@@ -10,6 +10,7 @@ interface IBankDetailsProps {
   bankName: string;
   bankBranch: string;
   bankIfscCode: string;
+  bankUpiId?: string;
 }
 
 export type ActionResult =
@@ -22,8 +23,9 @@ const BankDetailsUserAction = async ({
   bankName,
   bankBranch,
   bankIfscCode,
+  bankUpiId,
 }: IBankDetailsProps): Promise<ActionResult> => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if (!session?.user?.email) {
     return {
       success: false,
@@ -40,6 +42,12 @@ const BankDetailsUserAction = async ({
       .string()
       .min(1, "IFSC code is required")
       .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
+    bankUpiId: z
+      .string()
+      .trim()
+      .regex(/^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/, "Invalid UPI ID")
+      .optional()
+      .or(z.literal("")),
   });
 
   const isValidData = formData.safeParse({
@@ -48,6 +56,7 @@ const BankDetailsUserAction = async ({
     bankName,
     bankBranch,
     bankIfscCode,
+    bankUpiId,
   });
 
   if (!isValidData.success) {
@@ -75,6 +84,9 @@ const BankDetailsUserAction = async ({
         bankName,
         bankBranch,
         bankIfscCode,
+        // Stored as null rather than "" so the admin payouts screen's presence
+        // check reads correctly.
+        bankUpiId: isValidData.data.bankUpiId || null,
       },
       where: {
         email: session.user.email,

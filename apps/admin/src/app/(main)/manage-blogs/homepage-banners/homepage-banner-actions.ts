@@ -3,14 +3,14 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { IBlogCategory } from '@/src/_models/blog-category.model';
 import { IBlogForm } from '@/src/_models/blog.model';
 import { IHomepageBanner, IHomepageBannerForm } from '@/src/_models/homepage-banner.model';
 import { HomeBannerType } from '@repo/database';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createHomePageBanner = async (data: IHomepageBannerForm) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -28,7 +28,7 @@ export const createHomePageBanner = async (data: IHomepageBannerForm) => {
     usedFor : z.enum([HomeBannerType.HomeBannerClient, HomeBannerType.HomeBannerDoctor])
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     order,
     url,
     active,
@@ -36,11 +36,16 @@ export const createHomePageBanner = async (data: IHomepageBannerForm) => {
     usedFor
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.homeBanner.create({
     data: {
@@ -59,7 +64,7 @@ export const createHomePageBanner = async (data: IHomepageBannerForm) => {
 };
 
 export const updateHomepageBanner = async (data: IHomepageBannerForm) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -78,7 +83,7 @@ export const updateHomepageBanner = async (data: IHomepageBannerForm) => {
     usedFor : z.enum([HomeBannerType.HomeBannerClient, HomeBannerType.HomeBannerDoctor])
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     order,
     url,
@@ -86,6 +91,17 @@ export const updateHomepageBanner = async (data: IHomepageBannerForm) => {
     mediaId,
     usedFor
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.homeBanner.update({
     where: {
@@ -108,7 +124,7 @@ export const updateHomepageBanner = async (data: IHomepageBannerForm) => {
 
 
 export const deleteHomePageBanners = async( ids : string[]) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {

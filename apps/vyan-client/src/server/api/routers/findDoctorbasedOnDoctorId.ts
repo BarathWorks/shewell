@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 export const findDoctorbasedOnDoctorIdRouter = createTRPCRouter({
   findDoctorbasedOnDoctorId: publicProcedure
     .input(z.object({
@@ -26,8 +27,10 @@ export const findDoctorbasedOnDoctorIdRouter = createTRPCRouter({
           //   },
           // },
         },
+        // Gated: a by-id lookup must not reach an unapproved or deleted practitioner.
         where:{
-            id : doctorId
+            id : doctorId,
+            ...PUBLIC_DOCTOR
         }
       });
       console.log("professionalUser", professionalUser);

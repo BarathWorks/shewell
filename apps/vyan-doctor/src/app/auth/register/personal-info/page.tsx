@@ -1,11 +1,11 @@
 import { db } from "~/server/db";
 import PersonalInfoForm from "./personal-info-form";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
+import { getServerAuthSession } from "~/server/auth";
 
 const PersonalInfoPage = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if (!session?.user?.email) {
     redirect("/auth/login");

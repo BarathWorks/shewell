@@ -18,10 +18,17 @@ import { BookAppointmentStatus } from "@repo/database";
 import React from "react";
 import AppointmentSkeleton from "./appointment-skeleton";
 const currentDate = new Date();
+/**
+ * Optional throughout, matching what the tRPC query actually returns.
+ *
+ * These fields were declared required while the serialised router output carries
+ * them as optional — the mismatch that `ignoreBuildErrors` was hiding. The JSX
+ * already reads each one defensively.
+ */
 interface IAdditionalPatients {
-  firstName: string;
-  phoneNumber: string;
-  email: string;
+  firstName?: string;
+  phoneNumber?: string;
+  email?: string;
 }
 const StarDrawing = (
   <path d="M15.1533 1.24496C14.6395 0.359428 13.3607 0.359425 12.8468 1.24496L9.2281 7.48137C8.97427 7.91882 8.53553 8.21734 8.03545 8.29287L1.2537 9.31717C0.114654 9.48921 -0.284892 10.9274 0.602182 11.6623L5.6543 15.8479C6.12196 16.2354 6.34185 16.8465 6.22825 17.4431L4.90669 24.3833C4.69778 25.4804 5.8495 26.3328 6.8377 25.8125L13.2236 22.4501C13.7096 22.1941 14.2905 22.1941 14.7766 22.4501L21.1625 25.8125C22.1507 26.3328 23.3024 25.4804 23.0935 24.3833L21.7719 17.4431C21.6583 16.8465 21.8782 16.2354 22.3459 15.8479L27.398 11.6623C28.285 10.9274 27.8855 9.48921 26.7465 9.31717L19.9647 8.29287C19.4646 8.21734 19.0259 7.91882 18.7721 7.48137L15.1533 1.24496Z" />
@@ -102,6 +109,12 @@ const Past = ({ duration }: { duration: Duration | undefined }) => {
       bookAppointmentId,
     })
       .then((resp) => {
+        // See the note in past-form.tsx: a rejected review returns `{ error }`, and
+        // reading only `message` showed an empty toast.
+        if (resp?.error) {
+          toast({ description: resp.error, variant: "destructive" });
+          return;
+        }
         toast({
           description: resp?.message,
           variant: "default",

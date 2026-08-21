@@ -10,6 +10,7 @@ import { Demo } from '@/types';
 import { Tag } from 'primereact/tag';
 import AdminUserForm from '@/src/app/(main)/manage-users/admin-users/admin-user-form';
 import { FilterMatchMode } from 'primereact/api';
+import { ADMIN_ROLES, type IAdminUser } from '@/src/_models/admin-user.model';
 
 const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: string; name: string }[] }) => {
   const emptyAdminUser = { id: '', email: '', name: '', password: '', active: false };
@@ -86,6 +87,16 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
     );
   };
 
+  const roleBodyTemplate = (rowData: IAdminUser) => {
+    const label = ADMIN_ROLES.find((r) => r.value === rowData.role)?.label ?? rowData.role ?? '—';
+    return (
+      <>
+        <span className="p-column-title">Role</span>
+        {label}
+      </>
+    );
+  };
+
   const activeBodyTemplate = (rowData: Demo.Product) => {
     return (
       <>
@@ -152,6 +163,7 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
             <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column field="email" header="Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+            <Column field="role" header="Role" sortable body={roleBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="active" header="Active" sortable body={activeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
             <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
           </DataTable>

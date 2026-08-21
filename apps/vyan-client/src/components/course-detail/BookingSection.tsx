@@ -115,17 +115,21 @@ export const BookingSection = ({
     return true;
   };
 
-  const getStepImage = () => {
-    switch (step) {
-      case 1:
-        return banners?.[0].media.fileUrl;
-      case 2:
-        return banners?.[1].media.fileUrl;
+  // A session may legitimately have no banners, or fewer than the step being
+  // rendered. `banners?.[0].media` only guarded `banners` itself being nullish —
+  // on an empty array `banners[0]` is `undefined` and reading `.media` threw:
+  //   TypeError: Cannot read properties of undefined (reading 'media')
+  // Optional-chain every hop, and fall back to a local asset rather than an
+  // external placeholder host (which the CSP blocks anyway).
+  const FALLBACK_IMAGE = "/product-fallback.png";
 
-      default:
-        return banners?.[0].media.fileUrl;
-    }
-  };
+  const bannerImage = (index: number) =>
+    banners?.[index]?.media?.fileUrl ?? undefined;
+
+  const getStepImage = () =>
+    // Step 2 falls back to the first banner when only one is configured.
+    (step === 2 ? bannerImage(1) ?? bannerImage(0) : bannerImage(0)) ??
+    FALLBACK_IMAGE;
 
   // Load Razorpay SDK
   const initializeRazorpay = () => {
@@ -196,7 +200,12 @@ export const BookingSection = ({
             });
 
             if (verifyResponse.success) {
-              toast.success("Payment successful! Your session is booked.");
+              // `toast` has no `.success` — it is called with an options object.
+              // As written this threw, on the success path of a completed payment.
+              toast({
+                title: "Payment successful! Your session is booked.",
+                variant: "default",
+              });
               window.location.reload();
             } else {
               setError(verifyResponse.message || "Payment verification failed");
@@ -253,11 +262,12 @@ export const BookingSection = ({
                   alt="Booking backdrop"
                   className="h-full w-full object-cover object-center"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      banners?.[0].media.fileUrl ||
-                      "https://placehold.co/800x1200?text=Booking+Session";
-
-                    console.log("banners", banners);
+                    // Local asset, not an external placeholder service: the CSP
+                    // img-src allowlist does not include one, so the fallback
+                    // would be blocked and leave a broken image.
+                    const img = e.target as HTMLImageElement;
+                    if (img.src.endsWith(FALLBACK_IMAGE)) return; // avoid a loop
+                    img.src = FALLBACK_IMAGE;
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#F8FAFB]/30 md:to-transparent" />

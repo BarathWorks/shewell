@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getServerSession } from "next-auth";
 import { BookAppointmentStatus } from "@repo/database";
+import { getServerAuthSession } from "~/server/auth";
 type IGoogleCalenderEvent = {
   kind: string;
   etag: string;
@@ -68,7 +68,7 @@ export const searchMeetingRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { date } = input;
-      const session = await getServerSession();
+      const session = await getServerAuthSession();
       console.log("session", session);
       if(!session){
         throw new Error("Unauthorised")

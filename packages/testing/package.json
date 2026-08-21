@@ -1,0 +1,22 @@
+{
+  "name": "@repo/testing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:security": "vitest run security",
+    "test:e2e": "vitest run e2e"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.5",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "@repo/database": "workspace:*",
+    "bcrypt": "^5.1.1"
+  }
+}

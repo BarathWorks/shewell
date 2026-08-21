@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { db } from "~/server/db";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 export const searchPatientRouter = createTRPCRouter({
-  searchPatient: publicProcedure
+  searchPatient: protectedProcedure
     .input(
       z.object({
         id: z.string().optional(),
@@ -11,10 +11,7 @@ export const searchPatientRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { id } = input;
 
-      const user = { id: ctx.session?.user?.id };
-      if (!user.id) {
-        return;
-      }
+      const user = { id: ctx.session.user.id };
       const patient = await db.patient.findMany({
         where: {
           userId: user.id,

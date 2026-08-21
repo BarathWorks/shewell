@@ -1,10 +1,10 @@
 import { db } from "~/server/db";
 import UploadForm from "./upload-form";
-import { getServerSession } from "next-auth";
 import React from "react";
 import { DocumentType } from "@repo/database";
+import { getServerAuthSession } from "~/server/auth";
 const Upload = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   if(!session){
     return
   }

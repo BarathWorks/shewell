@@ -1,7 +1,7 @@
 "use server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface ISpecialization {
   value: string;
@@ -13,15 +13,23 @@ interface ISpecializationProps {
 const SpecializationUserAction = async ({
   specializations,
 }: ISpecializationProps) => {
-  const session = await getServerSession();
-  console.log("chek", session);
+  const session = await getServerAuthSession();
+
+  // The session was fetched and only logged, never checked — and the log printed
+  // the whole session object on every call. This app does not strip console
+  // statements in production.
+  if (!session?.user?.id) {
+    return { message: "Unauthorized" };
+  }
 
   try {
-    // fetching professional user
-    const professionalUser = await db.professionalUser.findUnique({
+    // Resolved by id from the session rather than by an unchecked email.
+    const professionalUser = await db.professionalUser.findFirst({
       where: {
-        email: session?.user.email!,
+        id: session.user.id,
+        deletedAt: null,
       },
+      select: { id: true },
     });
 
     // check if professional user exists

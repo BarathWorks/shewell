@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface ILanguageProps {
   id: string;
@@ -43,7 +43,7 @@ async function QualificationUserAction({
   try {
     const result = await db.$transaction(
       async (tx) => {
-        const session = await getServerSession();
+        const session = await getServerAuthSession();
         if (!session?.user?.email) {
           throw new Error("Unauthorised user");
         }

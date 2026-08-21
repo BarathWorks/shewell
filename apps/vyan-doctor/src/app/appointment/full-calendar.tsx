@@ -122,7 +122,9 @@ const FullCalendarPage = ({
   // );
 
   // // Process the data to create events
-  const events = data
+  // Annotated explicitly: the ternary's `{}` branch otherwise widens the union so
+  // `Object.values` yields `unknown[]`, which FullCalendar's `events` prop rejects.
+  const events: Events = data
     ? (data.meetingsForADayRange as any[]).reduce((acc: Events, meeting: Meeting) => {
         const meetingDate = meeting.startingTime.toISOString().split("T")[0]; // Convert to YYYY-MM-DD format
         if (!acc[meetingDate!]) {

@@ -38,10 +38,11 @@ interface ISelectDateTime {
   patientEmail: string;
   patientPhoneNumber: string;
   isCouple: boolean;
+  // Optional, matching the serialised tRPC output these values come from.
   additionalPatients: {
-    firstName: string;
-    phoneNumber: string;
-    email: string;
+    firstName?: string;
+    phoneNumber?: string;
+    email?: string;
   }[];
   open: boolean;
   defaultDuration: number;
@@ -322,7 +323,14 @@ const Rebook = ({
       firstName: patientFirstName,
       email: patientEmail,
       phoneNumber: patientPhoneNumber,
-      additionalPatients: additionalPatients,
+      // Normalised at the boundary rather than weakening the server's contract:
+      // these values come from existing patient records so they are present at
+      // runtime, but the serialised query type reports them as optional.
+      additionalPatients: (additionalPatients ?? []).map((p) => ({
+        firstName: p.firstName ?? "",
+        email: p.email ?? "",
+        phoneNumber: p.phoneNumber ?? "",
+      })),
     },
     startingTime: selectedTimeSlot?.startingTime!,
     endingTime: selectedTimeSlot?.endingTime!,

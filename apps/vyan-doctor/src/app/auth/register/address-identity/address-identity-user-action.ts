@@ -1,7 +1,7 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
 
 interface AddressIdentityData {
   countryId: string;
@@ -21,7 +21,7 @@ export type ActionResult =
 export default async function AddressIdentityUserAction(
   data: AddressIdentityData
 ): Promise<ActionResult> {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
   
   if (!session?.user?.email) {
     return { success: false, error: "Unauthorized - Please login" };

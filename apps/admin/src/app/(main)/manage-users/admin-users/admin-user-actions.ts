@@ -4,12 +4,44 @@ import { db } from '@/src/server/db';
 import { hash } from 'bcrypt';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { authOptions } from '@/src/server/auth';
 import { IAdminUser } from '@/src/_models/admin-user.model';
-import { getServerSession } from 'next-auth';
+import { requireAdminSession } from '@/src/server/authz';
+import { captureException, logger } from '@repo/observability';
+import { recordAudit } from '@/src/server/audit';
+
+/**
+ * Admin account management.
+ *
+ * Every path here can escalate privilege, so the rules are explicit:
+ *   - `role` is settable, and defaults to the least-privileged tier;
+ *   - an admin cannot deactivate or demote themselves;
+ *   - the last active SUPER_ADMIN cannot be removed or demoted, because doing so
+ *     locks everyone out with no route back except direct database access.
+ */
+
+const BCRYPT_COST = 12;
+const MIN_PASSWORD_LENGTH = 12;
+
+const ROLES = ['SUPER_ADMIN', 'OPERATIONS', 'FINANCE', 'CONTENT', 'SUPPORT'] as const;
+
+/** True when demoting or deactivating this admin would leave no active super admin. */
+async function isLastSuperAdmin(id: string): Promise<boolean> {
+  const target = await db.adminUser.findFirst({
+    where: { id, active: true },
+    select: { role: true }
+  });
+
+  if (target?.role !== 'SUPER_ADMIN') return false;
+
+  const others = await db.adminUser.count({
+    where: { role: 'SUPER_ADMIN', active: true, id: { not: id } }
+  });
+
+  return others === 0;
+}
 
 export const createAdminUser = async (data: IAdminUser) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('admin:write');
 
   if (!session) {
     return {
@@ -17,47 +49,65 @@ export const createAdminUser = async (data: IAdminUser) => {
     };
   }
 
-  const { name, email, active, password } = data;
-
-  const FormData = z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-    password: z.string().min(8),
-    active: z.boolean()
+  const schema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Enter a valid email address'),
+    password: z.string().min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`),
+    active: z.boolean(),
+    // Least privilege when unspecified.
+    role: z.enum(ROLES).default('SUPPORT')
   });
 
-  const isValidData = FormData.parse({
-    name,
-    email,
-    password,
-    active
-  });
+  const parsed = schema.safeParse(data);
 
-  if (!isValidData) {
+  if (!parsed.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsed.error.flatten().fieldErrors
     };
   }
 
-  const passwordHash = await hash(password as string, 10);
+  const { name, email, password, active, role } = parsed.data;
+  // Stored lowercase to match the seed script and the reset flow; sign-in also
+  // compares case-insensitively, but keeping one canonical form avoids duplicates.
+  const normalizedEmail = email.trim().toLowerCase();
 
-  await db.adminUser.create({
-    data: {
-      name: name as string,
-      email: email as string,
-      active: !!active,
-      passwordHash
+  try {
+    const existing = await db.adminUser.findUnique({ where: { email: normalizedEmail } });
+    if (existing) {
+      return { error: 'An admin with that email already exists' };
     }
-  });
 
-  revalidatePath('/manage-users/admin-users');
-  return {
-    message: 'Admin user created successfully'
-  };
+    const passwordHash = await hash(password, BCRYPT_COST);
+
+    const created = await db.adminUser.create({
+      data: { name, email: normalizedEmail, active, role, passwordHash },
+      select: { id: true, role: true }
+    });
+
+    await recordAudit({
+      actor: session,
+      action: 'admin.account_created',
+      entity: 'AdminUser',
+      entityId: created.id,
+      summary: `Created admin with role ${created.role}`,
+      metadata: { role: created.role, active }
+    });
+
+    revalidatePath('/manage-users/admin-users');
+    return { message: 'Admin user created successfully' };
+  } catch (error) {
+    const captured = captureException(error, {
+      source: 'admin-action',
+      route: 'createAdminUser',
+      actorId: session.id
+    });
+    return { error: `${captured.message} (ref ${captured.reference})` };
+  }
 };
 
 export const updateAdminUser = async (data: IAdminUser) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('admin:write');
 
   if (!session) {
     return {
@@ -65,48 +115,87 @@ export const updateAdminUser = async (data: IAdminUser) => {
     };
   }
 
-  const { id, name, email, active } = data;
-
-  const FormData = z.object({
-    id: z.string(),
-    name: z.string().min(1),
-    email: z.string().email(),
-    active: z.boolean()
-    // password: z.string().min(8).nullable()
+  const schema = z.object({
+    id: z.string().min(1),
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Enter a valid email address'),
+    active: z.boolean(),
+    role: z.enum(ROLES)
   });
 
-  const isValidData = FormData.parse({
-    id,
-    name,
-    email,
-    active
-    // password
-  });
+  const parsed = schema.safeParse(data);
 
-  if (!active) {
-    await db.session.deleteMany({
-      where: {
-        id: id as string
-      }
-    });
+  if (!parsed.success) {
+    return {
+      error: 'Invalid data',
+      details: parsed.error.flatten().fieldErrors
+    };
   }
 
-  // const passwordHash = await hash(password as string, 10);
+  const { id, name, email, active, role } = parsed.data;
+  const normalizedEmail = email.trim().toLowerCase();
 
-  await db.adminUser.update({
-    where: {
-      id: id as string
-    },
-    data: {
-      name: name as string,
-      email: email as string,
-      // passwordHash
-      active: !!active
+  // Self-protection: losing your own access mid-session is confusing, and doing it
+  // as the only super admin is unrecoverable.
+  if (id === session.id) {
+    if (!active) {
+      return { error: 'You cannot deactivate your own account' };
     }
-  });
+    if (role !== 'SUPER_ADMIN' && session.role === 'SUPER_ADMIN') {
+      return { error: 'You cannot remove your own super admin role' };
+    }
+  }
 
-  revalidatePath('/manage-users/admin-users');
-  return {
-    message: 'Admin user updated successfully'
-  };
+  if ((!active || role !== 'SUPER_ADMIN') && (await isLastSuperAdmin(id))) {
+    return {
+      error: 'This is the last active super admin. Promote another admin first.'
+    };
+  }
+
+  try {
+    const clash = await db.adminUser.findFirst({
+      where: { email: normalizedEmail, id: { not: id } },
+      select: { id: true }
+    });
+    if (clash) {
+      return { error: 'Another admin already uses that email' };
+    }
+
+    const before = await db.adminUser.findUnique({
+      where: { id },
+      select: { role: true, active: true }
+    });
+
+    await db.adminUser.update({
+      where: { id },
+      data: { name, email: normalizedEmail, active, role }
+    });
+
+    // Role and activation changes are the ones worth being able to reconstruct.
+    if (before && (before.role !== role || before.active !== active)) {
+      await recordAudit({
+        actor: session,
+        action: 'admin.account_changed',
+        entity: 'AdminUser',
+        entityId: id,
+        summary: `Role ${before.role} → ${role}, active ${before.active} → ${active}`,
+        metadata: {
+          fromRole: before.role,
+          toRole: role,
+          fromActive: before.active,
+          toActive: active
+        }
+      });
+    }
+
+    revalidatePath('/manage-users/admin-users');
+    return { message: 'Admin user updated successfully' };
+  } catch (error) {
+    const captured = captureException(error, {
+      source: 'admin-action',
+      route: 'updateAdminUser',
+      actorId: session.id
+    });
+    return { error: `${captured.message} (ref ${captured.reference})` };
+  }
 };

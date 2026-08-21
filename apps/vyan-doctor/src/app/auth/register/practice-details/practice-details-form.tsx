@@ -100,6 +100,19 @@ const PracticeDetailsForm = ({
     })
       .then((resp) => {
         setLoadingState(false);
+        // These actions report failure by RETURNING `{ success: false, error }`
+        // rather than throwing, so the `.catch` below never sees it. Without this
+        // check a failed save showed a success toast and advanced to the next
+        // registration step, silently discarding what the practitioner entered.
+        if (!resp?.success) {
+          toast({
+            title: "Could not save",
+            description: resp?.error ?? "Please try again",
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
           description: resp?.message,
           variant: "default",

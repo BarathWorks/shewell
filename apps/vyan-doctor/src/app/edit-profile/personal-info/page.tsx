@@ -1,9 +1,9 @@
 import { db } from "~/server/db";
 import PersonalInfoForm from "./personal-info-form";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/auth";
 
 const PersonalInfo = async () => {
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if(!session){
     return

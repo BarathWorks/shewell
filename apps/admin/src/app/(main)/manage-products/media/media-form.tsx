@@ -1,4 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,6 +17,7 @@ type CurrencyFormProps = {
 };
 
 const MediaForm = ({ media, hideDialog }: CurrencyFormProps) => {
+  const router = useRouter();
   const fileInputRef = useRef<FileUpload>(null);
   const [uploadingState, setUploadingState] = useState<0 | 1 | 2>(0);
   const { showToast } = useToastContext();
@@ -58,10 +60,15 @@ const MediaForm = ({ media, hideDialog }: CurrencyFormProps) => {
     return callServerAction(data)
       .then((resp) => {
         if (resp.error) {
-          showToast('error', 'Error', resp.error);
+          showToast('error', 'Error', resp.error ?? 'Upload failed');
         }
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })
@@ -80,8 +87,8 @@ const MediaForm = ({ media, hideDialog }: CurrencyFormProps) => {
         setUploadingState(1);
         getPresignedMediaImageUrl(image.name, image.type)
           .then(async (resp) => {
-            if (resp.error) {
-              showToast('error', 'Error', resp.error);
+            if ('error' in resp) {
+              showToast('error', 'Error', resp.error ?? 'Upload failed');
               setUploadingState(2);
               fileInputRef.current?.clear();
               return;

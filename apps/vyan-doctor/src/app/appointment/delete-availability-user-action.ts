@@ -1,13 +1,13 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db } from "~/server/db";
 import { format, formatISO } from "date-fns";
+import { getServerAuthSession } from "~/server/auth";
 
 const DeleteAvailabilityUserAction = async (date: Date) => {
   //   console.log("datesforunavailabilityDay", formatISO(date));
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   if(!session){
     throw new Error("Unauthorised")

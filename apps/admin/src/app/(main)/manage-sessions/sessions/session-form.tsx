@@ -1,4 +1,5 @@
 import SubmitButton from '@/src/_components/shared/submit-button';
+import { useRouter } from 'next/navigation';
 import useToastContext from '@/src/_hooks/useToast';
 import { ISessionCategory } from '@/src/_models/session-category.model';
 import { ISession } from '@/src/_models/session.model';
@@ -25,6 +26,7 @@ type SessionFormProps = {
 };
 
 const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
+  const router = useRouter();
   const { showToast } = useToastContext();
   const thumbnailFileInputRef = useRef<FileUpload>(null);
   const bannerFileInputRef = useRef<FileUpload>(null);
@@ -93,6 +95,9 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
 
     try {
       const resp = await uploadProductImage(file.name, file.type, 'Session Thumbnail');
+      if ('error' in resp) {
+        throw new Error(resp.error);
+      }
       const { id, fileUrl, presignedUrl } = resp;
       if (!presignedUrl || !id || !fileUrl) {
         throw new Error('Failed to get upload URL');
@@ -138,6 +143,9 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
         if (newBanners.length >= 2) break;
 
         const resp = await uploadProductImage(file.name, file.type, 'Session Banner');
+        if ('error' in resp) {
+          throw new Error(resp.error);
+        }
         const { id, fileUrl, presignedUrl } = resp;
         if (!presignedUrl || !id || !fileUrl) {
           throw new Error('Failed to get upload URL');
@@ -196,6 +204,11 @@ const SessionForm = ({ hideDialog, session, categories }: SessionFormProps) => {
 
         if (resp.message) {
           showToast('success', 'Successful', resp.message);
+          // Refresh the server-rendered table. `revalidatePath` in the action marks
+          // the cache stale but does not re-render the page the caller is already
+          // sitting on, so every admin CRUD screen showed stale rows until a manual
+          // reload.
+          router.refresh();
           hideDialog();
         }
       })

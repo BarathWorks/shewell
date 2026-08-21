@@ -18,7 +18,10 @@ export const sessionRouter = createTRPCRouter({
         minPrice: z.number().optional(),
         maxPrice: z.number().optional(),
         sortBy: z.enum(["price-asc", "price-desc"]).optional(),
-        status: z.nativeEnum(SessionStatus).optional(),
+        // `status` used to be accepted from the caller and defaulted to PUBLISHED
+        // only when absent — so passing `status: "DRAFT"` listed unpublished
+        // sessions to anyone. This is a public procedure; it shows published
+        // sessions and nothing else.
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         isOnlyOnline: z.string().optional(),
@@ -27,8 +30,8 @@ export const sessionRouter = createTRPCRouter({
     .query(async ({ input }) => {
       // Build flat AND array for clean index usage
       const andConditions: Prisma.SessionWhereInput[] = [
-        // Default to PUBLISHED unless caller explicitly requests another status
-        { status: input.status ?? SessionStatus.PUBLISHED },
+        // Not negotiable by the caller.
+        { status: SessionStatus.PUBLISHED },
         // Only show future online sessions or recordings (recordings always visible)
         {
           OR: [
@@ -81,6 +84,8 @@ export const sessionRouter = createTRPCRouter({
         orderBy: input.sortBy
           ? { price: input.sortBy === "price-asc" ? "asc" : "desc" }
           : { startAt: "asc" },
+        // Bounded: this returned every matching row.
+        take: 200,
       });
 
       return { sessions };
@@ -92,13 +97,12 @@ export const sessionRouter = createTRPCRouter({
       z.object({
         trimester: z.nativeEnum(Trimester).optional(),
         categoryId: z.string().optional(),
-        status: z.nativeEnum(SessionStatus).optional(),
+        // `status` removed for the same reason as `filterSessions`.
       }),
     )
     .query(async ({ input }) => {
       const whereCondition: Prisma.SessionWhereInput = {
-        // Default to PUBLISHED unless explicitly specified
-        status: input.status ?? SessionStatus.PUBLISHED,
+        status: SessionStatus.PUBLISHED,
       };
 
       if (input.categoryId) {
@@ -146,7 +150,11 @@ export const sessionRouter = createTRPCRouter({
   // This avoids fetching all registrations (can be thousands) on a public page.
   getSessionBySlug: publicProcedure
     .input(z.object({ slug: z.string(), userId: z.string().optional() }))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      // Scope registrations to the caller's own session. `input.userId` is accepted
+      // for signature compatibility but ignored — trusting it let anyone probe
+      // whether an arbitrary user had registered for a session.
+      const viewerId = ctx.session?.user?.id;
       const session = await db.session.findUnique({
         where: { slug: input.slug },
         select: {
@@ -169,7 +177,10 @@ export const sessionRouter = createTRPCRouter({
             },
           },
           overview: true,
-          meetingLink: true,
+          // `meetingLink` is deliberately NOT selected here. This is a public
+          // procedure, and returning the join link to every caller — signed in or
+          // not, paid or not — is the whole paywall. It is resolved separately
+          // below, only for a viewer with a COMPLETED registration.
           language: true,
           type: true,
           maxBookings: true,
@@ -185,9 +196,9 @@ export const sessionRouter = createTRPCRouter({
             select: { id: true, name: true, slug: true, trimester: true },
           },
           // Scope to current user only — avoids loading all registrations publicly
-          registrations: input.userId
+          registrations: viewerId
             ? {
-                where: { userId: input.userId },
+                where: { userId: viewerId },
                 select: {
                   id: true,
                   paymentStatus: true,
@@ -203,7 +214,32 @@ export const sessionRouter = createTRPCRouter({
         throw new Error("Session not found");
       }
 
-      return session;
+      // The join link is released only to a viewer who has actually paid for this
+      // session. Gating it in the page was not enough: the value still travelled to
+      // the browser in the serialised props, and this procedure handed it to
+      // anonymous callers outright.
+      // When there is no viewer the `registrations` select is `false`, so the key is
+      // absent at runtime even though the type says otherwise. `Array.isArray`
+      // rather than a truthiness check, for that reason.
+      const viewerRegistrations = session.registrations;
+      const hasPaid =
+        viewerId !== undefined &&
+        Array.isArray(viewerRegistrations) &&
+        viewerRegistrations.some(
+          (r) => r.paymentStatus === PaymentStatus.COMPLETED,
+        );
+
+      let meetingLink: string | null = null;
+
+      if (hasPaid) {
+        const withLink = await db.session.findUnique({
+          where: { id: session.id },
+          select: { meetingLink: true },
+        });
+        meetingLink = withLink?.meetingLink ?? null;
+      }
+
+      return { ...session, meetingLink };
     }),
 
   // Get session by ID
@@ -230,19 +266,12 @@ export const sessionRouter = createTRPCRouter({
               trimester: true,
             },
           },
-          registrations: {
-            select: {
-              id: true,
-              paymentStatus: true,
-              createdAt: true,
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
-              },
-            },
+          // Registrations are deliberately not returned here. This is a public
+          // procedure, and it was exposing every registrant's id, name and email —
+          // letting anyone enumerate who had booked a session. Callers that need a
+          // viewer's own registration should use `checkUserRegistration`.
+          _count: {
+            select: { registrations: true },
           },
         },
       });
@@ -468,60 +497,17 @@ export const sessionRouter = createTRPCRouter({
   }),
 
   // Update payment status for registration (protected)
-  updatePaymentStatus: protectedProcedure
-    .input(
-      z.object({
-        registrationId: z.string(),
-        paymentStatus: z.nativeEnum(PaymentStatus),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const userId = ctx.session.user.id;
-
-      // Verify the registration belongs to the user
-      const registration = await db.sessionRegistration.findUnique({
-        where: {
-          id: input.registrationId,
-        },
-      });
-
-      if (!registration) {
-        throw new Error("Registration not found");
-      }
-
-      if (registration.userId !== userId) {
-        throw new Error("Unauthorized to update this registration");
-      }
-
-      // Update payment status
-      const updatedRegistration = await db.sessionRegistration.update({
-        where: {
-          id: input.registrationId,
-        },
-        data: {
-          paymentStatus: input.paymentStatus,
-        },
-        select: {
-          id: true,
-          sessionId: true,
-          userId: true,
-          paymentStatus: true,
-          createdAt: true,
-          session: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              startAt: true,
-              endAt: true,
-              price: true,
-            },
-          },
-        },
-      });
-
-      return updatedRegistration;
-    }),
+  // `updatePaymentStatus` was removed.
+  //
+  // It let any signed-in user set the payment status of their own registration to
+  // any value, including COMPLETED. The ownership check passed precisely because
+  // the caller does own the row — so the sequence
+  //   registerForSession()  ->  updatePaymentStatus({ paymentStatus: 'COMPLETED' })
+  // granted free access to any paid session, bypassing Razorpay entirely. Nothing
+  // in the app called it.
+  //
+  // Payment status is now only ever set by paths that have verified a payment:
+  // `verifySessionPayment` (signature + amount checked) and the Razorpay webhook.
 
   // Get upcoming sessions
   getUpcomingSessions: publicProcedure

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { PUBLIC_DOCTOR } from "../bookable";
 export const similarDoctorProfileRouter = createTRPCRouter({
   similarDoctorProfile: publicProcedure
     .input(
@@ -58,6 +59,7 @@ export const similarDoctorProfileRouter = createTRPCRouter({
             id: similarDoctorProfileId,
           },
           displayQualificationId: displayQualificationId,
+          ...PUBLIC_DOCTOR,
         },
       });
 

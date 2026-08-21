@@ -6,6 +6,7 @@ import NewFooter from "~/components/new-footer";
 import ClientSessionProvider from "./client-session-provider";
 import { TRPCReactProvider } from "~/trpc/react";
 import { getServerAuthSession } from "~/server/auth";
+import { safeValue } from "@repo/observability";
 
 import { Poppins } from "next/font/google";
 // import { Header as NewHeader } from "./components/header";
@@ -41,14 +42,20 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-import { SlowSiteAlert } from "~/components/slow-site-alert";
+
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerAuthSession();
+  // The root layout wraps every route, so an unhandled throw here takes down the
+  // whole site rather than one page. A session lookup that fails (database down,
+  // pooler saturated) degrades to signed-out instead — the marketing pages, blogs
+  // and doctor profiles all still render.
+  const session = await safeValue("layout:session", () => getServerAuthSession(), null, {
+    source: "root-layout",
+  });
   
   // PERFORMANCE FIX: Removed blocking database queries from layout
   // verifiedAt is now stored in JWT token and accessible via session
@@ -60,7 +67,7 @@ export default async function RootLayout({
       lang="en"
     >
       <body className={"relative font-sans"}>
-        <SlowSiteAlert />
+        
         <div className="sticky top-0 z-40">
           <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
             <TRPCReactProvider>

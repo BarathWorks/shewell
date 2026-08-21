@@ -3,11 +3,11 @@
 import { db } from '@/src/server/db';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 import { ICountry } from '@/src/_models/country.model';
+import { requireAdminSession } from '@/src/server/authz';
 
 export const createCountry = async (data: ICountry) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -28,7 +28,7 @@ export const createCountry = async (data: ICountry) => {
     currencySymbol: z.string()
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     name,
     active,
     iso3,
@@ -39,11 +39,16 @@ export const createCountry = async (data: ICountry) => {
     currencySymbol
   });
 
-  if (!isValidData) {
+  if (!parsedInput.success) {
     return {
-      error: 'Invalid data'
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
     };
   }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.country.create({
     data: {
@@ -66,7 +71,7 @@ export const createCountry = async (data: ICountry) => {
 };
 
 export const updateCountry = async (data: ICountry) => {
-  const session = await getServerSession();
+  const session = await requireAdminSession('content:write');
 
   if (!session) {
     return {
@@ -81,10 +86,21 @@ export const updateCountry = async (data: ICountry) => {
     name: z.string().min(1)
   });
 
-  const isValidData = FormData.parse({
+  const parsedInput = FormData.safeParse({
     id,
     name
   });
+
+  if (!parsedInput.success) {
+    return {
+      error: 'Invalid data',
+      details: parsedInput.error.flatten().fieldErrors
+    };
+  }
+
+  // Downstream code reads these fields directly, so expose the parsed data under
+  // the original name rather than rewriting every reference.
+  const isValidData = parsedInput.data;
 
   await db.country.update({
     where: {

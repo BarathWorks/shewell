@@ -62,10 +62,17 @@ export default async function SessionDetailPage({
       reg.paymentStatus === PaymentStatus.COMPLETED,
   );
 
+  // `session.meetingLink` is already null unless the viewer has a COMPLETED
+  // registration — the procedure decides that, not this page. This is the second
+  // gate, and the reason the link is not simply forwarded: it was computed here
+  // correctly and then never used, so the raw link went into a client component's
+  // props for every visitor.
   const canViewMeetingLink =
     session.type === "ONLINE" &&
-    session.meetingLink &&
+    Boolean(session.meetingLink) &&
     userRegistration !== undefined;
+
+  const meetingLinkForViewer = canViewMeetingLink ? session.meetingLink : null;
 
   // Format dates
   const sessionDate = format(new Date(session.startAt), "dd MMM yyyy");
@@ -141,7 +148,7 @@ export default async function SessionDetailPage({
         price={Number(session.price)}
         sessionId={session.id}
         isRegistered={userRegistration !== undefined}
-        meetingLink={session.meetingLink}
+        meetingLink={meetingLinkForViewer}
         maxBookings={session.maxBookings}
         currentRegistrations={session._count?.registrations || 0}
       />

@@ -629,7 +629,8 @@ import AboutDoctor from "./about-doctor";
 import { Button } from "@repo/ui/src/@/components/button";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { PUBLIC_DOCTOR } from "~/server/api/bookable";
 import { api } from "~/trpc/react";
 import TimeSlots from "./date-with-time-slots";
 import React from "react";
@@ -650,7 +651,13 @@ interface IDoctorProfileProps {
 }
 
 const DoctorProfile = async ({ params }: { params: { username: string } }) => {
- 
+  // Next's App Router hands route segments over still percent-encoded, and these
+  // userNames contain spaces ("Gowtham K" arrives as "Gowtham%20K"), so an exact
+  // match never succeeded. This was masked until now: the lookup read the wrong
+  // params key, and Prisma drops an `undefined` filter rather than matching
+  // nothing, so any URL quietly resolved to whichever practitioner came first.
+  const userName = decodeURIComponent(params.username);
+
 
   const profile = await db.professionalUser.findFirst({
     select: {
@@ -695,8 +702,11 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
         },
       },
     },
+    // Gated by the same rule as every other public practitioner route: an
+    // unapproved or soft-deleted profile is not reachable by direct link.
     where: {
-      userName: params.username,
+      userName,
+      ...PUBLIC_DOCTOR,
     },
   });
 
@@ -704,8 +714,9 @@ const DoctorProfile = async ({ params }: { params: { username: string } }) => {
   //   redirect("/auth/login");
   // }
 
-  if(!profile){
-    return
+  // Was a bare `return`, which rendered a blank page rather than a 404.
+  if (!profile) {
+    notFound();
   }
 
   // converting the decimal avgrating to string avgrating

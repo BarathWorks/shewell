@@ -7,6 +7,16 @@ import { api } from "~/trpc/react";
 import { useSearchParams } from "next/navigation";
 import CompleteDoctorProfileSkeleton from "./complete-doctor-profile-skeleton";
 
+// Rendered per request, not prerendered at build time.
+//
+// This page reads from the database. It used to be forced dynamic as a side effect
+// of a stray `"use server"` directive at the top of the file; with that removed —
+// it was making the page component a callable endpoint — the intent has to be
+// stated directly, or the build tries to prerender it and needs a live database at
+// compile time.
+export const dynamic = "force-dynamic";
+
+
 const Counselling = () => {
   function toUTCDate(date: Date) {
     return new Date(

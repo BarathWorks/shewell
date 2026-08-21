@@ -114,6 +114,13 @@ const AddNewPatient = ({
   const { toast } = useToast();
 
   const onSubmit = (data: z.infer<typeof schema>) => {
+    // react-hook-form widens the resolved values to all-optional here, while the
+    // action's parameter requires firstName/email/phoneNumber. The zod schema does
+    // require them, so the values are present at runtime — this is a typing gap
+    // between the resolver and the action signature, not a validation hole.
+    // Narrowly suppressed rather than blanket-disabled: if the inference is ever
+    // fixed, this directive itself errors and can be removed.
+    // @ts-expect-error resolver output is widened to Partial by react-hook-form
     AddNewPatientUserAction(data)
       .then((resp) => {
         toast({

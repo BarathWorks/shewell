@@ -21,7 +21,6 @@ import { useState } from "react";
 import React from "react";
 
 import sendLoginOtp from "./send-login-otp-action";
-import verifyLoginOtp from "./verify-login-otp-action";
 
 // ─── Step 1: Email validation ───
 const emailSchema = z.object({
@@ -122,13 +121,20 @@ const LoginForm = () => {
   };
 
   // ─── Step 2 (OTP): Submit OTP → sign in ───
+  //
+  // The OTP is checked in exactly one place: the `OtpVyanClient` provider's
+  // `authorize`. It applies the lockout, the expiry window, the constant-time
+  // compare and the attempt budget, and then *consumes* the code so it cannot be
+  // replayed.
+  //
+  // This handler used to call a `verifyLoginOtp` server action first, which ran the
+  // same checks and cleared `otp`/`otpCreatedAt` on success. `signIn` then re-read
+  // the row, found the code already spent, and rejected it as expired — so a
+  // correct code failed every single time. Verifying in two places cannot work when
+  // verification is single-use; the provider is the one that has to own it.
   const handleOtpSubmit = async (data: z.infer<typeof otpSchema>) => {
     setIsLoading(true);
     try {
-      // First verify the OTP via server action
-      await verifyLoginOtp({ email, otp: data.otp });
-
-      // Then sign in via NextAuth OTP provider
       const signInData = await signIn("OtpVyanClient", {
         email,
         otp: data.otp,
@@ -145,13 +151,13 @@ const LoginForm = () => {
         });
       } else {
         toast({
-          title: signInData?.error || "Login failed",
+          title: signInData?.error || "Invalid or expired OTP",
           variant: "destructive",
         });
       }
     } catch (err: any) {
       toast({
-        title: err.message || "Invalid OTP",
+        title: err.message || "Invalid or expired OTP",
         variant: "destructive",
       });
     } finally {
