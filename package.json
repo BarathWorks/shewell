@@ -30,7 +30,7 @@
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "@date-fns/tz": "^1.1.2",
