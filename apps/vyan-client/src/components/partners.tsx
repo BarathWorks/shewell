@@ -1,7 +1,21 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import SectionHeader from "./section-header";
 
+/**
+ * Sponsor marquee.
+ *
+ * Same five logos, same duplicated track, same reversing animation.
+ *
+ * "Our Sponsors" was marked up as an `<h1>`. A document should have exactly one,
+ * and the page's belongs to the hero — a second one mid-page tells a screen reader
+ * a new document has started. `SectionHeader` renders an `<h2>`, matching every
+ * other section.
+ *
+ * The edge fades were hard-coded to white; they read from the section's own ground
+ * now, so they keep working if the band's background ever changes.
+ */
 const Partners = () => {
   const partners = [
     { name: "IIT Mandi", logo: "/images/trustees/iitmandi.webp" },
@@ -14,59 +28,49 @@ const Partners = () => {
   const duplicatedPartners = [...partners, ...partners];
 
   return (
-    <section className="overflow-hidden bg-white px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:px-20 xl:px-48">
-      <div className="max-w-full px-0 text-center">
-        <div className="mb-6 sm:mb-8 md:mb-12">
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-            className=" mb-2 font-poppins text-base font-medium leading-tight text-[#333333] sm:mb-3 sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl"
-          >
-            Our Sponsors
-          </motion.h1>
+    <section className="section-y overflow-hidden bg-canvas">
+      <div className="container-page">
+        <SectionHeader
+          eyebrow="Backed by"
+          title="Our Sponsors"
+          lead="Together, we empower motherhood with expertise."
+        />
+      </div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.1, duration: 0.8 }}
-            className="mx-auto text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-2xl xl:text-[24px] "
-          >
-            Together, we empower motherhood with expertise.
-          </motion.p>
-        </div>
+      {/* Marquee — full-bleed so logos travel edge to edge. */}
+      <div className="relative mt-10 w-full overflow-hidden md:mt-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-canvas to-transparent sm:w-24 lg:w-40"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-canvas to-transparent sm:w-24 lg:w-40"
+        />
 
-        {/* Logo Container - Infinite Scroll Wrapper */}
-        <div className="relative mb-12 w-full overflow-hidden sm:mb-16 md:mb-[65px]">
-          <div className="pointer-events-none absolute left-0 top-0 z-20 h-full w-12 bg-gradient-to-r from-white via-white/80 to-transparent sm:w-16 md:w-24 lg:w-32 xl:w-40" />
-
-          <div className="pointer-events-none absolute right-0 top-0 z-20 h-full w-12 bg-gradient-to-l from-white via-white/80 to-transparent sm:w-16 md:w-24 lg:w-32 xl:w-40" />
-
-          {/* The Moving Track */}
-          <motion.div
-            className="mt-10 flex w-max gap-2 py-3 sm:gap-3 sm:py-4 md:gap-4 lg:gap-8"
-            animate={{ x: ["20%", "-50%"] }}
-            transition={{
-              ease: "easeInOut",
-              duration: 20,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          >
-            {duplicatedPartners.map((partner, index) => (
-              <div
-                key={index}
-                className="relative z-10 flex h-16 w-28 items-center justify-center p-2 sm:h-20 sm:w-32 sm:p-3 md:h-24 md:w-40 md:p-4 lg:h-28 lg:w-48"
-              >
-                <img
-                  src={partner.logo}
-                  alt={partner.name}
-                  className="h-8 w-auto object-contain opacity-90 transition-all duration-100 hover:opacity-100 sm:h-10 md:h-14 lg:h-16"
-                />
-              </div>
-            ))}
-          </motion.div>
-        </div>
+        <motion.ul
+          className="flex w-max items-center gap-8 py-2 sm:gap-12 lg:gap-16"
+          animate={{ x: ["20%", "-50%"] }}
+          transition={{
+            ease: "easeInOut",
+            duration: 20,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+        >
+          {duplicatedPartners.map((partner, index) => (
+            <li
+              key={index}
+              className="flex h-20 w-32 shrink-0 items-center justify-center sm:w-40 lg:h-24 lg:w-48"
+            >
+              <img
+                src={partner.logo}
+                alt={partner.name}
+                className="max-h-10 w-auto object-contain opacity-60 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 lg:max-h-14"
+              />
+            </li>
+          ))}
+        </motion.ul>
       </div>
     </section>
   );

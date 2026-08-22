@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vyan-client",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "vyan-client", "dev"],
+      "port": 3001
+    },
+    {
+      "name": "vyan-doctor",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "vyan-doctor", "dev"],
+      "port": 3002
+    },
+    {
+      "name": "admin",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "admin", "dev"],
+      "port": 3004
+    }
+  ]
+}

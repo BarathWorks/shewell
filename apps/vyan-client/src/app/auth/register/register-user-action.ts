@@ -64,13 +64,35 @@ const RegisterUserAction = async ({
     };
   }
 
-  // Check if a verified user already exists
-  const existingVerifiedUser = await db.user.findFirst({
-    where: {
-      email: email,
-      verifiedAt: { not: null },
-    },
-  });
+  const [existingVerifiedUser, doctorAccount] = await Promise.all([
+    db.user.findFirst({
+      where: { email, verifiedAt: { not: null } },
+      select: { id: true, deletedAt: true },
+    }),
+    // Sign-in refuses a practitioner address on this portal. Without the same check
+    // here, a doctor could complete registration and then be turned away at login
+    // with an account they can never use — and `email` is unique on User, so the
+    // row would also block any later legitimate signup.
+    db.professionalUser.findFirst({
+      where: { email },
+      select: { id: true },
+    }),
+  ]);
+
+  if (doctorAccount) {
+    return {
+      success: false,
+      error:
+        "This email belongs to a practitioner account. Please sign in through the professional portal.",
+    };
+  }
+
+  if (existingVerifiedUser?.deletedAt) {
+    return {
+      success: false,
+      error: "This account has been closed. Please contact support to restore it.",
+    };
+  }
 
   if (existingVerifiedUser) {
     return { success: false, error: "User already exists please login" };
@@ -103,13 +125,13 @@ const RegisterUserAction = async ({
       },
     });
 
-    const emailBodySendGrid = {
-      from: process.env.FROM_EMAIL!,
-      subject: "Verification OTP",
+    const verificationEmail = {
+      subject: "Verification OTP - SheWellCare",
       to: [pendingUser.email],
-      html: `<p>Hi,<strong> ${pendingUser.name} <br/> </strong/></p>
-      <span>This is your verification OTP ${otp}<span/>
-      `,
+      html: `<p>Hi <strong>${pendingUser.name}</strong>,</p>
+      <p>Your verification OTP is: <strong style="font-size: 24px; letter-spacing: 4px;">${otp}</strong></p>
+      <p>This OTP is valid for 5 minutes.</p>`,
+      text: `Hi ${pendingUser.name}, your SheWellCare verification OTP is ${otp}. It is valid for 5 minutes.`,
     };
 
     // The PendingUser above is already written by this point, so a mail-provider
@@ -117,7 +139,7 @@ const RegisterUserAction = async ({
     // telling the user otherwise sends them round the loop again (where the
     // upsert quietly rotates their OTP a second time).
     try {
-      await sendEmail(emailBodySendGrid);
+      await sendEmail(verificationEmail);
     } catch (mailError) {
       logger.error("register.otp_mail_failed", {
         source: "auth",

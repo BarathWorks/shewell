@@ -2,26 +2,178 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Scrollbar Styling */
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --canvas: 247 249 251;
+    --surface: 255 255 255;
+    --ink: 24 36 47;
+    --body: 62 81 98;
+    --muted: 113 136 155;
+    --hairline: 223 231 237;
+    --brand: 0 137 143;
+  }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: theme("colors.hairline");
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: theme("colors.canvas");
+    color: theme("colors.body");
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: theme("colors.ink");
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* One focus treatment, drawn outside the element so focusing never shifts
+     layout. Keyboard users get it; pointer users do not. */
+  :focus-visible {
+    outline: 2px solid theme("colors.primary.500");
+    outline-offset: 2px;
+    border-radius: theme("borderRadius.sm");
+  }
+
+  ::selection {
+    background-color: rgb(var(--brand) / 0.16);
+    color: theme("colors.ink");
+  }
+
+  img, video, svg {
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@layer utilities {
+  /* The standard page gutter, replacing the per-section six-breakpoint padding
+     chains this app repeated everywhere. */
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 96rem;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .container-page { padding-inline: 1.75rem; }
+  }
+  @media (min-width: 1280px) {
+    .container-page { padding-inline: 2.5rem; }
+  }
+
+  /* Figures that sit in a column must not jitter as digits change. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+@layer components {
+  /* The panel every dashboard widget sits on. Hairline first, shadow second. */
+  .surface-card {
+    background-color: theme("colors.surface");
+    border: 1px solid theme("colors.hairline");
+    border-radius: theme("borderRadius.xl");
+    box-shadow: theme("boxShadow.xs");
+  }
+
+  /* Small caps label above a figure or a section. */
+  .eyebrow {
+    font-size: theme("fontSize.2xs[0]");
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: theme("colors.muted");
+  }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: theme("colors.slate.100");
+    border-radius: theme("borderRadius.md");
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.6),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+/* ==========================================================================
+   Scrollbar
+   ========================================================================== */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #ffffff;
-  box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.2);
-  border-radius: 10px;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #00898F;
-  border-radius: 10px;
-  transition: background 0.2s ease;
+  background: theme("colors.slate.300");
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: theme("colors.slate.400");
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.slate.300") transparent;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #006B70;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* FullCalendar Modern Styling */

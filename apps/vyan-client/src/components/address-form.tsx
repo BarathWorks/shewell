@@ -146,7 +146,7 @@ const AddressForm = () => {
                     return (
                       <>
                         <textarea
-                          className="w-full rounded-md border border-[#E9E9E9] py-[11px] pl-[14px] font-inter text-sm font-normal text-[#777777] placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-[#777777]"
+                          className="w-full rounded-md border border-hairline py-[11px] pl-[14px] font-inter text-sm font-normal text-muted placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-muted"
                           placeholder="eg. Near shiv mandir"
                           value={field.value}
                           onChange={field.onChange}
@@ -215,7 +215,7 @@ const AddressForm = () => {
             {/* div-5 */}
             <div>
               <UIFormLabel>Save Address as</UIFormLabel>
-              <div className="flex gap-3 rounded-md border border-[#E9E9E9] py-[13px] pl-[14px] ">
+              <div className="flex gap-3 rounded-md border border-hairline py-[13px] pl-[14px] ">
                 <Badge
                   onClick={() => setBadge("selectedAddress")}
                   variant={badge}

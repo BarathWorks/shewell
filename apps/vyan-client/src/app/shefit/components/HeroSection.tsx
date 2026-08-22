@@ -14,7 +14,7 @@ export const HeroSection = (): JSX.Element => {
       >
         <h1
           className="font-poppins text-[30px] font-bold
-          leading-tight text-[#114668] sm:text-[44px] md:text-[60px]
+          leading-tight text-ink sm:text-[44px] md:text-[60px]
           lg:text-[88px]"
         >
           One Body. Many Phases.
@@ -24,7 +24,7 @@ export const HeroSection = (): JSX.Element => {
 
         <p
           className="max-w-[1040px] font-poppins
-          text-base text-[#7b7b7b] sm:text-xl md:text-2xl
+          text-base text-body sm:text-xl md:text-2xl
           lg:text-[30px]"
         >
           From first flow to fertility, from hormonal imbalances to chronic pain

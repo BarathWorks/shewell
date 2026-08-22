@@ -425,7 +425,7 @@ const OnlineAppointment = ({
             <div className="flex justify-between px-4 pb-4 pt-6 lg:px-[30px] lg:pt-[30px]">
               <div className="flex items-center gap-3 lg:gap-4">
                 {step > 1 && (
-                  <div className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#F5F5F5] px-3 py-1.5 font-inter text-sm font-medium transition-colors hover:bg-gray-200" onClick={() => setStep(step - 1)}>
+                  <div className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-1.5 font-inter text-sm font-medium transition-colors hover:bg-gray-200" onClick={() => setStep(step - 1)}>
                     <svg
                       width="6"
                       height="10"
@@ -444,7 +444,7 @@ const OnlineAppointment = ({
                     <span>Back</span>
                   </div>
                 )}
-                <div className="font-inter text-lg font-bold leading-tight text-[#1a1a1a] sm:text-xl lg:font-semibold lg:leading-[30px]">
+                <div className="font-inter text-lg font-bold leading-tight text-ink sm:text-xl lg:font-semibold lg:leading-[30px]">
                   Register for appointment
                 </div>
               </div>

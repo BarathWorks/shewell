@@ -53,16 +53,17 @@ const DateRangeForAppointmentData = () => {
   return (
     <>
 
-      <div className='my-4 '>
+      <div className="w-full sm:w-auto">
       <Calendar
         value={dates}
         onChange={handleDateChange}
         selectionMode="range"
       
-        className="max-w-[380px]"
+        className="w-full sm:w-20rem"
+        inputClassName="text-sm"
         showIcon
         dateFormat="yy-mm-dd"
-        placeholder="Select Date Range"
+        placeholder="Last 30 days"
       />
       </div>
     

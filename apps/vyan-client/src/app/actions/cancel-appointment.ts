@@ -39,7 +39,7 @@ import { logger } from "@repo/observability";
  *     rather than left cancelled with the money still taken.
  *
  *   - **No surrounding transaction.** The old body opened `db.$transaction` and
- *     then made Google Calendar, Razorpay and SendGrid calls inside it while
+ *     then made Google Calendar, Razorpay and email-provider calls inside it while
  *     writing through `db` rather than `tx` — so it held a transaction open across
  *     three third-party round trips and got no atomicity in exchange. The
  *     conditional update above provides what the transaction was supposed to.

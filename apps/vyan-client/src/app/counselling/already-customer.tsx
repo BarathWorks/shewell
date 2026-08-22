@@ -46,7 +46,7 @@ const AlreadyCustomer = () => {
                       <Label className="font-inter text-base font-medium">
                         Are you a new customer to vyan counseling?
                       </Label>
-                      <div className="font-inter text-sm font-normal text-[#64748B]">
+                      <div className="font-inter text-sm font-normal text-muted">
                         Get 15 minute free counseling for new customer.{" "}
                       </div>
                     </div>
@@ -58,7 +58,7 @@ const AlreadyCustomer = () => {
                       <Label className="font-inter text-base font-medium">
                         Already a existing patient of counseling?
                       </Label>
-                      <div className="font-inter text-sm font-normal text-[#64748B]">
+                      <div className="font-inter text-sm font-normal text-muted">
                         Get a offline appointment with vyan's premium membership
                       </div>
                     </div>

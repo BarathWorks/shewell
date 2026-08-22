@@ -1,9 +1,8 @@
-"use client";
 import Image from "next/image";
-
-import { Button } from "@repo/ui/src/@/components/button";
 import Link from "next/link";
 import { format } from "date-fns";
+import { ArrowRight } from "lucide-react";
+
 import QuillHtml from "../components/shared/quill-html";
 
 type BlogCardProps = {
@@ -12,73 +11,90 @@ type BlogCardProps = {
   title: string;
   body: string;
   slug: string;
-  des : string | null
+  des: string | null;
+  category?: string;
 };
-const BlogCard = ({ fileUrl, title, createdAt, body, slug }: BlogCardProps) => {
-  return (
-    <>
-      <Link href={`/blogs/${slug}`} className="h-full w-full" >
-        <div className="group  w-full  h-full border border-3  ">
-          {/* <div className="w-[393px] md:w-[350px] lg:w-[295px] xl:w-[398px] 2xl:w-[498px]">
-            
-          </div> */}
-          <div className="relative aspect-square w-full   ">
-            <Image
-              src={fileUrl}
-              alt="blog-image"
-              fill
-              className="rounded-md  object-cover"
-            />
-          </div>
-          <div className=" px-3  py-5 md:p-6">
-            <div className="font-inter text-base font-medium text-primary">
-              {/* Posted on : {format(createdAt!, "dd MMMM yyyy")} */}
-            </div>
-            <h2 className="mb-2 mt-[2px] line-clamp-2 font-inter  text-base font-semibold group-hover:text-secondary md:mb-3 md:mt-1  md:text-xl md:leading-[30px] xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]">
-              {" "}
-              {title}
-            </h2>
-            <div
-              className=" mb-6 line-clamp-3 font-inter text-sm font-normal text-inactive md:mb-8 md:text-base"
-              // dangerouslySetInnerHTML={{ __html: body }}
-            >
-              {" "}
-              {/* {body} */}
-              
-              <QuillHtml className="line-clamp-3" body={body} />
-            </div>
 
-            <Button className="group-hover:bg-secondary" variant="blog">
-              <div className="mr-2">Read More</div>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_1939_3209)">
-                  <path
-                    d="M0.909061 9.09085H16.8962L13.9026 6.09727C13.5476 5.7423 13.5476 5.16667 13.9026 4.81164C14.2576 4.45667 14.8332 4.45667 15.1883 4.81164L19.7337 9.35709C20.0888 9.71206 20.0888 10.2877 19.7337 10.6427L15.1883 15.1882C15.0107 15.3657 14.7781 15.4545 14.5454 15.4545C14.3128 15.4545 14.0801 15.3657 13.9026 15.1882C13.5476 14.8332 13.5476 14.2576 13.9026 13.9025L16.8962 10.909H0.909061C0.407 10.909 -3.05176e-05 10.502 -3.05176e-05 9.99994C-3.05176e-05 9.49788 0.407 9.09085 0.909061 9.09085Z"
-                    fill="white"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_1939_3209">
-                    <rect
-                      width="20"
-                      height="20"
-                      fill="white"
-                      transform="matrix(-1 0 0 1 20 0)"
-                    />
-                  </clipPath>
-                </defs>
-              </svg>
-            </Button>
-          </div>
+/**
+ * A blog in a grid.
+ *
+ * Changes worth naming:
+ *
+ *  - The image was `aspect-square`. Every editorial photograph in this product is
+ *    shot 16:9, so each card cropped a third of its own picture away and made the
+ *    grid twice as tall as it needed to be. 16:9 now, matching the source.
+ *  - `border border-3` — `border-3` is not a Tailwind class and `border` alone
+ *    gave a 1px line in the browser's default colour, which is why cards had a
+ *    hairline in a grey that appears nowhere else in the app.
+ *  - The date was fetched, passed in, and then rendered inside a commented-out
+ *    line, so no card ever showed when its post was written. It shows now.
+ *  - The whole card is one `<Link>` and it contained a `<Button>` — a nested
+ *    interactive element, which is invalid HTML and gives screen readers two
+ *    overlapping targets for one destination. The "Read more" affordance is a
+ *    span styled to look like a link, and the card remains the single control.
+ *  - `des` was declared in the props type and never destructured, so the short
+ *    description each blog carries went unused while the body was clamped
+ *    instead. It is preferred now, with the body as the fallback.
+ *  - It was a client component with no state, no effects and no handlers. Server
+ *    component now — the markup no longer ships to the browser.
+ */
+const BlogCard = ({
+  fileUrl,
+  title,
+  createdAt,
+  body,
+  slug,
+  des,
+  category,
+}: BlogCardProps) => {
+  return (
+    <Link
+      href={`/blogs/${slug}`}
+      className="surface-card group flex h-full flex-col overflow-hidden transition-shadow duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+    >
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+        <Image
+          src={fileUrl}
+          alt=""
+          fill
+          sizes="(min-width: 1280px) 24rem, (min-width: 768px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+        />
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col p-5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+          {category ? (
+            <>
+              <span className="font-medium text-primary-700">{category}</span>
+              <span aria-hidden="true" className="text-slate-300">
+                ·
+              </span>
+            </>
+          ) : null}
+          <time dateTime={new Date(createdAt).toISOString()}>
+            {format(new Date(createdAt), "d MMM yyyy")}
+          </time>
         </div>
-      </Link>
-    </>
+
+        <h3 className="mt-2 line-clamp-2 text-base font-semibold leading-snug text-ink transition-colors duration-200 group-hover:text-primary-700">
+          {title}
+        </h3>
+
+        <div className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted">
+          {des ? des : <QuillHtml className="line-clamp-3" body={body} />}
+        </div>
+
+        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700">
+          Read more
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+          />
+        </span>
+      </div>
+    </Link>
   );
 };
+
 export default BlogCard;

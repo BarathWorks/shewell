@@ -85,18 +85,18 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
       <form onSubmit={handleSubmit(submitPassword)}>
         <div className="flex flex-col border-t border-t-gray-100 pt-10 font-inter md:flex-row">
           <div className="flex w-full flex-col gap-6 md:w-10/12 xl:gap-8">
-            <div className="text-center font-inter text-sm font-normal text-[#666666]">
+            <div className="text-center font-inter text-sm font-normal text-muted">
               Strong passwords are essential for security. This subheading will
               show you how to create a new one.
             </div>
             <div className="flex flex-col gap-6">
               <div className="w-full">
                 <div className="flex justify-between">
-                  <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                  <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                     Current Password*
                   </UIFormLabel>
                   <div
-                    className="cursor-pointer font-poppins text-sm font-medium text-[#00898F] underline"
+                    className="cursor-pointer font-poppins text-sm font-medium text-primary-700 underline"
                     onClick={() =>
                       forgetPasswordAction({ email })
                         .then((resp) => {
@@ -125,7 +125,7 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
                           placeholder="Enter your current password"
                           value={field.value}
                           onChange={field.onChange}
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                           // disabled={accountType === 'google'}
                         />
                         {errors && errors.password && (
@@ -139,7 +139,7 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
                 />
               </div>
               <div className="w-full">
-                <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                   New Password*
                 </UIFormLabel>
                 <Controller
@@ -152,7 +152,7 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
                           placeholder="Enter your new password"
                           value={field.value}
                           onChange={field.onChange}
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                           // disabled={accountType === 'google'}
                         />
                         {errors && errors.newPassword && (
@@ -166,7 +166,7 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
                 />
               </div>
               <div className="w-full">
-                <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                   Retype Password*
                 </UIFormLabel>
                 <Controller
@@ -179,7 +179,7 @@ const ManagePasswordForm = ({ email }: IManagePassword) => {
                           placeholder="Retype your new password"
                           value={field.value}
                           onChange={field.onChange}
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                           // disabled={accountType === 'google'}
                         />
                         {errors && errors.confirmPassword && (

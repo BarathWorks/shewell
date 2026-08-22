@@ -51,7 +51,7 @@ const ExamplePopover = () => {
                             dir="ltr"
                             data-state="closed"
                             data-placeholder=""
-                            className="ring-stepcolor flex w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                            className="ring-stepcolor flex w-full items-center justify-between rounded-md border-hairline-strong p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                           >
                             <span>Purity Level</span>
                             <svg
@@ -99,7 +99,7 @@ const ExamplePopover = () => {
                         dir="ltr"
                         data-state="closed"
                         data-placeholder=""
-                        className="ring-stepcolor text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 placeholder-[#CCCCCC] shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-hairline-strong p-4 placeholder-[#CCCCCC] shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                       >
                         <span>Fuel Colour</span>
                         <svg
@@ -139,7 +139,7 @@ const ExamplePopover = () => {
                     <div className="mt-2">
                       <input
                         type="number"
-                        className="ring-stepcolor block w-full rounded-md border-[#CCCCCC] p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor block w-full rounded-md border-hairline-strong p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                         id="weight"
                         placeholder="Weight"
                         name="fuelWeight"
@@ -166,7 +166,7 @@ const ExamplePopover = () => {
                         dir="ltr"
                         data-state="closed"
                         data-placeholder=""
-                        className="ring-stepcolor placeholde-[#CCCCCC] text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor placeholde-[#CCCCCC] text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-hairline-strong p-4 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                       >
                         <span>Weight Unit</span>
                         <svg
@@ -218,7 +218,7 @@ const ExamplePopover = () => {
                             dir="ltr"
                             data-state="closed"
                             data-placeholder=""
-                            className="ring-stepcolor flex w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                            className="ring-stepcolor flex w-full items-center justify-between rounded-md border-hairline-strong p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                           >
                             <span>Purity Level</span>
                             <svg
@@ -266,7 +266,7 @@ const ExamplePopover = () => {
                         dir="ltr"
                         data-state="closed"
                         data-placeholder=""
-                        className="ring-stepcolor text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 placeholder-[#CCCCCC] shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-hairline-strong p-4 placeholder-[#CCCCCC] shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                       >
                         <span>Fuel Colour</span>
                         <svg
@@ -306,7 +306,7 @@ const ExamplePopover = () => {
                     <div className="mt-2">
                       <input
                         type="number"
-                        className="ring-stepcolor block w-full rounded-md border-[#CCCCCC] p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor block w-full rounded-md border-hairline-strong p-4 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                         id="weight"
                         placeholder="Weight"
                         name="fuelWeight"
@@ -333,7 +333,7 @@ const ExamplePopover = () => {
                         dir="ltr"
                         data-state="closed"
                         data-placeholder=""
-                        className="ring-stepcolor placeholde-[#CCCCCC] text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-[#CCCCCC] p-4 shadow-sm ring-1 ring-inset placeholder:text-[#CCCCCC] focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
+                        className="ring-stepcolor placeholde-[#CCCCCC] text-secoundary focus:text-secoundary flex h-auto w-full items-center justify-between rounded-md border-hairline-strong p-4 shadow-sm ring-1 ring-inset placeholder:text-slate-300 focus:ring-1 focus:ring-primary sm:text-sm sm:leading-6"
                       >
                         <span>Weight Unit</span>
                         <svg

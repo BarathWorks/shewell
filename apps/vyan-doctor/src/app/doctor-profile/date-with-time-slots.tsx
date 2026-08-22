@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import UIFormLabel from "@repo/ui/src/@/components/form/label";
 import {
   Select,
@@ -139,84 +139,81 @@ const TimeSlots = ({ expertId }: { expertId: string }) => {
   };
 
   return (
-    <>
-      <div className="mb-6 flex items-center gap-2">
-        <Clock className="h-5 w-5 text-[#00898F]" />
-        <span className="font-poppins text-lg font-semibold text-[#333333]">
-          Available Time Slots
-        </span>
-      </div>
-      <div className="mb-6 mt-4 h-px w-full bg-gray-100"></div>
-      <div className="flex flex-wrap justify-between gap-y-5">
-        <div className="flex items-center gap-2 rounded-2xl bg-[#F8F8F8] p-1.5">
+    <div className="flex flex-col">
+      {/*
+        The panel this sits in already has a header, so the section no longer
+        needs its own `text-lg` title plus a rule under it.
+
+        Two fixes beyond the styling:
+         - The day chips were `<div onClick>`. Not focusable, not announced, and
+           no way to change the date from a keyboard. They are radio-style
+           buttons now, carrying `aria-pressed`.
+         - The slot pills had `cursor-pointer` and a full hover treatment that
+           turned them solid teal, but no handler — they are read-only on this
+           screen, which is the practitioner's own availability. Presenting them
+           as clickable promised an interaction that did not exist.
+      */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-1 rounded-lg border border-hairline bg-canvas p-1">
           <button
+            type="button"
             onClick={handlePrevDay}
             disabled={isPrevDisabled}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition-all hover:bg-gray-50 ${isPrevDisabled ? "cursor-not-allowed opacity-50" : "hover:text-[#00898F]"}`}
+            aria-label="Previous day"
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-body transition-colors duration-200 hover:bg-surface hover:text-primary-800 disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
           >
-            <svg
-              width="8"
-              height="12"
-              viewBox="0 0 8 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6.5 11L1.5 6L6.5 1"
-                stroke="#333333"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <ChevronLeft aria-hidden="true" className="size-4" />
           </button>
-          <div className="scrollbar-hide flex gap-1 overflow-x-auto px-1">
-            {days.map((day) => (
-              <div
-                key={day.toISOString()}
-                onClick={() => handleDayClick(day)}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-xl px-4 py-2 transition-all duration-300 ${
-                  format(day, "yyyy-MM-dd") ===
-                  format(selectedDate, "yyyy-MM-dd")
-                    ? "border-0 bg-[#00898F] text-white shadow-md"
-                    : "border-0 bg-transparent text-[#666666] hover:bg-white hover:text-[#00898F]"
-                }`}
-              >
-                <span className="text-xs font-medium uppercase opacity-80">
-                  {format(day, "EEE")}
-                </span>
-                <span className="text-sm font-semibold">
-                  {format(day, "d")}
-                </span>
-              </div>
-            ))}
+
+          <div className="scrollbar-hide flex min-w-0 gap-0.5 overflow-x-auto">
+            {days.map((day) => {
+              const isSelected =
+                format(day, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  type="button"
+                  onClick={() => handleDayClick(day)}
+                  aria-pressed={isSelected}
+                  aria-label={format(day, "EEEE d MMMM")}
+                  className={[
+                    "flex shrink-0 flex-col items-center justify-center rounded-md px-3 py-1.5 transition-colors duration-200",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50",
+                    isSelected
+                      ? "bg-primary-600 text-white"
+                      : "text-muted hover:bg-surface hover:text-ink",
+                  ].join(" ")}
+                >
+                  <span className="text-2xs font-semibold uppercase tracking-wide">
+                    {format(day, "EEE")}
+                  </span>
+                  <span className="tabular text-sm font-semibold">
+                    {format(day, "d")}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           <button
+            type="button"
             onClick={handleNextDay}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition-all hover:bg-gray-50 hover:text-[#00898F]"
+            aria-label="Next day"
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-body transition-colors duration-200 hover:bg-surface hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
           >
-            <svg
-              width="8"
-              height="12"
-              viewBox="0 0 8 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1.5 1L6.5 6L1.5 11"
-                stroke="#333333"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <ChevronRight aria-hidden="true" className="size-4" />
           </button>
         </div>
 
-        {/* Duration selector */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-[#333333]">Duration:</span>
+        {/* Duration */}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="slot-duration"
+            className="text-xs font-medium text-muted"
+          >
+            Duration
+          </label>
           <Select
             value={
               timeDuration?.toString() ||
@@ -226,18 +223,21 @@ const TimeSlots = ({ expertId }: { expertId: string }) => {
               setTimeDuration(parseInt(selectedValue));
             }}
           >
-            <SelectTrigger className="w-[120px] rounded-xl border-gray-200 bg-white font-medium text-[#333333] shadow-sm">
+            <SelectTrigger
+              id="slot-duration"
+              className="h-9 w-[6.5rem] rounded-lg border-hairline-strong bg-surface text-sm font-medium text-ink shadow-xs"
+            >
               <SelectValue placeholder="Duration" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 bg-white shadow-lg">
+            <SelectContent className="rounded-lg border-hairline bg-surface shadow-lg">
               <SelectGroup>
-                {timeDurations?.timeDurations.map((timeDuration) => (
+                {timeDurations?.timeDurations.map((duration) => (
                   <SelectItem
-                    className="cursor-pointer rounded-lg bg-white px-2 py-1.5 text-sm font-medium text-[#333333] hover:bg-gray-50"
-                    key={timeDuration.time}
-                    value={timeDuration.time.toString()}
+                    className="cursor-pointer rounded-md px-2 py-1.5 text-sm font-medium text-body hover:bg-slate-50"
+                    key={duration.time}
+                    value={duration.time.toString()}
                   >
-                    {timeDuration.time} Min
+                    {duration.time} min
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -245,39 +245,36 @@ const TimeSlots = ({ expertId }: { expertId: string }) => {
           </Select>
         </div>
       </div>
-      <div
-        className={`mt-[18px] ${timeSlots.length > 0 ? "max-h-[85px] overflow-y-auto" : ""}`}
-      >
+
+      <div className="mt-4">
         {timeSlots.length > 0 ? (
-        <div className="flex flex-wrap gap-3">
-            {timeSlots.map((slot, index) => (
-              <div key={index} className="flex flex-col gap-2">
-                {slot.availableTimings.map((timing, idx) => (
-                  <div key={idx} className="flex items-center">
-                    <span
-                      className="cursor-pointer rounded-xl border-2 border-[#00898F]/20 bg-[#F8FFFE] px-3 py-2 font-poppins text-sm font-medium text-[#0E3A47] shadow-sm transition-all duration-300 hover:border-[#00898F] hover:bg-[#00898F] hover:text-white hover:shadow-md"
-                    >
-                      {format(timing.startingTime, "h:mm a")} - {format(timing.endingTime, "h:mm a")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
+          <ul className="flex max-h-52 flex-wrap gap-2 overflow-y-auto">
+            {timeSlots.map((slot, index) =>
+              slot.availableTimings.map((timing, idx) => (
+                <li
+                  key={`${index}-${idx}`}
+                  className="tabular rounded-md bg-primary-50 px-2.5 py-1.5 text-xs font-medium text-primary-800 ring-1 ring-inset ring-primary-200/70"
+                >
+                  {format(timing.startingTime, "h:mm a")} &ndash;{" "}
+                  {format(timing.endingTime, "h:mm a")}
+                </li>
+              )),
+            )}
+          </ul>
         ) : (
-          <div className="mt-2 flex min-h-[100px] w-full items-center justify-center rounded-2xl border-2 border-dashed border-[#00898F]/20 bg-gradient-to-br from-[#F8FFFE] to-white">
-            <div className="flex flex-col items-center gap-2 px-4 py-4">
-              <div className="rounded-full bg-[#00898F]/10 p-3">
-                <Clock className="h-5 w-5 text-[#00898F]" />
-              </div>
-              <p className="text-center font-poppins text-sm font-medium text-[#0E3A47]/60">
-                No available slots for this date
-              </p>
-            </div>
+          <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-hairline-strong px-4 py-8 text-center">
+            <Clock aria-hidden="true" className="size-5 text-muted" />
+            <p className="text-sm font-medium text-body">
+              No slots open on this date
+            </p>
+            <p className="max-w-xs text-xs leading-relaxed text-muted">
+              Set your weekly hours from the Appointments screen to open bookings
+              on this day.
+            </p>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

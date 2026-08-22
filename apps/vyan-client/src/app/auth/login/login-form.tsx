@@ -20,7 +20,7 @@ import {
 import { useState } from "react";
 import React from "react";
 
-import sendLoginOtp from "./send-login-otp-action";
+import sendLoginOtp, { type SendLoginOtpResult } from "./send-login-otp-action";
 
 // ─── Step 1: Email validation ───
 const emailSchema = z.object({
@@ -48,10 +48,16 @@ const passwordSchema = z.object({
 
 type LoginStep = "email" | "otp" | "password";
 
+/** The failure branch of the action, or null when there is nothing to show. */
+type EmailStepError = Extract<SendLoginOtpResult, { status: "error" }> | null;
+
 const LoginForm = () => {
   const [step, setStep] = useState<LoginStep>("email");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // Rendered inline under the email field rather than only as a toast: "no account
+  // found" needs a link to registration next to it, and a toast disappears.
+  const [emailStepError, setEmailStepError] = useState<EmailStepError>(null);
 
   const router = useRouter();
   const session = useSession();
@@ -98,21 +104,34 @@ const LoginForm = () => {
   }, [timer, step]);
 
   // ─── Step 1: Submit email → send OTP ───
+  //
+  // The OTP step is only entered when a code was actually sent. Previously this
+  // advanced unconditionally, so an address with no account was asked for a code
+  // that had never been sent — and the action deliberately returned the same
+  // message either way, leaving nothing to distinguish the two.
   const handleEmailSubmit = async (data: z.infer<typeof emailSchema>) => {
     setIsLoading(true);
+    setEmailStepError(null);
     try {
       const resp = await sendLoginOtp(data.email);
+
+      if (resp.status === "error") {
+        setEmailStepError(resp);
+        toast({ title: resp.message, variant: "destructive" });
+        return;
+      }
+
       toast({
-        title: resp?.message || "OTP sent to your email",
+        title: resp.message || "OTP sent to your email",
         variant: "default",
       });
-      setEmail(data.email);
+      setEmail(resp.email);
       setStep("otp");
       setTimer(30);
       setCanResend(false);
     } catch (err: any) {
       toast({
-        title: err.message || "Failed to send OTP",
+        title: err?.message || "Failed to send OTP",
         variant: "destructive",
       });
     } finally {
@@ -206,13 +225,24 @@ const LoginForm = () => {
     setTimer(30);
     try {
       const resp = await sendLoginOtp(email);
+
+      if (resp.status === "error") {
+        // The account can disappear between the two calls (deleted, or the address
+        // corrected). Fall back to the email step, where the reason is shown with
+        // the right link beside it.
+        setEmailStepError(resp);
+        setStep("email");
+        toast({ title: resp.message, variant: "destructive" });
+        return;
+      }
+
       toast({
-        title: resp?.message || "OTP resent",
+        title: resp.message || "OTP resent",
         variant: "default",
       });
     } catch (err: any) {
       toast({
-        title: err.message || "Failed to resend OTP",
+        title: err?.message || "Failed to resend OTP",
         variant: "destructive",
       });
     }
@@ -229,19 +259,19 @@ const LoginForm = () => {
         </div>
       )}
 
-      <div className="mb-6 text-center font-poppins text-2xl font-semibold text-[#333333] md:mb-8 md:text-left xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
+      <div className="mb-6 text-center font-poppins text-2xl font-semibold text-ink md:mb-8 md:text-left xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
         Login into your account
       </div>
 
       {/* ═══════════ STEP 1: EMAIL ═══════════ */}
       {step === "email" && (
         <form
-          className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
+          className="rounded-3xl border border-hairline bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
           onSubmit={emailForm.handleSubmit(handleEmailSubmit)}
         >
           <div className="flex flex-col gap-6">
             <div>
-              <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+              <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                 Email*
               </UIFormLabel>
               <Controller
@@ -252,9 +282,14 @@ const LoginForm = () => {
                     <UIFormInput
                       type="email"
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        // The message names a specific address; keeping it visible
+                        // while that address is being edited makes it wrong.
+                        if (emailStepError) setEmailStepError(null);
+                        field.onChange(e);
+                      }}
                       placeholder="Enter your email id"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {emailForm.formState.errors?.email && (
                       <p className="mt-1 text-xs text-red-500">
@@ -266,6 +301,46 @@ const LoginForm = () => {
               />
             </div>
 
+            {/* Why no OTP was sent, with the action that resolves it. */}
+            {emailStepError && (
+              <div
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+              >
+                <p className="font-inter text-sm text-red-700">
+                  {emailStepError.message}
+                </p>
+
+                {emailStepError.code === "NO_ACCOUNT" && (
+                  <Link
+                    href={`/auth/register?email=${encodeURIComponent(emailStepError.email)}`}
+                    className="mt-2 inline-block font-poppins text-sm font-medium text-primary-700 hover:underline"
+                  >
+                    Create an account →
+                  </Link>
+                )}
+
+                {emailStepError.code === "UNVERIFIED" && (
+                  <Link
+                    href={`/auth/register-otp?email=${encodeURIComponent(emailStepError.email)}`}
+                    className="mt-2 inline-block font-poppins text-sm font-medium text-primary-700 hover:underline"
+                  >
+                    Verify your email →
+                  </Link>
+                )}
+
+                {emailStepError.code === "DOCTOR_ACCOUNT" &&
+                  process.env.NEXT_PUBLIC_PROFESSIONAL && (
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_PROFESSIONAL}/auth/login`}
+                      className="mt-2 inline-block font-poppins text-sm font-medium text-primary-700 hover:underline"
+                    >
+                      Go to the professional portal →
+                    </a>
+                  )}
+              </div>
+            )}
+
             <Button
               className="mx-auto w-full rounded-xl py-6 font-poppins text-base font-semibold md:w-[324px]"
               variant="OTP"
@@ -275,10 +350,10 @@ const LoginForm = () => {
               {isLoading ? "Sending OTP..." : "Continue"}
             </Button>
 
-            <div className="text-center font-inter text-base font-normal text-[#666666]">
+            <div className="text-center font-inter text-base font-normal text-muted">
               Don't have SheWellCare account
               <Link href="/auth/register">
-                <div className="ml-2 mt-2 block cursor-pointer font-poppins text-base font-medium text-[#00898F] hover:underline md:mt-0 md:inline">
+                <div className="ml-2 mt-2 block cursor-pointer font-poppins text-base font-medium text-primary-700 hover:underline md:mt-0 md:inline">
                   Create Account
                   <svg
                     className="ml-1 inline"
@@ -303,11 +378,11 @@ const LoginForm = () => {
       {/* ═══════════ STEP 2: OTP ═══════════ */}
       {step === "otp" && (
         <form
-          className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
+          className="rounded-3xl border border-hairline bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
           onSubmit={otpForm.handleSubmit(handleOtpSubmit)}
         >
           <div className="flex flex-col items-center gap-6">
-            <div className="font-poppins text-xl font-semibold text-[#333333]">
+            <div className="font-poppins text-xl font-semibold text-ink">
               Enter OTP
             </div>
             <div className="text-sm text-gray-500">Sent to {email}</div>
@@ -326,27 +401,27 @@ const LoginForm = () => {
                       <InputOTPGroup className="mx-auto gap-2">
                         <InputOTPSlot
                           index={0}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                         <InputOTPSlot
                           index={1}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                         <InputOTPSlot
                           index={2}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                         <InputOTPSlot
                           index={3}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                         <InputOTPSlot
                           index={4}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                         <InputOTPSlot
                           index={5}
-                          className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                          className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                         />
                       </InputOTPGroup>
                     </InputOTP>
@@ -367,8 +442,8 @@ const LoginForm = () => {
                 disabled={!canResend}
                 className={`font-poppins text-sm font-medium ${
                   canResend
-                    ? "cursor-pointer text-[#00898F] hover:underline"
-                    : "cursor-not-allowed text-[#00898F]"
+                    ? "cursor-pointer text-primary-700 hover:underline"
+                    : "cursor-not-allowed text-primary-700"
                 }`}
                 onClick={handleResendOTP}
               >
@@ -379,7 +454,7 @@ const LoginForm = () => {
             {/* Use password instead */}
             <button
               type="button"
-              className="font-poppins text-sm font-medium text-[#00898F] hover:underline"
+              className="font-poppins text-sm font-medium text-primary-700 hover:underline"
               onClick={() => setStep("password")}
             >
               Use password instead
@@ -397,7 +472,7 @@ const LoginForm = () => {
             {/* Back to email step */}
             <button
               type="button"
-              className="font-inter text-sm text-[#666666] hover:underline"
+              className="font-inter text-sm text-muted hover:underline"
               onClick={() => {
                 setStep("email");
                 otpForm.reset();
@@ -412,11 +487,11 @@ const LoginForm = () => {
       {/* ═══════════ STEP 2: PASSWORD ═══════════ */}
       {step === "password" && (
         <form
-          className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
+          className="rounded-3xl border border-hairline bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
           onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}
         >
           <div className="flex flex-col gap-6">
-            <div className="text-center font-poppins text-xl font-semibold text-[#333333]">
+            <div className="text-center font-poppins text-xl font-semibold text-ink">
               Enter Password
             </div>
             <div className="text-center text-sm text-gray-500">
@@ -424,7 +499,7 @@ const LoginForm = () => {
             </div>
 
             <div>
-              <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+              <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                 Password*
               </UIFormLabel>
               <Controller
@@ -436,7 +511,7 @@ const LoginForm = () => {
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Enter your password"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {passwordForm.formState.errors?.password && (
                       <p className="mt-1 text-xs text-red-500">
@@ -451,7 +526,7 @@ const LoginForm = () => {
             {/* Use OTP instead */}
             <button
               type="button"
-              className="text-center font-poppins text-sm font-medium text-[#00898F] hover:underline"
+              className="text-center font-poppins text-sm font-medium text-primary-700 hover:underline"
               onClick={() => setStep("otp")}
             >
               Use OTP instead
@@ -469,7 +544,7 @@ const LoginForm = () => {
             {/* Back to email step */}
             <button
               type="button"
-              className="text-center font-inter text-sm text-[#666666] hover:underline"
+              className="text-center font-inter text-sm text-muted hover:underline"
               onClick={() => {
                 setStep("email");
                 passwordForm.reset();

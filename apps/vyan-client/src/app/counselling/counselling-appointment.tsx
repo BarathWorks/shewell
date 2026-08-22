@@ -72,10 +72,10 @@ const CounsellingAppointment = ({
         <div className="flex gap-3 sm:gap-4 md:gap-6 md:self-center xl:flex-row xl:justify-between xl:gap-4">
           {/* price */}
           <div className="flex items-center gap-2 self-center rounded-lg bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-2 sm:rounded-xl sm:px-4 sm:py-2.5 md:rounded-2xl md:px-5 md:py-3">
-            <span className="font-poppins text-xs font-medium text-[#666666]  sm:hidden xs:hidden md:block">
+            <span className="font-poppins text-xs font-medium text-muted  sm:hidden xs:hidden md:block">
               Starting from
             </span>
-            <span className="font-poppins text-lg font-bold text-[#00898F] sm:text-xl md:text-2xl">
+            <span className="font-poppins text-lg font-bold text-primary-700 sm:text-xl md:text-2xl">
               ₹
               {priceInCents
                 ? (priceInCents / 100).toLocaleString("en-IN")
@@ -192,7 +192,7 @@ const CounsellingAppointment = ({
             {timeSlot ? (
               <div onClick={() => handleOpenDialogOnlineAppointment()}>
                 {" "}
-                <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-[#00898F] px-6 py-4 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#007a80] hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
+                <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-primary-600 px-6 py-4 font-poppins text-base font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-primary-700 hover:shadow-xl xs:text-sm md:text-base lg:text-lg">
                   <svg
                     className="transition-transform duration-300 group-hover:scale-110"
                     width="19"
@@ -252,7 +252,7 @@ const CounsellingAppointment = ({
             ) : (
               <HoverCard>
                 <HoverCardTrigger>
-                  <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-[#F2F2F2] px-6 py-4 font-poppins text-base font-medium text-[#00000066] shadow-sm transition-all duration-300 hover:bg-[#e5e5e5] hover:shadow-md">
+                  <Button className="group flex h-[56px] items-center gap-3 rounded-2xl bg-slate-100 px-6 py-4 font-poppins text-base font-medium text-muted shadow-sm transition-all duration-300 hover:bg-slate-200 hover:shadow-md">
                     <svg
                       className="transition-transform duration-300 group-hover:scale-110"
                       width="19"
@@ -309,7 +309,7 @@ const CounsellingAppointment = ({
                     Book Online Appointment
                   </Button>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-full rounded-2xl border border-gray-100 bg-white p-0 shadow-xl xs:max-w-[300px] sm:max-w-[375px]">
+                <HoverCardContent className="w-full rounded-2xl border border-hairline bg-white p-0 shadow-xl xs:max-w-[300px] sm:max-w-[375px]">
                   <div className="flex items-center gap-3 p-5">
                     <svg
                       width="24"
@@ -326,7 +326,7 @@ const CounsellingAppointment = ({
                         strokeLinejoin="round"
                       />
                     </svg>
-                    <span className="font-poppins text-sm font-medium text-[#333333]">
+                    <span className="font-poppins text-sm font-medium text-ink">
                       Please select a time slot first
                     </span>
                   </div>

@@ -16,7 +16,7 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
   onClick,
   
   className = "",
-  color = "bg-[#00898F]",
+  color = "bg-primary-600",
   active = false,
   size = "medium",
   as: Component = "button",
@@ -62,10 +62,10 @@ export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
         className={`
           
           ${active ? `rotate-[45deg]`  : `rotate-[225deg]`}
-          ${active ? `text-[#00898F]` : `text-[#E1EBED] `} 
+          ${active ? `text-primary-700` : `text-[#E1EBED] `} 
           transition-all duration-500 ease-in-out
           group-hover:rotate-[45deg]
-          group-hover:text-[#00898F]
+          group-hover:text-primary-700
         `}
       />
     </Component>

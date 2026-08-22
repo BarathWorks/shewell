@@ -29,7 +29,23 @@ export const env = createEnv({
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
       z.string().url(),
     ),
-    SENDGRID_API_KEY : z.string(),
+    // Mail — SMTP via Nodemailer (see `packages/mail`). SENDGRID_API_KEY is gone;
+    // there is one transport now. Host and port default to Gmail inside the mail
+    // package, so only the credentials are required.
+    //
+    // Required in production and optional elsewhere, matching NEXTAUTH_SECRET and
+    // CRON_SECRET above: a production deploy without mail cannot sign anyone in, so
+    // it should fail at build with a named variable. Locally, `@repo/mail` raises a
+    // MailConfigError naming these two, and the OTP is printed to the dev console —
+    // so a contributor with no mail account can still work on everything else.
+    SMTP_USER:
+      process.env.NODE_ENV === "production" ? z.string().email() : z.string().optional(),
+    SMTP_PASSWORD:
+      process.env.NODE_ENV === "production" ? z.string().min(1) : z.string().optional(),
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.string().optional(),
+    SMTP_SECURE: z.string().optional(),
+    MAIL_FROM_NAME: z.string().optional(),
 
     RAZORPAY_KEY_SECRET:z.string(),
 
@@ -42,7 +58,9 @@ export const env = createEnv({
     CRON_SECRET:
       process.env.NODE_ENV === "production" ? z.string() : z.string().optional(),
 
-    FROM_EMAIL : z.string(),
+    // Optional: `@repo/mail` falls back to SMTP_USER, which is the address Gmail
+    // sends as anyway.
+    FROM_EMAIL : z.string().email().optional(),
     GOOGLE_CLIENT_SECRET : z.string(),
     GOOGLE_CLIENT_ID : z.string(),
     // DISCORD_CLIENT_ID: z.string(),
@@ -72,7 +90,12 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    SENDGRID_API_KEY : process.env.SENDGRID_API_KEY,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_SECURE: process.env.SMTP_SECURE,
+    MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
     RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET,
     RAZORPAY_WEBHOOK_SECRET:process.env.RAZORPAY_WEBHOOK_SECRET,
     CRON_SECRET:process.env.CRON_SECRET,

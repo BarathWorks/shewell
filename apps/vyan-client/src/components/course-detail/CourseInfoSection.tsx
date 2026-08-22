@@ -11,13 +11,11 @@ export const CourseInfoSection = ({
   whatYouLearn,
 }: CourseInfoSectionProps): JSX.Element => {
   return (
-    <section className="w-full bg-white px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-20 py-6 sm:py-8 lg:py-10 xl:py-12 2xl:py-16">
-      <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 lg:gap-8 xl:gap-10 2xl:gap-12">
-          <WhoIsItForSection items={whoIsItFor} />
-          <WhatYouLearnSection items={whatYouLearn} />
-        </div>
+    <div className="container-page pt-6 md:pt-8">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
+        <WhoIsItForSection items={whoIsItFor} />
+        <WhatYouLearnSection items={whatYouLearn} />
       </div>
-    </section>
+    </div>
   );
 };

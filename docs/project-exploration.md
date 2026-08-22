@@ -194,7 +194,7 @@ All apps use **tRPC** for type-safe API calls (not REST). Traditional Next.js AP
 - **Razorpay API** - Payment processing (orders, refunds)
 - **Shiprocket API** - Shipping/logistics for products
 - **Google Calendar API** - Create Google Meet links for appointments
-- **SendGrid API** - Email notifications
+- **SMTP (Nodemailer)** - Email notifications
 - **AWS S3** - File storage (images, documents)
 
 ---
@@ -328,7 +328,7 @@ All apps use **tRPC** for type-safe API calls (not REST). Traditional Next.js AP
   - Package: `packages/shiprocket`
 
 ### Email:
-- **SendGrid** - Email service
+- **Nodemailer over SMTP** - Email service
   - Package: `packages/mail`
   - Used for notifications (OTPs, order confirmations, etc.)
 
@@ -352,7 +352,7 @@ All apps use **tRPC** for type-safe API calls (not REST). Traditional Next.js AP
 - `NEXTAUTH_SECRET`, `NEXTAUTH_URL` - Auth config
 - `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID` - Payments
 - `RAZORPAY_WEBHOOK_SECRET` - Webhook verification
-- `SENDGRID_API_KEY`, `FROM_EMAIL` - Email
+- `SMTP_USER`, `SMTP_PASSWORD`, `FROM_EMAIL` - Email (SMTP_HOST/SMTP_PORT default to Gmail)
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - OAuth
 - `SHIP_ROCKET_AUTH_KEY`, `SHIPROCKET_EMAIL`, `SHIPROCKET_PASSWORD` - Shipping
 - `NEXT_PUBLIC_GST`, `NEXT_PUBLIC_PLATFORM_FEE` - Business logic
@@ -385,7 +385,7 @@ vyan-monorepo/
 ├── packages/          # Shared packages
 │   ├── database/      # Prisma schema + migrations
 │   ├── aws/           # S3 utilities
-│   ├── mail/          # SendGrid wrapper
+│   ├── mail/          # Nodemailer SMTP wrapper
 │   ├── shiprocket/    # Shiprocket API
 │   ├── ui/            # Shared UI components
 │   ├── config/        # Shared configs
@@ -583,7 +583,7 @@ apps/[app-name]/
    - Unclear if fully tested/integrated
 
 2. **Email System:**
-   - SendGrid configured
+   - SMTP configured
    - No clear templates or email-sending logic in apps (might be manual)
 
 3. **Shiprocket Tracking:**
@@ -643,7 +643,7 @@ This is a **dual-purpose healthcare/wellness platform** that combines:
 - tRPC APIs well-structured
 
 **⚠️ POTENTIALLY OUTDATED/INCOMPLETE:**
-- Email notifications (SendGrid setup but no templates visible)
+- Email notifications (Nodemailer SMTP; templates in apps/vyan-client/src/lib/email-templates.ts)
 - Refund processing (code exists, testing unclear)
 - Shipment tracking UI for customers
 - In-app notification system (model exists, no UI)

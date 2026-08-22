@@ -80,13 +80,13 @@ export default function WisdomSection() {
           <div className="hidden items-center gap-3 md:flex">
             <button
               onClick={() => scroll("left")}
-              className="rounded-full border border-gray-300 p-3 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-full border border-hairline-strong p-3 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
             >
               <ChevronLeft size={28} />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="rounded-full border border-gray-300 p-3 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-full border border-hairline-strong p-3 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
             >
               <ChevronRight size={28} />
             </button>
@@ -123,10 +123,10 @@ export default function WisdomSection() {
 
               {/* Content */}
               <div className="flex flex-grow flex-col">
-                <span className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#167D71]">
+                <span className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-700">
                   {article.date}
                 </span>
-                <h3 className="mb-3 line-clamp-2 text-xl font-bold leading-tight text-gray-900 transition-colors group-hover:text-[#167D71]">
+                <h3 className="mb-3 line-clamp-2 text-xl font-bold leading-tight text-gray-900 transition-colors group-hover:text-primary-700">
                   {article.title}
                 </h3>
                 <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-gray-500">
@@ -135,8 +135,8 @@ export default function WisdomSection() {
 
                 {/* Read More Button */}
                 <div className="mt-auto">
-                  <button className="order-0 group flex h-[45px] w-full flex-grow flex-row items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-0 transition-all duration-300 ease-in-out hover:bg-[#e5e5e5]">
-                    <span className="text-lg font-medium text-[#00000066] sm:text-[17px]">
+                  <button className="order-0 group flex h-[45px] w-full flex-grow flex-row items-center justify-between gap-2.5 rounded-2xl bg-slate-100 px-4 py-0 transition-all duration-300 ease-in-out hover:bg-slate-200">
+                    <span className="text-lg font-medium text-muted sm:text-[17px]">
                       Shop Now
                     </span>
                     <InteractiveButton size="small" />

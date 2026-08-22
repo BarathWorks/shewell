@@ -1,5 +1,7 @@
 "use client";
-import { Button } from "@repo/ui/src/@/components/button";
+import { Button } from "~/components/ui/button";
+import { buttonClass } from "~/components/ui/button-styles";
+import { StatusPill } from "~/components/ui/page";
 import {
   Sheet,
   SheetContent,
@@ -7,6 +9,13 @@ import {
   SheetTrigger,
 } from "@repo/ui/src/@/components/sheet";
 import { format, isAfter } from "date-fns";
+import {
+  CalendarX2,
+  Clock,
+  ExternalLink,
+  MoreVertical,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import CancelAppointment from "../actions/cancel-appointment";
@@ -96,6 +105,9 @@ type IMeetingDetails = {
     meeting: IGoogleCalenderEvent;
   };
 };
+/** History rows shown before the list has to be expanded. */
+const VISIBLE_HISTORY = 3;
+
 const MeetingCard = ({ meetingInfo }: IMeetingDetails) => {
   const trpcContext = api.useUtils();
   const [isOpen, setIsOpen] = useState(false);
@@ -160,393 +172,323 @@ const MeetingCard = ({ meetingInfo }: IMeetingDetails) => {
   };
 
   console.log("data", data?.patientHistory);
+  /* ---------------------------------------------------------------------- */
+
+  const isCompleted = meetingInfo.status === BookAppointmentStatus.COMPLETED;
+  const hasEnded = isAfter(currentTime, meetingInfo.endingTime);
+  const minutesUntilStart = differenceInMinutes(
+    meetingInfo.startingTime,
+    currentTime,
+  );
+  const additionalPatients =
+    data?.meetingDetails?.patient.additionalPatients ?? [];
+  const patientHistory = data?.patientHistory ?? [];
+  const comments = data?.comments ?? [];
+
   return (
-    <>
-      <Sheet open={close} onOpenChange={setClose}>
-        <SheetTrigger className="p-1">
-          <svg
-            width="4"
-            height="17"
-            viewBox="0 0 4 17"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 4.97266C3.1 4.97266 4 4.07266 4 2.97266C4 1.87266 3.1 0.972656 2 0.972656C0.9 0.972656 0 1.87266 0 2.97266C0 4.07266 0.9 4.97266 2 4.97266ZM2 6.97266C0.9 6.97266 0 7.87266 0 8.97266C0 10.0727 0.9 10.9727 2 10.9727C3.1 10.9727 4 10.0727 4 8.97266C4 7.87266 3.1 6.97266 2 6.97266ZM2 12.9727C0.9 12.9727 0 13.8727 0 14.9727C0 16.0727 0.9 16.9727 2 16.9727C3.1 16.9727 4 16.0727 4 14.9727C4 13.8727 3.1 12.9727 2 12.9727Z"
-              fill="#434343"
-            />
-          </svg>
-        </SheetTrigger>
+    <Sheet open={close} onOpenChange={setClose}>
+      {/*
+        The trigger was a bare three-dot `<svg>` inside a `SheetTrigger` with no
+        accessible name, so the only way into a consultation's detail was a
+        control that announced nothing.
+      */}
+      <SheetTrigger
+        aria-label={`Open details for the consultation with ${meetingInfo.patient.firstName ?? "this client"}`}
+        className="flex size-9 items-center justify-center rounded-lg border border-hairline-strong bg-surface text-body transition-colors duration-200 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+      >
+        <MoreVertical aria-hidden="true" className="size-[18px]" />
+      </SheetTrigger>
 
-        <SheetContent side="signup" className="bg-white p-0">
-          <div className="w-full">
-            <div className=" border-b ">
-              <div className="xs:px-[10px] sm:px-[40px] py-[30px]">
-                {/* heading */}
-                <div className="flex justify-between  ">
-                  <div className=" font-poppins xs:text-[25px] text-[36px] font-bold leading-[45px] text-active">
-                    Client Meeting
-                  </div>
-                  <SheetClose>
-                    <svg
-                      width="30"
-                      height="50"
-                      viewBox="0 0 23 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M14.3984 8.45703L8.19665 15.4319"
-                        stroke="#008F4E"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M7.8125 8.84375L14.7874 15.0455"
-                        stroke="#008F4E"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </SheetClose>
-                </div>
-              </div>
+      <SheetContent
+        side="signup"
+        className="flex w-full max-w-[34rem] flex-col gap-0 bg-surface p-0"
+      >
+        {/* ---------------------------------------------------------------- */}
+        {/* Header                                                            */}
+        {/* ---------------------------------------------------------------- */}
+        <header className="flex items-start justify-between gap-4 border-b border-hairline p-5">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-ink">
+              {meetingInfo.patient.firstName || "Client"}
+              {additionalPatients.length > 0 ? " (couple)" : ""}
+            </h2>
+
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+                <Clock aria-hidden="true" className="size-4 shrink-0" />
+                <span className="tabular">
+                  {format(meetingInfo.startingTime, "h:mm a")} &ndash;{" "}
+                  {format(meetingInfo.endingTime, "h:mm a")}
+                </span>
+              </span>
+
+              <StatusPill tone={isCompleted ? "success" : "brand"}>
+                {isCompleted ? "Completed" : "Confirmed"}
+              </StatusPill>
             </div>
-            <div className="xs:px-[10px] sm:px-10">
-              {/* meeting-with */}
 
-              <div className="flex flex-col gap-[10px] border-b border-primary py-5 ">
-                {/* div-1 */}
-                <div className="flex items-center gap-4">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="5.88267"
-                      cy="5.97447"
-                      r="5.88267"
-                      fill="#03781D"
-                    />
-                  </svg>
-                  <div className="font=inter text-base font-medium text-active xl:text-[20px] xl:leading-[30px]">
-                    Meeting with {meetingInfo.patient.firstName}
-                  </div>
-                </div>
-                {/* div-2 */}
-                <div className="flex items-center gap-2 ">
-                  <svg
-                    width="19"
-                    height="20"
-                    viewBox="0 0 19 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M17.2574 9.97637C17.2574 14.306 13.7435 17.8199 9.41387 17.8199C5.08423 17.8199 1.57031 14.306 1.57031 9.97637C1.57031 5.64673 5.08423 2.13281 9.41387 2.13281C13.7435 2.13281 17.2574 5.64673 17.2574 9.97637Z"
-                      stroke="#7E7E7E"
-                      stroke-width="1.7648"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M12.3174 12.4672L9.88586 11.0161C9.4623 10.7651 9.11719 10.1612 9.11719 9.66703V6.45117"
-                      stroke="#7E7E7E"
-                      stroke-width="1.7648"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <div className="font-inter text-sm font-medium text-[#7E7E7E] xl:text-base">
-                    {format(meetingInfo.startingTime, "h':'mm a")} -{" "}
-                    {format(meetingInfo.endingTime, "h':'mm a")}
-                  </div>
-                </div>
-                {meetingInfo.status === BookAppointmentStatus.COMPLETED ? (
-                  ""
-                ) : (
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    {isAfter(currentTime, meetingInfo.endingTime) && (
-                      <div>
-                        <Controller
-                          control={control}
-                          name="completed"
-                          render={({ field }) => {
-                            return (
-                              <>
-                                <div className="flex items-center gap-2">
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                  <div>Is the Meeting Over ?</div>
-                                  <Button type="submit">Submit</Button>
-                                </div>
-                              </>
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </form>
-                )}
+            {meetingInfo.professionalUser.displayQualification
+              ?.specialization ? (
+              <p className="mt-2 text-xs text-muted">
+                Booked for{" "}
+                {
+                  meetingInfo.professionalUser.displayQualification
+                    ?.specialization
+                }
+              </p>
+            ) : null}
+          </div>
 
-                {/* div-3 */}
-                <div className="font-inter text-sm font-medium">
-                  Appointment booked for{" "}
-                  {
-                    meetingInfo.professionalUser.displayQualification
-                      ?.specialization
-                  }
-                </div>
+          <SheetClose
+            aria-label="Close"
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted transition-colors duration-200 hover:bg-slate-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+          >
+            <X aria-hidden="true" className="size-[18px]" />
+          </SheetClose>
+        </header>
 
-                {/* Reschedule-appointment */}
-                {differenceInMinutes(meetingInfo.startingTime, currentTime) >
-                  0 && (
-                  <div className="flex items-center justify-between border-b border-primary py-5">
-                    <div className="font-inter text-base font-medium">
-                      <span className="font-semibold text-active">
-                        Need to Reschedule?{" "}
+        {/* ---------------------------------------------------------------- */}
+        {/* Body — the one scrolling region                                   */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {/* Mark complete */}
+          {!isCompleted && hasEnded ? (
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="border-b border-hairline bg-canvas p-5"
+            >
+              <Controller
+                control={control}
+                name="completed"
+                render={({ field }) => (
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <label className="flex cursor-pointer items-start gap-2.5">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-0.5"
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-ink">
+                          This consultation is finished
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-relaxed text-muted">
+                          Marking it complete releases the fee into your next
+                          payout.
+                        </span>
                       </span>
-                      Click cancel appointment to choose a new time
-                    </div>
-                    <Button
-                      onClick={() => handleCancelAppointment(meetingInfo.id)}
-                      className="border border-[#CA0000] bg-white px-4 py-2 text-[#CA0000] hover:bg-white"
-                    >
-                      Cancel Appointment
+                    </label>
+
+                    <Button type="submit" size="sm">
+                      Mark complete
                     </Button>
                   </div>
                 )}
+              />
+            </form>
+          ) : null}
 
-                {/* Other-participants */}
-                {data?.meetingDetails?.patient.additionalPatients.length! >
-                  0 && (
-                  <div className="flex flex-col gap-[10px] border-b border-primary py-5">
-                    <div className="font-inter text-base font-semibold">
-                      Other Participants (
-                      {data?.meetingDetails?.patient.additionalPatients.length})
-                    </div>
-                    <div>
-                      <div className="flex flex-col gap-2">
-                        {data?.meetingDetails?.patient.additionalPatients.map(
-                          (item) => (
-                            <div className="flex justify-between">
-                              <div className="font-inter text-sm font-normal text-[#434343]">
-                                {item.firstName}
-                              </div>
-                              <div className="rounded-md bg-[#CCE9DC] px-2 py-1 font-inter text-xs font-medium text-secondary">
-                                Accepted
-                              </div>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="h-[300px] overflow-y-auto">
-                  {/* patient-history */}
-                  <div>
-                    <div className="flex flex-col gap-[10px] border-b border-primary py-5">
-                      <div className="flex items-center justify-between">
-                        <div className="font-inter text-base font-semibold">
-                          Patient History
-                        </div>
-                        <Button
-                          onClick={() => setIsOpen(!isOpen)}
-                          className="bg-white font-inter text-xs font-medium text-primary hover:bg-white"
-                        >
-                          {isOpen ? " View Less" : "View More"}
-                        </Button>
-                      </div>
-
-                      {/* 1st meeting */}
-                      {data?.patientHistory?.length! > 0 ? (
-                        <div className="flex flex-col gap-[10px]">
-                          {data?.patientHistory.map((item, index) => (
-                            <div className="flex justify-between rounded-[8px] border xs:p-2 sm:p-4">
-                              <div className="flex flex-col gap-2 w-full">
-                                <div className="flex justify-between items-center w-full ">
-                                <div className="font-inter text-base font-semibold">
-                                  Meeting with {item.patient.firstName}{" "}
-                                  {item.patient.additionalPatients.length > 0 &&
-                                    "(Couple)"}
-                                </div>
-                               {
-                                item.status === BookAppointmentStatus.COMPLETED &&  <div className="self-start rounded-lg bg-[#E6F4F4] px-2 py-1 font-inter text-xs font-medium text-primary">
-                                Completed
-                              </div>
-                               }
-                               {
-                                (item.status === BookAppointmentStatus.CANCELLED || item.status === BookAppointmentStatus.CANCELLED_WITH_REFUND )&&  <div className="self-start rounded-lg bg-[#FAE6E6] px-2 py-1 font-inter text-xs font-medium text-[#CA0000]">
-                                Cancelled
-                              </div>
-                               }
-                                </div>
-                                <div className="flex items-center font-inter xs:text-xs sm:text-sm font-medium text-[#777777]">
-                                  <svg
-                                    className="mr-[2px] inline"
-                                    width="19"
-                                    height="20"
-                                    viewBox="0 0 19 20"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M17.2574 9.97637C17.2574 14.306 13.7435 17.8199 9.41387 17.8199C5.08423 17.8199 1.57031 14.306 1.57031 9.97637C1.57031 5.64673 5.08423 2.13281 9.41387 2.13281C13.7435 2.13281 17.2574 5.64673 17.2574 9.97637Z"
-                                      stroke="#7E7E7E"
-                                      stroke-width="1.7648"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M12.3174 12.4672L9.88586 11.0161C9.4623 10.7651 9.11719 10.1612 9.11719 9.66703V6.45117"
-                                      stroke="#7E7E7E"
-                                      stroke-width="1.7648"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                  </svg>
-                                  <div>
-                                    {format(item.startingTime, "hh:mm aaa")} -
-                                    {format(item.endingTime, "hh:mm aaa")} ,
-                                    {format(item.createdAt, "MMMM dd, yyyy")}
-                                  </div>
-                                </div>
-                                <div className="font-inter text-xs font-medium text-inactive">
-                                  Appointment booked for{" "}
-                                  {
-                                    item.professionalUser.displayQualification
-                                      ?.specialization
-                                  }
-                                  
-                                </div>
-                                {item.patient.additionalPatients.length > 0 && (
-                                  <div className="my-4 font-inter text-xs font-normal text-inactive">
-                                    <span className="text-sm font-semibold text-primary">
-                                      Participants:
-                                    </span>{" "}
-                                    <div className="flex">
-                                      {" "}
-                                      {item.patient.additionalPatients.map(
-                                        (additionalPatient) =>
-                                          additionalPatient.firstName,
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                                {item.comments[item.comments.length - 1]
-                                  ?.comment && (
-                                  <div className="font-inter text-xs font-normal text-inactive">
-                                    <span className="text-sm font-semibold text-primary">
-                                      Doctor's Comment:
-                                    </span>{" "}
-                                    {
-                                      item.comments[item.comments.length - 1]
-                                        ?.comment
-                                    }
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div>There is no history</div>
-                      )}
-                    </div>
-                   
-                  </div>
-
-                  {/* doctor's-comment */}
-                  <div className="flex flex-col gap-[18px] pb-[50px] pt-5">
-                    {/* heading */}
-                    <div className="font-inter text-base font-semibold">
-                      Doctor's Comment
-                    </div>
-                   
-                    <DoctorCommentForm bookAppointmentId={meetingInfo.id} />
-                    {/* comments-from-doctor-with-time */}
-                    <div className="flex flex-col gap-3">
-                      {/* 1st-comment */}
-                      {data?.comments.map((item) => (
-                        <div className="flex flex-col gap-3">
-                          <div className="flex items-center gap-[2px] font-inter text-sm font-medium text-active">
-                            <svg
-                              width="19"
-                              height="20"
-                              viewBox="0 0 19 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M17.2574 9.97637C17.2574 14.306 13.7435 17.8199 9.41387 17.8199C5.08423 17.8199 1.57031 14.306 1.57031 9.97637C1.57031 5.64673 5.08423 2.13281 9.41387 2.13281C13.7435 2.13281 17.2574 5.64673 17.2574 9.97637Z"
-                                stroke="#7E7E7E"
-                                stroke-width="1.7648"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M12.3174 12.4672L9.88586 11.0161C9.4623 10.7651 9.11719 10.1612 9.11719 9.66703V6.45117"
-                                stroke="#7E7E7E"
-                                stroke-width="1.7648"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                            {format(item.createdAt, "hh:mm aaa, MMMM dd, yyyy")}
-                            {/* 9:00am, March 20, 2024 */}
-                          </div>
-                          <div className="font-inter text-xs font-normal text-inactive">
-                           
-                            {item.comment}
-                          </div>
-                        </div>
-                      ))}
-                     
-                    </div>
-                  </div>
-                </div>
+          {/* Reschedule / cancel */}
+          {minutesUntilStart > 0 ? (
+            <section className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline p-5">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-ink">
+                  Need to reschedule?
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted">
+                  Cancelling frees the slot and refunds the client. They can then
+                  book a new time.
+                </p>
               </div>
 
-              {/* Google-Meet-Link */}
-              {BookAppointmentStatus.COMPLETED !== meetingInfo.status &&
-                meetingInfo.meeting?.hangoutLink && 
-                  <div className="border-t">
-                    <div className="px-10 py-5">
-                      <Link
-                        href={meetingInfo.meeting?.hangoutLink || ""}
-                        target="_blank"
-                      >
-                        <Button className="w-full rounded-[12px] border border-primary bg-white  py-3 font-inter text-base font-medium text-inactive hover:bg-white">
-                          <div className="w-10">
-                            <div className="relative aspect-square w-full">
-                              <Image
-                                src="/images/google-meet.png"
-                                alt="meeting-link"
-                                fill={true}
-                                className="object-cover"
-                              />
-                            </div>
-                          </div>
-                          Go to meet link
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                }
-            </div>{" "}
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+              <Button
+                variant="outline"
+                size="sm"
+                leadingIcon={CalendarX2}
+                onClick={() => handleCancelAppointment(meetingInfo.id)}
+                className="border-danger-100 text-danger-600 hover:border-danger-500 hover:bg-danger-50 hover:text-danger-700"
+              >
+                Cancel appointment
+              </Button>
+            </section>
+          ) : null}
+
+          {/* Additional participants */}
+          {additionalPatients.length > 0 ? (
+            <section className="border-b border-hairline p-5">
+              <h3 className="text-sm font-semibold text-ink">
+                Other participants ({additionalPatients.length})
+              </h3>
+
+              <ul className="mt-2.5 flex flex-col gap-2">
+                {additionalPatients.map((participant, index) => (
+                  <li
+                    key={`${participant.firstName}-${index}`}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <span className="min-w-0 truncate text-sm text-body">
+                      {participant.firstName}
+                    </span>
+                    <StatusPill tone="success">Accepted</StatusPill>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {/* Patient history */}
+          <section className="border-b border-hairline p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-ink">
+                Previous consultations
+              </h3>
+
+              {patientHistory.length > VISIBLE_HISTORY ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  {isOpen ? "Show fewer" : `Show all ${patientHistory.length}`}
+                </Button>
+              ) : null}
+            </div>
+
+            {patientHistory.length === 0 ? (
+              <p className="mt-2 text-sm text-muted">
+                This is your first consultation with{" "}
+                {meetingInfo.patient.firstName || "this client"}.
+              </p>
+            ) : (
+              <ul className="mt-3 flex flex-col gap-2">
+                {/*
+                  "View More" toggled a boolean that nothing read — the full list
+                  rendered either way, inside a fixed `h-[300px]` scroller. The
+                  toggle now actually limits the list.
+                */}
+                {(isOpen
+                  ? patientHistory
+                  : patientHistory.slice(0, VISIBLE_HISTORY)
+                ).map((item) => {
+                  const cancelled =
+                    item.status === BookAppointmentStatus.CANCELLED ||
+                    item.status === BookAppointmentStatus.CANCELLED_WITH_REFUND;
+                  const latestComment =
+                    item.comments[item.comments.length - 1]?.comment;
+
+                  return (
+                    <li
+                      key={item.id}
+                      className="rounded-lg border border-hairline p-3.5"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="min-w-0 text-sm font-semibold text-ink">
+                          {item.patient.firstName}
+                          {item.patient.additionalPatients.length > 0
+                            ? " (couple)"
+                            : ""}
+                        </p>
+
+                        {item.status === BookAppointmentStatus.COMPLETED ? (
+                          <StatusPill tone="success">Completed</StatusPill>
+                        ) : cancelled ? (
+                          <StatusPill tone="danger">Cancelled</StatusPill>
+                        ) : null}
+                      </div>
+
+                      <p className="tabular mt-1 inline-flex items-center gap-1.5 text-xs text-muted">
+                        <Clock aria-hidden="true" className="size-3.5 shrink-0" />
+                        {format(item.startingTime, "h:mm a")} &ndash;{" "}
+                        {format(item.endingTime, "h:mm a")},{" "}
+                        {format(item.startingTime, "d MMMM yyyy")}
+                      </p>
+
+                      {item.patient.additionalPatients.length > 0 ? (
+                        <p className="mt-2 text-xs leading-relaxed text-muted">
+                          <span className="font-medium text-body">
+                            Participants:
+                          </span>{" "}
+                          {item.patient.additionalPatients
+                            .map((participant) => participant.firstName)
+                            .join(", ")}
+                        </p>
+                      ) : null}
+
+                      {latestComment ? (
+                        <p className="mt-2 text-xs leading-relaxed text-muted">
+                          <span className="font-medium text-body">
+                            Your note:
+                          </span>{" "}
+                          {latestComment}
+                        </p>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {/* Notes */}
+          <section className="p-5">
+            <h3 className="text-sm font-semibold text-ink">
+              Notes for this consultation
+            </h3>
+
+            <div className="mt-3">
+              <DoctorCommentForm bookAppointmentId={meetingInfo.id} />
+            </div>
+
+            {comments.length > 0 ? (
+              <ul className="mt-5 flex flex-col gap-3 border-t border-hairline pt-4">
+                {comments.map((item) => (
+                  <li key={item.id ?? item.createdAt.toString()}>
+                    <p className="tabular inline-flex items-center gap-1.5 text-xs font-medium text-muted">
+                      <Clock aria-hidden="true" className="size-3.5 shrink-0" />
+                      {format(item.createdAt, "h:mm a, d MMMM yyyy")}
+                    </p>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-body">
+                      {item.comment}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        </div>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Join                                                              */}
+        {/* ---------------------------------------------------------------- */}
+        {!isCompleted && meetingInfo.meeting?.hangoutLink ? (
+          <footer className="border-t border-hairline p-5">
+            <Link
+              href={meetingInfo.meeting.hangoutLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonClass({
+                variant: "primary",
+                size: "lg",
+                fullWidth: true,
+              })}
+            >
+              <span className="relative size-5 shrink-0">
+                <Image
+                  src="/images/google-meet.png"
+                  alt=""
+                  fill
+                  sizes="20px"
+                  className="object-contain"
+                />
+              </span>
+              Join Google Meet
+              <ExternalLink aria-hidden="true" className="size-4 shrink-0" />
+            </Link>
+          </footer>
+        ) : null}
+      </SheetContent>
+    </Sheet>
   );
 };
+
 export default MeetingCard;

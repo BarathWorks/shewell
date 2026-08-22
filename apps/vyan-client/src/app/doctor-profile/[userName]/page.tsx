@@ -222,7 +222,7 @@
 //                 {/* about-doctor and reviews and available time slots */}
 //                 <div className="flex flex-col gap-[30px] xl:flex-row 2xl:gap-[45px] ">
 //                   {/* about-doctor and reviews */}
-//                   <div className="bg-[#F7FBFC] py-6 md:py-8 xl:basis-[856px] 2xl:basis-[1109px] 2xl:py-10">
+//                   <div className="bg-primary-50 py-6 md:py-8 xl:basis-[856px] 2xl:basis-[1109px] 2xl:py-10">
 //                     <Tabs defaultValue="about-doctor" className="w-full">
 //                       <TabsList className="mb-[18px] grid w-full grid-cols-2 md:px-4 2xl:px-8">
 //                         <TabsTrigger
@@ -247,7 +247,7 @@
 //                     </Tabs>
 //                   </div>
 //                   {/* available time slots */}
-//                   <div className="bg-[#F7FBFC] py-6 md:py-8 xl:basis-[394px] xl:px-3 2xl:basis-[565px] 2xl:px-6 2xl:py-10">
+//                   <div className="bg-primary-50 py-6 md:py-8 xl:basis-[394px] xl:px-3 2xl:basis-[565px] 2xl:px-6 2xl:py-10">
 //                     <div className="w-[370px]">
 //                       <div className="relative aspect-[370/339] w-full">
 //                         <Image

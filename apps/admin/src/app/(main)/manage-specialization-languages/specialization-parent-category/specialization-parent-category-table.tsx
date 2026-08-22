@@ -121,7 +121,6 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Specializations</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
         <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
@@ -163,7 +162,6 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
           <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
           <DataTable
-            stripedRows
             ref={dt}
             rowGroupMode="subheader"
             groupRowsBy="country.name"
@@ -178,7 +176,7 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
             rowsPerPageOptions={[5, 10, 25]}
             className="datatable-responsive"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
             filters={filters}
             globalFilterFields={['id', 'specialization']}
             emptyMessage="No specializaitons found."
@@ -186,9 +184,9 @@ const SpecializationParentCategoryTable = ({ specializations }: { specialization
             exportFilename="Specializations"
           >
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
-            <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
+            <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '8rem' }} frozen={true}></Column>
           </DataTable>
 
           <Dialog visible={specializationDialog} style={{ width: '50vw' }} header="Specializations" modal className="p-fluid" onHide={hideDialog}>

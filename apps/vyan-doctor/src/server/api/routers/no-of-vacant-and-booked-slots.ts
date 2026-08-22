@@ -27,6 +27,10 @@ import { getServerAuthSession } from "~/server/auth";
   
         // Find the professional user by email
         const professionalUser = await db.professionalUser.findFirst({
+          // Only the id is used below. Without a projection Prisma returns every
+          // column — password hash, bank account number, IFSC, Google tokens and
+          // the pending OTP — into memory on every dashboard load.
+          select: { id: true },
           where: { email: session.user.email },
         });
         if (!professionalUser) {

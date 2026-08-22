@@ -95,12 +95,15 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
     }
   });
   return (
-    <>
-      <section className="w-full lg:mt-[65px]">
-        <div className="container mx-auto">
-          <div className="flex flex-col gap-[36px] xl:flex-row xl:gap-[50px]">
+    <div className="bg-canvas">
+      {/* `container mx-auto` with no max-width and a `lg:mt-[65px]` top margin —
+          the gutter and the measure did not match any other page. `container-page`
+          is the app-wide shell. */}
+      <section className="container-page py-10 md:py-14">
+        <div>
+          <div className="grid grid-cols-1 gap-8 xl:grid-cols-3 xl:gap-10">
             {/* Left Panel */}
-            <div className="w-full xl:w-2/3">
+            <div className="xl:col-span-2">
               <div className="w-full flex-col">
                 <div className="relative aspect-[16/9] w-full">
                   <Image
@@ -118,7 +121,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
                         {format(blog?.createdAt!, "dd-MM-yyyy")}
                       </span>
                     </div>
-                    <div className="w-fit items-center rounded-md bg-[#e6f4f4] px-2.5 align-middle uppercase leading-7 text-primary">
+                    <div className="w-fit items-center rounded-md bg-primary-50 px-2.5 align-middle uppercase leading-7 text-primary">
                       {blog?.category.name}
                     </div>
                   </div>
@@ -139,7 +142,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
             </div>
 
             {/* right panel */}
-            <div className="w-full xl:w-1/3">
+            <div className="xl:col-span-1">
               <div className="grid w-full grid-flow-row grid-cols-1 gap-6 lg:order-2 xl:order-1">
                 {/* categories */}
 
@@ -163,7 +166,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
                       return (
                         <div
                           key={blog.id}
-                          className="flex items-center gap-4 border-b-[1px] border-[#00898F] py-4 align-middle"
+                          className="flex items-center gap-4 border-b-[1px] border-primary-600 py-4 align-middle"
                         >
                           <Link href={`/blogs/${blog.slug}`} className="relative aspect-[4/3] h-[90px]">
                             <Image
@@ -302,7 +305,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

@@ -105,6 +105,11 @@ export const searchMeetingRouter = createTRPCRouter({
           startingTime: true,
           endingTime: true,
           status: true,
+          // Selected so the day schedule can say whether a consultation is
+          // online or in person. Without it every row looked identical, and
+          // "am I expecting this person in the room?" is the one thing a
+          // practitioner needs from that list before the appointment starts.
+          serviceType: true,
         },
         where: {
           professionalUser: {

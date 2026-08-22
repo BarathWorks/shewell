@@ -115,7 +115,7 @@
 //         ))}
 //       </div>
 
-//       <div className="border-t border-gray-200 pt-8">
+//       <div className="border-t border-hairline pt-8">
 //         {steps[activeStep].component}
 
 //         <div className="flex justify-end mt-8">

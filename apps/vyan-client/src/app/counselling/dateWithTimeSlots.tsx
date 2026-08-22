@@ -287,18 +287,22 @@ const DayNavigatorWithTimeSlots = ({
   return (
     <>
       <div className="mb-2 flex items-center gap-2">
-        <Clock className="h-5 w-5 text-[#00898F]" />
-        <span className="text-lg font-semibold text-[#333333]">
+        <Clock className="h-5 w-5 text-primary-700" />
+        <span className="text-lg font-semibold text-ink">
           Available Time Slots
         </span>
       </div>
       <div className="mb-4 mt-2 h-px w-full bg-gray-300"></div>
       <div className="flex flex-wrap justify-between gap-y-5">
-        <div className="flex items-center gap-2 rounded-2xl bg-[#F8F8F8] p-1.5">
+        {/* `min-w-0` and `w-full`: without them this rail sized itself to the
+            intrinsic width of the scrolling day list inside it, so on a 375px
+            screen it pushed ~24px past the viewport and gave the whole page a
+            horizontal scrollbar. It shrinks and scrolls internally now. */}
+        <div className="flex w-full min-w-0 items-center gap-2 rounded-xl border border-hairline bg-slate-50 p-1.5 sm:w-auto">
           <button
             onClick={handlePrevDay}
             disabled={isPrevDisabled}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition-all hover:bg-gray-50 ${isPrevDisabled ? "cursor-not-allowed opacity-50" : "hover:text-[#00898F]"}`}
+            className={`flex size-10 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface transition-colors hover:bg-slate-50 ${isPrevDisabled ? "cursor-not-allowed opacity-50" : "hover:text-primary-700"}`}
           >
             <svg
               width="8"
@@ -316,7 +320,7 @@ const DayNavigatorWithTimeSlots = ({
               />
             </svg>
           </button>
-          <div className="scrollbar-hide flex gap-1 overflow-x-auto px-1">
+          <div className="scrollbar-hide flex min-w-0 flex-1 gap-1 overflow-x-auto px-1">
             {days.map((day) => (
               <div
                 key={day.toISOString()}
@@ -324,8 +328,8 @@ const DayNavigatorWithTimeSlots = ({
                 className={`flex cursor-pointer flex-col items-center justify-center rounded-xl px-4 py-2 transition-all duration-300 ${
                   format(day, "yyyy-MM-dd") ===
                   format(selectedDate, "yyyy-MM-dd")
-                    ? "bg-[#00898F] text-white shadow-md"
-                    : "bg-transparent text-[#666666] hover:bg-white hover:text-[#00898F]"
+                    ? "bg-primary-600 text-white shadow-md"
+                    : "bg-transparent text-muted hover:bg-white hover:text-primary-700"
                 }`}
               >
                 <span className="text-xs font-medium uppercase opacity-80">
@@ -340,7 +344,7 @@ const DayNavigatorWithTimeSlots = ({
 
           <button
             onClick={handleNextDay}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition-all hover:bg-gray-50 hover:text-[#00898F]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition-all hover:bg-gray-50 hover:text-primary-700"
           >
             <svg
               width="8"
@@ -362,7 +366,7 @@ const DayNavigatorWithTimeSlots = ({
 
         {/* add time */}
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-[#333333]">Duration:</span>
+          <span className="text-sm font-medium text-ink">Duration:</span>
           <Select
             value={
               timeDuration?.toString() ||
@@ -376,14 +380,14 @@ const DayNavigatorWithTimeSlots = ({
               );
             }}
           >
-            <SelectTrigger className="w-[120px] rounded-xl border-gray-200 bg-white font-medium text-[#333333] shadow-sm">
+            <SelectTrigger className="w-[120px] rounded-xl border-hairline bg-white font-medium text-ink shadow-sm">
               <SelectValue placeholder="Duration" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 bg-white shadow-lg">
+            <SelectContent className="rounded-xl border-hairline bg-white shadow-lg">
               <SelectGroup>
                 {timeDurationData?.timeDurations.map((timeDuration) => (
                   <SelectItem
-                    className="cursor-pointer rounded-lg bg-white px-2 py-1.5 text-sm font-medium text-[#333333] hover:bg-gray-50"
+                    className="cursor-pointer rounded-lg bg-white px-2 py-1.5 text-sm font-medium text-ink hover:bg-gray-50"
                     key={timeDuration.time}
                     value={timeDuration.time.toString()}
                   >
@@ -432,8 +436,8 @@ const DayNavigatorWithTimeSlots = ({
             ))}
           </div>
         ) : (
-          <div className="mt-2 flex min-h-[100px] w-full items-center justify-center rounded-2xl border border-gray-100 bg-[#FCFCFD]">
-            <div className="flex flex-col items-center gap-2 text-[#999999]">
+          <div className="mt-2 flex min-h-[100px] w-full items-center justify-center rounded-2xl border border-hairline bg-slate-50">
+            <div className="flex flex-col items-center gap-2 text-muted">
               <Clock className="h-6 w-6 opacity-50" />
               <p className="text-sm font-medium">
                 No available slots for this date

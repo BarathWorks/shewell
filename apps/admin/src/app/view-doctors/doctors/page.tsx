@@ -23,6 +23,7 @@ interface IRecentAppointments {
   phoneNumber: string;
   userName: string;
   isapproved: boolean;
+  emailVerifiedAt: Date | null;
   gender: string | null;
   displayQualification: {
     specialization: string;
@@ -38,9 +39,14 @@ interface IRecentAppointments {
     completeAddress: string;
     pincode: string;
   } | null;
+  // Presence flags, not values. This screen is gated on `appointment:read`, which
+  // read-only SUPPORT holds, so the router reduces PAN and Aadhaar to booleans
+  // before they leave the server. The previous interface declared the numbers
+  // themselves — which did not make them arrive, it only made the completeness
+  // check below read `undefined` for every practitioner.
   identity: {
-    panNumber: string | null;
-    aadhaarNumber: string | null;
+    hasPanNumber: boolean;
+    hasAadhaarNumber: boolean;
     licenseNumber: string | null;
     isVerified: boolean;
   } | null;
@@ -56,6 +62,28 @@ interface IRecentAppointments {
     position: string;
     location: string;
   }[];
+}
+
+/**
+ * What a practitioner still has to supply before approval is reasonable.
+ *
+ * Deliberately does NOT require `identity.isVerified`: nothing in the application
+ * ever sets that flag — only the demo seed does — so gating on it would mark every
+ * real practitioner incomplete, which is the bug this replaced. Approval by an
+ * admin *is* the verification step; the flag is shown as information, not a gate.
+ */
+function missingInformationFor(row: IRecentAppointments): string[] {
+  const missing: string[] = [];
+  // The practitioner has not proved they control the address we would send
+  // appointment details and password resets to.
+  if (!row.emailVerifiedAt) missing.push('Email verification');
+  if (!row.address) missing.push('Address');
+  if (!row.identity || (!row.identity.hasPanNumber && !row.identity.hasAadhaarNumber)) {
+    missing.push('Identity Documents');
+  }
+  if (!row.degrees || row.degrees.length === 0) missing.push('Education');
+  if (!row.experiences || row.experiences.length === 0) missing.push('Experience');
+  return missing;
 }
 
 const Doctors = () => {
@@ -98,6 +126,9 @@ const Doctors = () => {
     return (
       <>
         <div className="text-sm">{row.email}</div>
+        <div className={`text-xs ${row.emailVerifiedAt ? 'text-green-600' : 'text-orange-600'}`}>
+          {row.emailVerifiedAt ? '✓ Verified' : '⚠ Not verified'}
+        </div>
       </>
     );
   };
@@ -159,8 +190,8 @@ const Doctors = () => {
     }
     return (
       <div className="text-sm">
-        <div><strong>PAN:</strong> {row.identity.panNumber || 'Not provided'}</div>
-        <div><strong>Aadhaar:</strong> {row.identity.aadhaarNumber ? `**** **** ${row.identity.aadhaarNumber.slice(-4)}` : 'Not provided'}</div>
+        <div><strong>PAN:</strong> {row.identity.hasPanNumber ? 'Provided' : 'Not provided'}</div>
+        <div><strong>Aadhaar:</strong> {row.identity.hasAadhaarNumber ? 'Provided' : 'Not provided'}</div>
         <div><strong>License:</strong> {row.identity.licenseNumber || 'Not provided'}</div>
         <div className={`text-xs ${row.identity.isVerified ? 'text-green-600' : 'text-orange-600'}`}>
           {row.identity.isVerified ? '✓ Verified' : '⚠ Not verified'}
@@ -212,13 +243,16 @@ const Doctors = () => {
     }
 
     function handleApprove(): void {
-      // Check if all required information is provided
-      const missingInfo = [];
-      if (!row.address) missingInfo.push('Address');
-      if (!row.identity || (!row.identity.panNumber && !row.identity.aadhaarNumber)) missingInfo.push('Identity Documents');
-      if (!row.degrees || row.degrees.length === 0) missingInfo.push('Education');
-      if (!row.experiences || row.experiences.length === 0) missingInfo.push('Experience');
-      
+      // Check if all required information is provided.
+      //
+      // This used to test `row.identity.panNumber || row.identity.aadhaarNumber`.
+      // Neither field is returned by the router, so both were always `undefined`:
+      // every practitioner counted as missing Identity Documents, every approval
+      // raised a spurious confirmation, and the "Incomplete Profile" badge showed
+      // on profiles that were in fact complete — training admins to click through
+      // the warning that is supposed to stop a premature approval.
+      const missingInfo = missingInformationFor(row);
+
       if (missingInfo.length > 0 && !row.isapproved) {
         const confirmApproval = window.confirm(
           `Warning: The following information is missing:\n- ${missingInfo.join('\n- ')}\n\nDo you still want to approve this doctor?`
@@ -232,21 +266,21 @@ const Doctors = () => {
       });
     }
 
-    // Check if profile is complete
-    const isProfileComplete = row.address && row.identity && 
-      (row.identity.panNumber || row.identity.aadhaarNumber) &&
-      row.degrees && row.degrees.length > 0 &&
-      row.experiences && row.experiences.length > 0;
+    // Same rule as the confirmation above — read from one place so the badge and
+    // the warning can never disagree.
+    const isProfileComplete = missingInformationFor(row).length === 0;
 
     return (
       <div className="flex flex-col gap-2">
         {!isProfileComplete && !row.isapproved && (
           <span className="text-xs text-orange-600 font-semibold">⚠ Incomplete Profile</span>
         )}
-        <button 
-          className={`${row.isapproved ? "bg-red-500 text-white" : "bg-green-500 text-white"} border-none hover:bg-blue-700 p-2 rounded-full`} 
+        <button
+          type="button"
+          className={`sw-btn ${row.isapproved ? 'sw-btn-danger' : 'sw-btn-primary'}`}
           onClick={row.isapproved ? handleDeactivate : handleApprove}
         >
+          <i className={`pi ${row.isapproved ? 'pi-ban' : 'pi-check'}`} aria-hidden="true" />
           {row.isapproved ? "Deactivate" : "Approve"}
         </button>
       </div>

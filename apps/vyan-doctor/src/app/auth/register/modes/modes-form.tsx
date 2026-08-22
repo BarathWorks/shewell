@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -137,7 +137,7 @@ const ModesForm = ({
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
           <div>
@@ -153,7 +153,7 @@ const ModesForm = ({
                       onValueChange={field.onChange}
                       defaultValue={sessionMode || ""}
                     >
-                      <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
+                      <SelectTrigger className="w-full  rounded-md border border-solid border-hairline py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
                         <SelectValue placeholder="Select the Session Mode" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
@@ -162,7 +162,7 @@ const ModesForm = ({
                       </SelectContent>
                     </Select>
                     {errors && errors.sessionMode && (
-                      <p className="text-red-500">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {" "}
                         {errors.sessionMode.message}
                       </p>
@@ -186,7 +186,7 @@ const ModesForm = ({
                         onValueChange={field.onChange}
                         defaultValue={sessionType || ""}
                       >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
+                        <SelectTrigger className="w-full  rounded-md border border-solid border-hairline py-3  pl-4 font-inter text-sm  font-normal  outline-primary ">
                           <SelectValue placeholder="Couple/Single" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -196,7 +196,7 @@ const ModesForm = ({
                       </Select>
 
                       {errors && errors.sessionType && (
-                        <p className="text-red-500">
+                        <p className="mt-1.5 text-xs font-medium text-danger-600">
                           {" "}
                           {errors.sessionType.message}
                         </p>
@@ -220,7 +220,7 @@ const ModesForm = ({
                         onValueChange={field.onChange}
                         //  defaultValue = {meetingType  || "google-meet"}
                       >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
+                        <SelectTrigger className="w-full  rounded-md border border-solid border-hairline py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
                           <SelectValue placeholder="Select Meeting Type" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -231,7 +231,7 @@ const ModesForm = ({
                         </SelectContent>
                       </Select>
                       {errors && errors.meetingType && (
-                        <p className="text-red-500">
+                        <p className="mt-1.5 text-xs font-medium text-danger-600">
                           {" "}
                           {errors.meetingType.message}
                         </p>
@@ -256,7 +256,7 @@ const ModesForm = ({
                         onValueChange={field.onChange}
                         defaultValue={listing || ""}
                       >
-                        <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9] py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
+                        <SelectTrigger className="w-full  rounded-md border border-solid border-hairline py-3  pl-4 font-inter text-sm  font-normal  outline-primary">
                           <SelectValue placeholder="Select an option" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -267,7 +267,7 @@ const ModesForm = ({
                         </SelectContent>
                       </Select>
                       {errors && errors.listing && (
-                        <p className="text-red-500">
+                        <p className="mt-1.5 text-xs font-medium text-danger-600">
                           {" "}
                           {errors.listing.message}
                         </p>
@@ -290,7 +290,7 @@ const ModesForm = ({
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
-                          <SelectTrigger className="w-full  rounded-md border border-solid border-[#e9e9e9]  py-3 pl-4 font-inter  text-sm font-normal text-placeholder-color">
+                          <SelectTrigger className="w-full  rounded-md border border-solid border-hairline  py-3 pl-4 font-inter  text-sm font-normal text-placeholder-color">
                             <SelectValue placeholder="Enter issues you handled" />
                           </SelectTrigger>
                           <SelectContent className="bg-white">
@@ -301,7 +301,7 @@ const ModesForm = ({
                           </SelectContent>
                         </Select>
                         {errors && errors.issues && (
-                          <p className="text-red-500"> {errors.issues.message}</p>
+                          <p className="mt-1.5 text-xs font-medium text-danger-600"> {errors.issues.message}</p>
                         )}
                       </>
                     );
@@ -313,13 +313,13 @@ const ModesForm = ({
           <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
             <Button
               disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
               type="submit"
               // onClick={handleSubmit(onSubmit, errorHandler)}
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-base font-normal">
               Already have a account?{" "}

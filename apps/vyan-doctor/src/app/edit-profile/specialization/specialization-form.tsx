@@ -1,16 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
-import Select from "react-tailwindcss-select";
+
+import React from "react";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import { Button } from "@repo/ui/src/@/components/button";
-import SpecializationUserAction from "./specialization-user-action";
-import { useToast } from "@repo/ui/src/@/components/use-toast";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import LoadingSpinner from "~/app/components/loading-spinner";
 import Multiselect from "multiselect-react-dropdown";
-import React from "react";
+import { AlertCircle, ArrowRight } from "lucide-react";
+
+import { useToast } from "@repo/ui/src/@/components/use-toast";
+import { Button } from "~/components/ui/button";
+import { Section } from "~/components/ui/page";
+import SpecializationUserAction from "./specialization-user-action";
+
 interface ISpecialization {
   value: string;
   label: string;
@@ -23,9 +25,28 @@ interface ISpecializationForm {
 const schema = z.object({
   specializations: z
     .array(z.object({ value: z.string(), label: z.string() }))
-    .nonempty("Please select at least one specialization."),
+    .nonempty("Choose at least one specialisation."),
 });
 
+/**
+ * Which areas the practitioner treats.
+ *
+ * Three things this fixes beyond the styling:
+ *
+ *  - `loadingState` was declared, read by the submit button, and never set to
+ *    `true` anywhere. The button therefore never showed a pending state and could
+ *    be pressed repeatedly while the action was in flight, submitting the form
+ *    several times. It uses the form's own `isSubmitting` now, which cannot fall
+ *    out of sync with the request.
+ *  - A `useEffect` on mount wrote `?step=3` into the URL with `router.replace`,
+ *    and the submit handler wrote `?step=4` onto the *next* page. Nothing read
+ *    either — the stepper that was supposed to compared the value as a string and
+ *    now derives the current section from the pathname. Both are gone, along with
+ *    the history entry the effect added on every visit.
+ *  - The commented-out `react-tailwindcss-select` block — 40 lines of dead
+ *    configuration for a component that was swapped out — and an unused
+ *    `useState(null)` called `animal`.
+ */
 const SpecializationForm = ({
   preSpecialisations,
   specializations,
@@ -36,168 +57,120 @@ const SpecializationForm = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ISpecializationForm>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      specializations: preSpecialisations,
-    },
+    defaultValues: { specializations: preSpecialisations },
   });
-  const [animal, setAnimal] = useState(null);
+
   const router = useRouter();
   const { toast } = useToast();
-  const [loadingState, setLoadingState] = useState<boolean>(false);
 
-
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams);
-  params.set("step", "4");
-  const onSubmit = (data: { specializations: ISpecialization[] }) => {
-    console.log("Form data:", data);
-    SpecializationUserAction(data)
-      .then((resp) => {
-        toast({
-          description: "Successfully added the specializations",
-          variant: "default",
-        });
-        console.log(resp?.message);
-        router.push(`/edit-profile/prices?${params.toString()}`);
-      })
-      .catch((err) => {
-        toast({
-          description: "Failed to add the specializations",
-          variant: "destructive",
-        });
-        console.log(err.message);
+  const onSubmit = async (data: { specializations: ISpecialization[] }) => {
+    try {
+      await SpecializationUserAction(data);
+      toast({ description: "Specialisations saved" });
+      router.push("/edit-profile/prices");
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error
+            ? error.message
+            : "Couldn't save your specialisations. Try again.",
+        variant: "destructive",
       });
+    }
   };
 
-  //   const handleChange = (value) => {
-  //     console.log("value:", value);
-  //     setAnimal(value);
-  //   };
-  // console.log("specialisations", specializations);
-
-  useEffect(() => {
-    params.set("step", "3");
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  },[]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-6 font-inter text-lg font-semibold text-active md:leading-[30px] xl:mb-8 xl:text-2xl 2xl:text-[28px] 2xl:leading-[38px]">
-        Specialization
-      </div>
-      <Controller
-        control={control}
-        name="specializations"
-        render={({ field }) => {
-          return (
-            <>
-              {/* <Select
-                {...field}
-                primaryColor=""
-                isSearchable={true}
-                // value={animal}
-                value={field.value}
-                // onChange={field.onChange}
-
-                onChange={(value) => {
-                  field.onChange(value);
-                  console.log(value);
-                  // setAnimal(value);
-                }}
-                isMultiple={true}
-                placeholder="Add Your Speciality"
-                options={specializations}
-                classNames={{
-                  searchBox: "bg-white w-full pl-10",
-                  searchIcon: "absolute w-5 h-5 mt-1 pb-0.5 ml-2 text-gray-500",
-                  tagItemIconContainer: "bg-black",
-                  // menuButton: ({ isDisabled }) =>
-                  //   `flex text-sm bg-white-500 text-gray-500 rounded shadow-sm transition-all duration-300 focus:outline-none ${
-                  //     isDisabled
-                  //       ? "bg-white"
-                  //       : "bg-white hover:border-gray-400 focus:border-blue-500 focus:ring focus:ring-blue-500/20"
-                  //   }`,
-                  menu: "absolute z-10 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700",
-                  listItem: ({ isSelected }: any) =>
-                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                      isSelected
-                        ? `text-white bg-blue-500`
-                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
-                    }`,
-                }}
-              /> */}
+      <Section
+        title="Specialisations"
+        note="These decide which searches you appear in, so list every area you genuinely practise — but only those."
+        footer={
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            loadingText="Saving…"
+            trailingIcon={ArrowRight}
+          >
+            Save and continue
+          </Button>
+        }
+      >
+        <Controller
+          control={control}
+          name="specializations"
+          render={({ field }) => (
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="specialisations"
+                className="text-sm font-medium leading-none text-ink"
+              >
+                Your specialisations
+                <span aria-hidden="true" className="ml-0.5 text-danger-500">
+                  *
+                </span>
+              </label>
 
               <Multiselect
-                placeholder="Select"
-                className=" text-black"
-                options={specializations} // Options to display in the dropdown
-                selectedValues={field.value} // Preselected value to persist in dropdown
-                onSelect={(selectedList, selectedItem) =>
-                  field.onChange(selectedList)
-                } // Update form state on select
-                onRemove={(selectedList, removedItem) =>
-                  field.onChange(selectedList)
-                } // Update form state on remove
-                displayValue="label" // Property name to display in the dropdown options
+                id="specialisations"
+                placeholder="Search and select…"
+                options={specializations}
+                selectedValues={field.value}
+                onSelect={(selectedList) => field.onChange(selectedList)}
+                onRemove={(selectedList) => field.onChange(selectedList)}
+                displayValue="label"
+                /*
+                  The library styles itself inline, so its appearance has to be
+                  set through these objects rather than classes — otherwise the
+                  control keeps its own blue chips and 2px grey border and reads
+                  as a foreign widget dropped into the page.
+                */
+                style={{
+                  searchBox: {
+                    border: `1px solid ${errors.specializations ? "#D14343" : "#C6D3DD"}`,
+                    borderRadius: "0.5rem",
+                    padding: "0.375rem 0.5rem",
+                    minHeight: "2.75rem",
+                    fontSize: "0.8125rem",
+                  },
+                  inputField: { margin: "0.25rem", fontSize: "0.8125rem" },
+                  chips: {
+                    background: "#EDF7F8",
+                    color: "#0A5C61",
+                    borderRadius: "0.375rem",
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                    padding: "0.25rem 0.5rem",
+                  },
+                  optionContainer: {
+                    border: "1px solid #DFE7ED",
+                    borderRadius: "0.5rem",
+                    boxShadow:
+                      "0 6px 16px -4px rgb(13 22 30 / 0.09), 0 2px 6px -2px rgb(13 22 30 / 0.05)",
+                  },
+                  option: { fontSize: "0.8125rem", color: "#3E5162" },
+                }}
               />
-              {errors && errors.specializations && (
-                <p className="text-red-500">{errors.specializations.message}</p>
-              )}
-            </>
-          );
-        }}
-      />
-      {/* <Button
-        type="submit"
-        className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-      >
-        Save
 
-        
-      </Button> */}
-
-      <div className="flex justify-end gap-[29px] ">
-        <Button
-          disabled={loadingState}
-          type="submit"
-          className="mt-4 rounded-md border border-primary bg-primary px-4 py-2 font-inter text-base font-medium text-white"
-        >
-          {loadingState && <LoadingSpinner width="20" height="20" />}
-          {loadingState ? "Loading..." : " Next"}
-          {loadingState ? (
-            ""
-          ) : (
-            <svg
-              className="ml-1 inline"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clipPath="url(#clip0_4616_19548)">
-                <path
-                  d="M0.909061 9.09134H16.8962L13.9026 6.09776C13.5476 5.74279 13.5476 5.16716 13.9026 4.81213C14.2576 4.45716 14.8332 4.45716 15.1883 4.81213L19.7337 9.35758C20.0888 9.71255 20.0888 10.2882 19.7337 10.6432L15.1883 15.1887C15.0107 15.3662 14.7781 15.455 14.5454 15.455C14.3128 15.455 14.0801 15.3662 13.9026 15.1887C13.5476 14.8337 13.5476 14.2581 13.9026 13.903L16.8962 10.9095H0.909061C0.407 10.9095 -3.05176e-05 10.5025 -3.05176e-05 10.0004C-3.05176e-05 9.49837 0.407 9.09134 0.909061 9.09134Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_4616_19548">
-                  <rect
-                    width="20"
-                    height="20"
-                    fill="white"
-                    transform="matrix(-1 0 0 1 20 0)"
+              {errors.specializations ? (
+                <p className="flex items-start gap-1.5 text-xs font-medium text-danger-600">
+                  <AlertCircle
+                    aria-hidden="true"
+                    className="mt-px size-3.5 shrink-0"
                   />
-                </clipPath>
-              </defs>
-            </svg>
+                  <span>{errors.specializations.message}</span>
+                </p>
+              ) : (
+                <p className="text-xs leading-relaxed text-muted">
+                  Start typing to search. Select a chip&apos;s cross to remove it.
+                </p>
+              )}
+            </div>
           )}
-        </Button>
-      </div>
+        />
+      </Section>
     </form>
   );
 };

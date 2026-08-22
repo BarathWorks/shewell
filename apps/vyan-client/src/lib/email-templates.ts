@@ -31,6 +31,27 @@ interface AppointmentRescheduleEmailProps extends EmailTemplateProps {
   planName: string;
 }
 
+interface AppointmentReminderEmailProps extends EmailTemplateProps {
+  doctorName: string;
+  appointmentDate: Date;
+  appointmentTime: string;
+  planName: string;
+  serviceType: string;
+  meetingLink?: string;
+  /**
+   * How far off the appointment is, in words: "tomorrow", "in about 4 hours",
+   * "in about an hour".
+   *
+   * Passed in rather than derived from which reminder this is. The day-before job
+   * picks up anything inside the next 24 hours, which includes a booking made only
+   * two hours in advance — telling that person it is "tomorrow" is simply wrong.
+   * Phrased relatively so it carries no timezone assumption.
+   */
+  lead: string;
+  /** Starting within the hour: changes the subject line and the closing advice. */
+  isImminent: boolean;
+}
+
 interface AppointmentCancelEmailProps extends EmailTemplateProps {
   doctorName: string;
   appointmentDate: Date;
@@ -514,5 +535,169 @@ export const getDoctorAppointmentBookingEmailTemplate = ({
   return {
     html: getBaseTemplate(content),
     subject: `🔔 New Appointment - ${patientName}`,
+  };
+};
+
+/**
+ * Reminder for an upcoming appointment.
+ *
+ * One template covers both send windows: the details are identical and only the
+ * urgency wording changes, so a second near-copy would just be a second place to
+ * forget to update.
+ */
+export const getAppointmentReminderEmailTemplate = ({
+  userName,
+  doctorName,
+  appointmentDate,
+  appointmentTime,
+  planName,
+  serviceType,
+  meetingLink,
+  lead,
+  isImminent,
+}: AppointmentReminderEmailProps) => {
+
+  const content = `
+    <div class="greeting">Hi ${userName}! ⏰</div>
+    <p>This is a reminder that your appointment with <strong>${doctorName}</strong> is ${lead}.</p>
+
+    <div class="info-box">
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #667eea;">
+        Appointment Details
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expert:</span>
+        <span class="info-value">${doctorName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Plan:</span>
+        <span class="info-value">${planName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Service Type:</span>
+        <span class="info-value">${serviceType}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Date:</span>
+        <span class="info-value">${format(appointmentDate, "MMMM dd, yyyy")}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Time:</span>
+        <span class="info-value">${appointmentTime}</span>
+      </div>
+      ${meetingLink ? `
+      <div class="info-row">
+        <span class="info-label">Meeting Link:</span>
+        <span class="info-value"><a href="${meetingLink}" style="color: #667eea;">Join Meeting</a></span>
+      </div>
+      ` : ''}
+    </div>
+
+    ${meetingLink ? `
+    <div style="text-align: center;">
+      <a href="${meetingLink}" class="button">Join Your Session</a>
+    </div>
+    ` : `
+    <div style="text-align: center;">
+      <a href="${process.env.NEXTAUTH_URL}/profile/appointments" class="button">View My Appointments</a>
+    </div>
+    `}
+
+    <div class="divider"></div>
+
+    <p style="font-size: 14px; color: #666666;">
+      ${isImminent
+        ? "<strong>Starting soon:</strong> please join a few minutes early and find a quiet spot with a stable connection."
+        : "<strong>Need to change it?</strong> You can reschedule from your appointments dashboard up to 2 hours before the scheduled time."}
+    </p>
+
+    <p style="margin-top: 30px;">
+      Best regards,<br>
+      <strong class="highlight">Team Shewell</strong>
+    </p>
+  `;
+
+  return {
+    html: getBaseTemplate(content),
+    subject: isImminent
+      ? `⏰ Starting soon: your appointment with ${doctorName}`
+      : `⏰ Reminder: your appointment with ${doctorName} is ${lead}`,
+  };
+};
+
+/** The same reminder, addressed to the practitioner. */
+export const getDoctorAppointmentReminderEmailTemplate = ({
+  doctorName,
+  patientName,
+  appointmentDate,
+  appointmentTime,
+  planName,
+  serviceType,
+  meetingLink,
+  lead,
+  isImminent,
+}: {
+  doctorName: string;
+  patientName: string;
+  appointmentDate: Date;
+  appointmentTime: string;
+  planName: string;
+  serviceType: string;
+  meetingLink?: string;
+  lead: string;
+  isImminent: boolean;
+}) => {
+
+  const content = `
+    <div class="greeting">Hi Dr. ${doctorName}! ⏰</div>
+    <p>A reminder that your appointment with <strong>${patientName}</strong> is ${lead}.</p>
+
+    <div class="info-box">
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #667eea;">
+        Appointment Details
+      </div>
+      <div class="info-row">
+        <span class="info-label">Patient:</span>
+        <span class="info-value">${patientName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Plan:</span>
+        <span class="info-value">${planName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Service Type:</span>
+        <span class="info-value">${serviceType}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Date:</span>
+        <span class="info-value">${format(appointmentDate, "MMMM dd, yyyy")}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Time:</span>
+        <span class="info-value">${appointmentTime}</span>
+      </div>
+      ${meetingLink ? `
+      <div class="info-row">
+        <span class="info-label">Meeting Link:</span>
+        <span class="info-value"><a href="${meetingLink}" style="color: #667eea;">Join Meeting</a></span>
+      </div>
+      ` : ''}
+    </div>
+
+    <div style="text-align: center;">
+      <a href="${process.env.NEXT_PUBLIC_PROFESSIONAL}/appointments" class="button">View Dashboard</a>
+    </div>
+
+    <p style="margin-top: 30px;">
+      Best regards,<br>
+      <strong class="highlight">Team Shewell</strong>
+    </p>
+  `;
+
+  return {
+    html: getBaseTemplate(content),
+    subject: isImminent
+      ? `⏰ Starting soon: session with ${patientName}`
+      : `⏰ Reminder: session with ${patientName} ${lead}`,
   };
 };

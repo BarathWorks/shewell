@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/src/@/components/button";

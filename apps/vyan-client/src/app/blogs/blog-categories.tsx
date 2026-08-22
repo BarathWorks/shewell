@@ -27,19 +27,34 @@ export default function BlogCategories({
     // setSelected(item.name);
   };
   const pathname = usePathname();
-  console.log("path", pathname);
   const router = useRouter();
   return (
     <>
-      {blogCategories.map((item, index) => (
+      {blogCategories.map((item, index) => {
+        const isActive =
+          selectedCategory === item.id ||
+          pathname === `/blogs-category/${item.slug}`;
+
+        return (
         <button
           onClick={() => handleClick(item)}
           key={index}
-          className={`${selectedCategory === item.id ? `border-primary bg-primary text-white` :``} whitespace-nowrap rounded-md border-[1.4px]  border-black px-2 py-[6px] font-inter text-sm font-medium leading-5 tracking-[0.84px] hover:border-primary hover:bg-primary hover:text-white ${pathname === `/blogs-category/${item.slug}` ? "border-primary bg-primary text-white" : ""}`}
+          // `aria-current` so the selected category is announced, not conveyed by
+          // colour alone. The chips were outlined in solid black at 1.4px, which
+          // read as heavier than anything else on the page.
+          aria-current={isActive ? "page" : undefined}
+          className={[
+            "whitespace-nowrap rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors duration-200",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2",
+            isActive
+              ? "border-primary-600 bg-primary-600 text-white"
+              : "border-hairline bg-surface text-body hover:border-primary-400 hover:bg-primary-50 hover:text-primary-800",
+          ].join(" ")}
         >
           {item.name}
         </button>
-      ))}
+        );
+      })}
     </>
   );
 }

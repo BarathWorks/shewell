@@ -171,18 +171,18 @@ const Past = ({ duration }: { duration: Duration | undefined }) => {
                     className="flex w-full flex-col gap-[14px] rounded-[8px]  border-b py-2 md:border md:p-3 lg:p-4 xl:p-5 2xl:p-6"
                   >
                     {item.status === BookAppointmentStatus.COMPLETED && (
-                      <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-secondary">
+                      <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-secondary">
                         Session Completed
                       </div>
                     )}
                     {item.status === BookAppointmentStatus.CANCELLED && (
-                      <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-red-500">
+                      <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-red-500">
                         Session Cancelled
                       </div>
                     )}
                     {item.status ===
                       BookAppointmentStatus.PAYMENT_SUCCESSFUL && (
-                      <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-red-500">
+                      <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-red-500">
                         Pending..
                       </div>
                     )}
@@ -338,7 +338,7 @@ const Past = ({ duration }: { duration: Duration | undefined }) => {
                               <div className="font-inter text-sm font-semibold text-primary md:text-[15px] md:leading-[22px] xl:text-base ">
                                 Message:
                               </div>
-                              <div className="font-inter text-xs font-normal text-[#898989] xl:text-sm">
+                              <div className="font-inter text-xs font-normal text-muted xl:text-sm">
                                 {item.patient.message}
                               </div>
                             </div>

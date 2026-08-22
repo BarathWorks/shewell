@@ -181,10 +181,10 @@ const PatientInformation = ({
   return (
     <>
       <div className="mb-6 flex flex-col gap-1.5 p-1 font-poppins lg:mb-8 2xl:mb-10">
-        <div className="text-base font-bold text-[#1a1a1a] sm:text-lg md:text-xl lg:text-2xl">
+        <div className="text-base font-bold text-ink sm:text-lg md:text-xl lg:text-2xl">
           For whom are you booking the appointment?
         </div>
-        <div className="text-xs font-medium text-[#666666] sm:text-sm xl:text-base">
+        <div className="text-xs font-medium text-muted sm:text-sm xl:text-base">
           Select the patient or couple for this session.
         </div>
       </div>
@@ -203,29 +203,29 @@ const PatientInformation = ({
                   handleSelectPatient(item);
                   handleFinalPriceOnSelectingCouple(item);
                 }}
-                className={`flex w-full cursor-pointer justify-between rounded-2xl border p-4 transition-all duration-300 sm:p-5 ${isSelected ? "border-[#00898F] bg-[#F2F9F9] shadow-md ring-1 ring-[#00898F]/20" : "border-gray-200 bg-white shadow-sm hover:border-[#00898F]/50 hover:shadow-md"}`}
+                className={`flex w-full cursor-pointer justify-between rounded-2xl border p-4 transition-all duration-300 sm:p-5 ${isSelected ? "border-primary-600 bg-primary-50 shadow-md ring-1 ring-[#00898F]/20" : "border-hairline bg-white shadow-sm hover:border-primary-600/50 hover:shadow-md"}`}
               >
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div
-                      className={`mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border sm:h-5 sm:w-5 ${isSelected ? "border-[#00898F]" : "border-gray-300"}`}
+                      className={`mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border sm:h-5 sm:w-5 ${isSelected ? "border-primary-600" : "border-hairline-strong"}`}
                     >
                       {isSelected && (
-                        <div className="h-2 w-2 rounded-full bg-[#00898F] sm:h-2.5 sm:w-2.5" />
+                        <div className="h-2 w-2 rounded-full bg-primary-600 sm:h-2.5 sm:w-2.5" />
                       )}
                     </div>
 
                     <div className="flex flex-col font-poppins">
-                      <div className="text-sm font-bold text-[#1a1a1a] sm:text-base lg:text-lg">
+                      <div className="text-sm font-bold text-ink sm:text-base lg:text-lg">
                         <span className="capitalize">{item.firstName}</span>
                         {item.additionalPatients.map((p) => (
                           <span key={p.id}> & {p.firstName}</span>
                         ))}
                       </div>
 
-                      <div className="mt-1 flex flex-col gap-0.5 text-[11px] leading-tight text-[#666666] sm:gap-1 sm:text-sm lg:text-base">
+                      <div className="mt-1 flex flex-col gap-0.5 text-[11px] leading-tight text-muted sm:gap-1 sm:text-sm lg:text-base">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#999999]">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted">
                             Mobile:
                           </span>
                           {item.phoneNumber}
@@ -234,7 +234,7 @@ const PatientInformation = ({
                           )}
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-[#999999]">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted">
                             Email:
                           </span>
                           <span className="break-all">{item.email}</span>
@@ -247,7 +247,7 @@ const PatientInformation = ({
 
                 <div className="flex flex-col items-end justify-between gap-3 sm:gap-4">
                   <div
-                    className={`rounded-full px-2.5 py-0.5 font-poppins text-[10px] font-bold uppercase tracking-wider sm:px-3 sm:py-1 sm:text-xs ${item.additionalPatients.length > 0 ? "bg-[#E6F4F4] text-[#00898F]" : "bg-gray-100 text-[#666666]"}`}
+                    className={`rounded-full px-2.5 py-0.5 font-poppins text-[10px] font-bold uppercase tracking-wider sm:px-3 sm:py-1 sm:text-xs ${item.additionalPatients.length > 0 ? "bg-primary-50 text-primary-700" : "bg-gray-100 text-muted"}`}
                   >
                     {item.additionalPatients.length > 0 ? "Couple" : "Single"}
                   </div>
@@ -259,7 +259,7 @@ const PatientInformation = ({
                         handleOnOpenDialogEditPatient();
                         setSelectedPatientId(item.id);
                       }}
-                      className="rounded-full p-2 text-[#666666] transition-colors hover:bg-gray-100 hover:text-[#00898F]"
+                      className="rounded-full p-2 text-muted transition-colors hover:bg-gray-100 hover:text-primary-700"
                       title="Edit Patient"
                     >
                       <svg
@@ -315,12 +315,12 @@ const PatientInformation = ({
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mt-10">
         <div
           onClick={() => handleOnOpenDialogAddNewPatient()}
-          className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-[#00898F] bg-white px-6 font-poppins text-sm font-bold text-[#00898F] transition-all hover:bg-[#F2F9F9] hover:shadow-sm active:scale-[0.98] sm:h-12 sm:px-8 md:h-auto md:py-3"
+          className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-primary-600 bg-white px-6 font-poppins text-sm font-bold text-primary-700 transition-all hover:bg-primary-50 hover:shadow-sm active:scale-[0.98] sm:h-12 sm:px-8 md:h-auto md:py-3"
         >
           + Add New Patient
         </div>
         <Button
-          className="h-11 rounded-xl bg-[#00898F] px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-[#007a80] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 sm:h-12 sm:px-12 md:h-auto md:py-3"
+          className="h-11 rounded-xl bg-primary-600 px-10 font-poppins text-sm font-bold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 sm:h-12 sm:px-12 md:h-auto md:py-3"
           onClick={onNextStep}
           disabled={!selectPatient}
         >

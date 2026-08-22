@@ -27,8 +27,20 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      /**
+       * Whether an admin has approved this practitioner.
+       *
+       * Approval is what makes an account bookable by patients (see
+       * `PUBLIC_DOCTOR` in the patient app). The portal previously had no idea
+       * about it at all, so a practitioner who had finished registration saw a
+       * dashboard identical to an approved one and no indication they were
+       * waiting on anything.
+       */
+      isApproved: boolean;
+      /** False when the account no longer exists or has been soft-deleted. */
+      accountExists: boolean;
+      /** Whether the practitioner has confirmed control of their email address. */
+      emailVerified: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -49,21 +61,39 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    session: async ({ session, user }) => {
+    session: async ({ session }) => {
+      if (!session.user?.email) return session;
+
+      // `select` matters here: this callback runs on every session read, and the
+      // query had no projection at all — so each one pulled the practitioner's
+      // whole row, password hash, bank account number and Aadhaar included, to use
+      // a single id field.
       const userAuth = await db.professionalUser.findFirst({
         where: {
           email: {
-            equals: session.user.email as string,
+            equals: session.user.email,
             mode: "insensitive",
           },
-          deletedAt : null
-          
+          deletedAt: null,
         },
+        select: { id: true, isapproved: true, emailVerifiedAt: true },
       });
-      if (session.user && userAuth) {
+
+      if (userAuth) {
         session.user.id = userAuth.id;
+        session.user.isApproved = userAuth.isapproved;
+        session.user.emailVerified = Boolean(userAuth.emailVerifiedAt);
+        session.user.accountExists = true;
+      } else {
+        // The cookie outlives the account: a soft-deleted practitioner keeps a
+        // valid JWT until it expires. Callers get an explicit flag rather than a
+        // session whose `user.id` is silently `undefined`.
+        session.user.accountExists = false;
+        session.user.isApproved = false;
+        session.user.emailVerified = false;
       }
-      return { ...session };
+
+      return session;
     },
   },
 
@@ -117,6 +147,7 @@ export const authOptions: NextAuthOptions = {
             id: true,
             email: true,
             passwordHash: true,
+            emailVerifiedAt: true,
           },
           where: {
             // Matched case-insensitively, as the session callback and the admin
@@ -127,9 +158,17 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
+        // No account on this address at all.
+        //
+        // Named, rather than folded into the generic failure, so the login screen
+        // can offer registration instead of leaving someone retrying a password
+        // for an account that was never created — the same trade-off already made
+        // deliberately on the patient portal. The rate limit above is what bounds
+        // using this to probe for addresses.
         if (!professionalUser) {
-          return null;
+          throw new Error("NO_ACCOUNT");
         }
+
         if (!professionalUser.passwordHash) {
           return null;
         }
@@ -140,6 +179,20 @@ export const authOptions: NextAuthOptions = {
         );
         if (!isValid) {
           return null;
+        }
+
+        // Password is right, but the address is still unproven.
+        //
+        // Checked *after* the password deliberately: answering before it would let
+        // anyone learn which addresses have unverified accounts here just by
+        // guessing. The message is a marker the login form recognises and turns
+        // into a link to the verification screen — NextAuth surfaces a thrown
+        // message as `signIn(...).error`, and there is no other channel for it.
+        //
+        // Accounts that predate verification were backfilled by the migration, so
+        // this only affects signups from that point on.
+        if (!professionalUser.emailVerifiedAt) {
+          throw new Error("EMAIL_NOT_VERIFIED");
         }
 
         // Clear the budget on success, so a legitimate practitioner who mistyped a

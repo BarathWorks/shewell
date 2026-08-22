@@ -243,7 +243,7 @@ export const BookingSection = ({
   return (
     <section className="w-full overflow-hidden bg-white px-4 py-8 sm:px-6 sm:py-10 md:px-10 md:py-12 lg:px-12 lg:py-16 xl:px-16 2xl:px-20 2xl:py-20">
       <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
-        <div className="relative flex h-[85vh] max-h-[700px] flex-col items-center overflow-hidden rounded-2xl border border-gray-100 bg-[#F8FAFB] shadow-xl sm:rounded-3xl lg:flex-row lg:rounded-[40px]">
+        <div className="relative flex h-[85vh] max-h-[700px] flex-col items-center overflow-hidden rounded-2xl border border-hairline bg-[#F8FAFB] shadow-xl sm:rounded-3xl lg:flex-row lg:rounded-[40px]">
           {/* LEFT IMAGE SECTION - hidden for registered users */}
           <div
             className={`absolute inset-0 h-full w-full lg:w-[50%] ${isRegistered ? "hidden" : "hidden lg:block"}`}
@@ -295,9 +295,9 @@ export const BookingSection = ({
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="flex flex-col items-center gap-2 rounded-lg border border-[#00898F]/10 bg-[#e6eff1] px-3 py-2.5 shadow-sm sm:flex-row sm:gap-2.5 sm:rounded-2xl sm:px-5 sm:py-3 md:rounded-full md:px-6 lg:px-8"
+                    className="flex flex-col items-center gap-2 rounded-lg border border-primary-600/10 bg-primary-50 px-3 py-2.5 shadow-sm sm:flex-row sm:gap-2.5 sm:rounded-2xl sm:px-5 sm:py-3 md:rounded-full md:px-6 lg:px-8"
                   >
-                    <span className="font-poppins text-lg font-bold text-[#00898F] sm:text-xl md:text-2xl lg:text-3xl">
+                    <span className="font-poppins text-lg font-bold text-primary-700 sm:text-xl md:text-2xl lg:text-3xl">
                       ₹{price}
                     </span>
                     <span className="font-poppins text-xs font-medium text-gray-700 sm:text-sm md:text-base">
@@ -310,7 +310,7 @@ export const BookingSection = ({
               {/* REGISTERED STATE */}
               {isRegistered ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00898F]/10 text-[#00898F] sm:h-20 sm:w-20">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/10 text-primary-700 sm:h-20 sm:w-20">
                     <Check size={28} className="sm:h-8 sm:w-8" />
                   </div>
                   <div>
@@ -326,7 +326,7 @@ export const BookingSection = ({
                       href={meetingLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex w-full max-w-xs items-center justify-between gap-2 rounded-xl bg-[#00898F] px-4 py-3 text-white transition-all duration-300 hover:bg-teal-700"
+                      className="group flex w-full max-w-xs items-center justify-between gap-2 rounded-xl bg-primary-600 px-4 py-3 text-white transition-all duration-300 hover:bg-teal-700"
                     >
                       <span className="text-sm font-medium">
                         Join Meeting Now
@@ -370,7 +370,7 @@ export const BookingSection = ({
                           {step === s && (
                             <motion.div
                               layoutId="step-label"
-                              className="absolute -bottom-4 whitespace-nowrap text-[7px] font-bold uppercase tracking-tighter text-[#00898F] sm:-bottom-5 sm:text-[8px] md:text-[9px] lg:text-[10px]"
+                              className="absolute -bottom-4 whitespace-nowrap text-[7px] font-bold uppercase tracking-tighter text-primary-700 sm:-bottom-5 sm:text-[8px] md:text-[9px] lg:text-[10px]"
                             >
                               Step {s}
                             </motion.div>
@@ -382,7 +382,7 @@ export const BookingSection = ({
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: step > s ? "100%" : "0%" }}
-                              className="absolute inset-0 bg-[#00898F]"
+                              className="absolute inset-0 bg-primary-600"
                             />
                           </div>
                         )}
@@ -411,7 +411,7 @@ export const BookingSection = ({
                               </label>
                               <Input
                                 placeholder="Enter your full name"
-                                className="h-9 rounded-lg border-none bg-[#F3F7F8] text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
+                                className="h-9 rounded-lg border-none bg-primary-50 text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
                                 value={formData.name}
                                 onChange={(e) => {
                                   setError(null);
@@ -429,7 +429,7 @@ export const BookingSection = ({
                               <Input
                                 placeholder="Enter your email"
                                 type="email"
-                                className="h-9 rounded-lg border-none bg-[#F3F7F8] text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
+                                className="h-9 rounded-lg border-none bg-primary-50 text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
                                 value={formData.email}
                                 onChange={(e) => {
                                   setError(null);
@@ -446,7 +446,7 @@ export const BookingSection = ({
                               </label>
                               <Input
                                 placeholder="Enter contact number"
-                                className="h-9 rounded-lg border-none bg-[#F3F7F8] text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
+                                className="h-9 rounded-lg border-none bg-primary-50 text-xs focus-visible:ring-1 focus-visible:ring-[#00898F] sm:h-10 sm:rounded-xl sm:text-sm md:h-11 lg:h-12"
                                 value={formData.mobile}
                                 onChange={(e) => {
                                   setError(null);
@@ -464,7 +464,7 @@ export const BookingSection = ({
                         {step === 2 && (
                           <div className="space-y-2 py-1">
                             {/* Planning Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                            <div className="rounded-lg border border-hairline bg-primary-50 px-3 py-2 sm:rounded-xl">
                               <div className="flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Are you planning to get pregnant?
@@ -483,7 +483,7 @@ export const BookingSection = ({
                                     }
                                   }}
                                   className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
-                                    isPlanning ? "bg-[#00898F]" : "bg-gray-200"
+                                    isPlanning ? "bg-primary-600" : "bg-gray-200"
                                   }`}
                                 >
                                   <span
@@ -498,7 +498,7 @@ export const BookingSection = ({
                             </div>
 
                             {/* Other Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                            <div className="rounded-lg border border-hairline bg-primary-50 px-3 py-2 sm:rounded-xl">
                               <div className="flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Other
@@ -517,7 +517,7 @@ export const BookingSection = ({
                                     }
                                   }}
                                   className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
-                                    isOther ? "bg-[#00898F]" : "bg-gray-200"
+                                    isOther ? "bg-primary-600" : "bg-gray-200"
                                   }`}
                                 >
                                   <span
@@ -531,7 +531,7 @@ export const BookingSection = ({
                               </div>
                             </div>
                             {/* Currently Pregnant Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                            <div className="rounded-lg border border-hairline bg-primary-50 px-3 py-2 sm:rounded-xl">
                               <div className="mb-1.5 flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Currently pregnant?
@@ -550,7 +550,7 @@ export const BookingSection = ({
                                     }
                                   }}
                                   className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
-                                    isPregnant ? "bg-[#00898F]" : "bg-gray-200"
+                                    isPregnant ? "bg-primary-600" : "bg-gray-200"
                                   }`}
                                 >
                                   <span
@@ -612,7 +612,7 @@ export const BookingSection = ({
                             </div>
 
                             {/* New Mom Toggle */}
-                            <div className="rounded-lg border border-gray-100 bg-[#F3F7F8] px-3 py-2 sm:rounded-xl">
+                            <div className="rounded-lg border border-hairline bg-primary-50 px-3 py-2 sm:rounded-xl">
                               <div className="mb-1.5 flex items-center justify-between">
                                 <span className="font-poppins text-xs font-medium text-gray-800 sm:text-sm md:text-base">
                                   Are you a new mom?
@@ -631,7 +631,7 @@ export const BookingSection = ({
                                     }
                                   }}
                                   className={`relative mr-1 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full p-0.5 shadow-inner transition-colors duration-300 focus:outline-none sm:h-6 sm:w-11 ${
-                                    isNewMom ? "bg-[#00898F]" : "bg-gray-200"
+                                    isNewMom ? "bg-primary-600" : "bg-gray-200"
                                   }`}
                                 >
                                   <span
@@ -695,9 +695,9 @@ export const BookingSection = ({
                   {/* WHITE SEPARATOR WITH BLUR */}
                   <div className="my-3 flex items-center gap-2">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00898F]/40 to-[#00898F]/40" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/50" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/30" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#00898F]/50" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary-600/50" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary-600/30" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary-600/50" />
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[#00898F]/40 to-[#00898F]/40" />
                   </div>
 
@@ -723,9 +723,9 @@ export const BookingSection = ({
                           handleBooking();
                         }
                       }}
-                      className="order-0 group flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-3 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] hover:text-white sm:gap-2.5 sm:rounded-lg sm:px-4 sm:py-2.5 md:rounded-lg md:px-5 md:py-3 lg:rounded-xl lg:px-6 lg:py-4"
+                      className="order-0 group flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-slate-100 px-3 py-2 transition-all duration-300 ease-in-out hover:bg-primary-600 hover:text-white sm:gap-2.5 sm:rounded-lg sm:px-4 sm:py-2.5 md:rounded-lg md:px-5 md:py-3 lg:rounded-xl lg:px-6 lg:py-4"
                     >
-                      <span className="text-xs font-medium text-[#00000066] group-hover:text-white sm:text-sm md:text-base lg:text-lg">
+                      <span className="text-xs font-medium text-muted group-hover:text-white sm:text-sm md:text-base lg:text-lg">
                         {isProcessing
                           ? "Processing..."
                           : step === 2
@@ -738,7 +738,7 @@ export const BookingSection = ({
  
                   {/* SLOTS LEFT INDICATOR */}
                   {!isRegistered && remainingSlots !== null && remainingSlots > 0 && remainingSlots <= 5 && (
-                    <div className="mt-2 text-center text-[10px] font-medium text-[#00898F] sm:text-px">
+                    <div className="mt-2 text-center text-[10px] font-medium text-primary-700 sm:text-px">
                       Only {remainingSlots} slot{remainingSlots > 1 ? "s" : ""} left!
                     </div>
                   )}

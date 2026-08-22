@@ -741,7 +741,7 @@ async function main() {
   console.log(line);
   console.log("");
   console.log("  Note: OTP sign-in mails a code, so use password sign-in unless");
-  console.log("  SENDGRID_API_KEY is configured.");
+  console.log("  SMTP_USER / SMTP_PASSWORD are configured.");
   console.log("");
 }
 

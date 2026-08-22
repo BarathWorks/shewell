@@ -226,7 +226,7 @@ const Cancelled = () => {
                           <div className="font-inter text-sm font-semibold text-primary md:text-[15px] md:leading-[22px] xl:text-base ">
                             Message:
                           </div>
-                          <div className="font-inter text-xs font-normal text-[#898989] xl:text-sm">
+                          <div className="font-inter text-xs font-normal text-muted xl:text-sm">
                             {item.patient.message}
                           </div>
                         </div>

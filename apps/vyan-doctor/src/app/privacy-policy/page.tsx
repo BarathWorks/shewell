@@ -1,44 +1,47 @@
 import React from "react";
 
+import LegalPage from "~/components/ui/legal-page";
+
+/**
+ * Privacy Policy.
+ *
+ * The prose is unchanged. What was removed is the styling that made it hard to
+ * read: `max-w-full` (an unbounded line length) and `text-justify` (rivers of
+ * whitespace at that length), plus a `className` on every one of the several
+ * hundred elements below. `LegalPage` sets all of it once — see the note there.
+ */
 const PrivacyPolicyPage = () => {
   return (
-    <>
-      <div className="mt-10">
-        <div className="container mx-auto max-w-full text-justify">
-          <h1 className="mb-2 mt-3 text-lg font-semibold xl:text-2xl">
-            SHEWELL PRIVACY POLICY
-          </h1>
-          <p className="mb-4 text-sm font-medium lg:text-base">
-            (Prenatal & Postnatal Counselling Platform)
-          </p>
-          <p className="mb-4 text-sm lg:text-base">
-            <strong>Effective Date:</strong> 01.03.2026
-          </p>
-          <p className="mb-4 text-sm lg:text-base">
+    <LegalPage
+      title="Privacy Policy"
+      subtitle="How Shewell collects, uses and protects maternal and child health information."
+      effectiveDate="1 March 2026"
+    >
+          <p>
             Shewell ("we", "our", "us") is committed to protecting the privacy, confidentiality, and security of maternal and child health information shared on our platform.
             This Privacy Policy explains how we collect, use, store, and protect your personal and health-related data when you use Shewell's counselling services, website, or mobile application.
           </p>
-          <p className="mb-4 text-sm lg:text-base">
+          <p>
             By using Shewell, you consent to this Privacy Policy.
           </p>
-          <h2 className="mb-2 mt-4 text-base font-semibold xl:text-xl">
+          <h2>
             2. Information We Collect
           </h2>
-          <p className="mb-4 text-sm lg:text-base">
+          <p>
             We may collect the following categories of information:
           </p>
-          <h3 className="mb-2 text-base font-semibold xl:text-lg">
+          <h3>
             Information We Collect Through Your Use
           </h3>
 
-          <p className="text-sm lg:text-base">
+          <p>
             When you use our Services, we collect information about you in the
             following general categories:
           </p>
 
-          <ul className="mt-2 list-inside list-disc space-y-1 pl-2">
+          <ul>
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Location Information:
               </span>{" "}
               When you use the Services for placing order(s) or delivery, we
@@ -52,7 +55,7 @@ const PrivacyPolicyPage = () => {
               faster.
             </li>
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Contacts Information:
               </span>
               If you permit the Flex IT Sports & Fitness app/website to access the address book on
@@ -65,7 +68,7 @@ const PrivacyPolicyPage = () => {
             </li>
 
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Transaction Information:
               </span>
               We collect transaction details related to your use of our
@@ -77,7 +80,7 @@ const PrivacyPolicyPage = () => {
             </li>
 
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Usage and Preference Information:
               </span>
               We collect information about how you and site visitors interact
@@ -87,7 +90,7 @@ const PrivacyPolicyPage = () => {
             </li>
 
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Device Information:
               </span>
               We may collect information about your mobile device, including,
@@ -101,7 +104,7 @@ const PrivacyPolicyPage = () => {
             </li>
 
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Call and SMS Data:
               </span>
               Our app/website facilitates communication between Users and
@@ -112,7 +115,7 @@ const PrivacyPolicyPage = () => {
             </li>
 
             <li>
-              <span className="text-sm font-semibold lg:text-base">
+              <span>
                 Log Information:
               </span>
               When you interact with the Services, we collect server logs, which
@@ -126,13 +129,13 @@ const PrivacyPolicyPage = () => {
             </li>
           </ul>
 
-          <h3 className="mb-2 mt-2 text-base font-semibold xl:text-lg">
+          <h3>
             Use of Information
           </h3>
-          <p className="text-sm lg:text-base">
+          <p>
             We may use the information we collect about you to
           </p>
-          <ul className="mt-2 list-inside list-disc space-y-1 pl-2">
+          <ul>
             <li>
               Provide, maintain, and improve our Services, including, for
               example, to facilitate payments, send receipts, provide products
@@ -160,10 +163,10 @@ const PrivacyPolicyPage = () => {
             </li>
           </ul>
 
-          <h3 className="mb-2 mt-2 text-base font-semibold xl:text-lg">
+          <h3>
             Social Sharing Features
           </h3>
-          <p className="mb-2 text-sm lg:text-base">
+          <p>
             The Services may integrate with social sharing features and other
             related tools which let you share actions you take on our Services
             with other apps, sites, or media, and vice versa. Your use of such
@@ -173,18 +176,18 @@ const PrivacyPolicyPage = () => {
             information about how they handle the data you provide to or share
             through them.
           </p>
-          <p className="text-sm lg:text-base">
+          <p>
             Our promotional offers/discounts are not sitewide and are limited to
             selected categories. Coupon codes may not be applicable on
             categories like diapers, baby food etc. or such other product or
             service as may be determined by us in our sole discretion.
           </p>
 
-          <h3 className="mb-2 mt-2 text-base font-semibold xl:text-lg">
+          <h3>
             Analytics and Advertising Services Provided by Others
           </h3>
 
-          <p className="text-sm lg:text-base">
+          <p>
             We may allow others to provide audience measurement and analytics
             services for us, to serve advertisements on our behalf across the
             Internet, and to track and report on the performance of those
@@ -193,9 +196,9 @@ const PrivacyPolicyPage = () => {
             and use our Services, as well as when you visit other online sites
             and services.
           </p>
-          <p className="mb-2 text-sm lg:text-base">Your Choices</p>
-          <p className="mb-2 text-sm lg:text-base">Account Information</p>
-          <p className="mb-2 text-sm lg:text-base">
+          <p>Your Choices</p>
+          <p>Account Information</p>
+          <p>
             You may correct your account information at any time by logging into
             your online or in-app account. Please note that in some cases we may
             retain certain information about you as required by law, or for
@@ -205,53 +208,53 @@ const PrivacyPolicyPage = () => {
             seek to resolve the issue before deleting your information.
           </p>
 
-          <p className="my-2 text-sm lg:text-base">Access Rights</p>
-          <p className="text-sm lg:text-base">
+          <p>Access Rights</p>
+          <p>
           Flex IT Sports & Fitness will comply with individual's requests regarding access,
             correction, and/or deletion of the personal data it stores in
             accordance with applicable law. You can write to us at{" "}
-            <a href="mailto:report@flexitshop.in" className="text-blue-600">
+            <a href="mailto:report@flexitshop.in">
               report@flexitshop.in
             </a>{" "}
             to assist you with your request to correct and/or delete your
             personal data and we shall comply with such request in accordance
             with the applicable laws.
           </p>
-          <p className="my-2 text-sm lg:text-base">Location Information</p>
+          <p>Location Information</p>
 
-          <p className="text-sm lg:text-base">
+          <p>
             We request permission for our app's collection of precise location
             from your device per the permission system used by your mobile
             operating system.
           </p>
-          <p className="my-2 text-sm lg:text-base">Contact Information</p>
+          <p>Contact Information</p>
 
-          <p className="text-sm lg:text-base">
+          <p>
             We may also seek permission for our app's collection and syncing of
             contact information from your device per the permission system used
             by your mobile operating system.
           </p>
 
-          <p className="my-2 text-sm lg:text-base">
+          <p>
             Promotional Communications
           </p>
-          <p className="text-sm lg:text-base">
+          <p>
             You may opt out of receiving promotional messages from us by
             following the instructions in those messages. If you opt out, we may
             still send you non-promotional communications, such as those about
             your account, about Services you have requested, or our ongoing
             business relations.
           </p>
-          <p className="text-sm lg:text-base">
+          <p>
             If you initially permit the collection of any information, you can
             later disable it by changing the settings on your mobile device.
             However, this will limit your ability to use certain features of our
             Services.{" "}
           </p>
-          <p className="my-2 text-sm lg:text-base">
+          <p>
             Promotional Communication Through WhatsApp Messenger
           </p>
-          <p className="text-sm lg:text-base">
+          <p>
             By opting in/accepting the terms and conditions, you (the “User”)
             give consent to Flex IT Sports & Fitness to communicate with you on WhatsApp for all
             its transactional and promotional messages/communication needs. We
@@ -259,9 +262,9 @@ const PrivacyPolicyPage = () => {
             experience with us & provide the best deals & discounts.
           </p>
 
-          <p className="my-2 text-sm lg:text-base">Changes to the Statement</p>
+          <p>Changes to the Statement</p>
 
-          <p className="text-sm lg:text-base">
+          <p>
             We may change this Statement from time to time. If we make
             significant changes in the way we treat your personal information,
             or to the Statement, we will provide you notice through the Services
@@ -270,9 +273,7 @@ const PrivacyPolicyPage = () => {
             We encourage you to periodically review the Statement for the latest
             information on our privacy practices.
           </p>
-        </div>
-      </div>
-    </>
+        </LegalPage>
   );
 };
 

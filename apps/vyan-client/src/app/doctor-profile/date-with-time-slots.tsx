@@ -178,7 +178,7 @@ const TimeSlots = ({ expertId }: { expertId: string }) => {
   };
   return (
     <>
-      <div className="flex items-center justify-between  border-b-2 border-[#C6E4E7] pb-[6px]">
+      <div className="flex items-center justify-between  border-b-2 border-primary-200 pb-[6px]">
         <div className="font-inter text-[12px] sm:text-base font-semibold ">
           {" "}
           Available Time Slots

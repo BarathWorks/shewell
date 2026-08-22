@@ -65,7 +65,19 @@ const config = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.amazonaws.com",
-              "connect-src 'self'",
+              // S3 is here, not just in `img-src`.
+              //
+              // Uploads are direct-to-S3 with a presigned URL: the server signs it
+              // and the *browser* PUTs the file. `connect-src 'self'` blocked that
+              // fetch outright, so every upload in this app failed — silently, in
+              // the console, with the form simply refusing to advance.
+              //
+              // In the practitioner portal that made registration impossible to
+              // finish: the profile photo is a required field on step 2, so the
+              // wizard could not be completed by anyone. `img-src` already trusted
+              // this origin to *display* the files; it has to be trusted to receive
+              // them too.
+              "connect-src 'self' https://*.amazonaws.com",
               "frame-src 'self' https://meet.google.com",
               "upgrade-insecure-requests",
             ].join("; "),

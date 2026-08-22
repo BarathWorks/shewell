@@ -34,7 +34,7 @@ export function Navmenu() {
             <NavigationMenuItem>
               <NavigationMenuLink
                 href="#"
-                className=" bg-[#00898F]  px-4 py-[18px] text-sm font-medium text-white "
+                className=" bg-primary-600  px-4 py-[18px] text-sm font-medium text-white "
               >
                 Home
               </NavigationMenuLink>

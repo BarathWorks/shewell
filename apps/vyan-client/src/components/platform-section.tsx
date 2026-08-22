@@ -35,7 +35,7 @@ const PLATFORM_DATA = [
     description:
       "Learn when and how to start solids with balanced, safe meal plans curated by child nutrition experts.",
     image: "/home/1-3.webp",
-    color: "bg-[#167D71]",
+    color: "bg-primary-600",
   },
   {
     id: "postpartum",
@@ -95,7 +95,7 @@ export default function PlatformSection() {
         <h3 className="mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-900 md:mb-4 md:text-2xl lg:text-3xl xl:text-4xl">
           Courses That Support You Every Step of the Way
         </h3>
-        <p className="mx-auto text-xs sm:text-sm md:text-base text-[#33333399] lg:text-lg xl:text-xl">
+        <p className="mx-auto text-xs sm:text-sm md:text-base text-muted lg:text-lg xl:text-xl">
           From fertility to first steps evidence based heart led expert designed just for you.
         </p>
       </div>
@@ -113,7 +113,7 @@ export default function PlatformSection() {
                             ${
                               activeTab?.id === item.id
                                 ? "bg-[#005F5F] text-white"
-                                : "bg-[#F2F2F2] text-[#00000066] hover:bg-gray-200"
+                                : "bg-slate-100 text-muted hover:bg-gray-200"
                             }`}
               >
                 <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-medium line-clamp-2 lg:line-clamp-3 flex-1">

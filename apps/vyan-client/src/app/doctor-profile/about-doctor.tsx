@@ -58,7 +58,7 @@ const AboutDoctor = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px] rounded-t-lg bg-[#94CED0] py-2 pl-4 font-inter text-base font-semibold text-active">
+                  <TableHead className="w-[100px] rounded-t-lg bg-primary-200 py-2 pl-4 font-inter text-base font-semibold text-active">
                     Degree
                   </TableHead>
                 </TableRow>
@@ -67,7 +67,7 @@ const AboutDoctor = ({
                 {degrees &&
                   degrees.map((item) => (
                     <TableRow key={item.degree}>
-                      <TableCell className="py-2 pl-4 font-inter text-xs md:text-base font-normal text-inactive hover:bg-[#Dff0f1] hover:text-active ">
+                      <TableCell className="py-2 pl-4 font-inter text-xs md:text-base font-normal text-inactive hover:bg-primary-50 hover:text-active ">
                         {item.degree}
                       </TableCell>
                     </TableRow>
@@ -83,7 +83,7 @@ const AboutDoctor = ({
           </h3>
 
           <Table>
-            <TableHeader className=" bg-[#94CED0]">
+            <TableHeader className=" bg-primary-200">
               <TableRow className="rounded-t-lg">
                 <TableHead className="w-[100px]  py-2 pl-4 font-inter text-base font-semibold text-active">
                   Year
@@ -102,7 +102,7 @@ const AboutDoctor = ({
             <TableBody>
               {experience.map((item) => (
                 <TableRow
-                  className="hover:bg-[#Dff0f1] hover:text-active "
+                  className="hover:bg-primary-50 hover:text-active "
                   key={item.startingYear}
                 >
                   <TableCell className="py-2 pl-4 font-inter text-base font-normal text-inactive ">

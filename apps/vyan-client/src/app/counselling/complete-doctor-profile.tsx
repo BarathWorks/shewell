@@ -85,109 +85,111 @@ const CompleteDoctorProfile = ({
   };
 
   return (
-    <div className="group w-full">
-      <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white/80 px-2 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm transition-all duration-300 ease-in-out hover:border-gray-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] sm:gap-5 sm:rounded-2xl sm:px-4 sm:py-5 md:flex-col md:justify-between md:gap-6 md:rounded-3xl md:px-8 md:py-8">
-        <div className="flex flex-col gap-4 sm:gap-4 md:gap-[18px]">
-          {/* image + text */}
-          <div className="flex gap-3 sm:gap-4 md:gap-6 lg:gap-6 2xl:gap-8">
-            {/* image */}
-            <div className="relative flex aspect-square w-20 items-center justify-center sm:w-28 md:w-32 lg:w-40">
-              <div className="absolute inset-0 h-20 w-20 rounded-full bg-gradient-to-br from-[#00898F]/20 to-[#51AF5A]/20 p-0.5 sm:h-32 sm:w-32 sm:p-1 md:h-36 md:w-36 md:p-2 lg:h-44 lg:w-44">
-                <div className="relative aspect-square overflow-hidden rounded-full bg-white shadow-lg ring-2 ring-white">
-                  <Image
-                    src={doctorProfile.media?.fileUrl || "/images/fallback-user-profile.png"}
-                    alt="feature-card"
-                    className="rounded-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    fill={true}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5 sm:gap-2">
-              <div className="flex items-center gap-2">
-                <h3 className="font-poppins text-base font-semibold leading-tight text-[#333333] sm:text-lg md:text-xl lg:text-2xl">
-                  {doctorProfile.firstName}
-                </h3>
-                <Link href={`counselling/${doctorProfile.userName}`} className="hover:opacity-80 transition-opacity">
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#00898F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-              </div>
-              <div className="font-poppins text-xs font-medium text-[#00898F] sm:text-sm md:text-base">
-                {doctorProfile.displayQualification?.specialization}
-              </div>
-
-              {/* Languages */}
-              <div className="flex flex-wrap items-center gap-1">
-                {doctorProfile.languages?.map((item, index) => (
-                  <div
-                    className="rounded-full border border-gray-200 bg-[#F5F5F5] px-2 py-0.5 font-poppins text-[10px] font-medium text-[#666666]"
-                    key={index}
-                  >
-                    {item.language}
-                  </div>
-                ))}
-              </div>
-
-              {/* Specializations */}
-              <div className="flex flex-wrap items-center gap-1">
-                {specialization &&
-                  specialization.map((item, index) => (
-                    <div
-                      className="rounded-full border border-[#00898F]/20 bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-2 py-0.5 font-poppins text-[10px] font-medium text-[#00898F]"
-                      key={index}
-                    >
-                      {item.specialization}
-                    </div>
-                  ))}
-              </div>
-
-              <div className="mt-0.5 flex w-full flex-wrap items-center gap-2 md:justify-start">
-                <div className="flex items-center gap-2 rounded-full bg-[#F8F8F8] px-2 py-0.5">
-                  <Rating
-                    className="inline"
-                    readOnly={true}
-                    style={{ maxWidth: 60 }}
-                    value={parseFloat(doctorProfile.avgRating || "0")}
-                    itemStyles={customStyles}
-                  />
-                  <div className="font-poppins text-[10px] font-semibold text-[#00898F]">
-                    {parseFloat(doctorProfile.avgRating || "0").toFixed(1)}
-                  </div>
-                </div>
-                <div className="font-poppins text-[10px] font-normal text-[#666666]">
-                  • {doctorProfile?.totalConsultations || 0} Consultations
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-2">
-            
-           
-            <DayNavigatorWithTimeSlots
-              onSelectDuration={handleDuration}
-              onSelectDateTime={handleDateTimeSelect}
-              professionalUserId={doctorProfile.id}
+    <article className="surface-card surface-card-interactive group flex h-full w-full flex-col gap-6 p-5 sm:p-6">
+      {/* Identity */}
+      <div className="flex gap-4 sm:gap-5">
+        <div className="relative size-20 shrink-0 sm:size-24">
+          <div className="relative size-full overflow-hidden rounded-full border border-hairline bg-slate-100">
+            <Image
+              src={
+                doctorProfile.media?.fileUrl ||
+                "/images/fallback-user-profile.png"
+              }
+              alt=""
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              fill={true}
+              sizes="96px"
             />
           </div>
         </div>
-        
-        <div className="md:self-center xl:self-start">
-          <CounsellingAppointment
-            duration={duration!}
-            firstName={doctorProfile.firstName!}
-            professionalUserId={doctorProfile.id}
-            date={selectedDateTime?.date!}
-            timeSlots={selectedDateTime?.timeSlots!}
-            priceInCents={selectedDateTime?.priceInCents!}
-          />
+
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h3 className="text-lg font-semibold leading-tight text-ink sm:text-xl">
+              {doctorProfile.firstName}
+            </h3>
+
+            {/*
+              This was `href={`counselling/${userName}`}` — no leading slash, so it
+              resolved relative to whatever path the card happened to be rendered
+              on. It only reached the right place from `/counselling`; anywhere
+              else it produced `/counselling/counselling/<name>`. It was also a
+              bare SVG with no accessible name, announced as "link" and nothing
+              more.
+            */}
+            <Link
+              href={`/counselling/${doctorProfile.userName}`}
+              className="inline-flex h-7 items-center gap-1 rounded-md border border-hairline px-2.5 text-xs font-medium text-primary-700 transition-colors duration-200 hover:border-primary-400 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+            >
+              View profile
+            </Link>
+          </div>
+
+          <p className="text-sm font-medium text-primary-700">
+            {doctorProfile.displayQualification?.specialization}
+          </p>
+
+          {/* Rating */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="inline-flex items-center gap-1.5">
+              <Rating
+                className="inline"
+                readOnly={true}
+                style={{ maxWidth: 64 }}
+                value={parseFloat(doctorProfile.avgRating || "0")}
+                itemStyles={customStyles}
+              />
+              <span className="text-xs font-semibold text-ink">
+                {parseFloat(doctorProfile.avgRating || "0").toFixed(1)}
+              </span>
+            </span>
+            <span className="text-xs text-muted">
+              {doctorProfile?.totalConsultations || 0} consultations
+            </span>
+          </div>
+
+          {/* Languages and specialities */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {doctorProfile.languages?.map((item, index) => (
+              <span
+                className="inline-flex items-center rounded-md border border-hairline bg-slate-50 px-2 py-1 text-2xs font-medium text-body"
+                key={`lang-${index}`}
+              >
+                {item.language}
+              </span>
+            ))}
+            {specialization?.map((item, index) => (
+              <span
+                className="inline-flex items-center rounded-md border border-primary-100 bg-primary-50 px-2 py-1 text-2xs font-medium text-primary-800"
+                key={`spec-${index}`}
+              >
+                {item.specialization}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Availability */}
+      <div className="border-t border-hairline pt-5">
+        <DayNavigatorWithTimeSlots
+          onSelectDuration={handleDuration}
+          onSelectDateTime={handleDateTimeSelect}
+          professionalUserId={doctorProfile.id}
+        />
+      </div>
+
+      <div className="mt-auto">
+        <CounsellingAppointment
+          duration={duration!}
+          firstName={doctorProfile.firstName!}
+          professionalUserId={doctorProfile.id}
+          date={selectedDateTime?.date!}
+          timeSlots={selectedDateTime?.timeSlots!}
+          priceInCents={selectedDateTime?.priceInCents!}
+        />
+      </div>
+    </article>
   );
 };
 

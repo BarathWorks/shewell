@@ -6,6 +6,7 @@ import AdminUsersTable from './admin-users-table';
 import { Skeleton } from 'primereact/skeleton';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const AdminUsers = async () => {
   await requireAdminPage('admin:read');
 
@@ -24,9 +25,12 @@ const AdminUsers = async () => {
   });
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <AdminUsersTable adminUsers={adminUsers} />
-    </Suspense>
+    <>
+      <PageHeader title="Admin users" description="Staff accounts and the roles that govern their access." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <AdminUsersTable adminUsers={adminUsers} />
+      </Suspense>
+    </>
   );
 };
 

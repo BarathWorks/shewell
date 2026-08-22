@@ -61,7 +61,7 @@ const SimilarDoctorProfileCard = ({
   const displayPrice = singlePrice || couplePrice;
 
   return (
-    <div className="group relative flex gap-4 rounded-3xl border border-gray-100 bg-white p-4 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out hover:border-gray-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:p-5 lg:gap-6 lg:p-6">
+    <div className="group relative flex gap-4 rounded-3xl border border-hairline bg-white p-4 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out hover:border-hairline hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:p-5 lg:gap-6 lg:p-6">
       {/* image  */}
       <div className="flex flex-col items-center justify-center gap-3 self-center">
         <div className="relative flex aspect-square w-[135px] items-center justify-center self-center">
@@ -151,7 +151,7 @@ const SimilarDoctorProfileCard = ({
 
           {specialization.map((item, index) => (
             <div
-              className="rounded-full border border-[#00898F]/20 bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-1.5 font-poppins text-xs font-medium text-[#00898F]"
+              className="rounded-full border border-primary-600/20 bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 px-3 py-1.5 font-poppins text-xs font-medium text-primary-700"
               key={index}
             >
               {item.specialization}
@@ -165,7 +165,7 @@ const SimilarDoctorProfileCard = ({
 
           {doctorProfile.languages.map((item, index) => (
             <div
-              className="rounded-full border border-gray-200 bg-[#F5F5F5] px-3 py-1.5 font-poppins text-xs font-medium text-[#666666]"
+              className="rounded-full border border-hairline bg-slate-50 px-3 py-1.5 font-poppins text-xs font-medium text-muted"
               key={index}
             >
               {item.language}

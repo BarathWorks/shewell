@@ -8,18 +8,22 @@ import { logger } from "@repo/observability";
 /**
  * Issues a login OTP.
  *
- * Two deliberate behaviours:
+ * **A code is sent only when a verified account exists.** Anything else is named:
+ * an address with no account is told so and pointed at registration, a half-finished
+ * registration is sent back to finish verifying, and a practitioner address is sent
+ * to the professional portal.
  *
- * 1. **Rate limited per address.** Unbounded, this endpoint mails an arbitrary
- *    address on demand — usable to flood someone's inbox and to burn through
- *    OTPs faster than the attempt limit on verification can bite.
+ * This replaces the previous uniform "if that email has an account…" response,
+ * which was there to stop the endpoint being used to test who has an account here.
+ * That protection is deliberately traded away for a sign-in flow people can
+ * actually complete — a mistyped address used to fail silently and then fail again
+ * at the OTP step with no explanation. The rate limit below is what remains of the
+ * defence: it bounds how fast addresses can be probed, and how many messages any
+ * one inbox can be made to receive.
  *
- * 2. **Uniform response.** It no longer reveals whether an address is registered.
- *    Distinct errors let anyone test addresses to learn who is a patient here,
- *    which for a healthcare product is a disclosure in itself. The trade-off is
- *    that a mistyped address now fails at the OTP step rather than immediately;
- *    to restore the old behaviour, return the specific errors below instead of
- *    `genericResponse`.
+ * Results are returned, never thrown. Next.js replaces the message of an error
+ * thrown out of a Server Action with a generic string in production builds, so a
+ * thrown "No account found" reaches the user as "An unexpected error occurred".
  */
 
 const OTP_SEND_LIMIT = 5;
@@ -27,18 +31,43 @@ const OTP_SEND_LIMIT = 5;
 // locked out only has to wait as long as the code they were sent lasts.
 const OTP_SEND_WINDOW_SECONDS = 5 * 60;
 
-const sendLoginOtp = async (email: string) => {
-  if (!email) {
-    throw new Error("Email is required");
+/**
+ * Discriminated on a string rather than a `success: boolean`.
+ *
+ * This app compiles with `strict: false`, and with `strictNullChecks` off
+ * TypeScript will not narrow a union on a boolean-literal discriminant: every
+ * `if (!result.success)` branch still saw the success shape, so reading the error
+ * code inside it was a type error. A string discriminant narrows in both modes.
+ */
+export type SendLoginOtpResult =
+  | { status: "sent"; message: string; email: string }
+  | {
+      status: "error";
+      /** Lets the form choose a destination — register, verify, or the doctor portal. */
+      code:
+        | "INVALID_EMAIL"
+        | "NO_ACCOUNT"
+        | "UNVERIFIED"
+        | "DELETED_ACCOUNT"
+        | "DOCTOR_ACCOUNT"
+        | "RATE_LIMITED"
+        | "MAIL_FAILED"
+        | "UNKNOWN";
+      message: string;
+      email: string;
+    };
+
+const sendLoginOtp = async (email: string): Promise<SendLoginOtpResult> => {
+  const normalized = (email ?? "").trim().toLowerCase();
+
+  if (!normalized || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalized)) {
+    return {
+      status: "error",
+      code: "INVALID_EMAIL",
+      message: "Please enter a valid email address.",
+      email: normalized,
+    };
   }
-
-  const normalized = email.trim().toLowerCase();
-
-  // Same shape whether or not an account exists.
-  const genericResponse = {
-    message: "If that email has an account, an OTP is on its way.",
-    email: normalized,
-  };
 
   const limit = await consumeRateLimit(db, {
     scope: "otp:send",
@@ -53,37 +82,85 @@ const sendLoginOtp = async (email: string) => {
       route: "sendLoginOtp",
       retryAfterSeconds: limit.retryAfterSeconds,
     });
-    throw new Error(
-      `Too many OTP requests. Please try again in ${Math.ceil(limit.retryAfterSeconds / 60)} minute(s).`
-    );
+    return {
+      status: "error",
+      code: "RATE_LIMITED",
+      message: `Too many OTP requests. Please try again in ${Math.ceil(
+        limit.retryAfterSeconds / 60,
+      )} minute(s).`,
+      email: normalized,
+    };
   }
 
   try {
-    // A practitioner signing in here is a routing mistake, not an attack, and the
-    // portals are public knowledge — so this one stays specific.
-    const isDoctorAccount = await db.professionalUser.findFirst({
-      where: { email: normalized },
-      select: { id: true },
-    });
+    // One round trip instead of three sequential ones: the answer needs all three
+    // to tell "no account" apart from "wrong portal" and "not yet verified".
+    const [doctorAccount, user, pendingUser] = await Promise.all([
+      db.professionalUser.findFirst({
+        where: { email: normalized },
+        select: { id: true },
+      }),
+      // `deletedAt` is selected rather than filtered on. A closed account must not
+      // be mailed a code, but it must not be reported as "no account" either —
+      // registration refuses the address (`email` is unique on User), so the two
+      // messages would send the user in a circle.
+      db.user.findFirst({
+        where: { email: normalized, verifiedAt: { not: null } },
+        select: { id: true, name: true, email: true, deletedAt: true },
+      }),
+      db.pendingUser.findUnique({
+        where: { email: normalized },
+        select: { id: true },
+      }),
+    ]);
 
-    if (isDoctorAccount) {
-      throw new Error(
-        "Doctor accounts cannot access this portal. Please use the professional portal.",
-      );
+    // A practitioner signing in here is a routing mistake, and the portals are
+    // public knowledge.
+    if (doctorAccount) {
+      return {
+        status: "error",
+        code: "DOCTOR_ACCOUNT",
+        message:
+          "This is a practitioner account. Please sign in through the professional portal.",
+        email: normalized,
+      };
     }
 
-    const user = await db.user.findFirst({
-      where: {
+    if (user?.deletedAt) {
+      logger.info("otp.send_deleted_account", { source: "auth", route: "sendLoginOtp" });
+      return {
+        status: "error",
+        code: "DELETED_ACCOUNT",
+        message:
+          "This account has been closed. Please contact support if you would like it restored.",
         email: normalized,
-        verifiedAt: { not: null },
-      },
-      select: { id: true, name: true, email: true },
-    });
+      };
+    }
 
     if (!user) {
-      // Deliberately indistinguishable from success.
+      // Registered but never verified: the account is half-created, so sending
+      // them to "create an account" would just hit "user already exists".
+      if (pendingUser) {
+        logger.info("otp.send_unverified_account", {
+          source: "auth",
+          route: "sendLoginOtp",
+        });
+        return {
+          status: "error",
+          code: "UNVERIFIED",
+          message:
+            "This email is registered but not verified yet. Please complete verification to continue.",
+          email: normalized,
+        };
+      }
+
       logger.info("otp.send_unknown_email", { source: "auth", route: "sendLoginOtp" });
-      return genericResponse;
+      return {
+        status: "error",
+        code: "NO_ACCOUNT",
+        message: "No account found with this email. Please create an account first.",
+        email: normalized,
+      };
     }
 
     const otp = generateOtp();
@@ -101,21 +178,18 @@ const sendLoginOtp = async (email: string) => {
     });
 
     const emailBody = {
-      from: process.env.FROM_EMAIL!,
       subject: "Login OTP - SheWellCare",
       to: [user.email],
       html: `<p>Hi <strong>${user.name}</strong>,</p>
       <p>Your login OTP is: <strong style="font-size: 24px; letter-spacing: 4px;">${otp}</strong></p>
       <p>This OTP is valid for 5 minutes.</p>
       <p>If you did not request this, please ignore this email.</p>`,
+      text: `Hi ${user.name}, your SheWellCare login OTP is ${otp}. It is valid for 5 minutes.`,
     };
 
-    // A mail-provider failure must not surface as a 500.
-    //
-    // This threw straight out of the action, so an invalid or expired SendGrid
-    // key turned sign-in into an unhandled Server Action error — and because the
-    // code above has already written the new OTP, the previous one is gone too.
-    // The user is left locked out with a stack trace.
+    // A mail-provider failure must not surface as a 500. The new OTP is already
+    // written by this point, so the previous one is gone either way — the user has
+    // to be told to retry rather than left staring at an error page.
     try {
       await sendEmail(emailBody);
     } catch (mailError) {
@@ -133,20 +207,38 @@ const sendLoginOtp = async (email: string) => {
         console.warn(
           `[dev] Email delivery failed. Login OTP for ${user.email}: ${otp}`,
         );
-        return genericResponse;
+        return {
+          status: "sent",
+          message: "OTP sent to your email",
+          email: normalized,
+        };
       }
 
-      throw new Error(
-        "We could not send your code right now. Please try again in a moment.",
-      );
+      return {
+        status: "error",
+        code: "MAIL_FAILED",
+        message: "We could not send your code right now. Please try again in a moment.",
+        email: normalized,
+      };
     }
 
-    return genericResponse;
+    return {
+      status: "sent",
+      message: "OTP sent to your email",
+      email: normalized,
+    };
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Failed to send OTP");
+    logger.error("otp.send_failed", {
+      source: "auth",
+      route: "sendLoginOtp",
+      error,
+    });
+    return {
+      status: "error",
+      code: "UNKNOWN",
+      message: "Something went wrong. Please try again.",
+      email: normalized,
+    };
   }
 };
 

@@ -63,20 +63,20 @@ export const FooterSection = (): JSX.Element => {
             <div className="flex flex-col items-start gap-2 sm:gap-4 w-full">
               <Label className="[font-family:'Poppins',Helvetica] font-normal text-sm sm:text-base tracking-[0] leading-5 whitespace-nowrap">
                 <span className="text-white">First name</span>
-                <span className="text-[#ff0000]">*</span>
+                <span className="text-danger-600">*</span>
               </Label>
-              <Input className="w-full h-12 sm:h-14 bg-[#f5f8fa] rounded-lg border border-solid border-[#cbd6e2]" />
+              <Input className="w-full h-12 sm:h-14 bg-slate-50 rounded-lg border border-solid border-hairline" />
             </div>
 
             <div className="flex flex-col items-start gap-2 sm:gap-4 w-full">
               <Label className="[font-family:'Poppins',Helvetica] font-normal text-sm sm:text-base tracking-[0] leading-5 whitespace-nowrap">
                 <span className="text-white">Email</span>
-                <span className="text-[#ff0000]">*</span>
+                <span className="text-danger-600">*</span>
               </Label>
-              <Input className="w-full h-12 sm:h-14 bg-[#f5f8fa] rounded-lg border border-solid border-[#cbd6e2]" />
+              <Input className="w-full h-12 sm:h-14 bg-slate-50 rounded-lg border border-solid border-hairline" />
             </div>
 
-            <Button className="inline-flex items-center justify-center gap-2.5 px-8 sm:px-10 py-3 sm:py-4 bg-[#00898f] rounded-xl sm:rounded-2xl hover:bg-[#00898f]/90">
+            <Button className="inline-flex items-center justify-center gap-2.5 px-8 sm:px-10 py-3 sm:py-4 bg-primary-600 rounded-xl sm:rounded-2xl hover:bg-primary-600/90">
               <span className="[font-family:'Poppins',Helvetica] font-medium text-white text-sm sm:text-base text-center tracking-[0] leading-3 whitespace-nowrap">
                 Subscribe
               </span>
@@ -97,7 +97,7 @@ export const FooterSection = (): JSX.Element => {
             {quickLinks.map((link, index) => (
               <div
                 key={index}
-                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-[#00898f] transition-colors"
+                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-primary-700 transition-colors"
               >
                 {link}
               </div>
@@ -114,7 +114,7 @@ export const FooterSection = (): JSX.Element => {
             {counsellingLinks.map((link, index) => (
               <div
                 key={index}
-                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-[#00898f] transition-colors"
+                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-primary-700 transition-colors"
               >
                 {link}
               </div>
@@ -131,7 +131,7 @@ export const FooterSection = (): JSX.Element => {
             {serviceLinks.map((link, index) => (
               <div
                 key={index}
-                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-[#00898f] transition-colors"
+                className="[font-family:'Poppins',Helvetica] font-normal text-white text-base sm:text-lg lg:text-2xl tracking-[0] leading-5 whitespace-nowrap cursor-pointer hover:text-primary-700 transition-colors"
               >
                 {link}
               </div>
@@ -181,7 +181,7 @@ export const FooterSection = (): JSX.Element => {
         <div className="inline-flex items-center gap-2.5">
           <div className="[font-family:'Inter',Helvetica] font-normal text-xs sm:text-sm lg:text-base tracking-[0] leading-6 whitespace-nowrap">
             <span className="text-white">Designed By </span>
-            <span className="font-medium text-[#00898f]">Thebrandopedia</span>
+            <span className="font-medium text-primary-700">Thebrandopedia</span>
           </div>
         </div>
       </div>

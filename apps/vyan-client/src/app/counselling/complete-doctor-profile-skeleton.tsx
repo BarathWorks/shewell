@@ -1,58 +1,46 @@
+/**
+ * Placeholder for one expert card.
+ *
+ * Rebuilt to mirror the real card's structure so the layout does not jump when
+ * results arrive. The old version was a different shape entirely — a `md:flex-row`
+ * split with a "Specialized In:" / "Languages:" / "Available Time Slots" label
+ * scaffold that the loaded card does not have — so the page visibly reflowed on
+ * every search.
+ */
 const CompleteDoctorProfileSkeleton = () => {
   return (
-    <>
-      <div className="w-full">
-        <div className="flex flex-col gap-6 rounded-md border border-border-300 py-4 xs:px-2 sm:px-3 md:flex-row md:justify-between md:px-[30px] md:py-[30px] xl:flex-col">
-          {/* Left Section */}
-          <div className="flex flex-col gap-[18px]">
-            {/* Image + Text */}
-            <div className="flex gap-4 lg:gap-6 2xl:gap-8">
-              {/* Image */}
-              <div className="flex aspect-square animate-pulse items-center justify-center rounded-full bg-gray-100 xs:w-[116px] sm:w-[138px]"></div>
-              {/* Text */}
-              <div className="flex flex-col gap-1">
-                <div className="h-6 w-32 animate-pulse rounded-md bg-gray-100"></div>
-                <div className="h-4 w-24 animate-pulse rounded-md bg-gray-100"></div>
-                {/* Ratings */}
-                <div className="flex w-full flex-wrap items-center gap-2 md:justify-start">
-                  <div className="h-4 w-16 animate-pulse rounded-md bg-gray-100"></div>
-                  <div className="h-4 w-20 animate-pulse rounded-md bg-gray-100"></div>
-                </div>
-                {/* Button */}
-                <div className="mt-4 h-10 w-32 animate-pulse rounded-md bg-gray-100"></div>
-              </div>
-            </div>
+    <div
+      className="surface-card flex h-full w-full flex-col gap-6 p-5 sm:p-6"
+      aria-hidden="true"
+    >
+      <div className="flex gap-4 sm:gap-5">
+        <div className="skeleton size-20 shrink-0 rounded-full sm:size-24" />
 
-            {/* Specialization */}
-            <div className="flex flex-wrap items-center gap-1 font-inter text-xs font-normal text-inactive md:text-sm">
-              <span className="font-medium text-active">Specialized In: </span>
-              <div className="h-6 w-20 animate-pulse rounded-md bg-gray-100"></div>
-              <div className="h-6 w-16 animate-pulse rounded-md bg-gray-100"></div>
-            </div>
-
-            {/* Languages */}
-            <div className="flex flex-wrap items-center gap-1 font-inter text-xs font-normal text-inactive md:text-sm">
-              <span className="font-medium text-active">Languages: </span>
-              <div className="h-6 w-20 animate-pulse rounded-md bg-gray-100"></div>
-              <div className="h-6 w-16 animate-pulse rounded-md bg-gray-100"></div>
-            </div>
-
-            {/* Available Time Slots */}
-            <div className="mb-6 mt-[18px] md:my-6">
-              <div className="border-b border-primary pb-1 font-inter text-base font-medium 2xl:text-lg">
-                Available Time Slots
-              </div>
-              <div className="h-12 w-full animate-pulse rounded-md bg-gray-100"></div>
-            </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="md:self-center xl:self-start">
-            <div className="h-12 w-48 animate-pulse rounded-md bg-gray-100"></div>
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <div className="skeleton h-6 w-40" />
+          <div className="skeleton h-4 w-28" />
+          <div className="skeleton h-4 w-44" />
+          <div className="flex gap-1.5">
+            <div className="skeleton h-6 w-16" />
+            <div className="skeleton h-6 w-20" />
+            <div className="skeleton h-6 w-14" />
           </div>
         </div>
       </div>
-    </>
+
+      <div className="border-t border-hairline pt-5">
+        <div className="skeleton h-10 w-full" />
+        <div className="mt-3 flex gap-2">
+          <div className="skeleton h-9 w-20" />
+          <div className="skeleton h-9 w-20" />
+          <div className="skeleton h-9 w-20" />
+        </div>
+      </div>
+
+      <div className="mt-auto">
+        <div className="skeleton h-11 w-full sm:w-48" />
+      </div>
+    </div>
   );
 };
 export default CompleteDoctorProfileSkeleton;

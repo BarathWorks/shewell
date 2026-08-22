@@ -2,9 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Calendar, Clock, IndianRupee } from "lucide-react";
-import { Badge } from "../components/ui/badge";
-import { InteractiveButton } from "../components/ui/interactive-button";
+import { ArrowRight, CalendarDays, Clock } from "lucide-react";
 
 interface SessionCardProps {
   imageUrl?: string;
@@ -21,13 +19,28 @@ interface SessionCardProps {
   detailPath?: string;
 }
 
+/**
+ * A session in a list.
+ *
+ * The prop interface is unchanged, so every existing call site keeps working.
+ *
+ * This is now the only session card in the listing. `/session` previously
+ * rendered two completely separate implementations — a ~130-line inline card
+ * under `md:hidden` and this component under `hidden md:block` — which had
+ * drifted into different type scales, different badge colours, different
+ * corner radii and different price treatments. The same session looked like two
+ * different products depending on the width of the window. One responsive card
+ * replaces both.
+ *
+ * The nested `<a>` fix from before is preserved: the whole card is the link, so
+ * nothing inside it may be a link too.
+ */
 export const SessionCard: React.FC<SessionCardProps> = ({
   imageUrl,
   language = "English",
   isOnline = true,
   hasRecording = true,
   sessionDate,
-  sessionTime,
   title,
   description,
   price,
@@ -39,103 +52,106 @@ export const SessionCard: React.FC<SessionCardProps> = ({
   const day = dateObj.getDate();
 
   const card = (
-      <div className="group relative mx-auto flex w-full max-w-full flex-col items-stretch gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#00898F] hover:shadow-xl md:flex-row md:items-center md:gap-6 md:p-6 lg:max-w-[1440px] 2xl:max-w-[1920px]">
-        {/* Date Box - Top on Mobile, Left on Desktop */}
-        <div className="flex flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00898F] to-[#006B70] p-3 text-white shadow-md md:h-24 md:w-20 md:flex-col">
-          <div className="mr-2 text-xs font-bold uppercase tracking-wider opacity-90 md:mr-0 md:text-sm">
+    <article className="surface-card surface-card-interactive group flex h-full w-full flex-col overflow-hidden md:flex-row">
+      {/* Thumbnail */}
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 md:aspect-auto md:h-auto md:w-56 lg:w-64">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-primary-50 text-primary-300">
+            <CalendarDays aria-hidden="true" className="size-10" />
+          </div>
+        )}
+
+        {/* Date chip */}
+        <div className="absolute left-3 top-3 flex flex-col items-center rounded-lg border border-white/70 bg-surface/95 px-2.5 py-1.5 shadow-sm backdrop-blur-sm">
+          <span className="text-2xs font-semibold uppercase tracking-wider text-primary-600">
             {month}
-          </div>
-          <div className="text-xl font-black md:text-3xl">{day}</div>
-        </div>
-
-        {/* Image Thumbnail - Responsive Sizing */}
-        <div className="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-64 md:h-32 md:w-48 2xl:w-64">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-              <Calendar size={32} />
-            </div>
-          )}
-          {/* Mobile-only Price Badge overlay */}
-          <div className="absolute right-2 top-2 md:hidden">
-            <Badge className="bg-white/90 text-[#00898F] backdrop-blur-sm">
-              ₹{price}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 space-y-2 md:space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="secondary"
-              className="border-none bg-[#E1EBED] px-2.5 py-0.5 font-medium text-[#00898F]"
-            >
-              {language}
-            </Badge>
-
-            {isOnline && (
-              <Badge className="border-green-100 bg-green-50 px-2.5 py-0.5 text-green-700">
-                <span className="mr-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                Online
-              </Badge>
-            )}
-
-            {hasRecording && (
-              <Badge className="border-orange-100 bg-orange-50 px-2.5 py-0.5 text-orange-700">
-                <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-orange-500" />
-                Recording
-              </Badge>
-            )}
-          </div>
-
-          <h2 className="line-clamp-2 text-lg font-extrabold text-gray-900 md:text-xl 2xl:text-2xl">
-            {title}
-          </h2>
-
-          <p className="line-clamp-2 max-w-3xl text-sm leading-relaxed text-gray-600 md:line-clamp-3 md:text-base">
-            {description}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            <div className="hidden md:block">
-              <InfoChip icon={<IndianRupee size={16} />} label={`${price}`} />
-            </div>
-            <InfoChip icon={<Clock size={16} />} label={timeSlot} />
-          </div>
-        </div>
-
-        {/* Action Button - Full width on mobile, Auto on desktop */}
-        {/* NOT a <Link>. The whole card is already wrapped in one pointing at the
-            same href, and an <a> inside an <a> is invalid HTML — React refuses to
-            hydrate it, discards the server-rendered markup and re-renders the
-            entire page on the client. That showed up as a hydration error on
-            /session and made the page visibly slower to settle. */}
-        <div className="flex w-full flex-col items-center justify-center border-t border-gray-100 pt-4 md:w-auto md:items-end md:border-none md:pt-0">
-          <InteractiveButton />
+          </span>
+          <span className="text-lg font-semibold leading-none text-ink">
+            {day}
+          </span>
         </div>
       </div>
+
+      {/* Body */}
+      <div className="flex flex-1 flex-col p-5 md:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-md border border-hairline bg-slate-50 px-2 py-1 text-2xs font-medium text-body">
+            {language}
+          </span>
+
+          {isOnline && (
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-success-100 bg-success-50 px-2 py-1 text-2xs font-medium text-secondary-700">
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-secondary-500"
+              />
+              Online
+            </span>
+          )}
+
+          {hasRecording && (
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-info-100 bg-info-50 px-2 py-1 text-2xs font-medium text-info-600">
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-info-500"
+              />
+              Recording
+            </span>
+          )}
+        </div>
+
+        <h3 className="mt-3 line-clamp-2 text-base font-semibold leading-snug text-ink md:text-lg">
+          {title}
+        </h3>
+
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">
+          {description}
+        </p>
+
+        {timeSlot ? (
+          <p className="mt-3 flex items-center gap-2 text-sm text-body">
+            <Clock aria-hidden="true" className="size-4 shrink-0 text-primary-500" />
+            {timeSlot}
+          </p>
+        ) : null}
+
+        <div className="flex-1" />
+
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-hairline pt-4">
+          <span className="text-base font-semibold text-ink">
+            ₹{Number(price).toLocaleString("en-IN")}
+          </span>
+
+          {/* Deliberately not a <Link>: the whole card is already one, and an
+              <a> inside an <a> is invalid HTML that React refuses to hydrate. */}
+          <span className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-primary-600 bg-primary-600 px-4 text-sm font-medium text-white transition-colors duration-200 group-hover:border-primary-700 group-hover:bg-primary-700">
+            Register
+            <ArrowRight
+              aria-hidden="true"
+              className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </span>
+        </div>
+      </div>
+    </article>
   );
 
   // `detailPath` is optional and `Link` requires a string href, so only wrap when
   // there is somewhere to go.
-  return detailPath ? <Link href={detailPath}>{card}</Link> : card;
+  return detailPath ? (
+    <Link
+      href={detailPath}
+      className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2"
+    >
+      {card}
+    </Link>
+  ) : (
+    card
+  );
 };
-
-const InfoChip = ({
-  icon,
-  label,
-}: {
-  icon: React.ReactNode;
-  label: string;
-}) => (
-  <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-xs md:text-sm font-semibold text-gray-700 border border-gray-100">
-    <span className="text-[#00898F]">{icon}</span>
-    {label}
-  </div>
-);

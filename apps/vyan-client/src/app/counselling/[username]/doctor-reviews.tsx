@@ -187,7 +187,7 @@ const DoctorReview = ({ doctorReview }: IdoctorReviews) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-col gap-[18px] rounded-2xl border border-gray-100 bg-[#F8F8F8] p-[18px] xl:p-6"
+                    className="flex flex-col gap-[18px] rounded-2xl border border-hairline bg-slate-50 p-[18px] xl:p-6"
                   >
                     <div className="flex items-center gap-4 ">
                       <div className="flex items-center gap-4 border-r border-primary pr-2">
@@ -237,7 +237,7 @@ const DoctorReview = ({ doctorReview }: IdoctorReviews) => {
                     <div className="font-inter text-sm font-normal text-inactive xl:text-base">
                       {item.review}
                     </div>
-                    <div className="font-inter text-sm font-normal text-[#949494]">
+                    <div className="font-inter text-sm font-normal text-muted">
                       {" "}
                       Posted on{" "}
                       {format(new Date(item.createdAt), "MMMM dd , yyyy")}

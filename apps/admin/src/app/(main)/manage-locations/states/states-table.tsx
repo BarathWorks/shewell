@@ -113,7 +113,6 @@ const StatesTable = ({ states, countries }: { states: IState[]; countries: ICoun
 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage States</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
         <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
@@ -166,7 +165,6 @@ const StatesTable = ({ states, countries }: { states: IState[]; countries: ICoun
           <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
           <DataTable
-            stripedRows
             ref={dt}
             rowGroupMode="subheader"
             groupRowsBy="country.name"
@@ -191,9 +189,9 @@ const StatesTable = ({ states, countries }: { states: IState[]; countries: ICoun
             exportFilename="States"
           >
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
-            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="stateCode" header="State Code" sortable body={stateCodeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
+            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="stateCode" header="State Code" sortable body={stateCodeBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
+            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '8rem' }} frozen={true}></Column>
           </DataTable>
 
           <Dialog visible={stateDialog} style={{ width: '50vw' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="State Details" modal className="p-fluid" onHide={hideDialog}>

@@ -191,6 +191,24 @@ model ProfessionalUser {
   isapproved                        Boolean                            @default(false)
   notifications                     ProfessionalNotification[]
 
+  /// Email verification, mirroring the patient flow on `User`.
+  ///
+  /// A practitioner account previously went live on an address nobody had proved
+  /// control of — the account was created and signed in on the spot. That address
+  /// is where appointment notifications and the password-reset link are sent, so a
+  /// typo silently routed both to a stranger, and it left the door open to
+  /// registering under someone else's address.
+  ///
+  /// Null means unverified. Sign-in refuses those; the migration backfills every
+  /// account that existed before this was introduced, so nobody is locked out.
+  emailVerifiedAt                   DateTime?
+  otp                               String?
+  otpCreatedAt                      DateTime?
+  /// Brute-force protection. A 6-digit code is only 1e6 possibilities, so without a
+  /// bounded attempt count it is guessable well inside its five-minute life.
+  otpAttempts                       Int                                @default(0)
+  otpLockedUntil                    DateTime?
+
   /// Bank Details
   bankAccountHolderName String?
   bankAccountNumber     String?
@@ -209,6 +227,7 @@ model ProfessionalUser {
   @@index([email])
   @@index([userName])
   @@index([isapproved])
+  @@index([emailVerifiedAt])
   @@index([deletedAt])
   @@index([avgRating])
   @@index([displayQualificationId])
@@ -308,6 +327,13 @@ model BookAppointment {
   meeting            Json?
   // professionalRatingId String?
 
+  /// Reminder emails already sent for this booking, so the scheduled job is
+  /// idempotent. The job runs on a fixed interval and each window it inspects is
+  /// wider than the interval, so without these every booking would be reminded
+  /// several times.
+  reminder24hSentAt  DateTime?
+  reminder1hSentAt   DateTime?
+
   /// Doctor Payout System
   appointmentPayment AppointmentPayment?
 
@@ -317,6 +343,9 @@ model BookAppointment {
   @@index([startingTime])
   @@index([userId, status])
   @@index([userId, status, startingTime])
+  // The reminder job scans by start time within a status; unindexed it is a full
+  // table scan on every run.
+  @@index([status, startingTime])
   // Payment confirmation and the Razorpay webhook both look an appointment up by
   // order id. Unindexed, every payment callback was a full table scan.
   @@index([razorpayOrderId])

@@ -1,247 +1,186 @@
 "use client";
+
 import React from "react";
+import Link from "next/link";
+import { Mail, MapPin, Phone } from "lucide-react";
+
+/**
+ * Site footer.
+ *
+ * Visual rework only. Every destination is unchanged, including the three Quick
+ * Links that point at `#` — those were already placeholders and repointing them
+ * would change behaviour, so they are left exactly as they were.
+ *
+ * The ground is now the palette's deepest ink rather than a free-standing
+ * `#1A1A1A`, the four social buttons and three contact rows are generated from
+ * data instead of being copy-pasted markup, and the columns sit on a real grid so
+ * the layout holds together between the `sm` and `lg` breakpoints — previously it
+ * jumped straight from one column to a 50/50 split with nothing in between.
+ */
+
+const SOCIALS = [
+  { href: "https://x.com/shewellcare", label: "X (Twitter)", icon: "/icons/x.svg" },
+  {
+    href: "https://www.instagram.com/shewellcare",
+    label: "Instagram",
+    icon: "/icons/insta.svg",
+  },
+  {
+    href: "https://www.facebook.com/people/Shewellcare/61566486577092",
+    label: "Facebook",
+    icon: "/icons/facebook.svg",
+  },
+  {
+    href: "https://www.youtube.com/@Shewellcare",
+    label: "YouTube",
+    icon: "/icons/youtube.svg",
+  },
+] as const;
+
+const QUICK_LINKS = [
+  { href: "#", label: "Home" },
+  { href: "#", label: "Sessions" },
+  { href: "#", label: "Counselling" },
+] as const;
+
+const LEGAL_LINKS = [
+  { href: "/terms", label: "Terms & Conditions" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/refund-policy", label: "Refund & Cancellation" },
+] as const;
 
 export default function NewFooter() {
   return (
-    <footer className="bg-[#1A1A1A] pb-6 pt-8 text-white sm:pb-8 sm:pt-10 md:pb-10 md:pt-12">
-      <div className=" px-6 sm:px-8 md:px-10 lg:px-12 xl:px-16">
-        {/* Top Section */}
-        <div className="mb-8 flex flex-col gap-8 sm:mb-10 sm:gap-10 md:mb-12 lg:mb-14 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
-          {/* Brand & Socials */}
-          <div className="w-full lg:w-[50%]">
-            <div className="flex flex-col gap-0">
-              <div className="relative h-14 w-28 sm:h-16 sm:w-32 md:h-20 md:w-40 lg:h-24 lg:w-48">
-                <img
-                  src="/home/Logo.png"
-                  alt="Shewell"
-                  className="h-full w-full object-contain brightness-0 invert"
-                />
-              </div>
-              <p className="mb-12 text-sm text-gray-400 sm:text-base md:mb-16 md:text-base lg:pr-8">
-                Empowering motherhood with care, expertise, and support every
-                step of the way.
-              </p>
+    <footer className="mt-auto bg-slate-950 text-slate-300">
+      <div className="container-page py-12 md:py-16">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* Brand */}
+          <div className="lg:col-span-5">
+            <div className="h-9 w-36 sm:h-10 sm:w-40">
+              <img
+                src="/home/Logo.png"
+                alt="Shewell"
+                className="h-full w-full object-contain object-left"
+              />
             </div>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <a
-                href="https://x.com/shewellcare"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
-                aria-label="X (Twitter)"
-              >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
+
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">
+              Empowering motherhood with care, expertise, and support every step
+              of the way.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-2.5">
+              {SOCIALS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="flex size-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] transition-colors duration-200 hover:border-primary-500/60 hover:bg-primary-500/15"
+                >
                   <img
-                    src="/icons/x.svg"
-                    alt="X"
+                    src={social.icon}
+                    alt=""
+                    aria-hidden="true"
                     width={16}
                     height={16}
-                    className="group-hover:invert sm:h-5 sm:w-5"
+                    className="h-4 w-4 opacity-80 invert"
                   />
-                </div>
-              </a>
-              <a
-                href="https://www.instagram.com/shewellcare"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
-                aria-label="Instagram"
-              >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img
-                    src="/icons/insta.svg"
-                    alt="Instagram"
-                    width={16}
-                    height={16}
-                    className="group-hover:invert sm:h-5 sm:w-5"
-                  />
-                </div>
-              </a>
-              <a
-                href="https://www.facebook.com/people/Shewellcare/61566486577092"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
-                aria-label="Facebook"
-              >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img
-                    src="/icons/facebook.svg"
-                    alt="Facebook"
-                    width={16}
-                    height={16}
-                    className="group-hover:invert sm:h-5 sm:w-5"
-                  />
-                </div>
-              </a>
-              <a
-                href="https://www.youtube.com/@Shewellcare"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
-                aria-label="YouTube"
-              >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
-                  <img
-                    src="/icons/youtube.svg"
-                    alt="YouTube"
-                    width={16}
-                    height={16}
-                    className="group-hover:invert sm:h-5 sm:w-5"
-                  />
-                </div>
-              </a>
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Links & Contact - Responsive Grid */}
-          <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 md:gap-12 lg:w-[50%] lg:gap-12">
-            <div>
-              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">
-                Quick Links
-              </h4>
-              <ul className="flex flex-col gap-3 text-sm text-gray-300 sm:gap-3.5 sm:text-base">
-                <li>
+          {/* Quick links */}
+          <div className="lg:col-span-3">
+            <h4 className="text-2xs font-semibold uppercase tracking-[0.09em] text-slate-500">
+              Quick Links
+            </h4>
+            <ul className="mt-5 flex flex-col gap-3.5 text-sm">
+              {QUICK_LINKS.map((link) => (
+                <li key={link.label}>
                   <a
-                    href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                    href={link.href}
+                    className="inline-block py-1 text-slate-300 transition-colors duration-200 hover:text-primary-300"
                   >
-                    Home{" "}
+                    {link.label}
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
-                  >
-                    Sessions
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
-                  >
-                    Counselling
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-lg font-medium sm:mb-5 sm:text-xl md:text-2xl">
-                Contact Us
-              </h4>
-              <ul className="space-y-3.5 text-sm text-gray-300 sm:space-y-4 sm:text-base">
-                <li className="flex min-w-0 items-start gap-2">
-                  <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#167D71]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <a
-                    href="https://maps.google.com/?q=NO.1274,+CHARUKESI+APARTMENTS,+17TH+STREET,+POOMPUHAR+NAGAR,+KOLATHUR,+CHENNAI,+Tamil+Nadu,+India+600099"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="min-w-0 break-words leading-relaxed transition-colors hover:text-[#167D71]"
-                  >
-                    NO.1274, CHARUKESI APARTMENTS,
-                    <br /> 17TH STREET, POOMPUHAR
-                    NAGAR,
-                    <br /> KOLATHUR, CHENNAI,
-                    <br /> Tamil Nadu, India -
-                    600099
-                  </a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <a
-                    href="mailto:info@shewellofficial.com"
-                    className="transition-colors hover:text-[#167D71]"
-                  >
-                    info@shewellofficial.com
-                  </a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  <a
-                    href="tel:+917397380900"
-                    className="transition-colors hover:text-[#167D71]"
-                  >
-                    +91 7397 380 900
-                  </a>
-                </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="lg:col-span-4">
+            <h4 className="text-2xs font-semibold uppercase tracking-[0.09em] text-slate-500">
+              Contact Us
+            </h4>
+            <ul className="mt-5 flex flex-col gap-4 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin
+                  aria-hidden="true"
+                  className="mt-0.5 size-4 shrink-0 text-primary-400"
+                />
+                <a
+                  href="https://maps.google.com/?q=NO.1274,+CHARUKESI+APARTMENTS,+17TH+STREET,+POOMPUHAR+NAGAR,+KOLATHUR,+CHENNAI,+Tamil+Nadu,+India+600099"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-0 leading-relaxed text-slate-300 transition-colors duration-200 hover:text-primary-300"
+                >
+                  NO.1274, Charukesi Apartments, 17th Street, Poompuhar Nagar,
+                  Kolathur, Chennai, Tamil Nadu, India&nbsp;&ndash;&nbsp;600099
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-primary-400"
+                />
+                <a
+                  href="mailto:info@shewellofficial.com"
+                  className="inline-block py-1 text-slate-300 transition-colors duration-200 hover:text-primary-300"
+                >
+                  info@shewellofficial.com
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-primary-400"
+                />
+                <a
+                  href="tel:+917397380900"
+                  className="inline-block py-1 text-slate-300 transition-colors duration-200 hover:text-primary-300"
+                >
+                  +91 7397 380 900
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* Divider */}
-        <hr className="my-6 border-gray-700/50 sm:my-8 md:my-10" />
+        <hr className="my-10 border-white/10" />
 
-        {/* Bottom Bar - Responsive */}
-        <div className="flex flex-col items-center justify-between gap-5 text-sm text-gray-400 sm:flex-row sm:gap-6 md:text-base">
-          <div className="flex flex-wrap items-center justify-center gap-5 sm:justify-start sm:gap-6 md:gap-8">
-            <a href="/terms" className="transition-all hover:text-[#167D71]">
-              Terms & Conditions
-            </a>
-            <span className="hidden text-gray-600 sm:inline">•</span>
-            <a
-              href="/privacy-policy"
-              className="transition-all hover:text-[#167D71]"
-            >
-              Privacy Policy
-            </a>
-            <span className="hidden text-gray-600 sm:inline">•</span>
-            <a
-              href="/refund-policy"
-              className="transition-all hover:text-[#167D71]"
-            >
-              Refund & Cancellation
-            </a>
-          </div>
-          <div className="text-center sm:text-right">
-            <span className="text-gray-500">
-              2025 © Shewell. All Rights Reserved
-            </span>
-          </div>
+        <div className="flex flex-col items-center justify-between gap-5 sm:flex-row">
+          <nav
+            aria-label="Legal"
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:justify-start"
+          >
+            {LEGAL_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-block py-1 text-slate-400 transition-colors duration-200 hover:text-primary-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <p className="text-sm text-slate-500">
+            2025 © Shewell. All Rights Reserved
+          </p>
         </div>
       </div>
     </footer>

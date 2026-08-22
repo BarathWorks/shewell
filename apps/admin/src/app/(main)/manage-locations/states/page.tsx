@@ -4,6 +4,7 @@ import StatesTable from './states-table';
 import { Skeleton } from 'primereact/skeleton';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 export const revalidate = 0;
 
 const StatesPage = async () => {
@@ -47,9 +48,12 @@ const StatesPage = async () => {
   });
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <StatesTable states={states} countries={countries} />
-    </Suspense>
+    <>
+      <PageHeader title="States" description="Reference data used by practitioner addresses." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <StatesTable states={states} countries={countries} />
+      </Suspense>
+    </>
   );
 };
 

@@ -146,7 +146,7 @@ const Appointments = () => {
         <div>
           <h5>View Appointment Details</h5>
         </div>
-        <DataTable value={updatedData} stripedRows paginator rows={5} filters={filters} globalFilterFields={['professionalUser.firstName', 'status']} header={header}>
+        <DataTable value={updatedData} paginator rows={10} filters={filters} globalFilterFields={['professionalUser.firstName', 'status']} header={header}>
           <Column field="professionalUser" header="Doctor Details" body={doctorDetailsTemplate}></Column>
           <Column field="patient" header="Patient Details" body={patientDetailsTemplate}></Column>
           <Column field="startingTime" header="Appointment Details" body={appointmentDetailsTemplate}></Column>

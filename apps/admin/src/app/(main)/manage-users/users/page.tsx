@@ -6,6 +6,7 @@ import { Skeleton } from 'primereact/skeleton';
 import { requireAdminPage } from '@/src/server/authz';
 import UsersTable from './users-table';
 
+import PageHeader from '@/src/_components/shared/page-header';
 /**
  * Customer accounts.
  *
@@ -39,9 +40,12 @@ const Users = async () => {
   }));
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <UsersTable users={rows} />
-    </Suspense>
+    <>
+      <PageHeader title="Patients" description="Customer accounts. Disable or restore access here." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <UsersTable users={rows} />
+      </Suspense>
+    </>
   );
 };
 

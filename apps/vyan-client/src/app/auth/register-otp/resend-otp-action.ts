@@ -5,44 +5,76 @@ import { sendEmail } from "@repo/mail";
 import { consumeRateLimit } from "@repo/database";
 import { logger } from "@repo/observability";
 
-const resendOTP = async (email: string) => {
-    if (!email) {
-        throw new Error("Email is required");
+/**
+ * Re-issues the registration OTP.
+ *
+ * Results are returned rather than thrown, for the same reason as the rest of this
+ * flow: a message thrown out of a Server Action is replaced with a generic string
+ * in production, so "Registration not found. Please register again." never reached
+ * the person who needed to read it.
+ */
+
+/**
+ * Discriminated on a string rather than a `success: boolean`.
+ *
+ * This app compiles with `strict: false`, and with `strictNullChecks` off
+ * TypeScript will not narrow a union on a boolean-literal discriminant: every
+ * `if (!result.success)` branch still saw the success shape, so reading the error
+ * code inside it was a type error. A string discriminant narrows in both modes.
+ */
+export type ResendOtpResult =
+  | { status: "sent"; message: string }
+  | {
+      status: "error";
+      code: "MISSING_EMAIL" | "NOT_FOUND" | "RATE_LIMITED" | "MAIL_FAILED" | "UNKNOWN";
+      message: string;
+    };
+
+const resendOTP = async (email: string): Promise<ResendOtpResult> => {
+    const normalized = (email ?? "").trim().toLowerCase();
+
+    if (!normalized) {
+        return { status: "error", code: "MISSING_EMAIL", message: "Email is required." };
     }
 
     // Unbounded, this mails an arbitrary address on demand and refreshes the OTP —
     // which also resets the attempt budget on the verify side.
     const limit = await consumeRateLimit(db, {
         scope: "register:resend",
-        subject: email.trim().toLowerCase(),
+        subject: normalized,
         limit: 5,
         windowSeconds: 5 * 60,
     });
 
     if (!limit.allowed) {
         logger.warn("register.resend_rate_limited", { source: "auth", route: "resendOtp" });
-        throw new Error(
-            `Too many requests. Please try again in ${Math.ceil(limit.retryAfterSeconds / 60)} minute(s).`,
-        );
+        return {
+            status: "error",
+            code: "RATE_LIMITED",
+            message: `Too many requests. Please try again in ${Math.ceil(
+                limit.retryAfterSeconds / 60,
+            )} minute(s).`,
+        };
     }
 
     try {
-        // Find the pending user
         const pendingUser = await db.pendingUser.findUnique({
-            where: { email: email },
+            where: { email: normalized },
         });
 
         if (!pendingUser) {
-            throw new Error("Registration not found. Please register again.");
+            return {
+                status: "error",
+                code: "NOT_FOUND",
+                message: "Registration not found. Please register again.",
+            };
         }
 
-        // Generate new OTP
         const newOtp = generateOtp();
         const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
-        // Update the pending user with new OTP
         await db.pendingUser.update({
-            where: { email: email },
+            where: { email: normalized },
             data: {
                 otp: newOtp,
                 otpExpiresAt: otpExpiresAt,
@@ -53,21 +85,20 @@ const resendOTP = async (email: string) => {
             },
         });
 
-        // Send email
-        const emailBodySendGrid = {
-            from: process.env.FROM_EMAIL!,
-            subject: "Verification OTP",
-            to: [email],
-            html: `<p>Hi,<strong> ${pendingUser.name} <br/> </strong/></p>
-      <span>This is your verification OTP ${newOtp}<span/>
-      `,
+        const emailBody = {
+            subject: "Verification OTP - SheWellCare",
+            to: [normalized],
+            html: `<p>Hi <strong>${pendingUser.name}</strong>,</p>
+      <p>Your verification OTP is: <strong style="font-size: 24px; letter-spacing: 4px;">${newOtp}</strong></p>
+      <p>This OTP is valid for 5 minutes.</p>`,
+            text: `Hi ${pendingUser.name}, your SheWellCare verification OTP is ${newOtp}. It is valid for 5 minutes.`,
         };
 
-        // Same guard as `sendLoginOtp`: a mail-provider failure must not become an
-        // unhandled 500. The new OTP has already been written at this point, so
-        // rethrowing leaves the user with no valid code and an error page.
+        // A mail-provider failure must not become an unhandled 500. The new OTP has
+        // already been written at this point, so failing loudly here would leave the
+        // user with no valid code and an error page.
         try {
-            await sendEmail(emailBodySendGrid);
+            await sendEmail(emailBody);
         } catch (mailError) {
             logger.error("otp.resend_mail_failed", {
                 source: "auth",
@@ -78,25 +109,26 @@ const resendOTP = async (email: string) => {
             // Dev only — never log a credential in production.
             if (process.env.NODE_ENV !== "production") {
                 console.warn(
-                    `[dev] Email delivery failed. Registration OTP for ${email}: ${newOtp}`,
+                    `[dev] Email delivery failed. Registration OTP for ${normalized}: ${newOtp}`,
                 );
-                return { message: "OTP resent successfully" };
+                return { status: "sent", message: "OTP resent successfully" };
             }
 
-            throw new Error(
-                "We could not send your code right now. Please try again in a moment.",
-            );
+            return {
+                status: "error",
+                code: "MAIL_FAILED",
+                message: "We could not send your code right now. Please try again in a moment.",
+            };
         }
 
-        return {
-            message: "OTP resent successfully",
-        };
+        return { status: "sent", message: "OTP resent successfully" };
     } catch (error) {
-        console.log("resend-otp-error:", error);
-        if (error instanceof Error) {
-            throw error;
-        }
-        throw new Error("Failed to resend OTP");
+        logger.error("register.resend_failed", { source: "auth", route: "resendOTP", error });
+        return {
+            status: "error",
+            code: "UNKNOWN",
+            message: "Failed to resend OTP. Please try again.",
+        };
     }
 };
 

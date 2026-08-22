@@ -1,114 +1,44 @@
-"use client";
-
-import Link from "next/link";
-
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-
-import TestimonialCarousel from "../logo-swiper";
-import { useSession } from "next-auth/react";
-
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import AuthShell from "../auth-shell";
 import StepperRegister from "./stepper-register";
 
-// import SignUpStepper from "../components/stepper";
-// import StepperComponent from "../components/stepper";
-
-const steps = [
-  { title: 'Account Setup' },
-  { title: 'Personal Info' },
-  { title: 'Address' },
-  { title: 'Identity & Documents' },
-  { title: 'Education' },
-  { title: 'Practice Details' },
-  { title: 'Bank Details' },
-]
+/**
+ * Registration.
+ *
+ * Same `AuthShell` as sign-in, so the two screens are one experience rather than
+ * two layouts that happen to look similar. What is specific to registration:
+ * a wider form column (these steps carry six-field forms, not two), a progress
+ * indicator above the form, and the pointer back to sign-in.
+ *
+ * Gone with the old layout: the three Swiper stylesheets it imported without
+ * using a Swiper, an unread `steps` array, an unread `useState` step counter, an
+ * unused `useSearchParams`, and a duplicated legal block written once for `md:`
+ * and once for below it.
+ */
 const RegisterLayout = ({ children }: { children: React.ReactNode }) => {
- const [step, setStep] = useState<number>(1)
- 
   return (
-    <>
-      <div className="w-full">
-        <div className="mb-8 sm:mb-10 md:mb-12 lg:mb-0">{/* <Header /> */}</div>
-        <div className="container mx-auto px-3 sm:px-4 md:px-8 lg:px-0">
-          {/* 1-s */}
+    <AuthShell
+      contentWidth="lg"
+      title="Join Shewell as a practitioner."
+      subtitle="A few steps to set up your practice. You can stop and come back — each step is saved as you go."
+      altAction={{
+        prompt: "Already registered?",
+        label: "Sign in",
+        href: "/auth/login",
+      }}
+    >
+      <header className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          Create your account
+        </h1>
+        <p className="mt-1.5 text-sm text-muted">
+          Tell us about your practice so clients know who they are booking.
+        </p>
+      </header>
 
-          {/* 2-s */}
+      <StepperRegister />
 
-          <div className="mt-3 sm:mt-4 md:mt-5 flex flex-col gap-4 sm:gap-5 md:gap-8 lg:gap-12 xl:gap-[60px] 2xl:gap-[198px] lg:flex-row">
-            {/* form */}
-
-            
-            <div className="lg:basis-1/2 lg:self-center">
-
-            <div className="mb-4 sm:mb-6 md:mb-8 text-center font-inter text-lg sm:text-xl md:text-2xl xl:mb-9 2xl:mb-[50px] 2xl:text-3xl font-semibold">
-        Create your free account
-      </div>
-              {/* <StepperComponent/> */}
-              {/* <Suspense>
-                <SessionProvider>{children}</SessionProvider>
-              </Suspense> */}
-              {/* <Stepper  setStep={setStep} steps={steps}/> */}
-              <StepperRegister/>
-            {children}
-            </div>
-
-            {/* text + image */}
-            <div className="flex flex-col items-center lg:self-center lg:order-first lg:basis-1/2">
-              <div className="mb-2 sm:mb-3 md:mb-4 text-center font-poppins text-base sm:text-lg md:text-2xl lg:text-3xl xl:mb-3 xl:text-4xl 2xl:text-[41px] 2xl:leading-[54px] font-bold leading-tight">
-                Provide wellness virtuality{" "}
-              </div>
-              <div className="text-center font-poppins text-xs sm:text-sm md:text-base lg:text-lg xl:text-2xl px-2 sm:px-4 md:px-12 lg:px-0 2xl:px-[150px] font-normal">
-                Provide best services to your client with SheWellCare
-              </div>
-
-              <TestimonialCarousel />
-
-              <div className="hidden md:block">
-                <div className="mb-1 mt-8 sm:mt-10 md:mt-12 lg:mt-[50px] font-inter text-xs sm:text-sm font-normal 2xl:text-base">
-                  By proceeding, you agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-primary">
-                    Terms and Conditions
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy-policy" target="_blank" className="text-primary">
-                    Privacy Policy
-                  </Link>
-                </div>
-                <div className="flex justify-center gap-4 sm:gap-5 md:gap-6">
-                  <Link href={""}>Help</Link>
-                  <Link href={""}>Privacy</Link>
-                  <Link href={""}>Terms</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3-s */}
-
-          <div className=" md:hidden ">
-            <div className="mb-1 mt-[50px] font-inter text-sm font-normal 2xl:text-base">
-              By proceeding, you agree to the{" "}
-              <Link href="#" className="text-primary">
-                Terms and Conditions
-              </Link>{" "}
-              and{" "}
-              <Link href="#" className="text-primary">
-                Privacy Policy
-              </Link>
-            </div>
-            <div className="flex justify-center gap-6">
-              <Link href={""}>Help</Link>
-              <Link href={""}>Privacy</Link>
-              <Link href={""}>Terms</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-[50px]">{/* <Footer /> */}</div>
-    </>
+      {children}
+    </AuthShell>
   );
 };
 

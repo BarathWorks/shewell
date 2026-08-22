@@ -1,27 +1,56 @@
 import Link from "next/link";
+import { CalendarDays, Compass, LayoutDashboard } from "lucide-react";
 
+import { buttonClass } from "~/components/ui/button-styles";
+
+/**
+ * 404.
+ *
+ * Was styled entirely with inline `style={{}}` objects — `color: "#555"`, an
+ * underlined `#111` link — so it inherited nothing from the design system and
+ * looked like a different product. It also offered a single "Go back home" link
+ * to `/`, which in this app redirects to `/dashboard`; a practitioner who
+ * mistyped a URL got one destination and no idea what else existed.
+ */
 export default function NotFound() {
   return (
-    <div
-      style={{
-        minHeight: "60vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        textAlign: "center",
-      }}
-    >
-      <div style={{ maxWidth: "32rem" }}>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-          Page not found
-        </h2>
-        <p style={{ color: "#555", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-          The page you are looking for does not exist or has moved.
+    <div className="flex min-h-full flex-1 items-center justify-center bg-canvas px-5 py-16">
+      <div className="w-full max-w-md text-center">
+        <span
+          aria-hidden="true"
+          className="mx-auto flex size-14 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-200/70"
+        >
+          <Compass className="size-6" />
+        </span>
+
+        <p className="eyebrow mt-6">Error 404</p>
+
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">
+          We couldn&apos;t find that page
+        </h1>
+
+        <p className="mt-2 text-sm leading-relaxed text-muted">
+          The link may be out of date, or the page may have moved. Here are the
+          two places you are most likely headed.
         </p>
-        <Link href="/" style={{ color: "#111", textDecoration: "underline" }}>
-          Go back home
-        </Link>
+
+        <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
+          <Link
+            href="/dashboard"
+            className={buttonClass({ variant: "primary", size: "md" })}
+          >
+            <LayoutDashboard aria-hidden="true" className="size-4" />
+            Go to dashboard
+          </Link>
+
+          <Link
+            href="/appointment"
+            className={buttonClass({ variant: "outline", size: "md" })}
+          >
+            <CalendarDays aria-hidden="true" className="size-4" />
+            View appointments
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -73,7 +73,7 @@ const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
 const domains = config.domains ?? {};
 const projects = config.vercelProjects ?? {};
 const overrides = config.overrides ?? {};
-const secrets = readEnvFile(path.join(ROOT, config.secretsFrom ?? 'apps/admin/.env.local'));
+const secrets = readEnvFile(path.join(ROOT, config.secretsFrom ?? 'apps/admin/.env'));
 
 for (const key of ['client', 'doctor', 'admin']) {
   const d = domains[key];
@@ -112,8 +112,15 @@ const MATRIX = {
       NEXT_PUBLIC_RAZORPAY_KEY_ID: val('NEXT_PUBLIC_RAZORPAY_KEY_ID') || val('RAZORPAY_KEY_ID'),
       NEXT_PUBLIC_GST: overrides.NEXT_PUBLIC_GST ?? '18',
       NEXT_PUBLIC_PLATFORM_FEE: overrides.NEXT_PUBLIC_PLATFORM_FEE ?? '10',
-      SENDGRID_API_KEY: val('SENDGRID_API_KEY'),
-      FROM_EMAIL: val('FROM_EMAIL')
+      // Only SMTP_USER and SMTP_PASSWORD have to be supplied; an empty value here
+      // is treated as a missing variable and aborts the push, so the optional ones
+      // carry the same defaults `packages/mail` applies.
+      SMTP_USER: val('SMTP_USER'),
+      SMTP_PASSWORD: val('SMTP_PASSWORD'),
+      SMTP_HOST: val('SMTP_HOST') || 'smtp.gmail.com',
+      SMTP_PORT: val('SMTP_PORT') || '465',
+      MAIL_FROM_NAME: val('MAIL_FROM_NAME') || 'SheWell',
+      FROM_EMAIL: val('FROM_EMAIL') || val('SMTP_USER')
     }
   },
   doctor: {
@@ -127,6 +134,13 @@ const MATRIX = {
       RAZORPAY_KEY_SECRET: val('RAZORPAY_KEY_SECRET'),
       NEXT_PUBLIC_RAZORPAY_KEY_ID: val('NEXT_PUBLIC_RAZORPAY_KEY_ID') || val('RAZORPAY_KEY_ID'),
       NEXT_PUBLIC_PLATFORM_FEE: overrides.NEXT_PUBLIC_PLATFORM_FEE ?? '10',
+      // The practitioner portal sends its own email-verification codes.
+      SMTP_USER: val('SMTP_USER'),
+      SMTP_PASSWORD: val('SMTP_PASSWORD'),
+      SMTP_HOST: val('SMTP_HOST') || 'smtp.gmail.com',
+      SMTP_PORT: val('SMTP_PORT') || '465',
+      MAIL_FROM_NAME: val('MAIL_FROM_NAME') || 'SheWell',
+      FROM_EMAIL: val('FROM_EMAIL') || val('SMTP_USER'),
       AWS_ACCESS_KEY_ID: val('AWS_ACCESS_KEY_ID'),
       AWS_SECRET_ACCESS_KEY: val('AWS_SECRET_ACCESS_KEY'),
       AWS_REGION: val('AWS_REGION'),
@@ -148,8 +162,15 @@ const MATRIX = {
       AWS_BUCKET: val('AWS_BUCKET'),
       RAZORPAY_KEY_ID: val('RAZORPAY_KEY_ID'),
       RAZORPAY_KEY_SECRET: val('RAZORPAY_KEY_SECRET'),
-      SENDGRID_API_KEY: val('SENDGRID_API_KEY'),
-      FROM_EMAIL: val('FROM_EMAIL')
+      // Only SMTP_USER and SMTP_PASSWORD have to be supplied; an empty value here
+      // is treated as a missing variable and aborts the push, so the optional ones
+      // carry the same defaults `packages/mail` applies.
+      SMTP_USER: val('SMTP_USER'),
+      SMTP_PASSWORD: val('SMTP_PASSWORD'),
+      SMTP_HOST: val('SMTP_HOST') || 'smtp.gmail.com',
+      SMTP_PORT: val('SMTP_PORT') || '465',
+      MAIL_FROM_NAME: val('MAIL_FROM_NAME') || 'SheWell',
+      FROM_EMAIL: val('FROM_EMAIL') || val('SMTP_USER')
     }
   }
 };

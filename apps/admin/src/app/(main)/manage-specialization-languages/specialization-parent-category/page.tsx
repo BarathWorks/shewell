@@ -8,6 +8,7 @@ import SpecializationTable from './specialization-parent-category-table';
 import SpecializationParentCategoryTable from './specialization-parent-category-table';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const SpecializationParentCategoryPage = async () => {
   await requireAdminPage('doctor:read');
 
@@ -40,9 +41,12 @@ const SpecializationParentCategoryPage = async () => {
   });
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <SpecializationParentCategoryTable specializations={specializations} />
-    </Suspense>
+    <>
+      <PageHeader title="Speciality categories" description="Top-level grouping for practitioner specialities." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <SpecializationParentCategoryTable specializations={specializations} />
+      </Suspense>
+    </>
   );
 };
 

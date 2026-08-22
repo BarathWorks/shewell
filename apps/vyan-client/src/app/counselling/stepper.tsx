@@ -23,10 +23,10 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   }}
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
                     isCompleted
-                      ? "cursor-pointer bg-[#00898F] text-white shadow-md"
+                      ? "cursor-pointer bg-primary-600 text-white shadow-md"
                       : isActive
-                        ? "border-2 border-[#00898F] bg-[#F2F9F9] text-[#00898F] shadow-sm"
-                        : "border-2 border-gray-200 bg-white text-gray-400"
+                        ? "border-2 border-primary-600 bg-primary-50 text-primary-700 shadow-sm"
+                        : "border-2 border-hairline bg-white text-gray-400"
                   }`}
                 >
                   {isCompleted ? "✓" : index + 1}
@@ -34,7 +34,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
 
                 {/* Step label — only show for active */}
                 {isActive && (
-                  <span className="text-sm font-semibold text-[#333333]">
+                  <span className="text-sm font-semibold text-ink">
                     {item.title}
                   </span>
                 )}
@@ -42,7 +42,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                 {/* Connector line between steps */}
                 {index < steps.length - 1 && !isActive && (
                   <div
-                    className={`h-[2px] w-6 shrink-0 rounded-full sm:w-8 ${isCompleted ? "bg-[#00898F]" : "bg-gray-200"}`}
+                    className={`h-[2px] w-6 shrink-0 rounded-full sm:w-8 ${isCompleted ? "bg-primary-600" : "bg-gray-200"}`}
                   />
                 )}
               </div>
@@ -64,7 +64,7 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                 {index < steps.length - 1 && (
                   <div className="absolute left-[17px] top-9 z-0 h-10 w-[2px] rounded-full bg-gray-100">
                     <div
-                      className="h-full rounded-full bg-[#00898F] transition-all duration-500"
+                      className="h-full rounded-full bg-primary-600 transition-all duration-500"
                       style={{ height: isCompleted ? "100%" : "0%" }}
                     />
                   </div>
@@ -77,10 +77,10 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   }}
                   className={`relative z-10 mb-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${
                     isCompleted
-                      ? "cursor-pointer border-[#00898F] bg-[#00898F] text-white shadow-md"
+                      ? "cursor-pointer border-primary-600 bg-primary-600 text-white shadow-md"
                       : isActive
-                        ? "border-[#00898F] bg-[#F2F9F9] text-[#00898F] shadow-sm ring-4 ring-[#00898F]/10"
-                        : "cursor-not-allowed border-gray-200 bg-white text-gray-400"
+                        ? "border-primary-600 bg-primary-50 text-primary-700 shadow-sm ring-4 ring-[#00898F]/10"
+                        : "cursor-not-allowed border-hairline bg-white text-gray-400"
                   }`}
                 >
                   {isCompleted ? (
@@ -95,19 +95,19 @@ const Stepper = ({ steps, currentStep, setStep }: IStepperProps) => {
                   <p
                     className={`text-sm font-semibold leading-tight transition-colors ${
                       isActive
-                        ? "text-[#00898F]"
+                        ? "text-primary-700"
                         : isCompleted
-                          ? "text-[#333333]"
+                          ? "text-ink"
                           : "text-[#BBBBBB]"
                     }`}
                   >
                     {item.title}
                   </p>
                   {isActive && (
-                    <p className="mt-0.5 text-xs text-[#999999]">In progress</p>
+                    <p className="mt-0.5 text-xs text-muted">In progress</p>
                   )}
                   {isCompleted && (
-                    <p className="mt-0.5 text-xs text-[#00898F]">Completed</p>
+                    <p className="mt-0.5 text-xs text-primary-700">Completed</p>
                   )}
                 </div>
               </div>

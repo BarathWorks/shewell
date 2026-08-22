@@ -65,6 +65,9 @@ export const searchCommentsRouter = createTRPCRouter({
             professionalUserId,
           },
           select: {
+            // Selected so the history list has a stable React key. Without it
+            // the client rendered those rows with no key at all.
+            id: true,
             startingTime: true,
             endingTime: true,
             createdAt: true,
@@ -79,6 +82,7 @@ export const searchCommentsRouter = createTRPCRouter({
             },
             comments: true,
           },
+          orderBy: { startingTime: "desc" },
         }),
 
         db.bookAppointment.findFirst({

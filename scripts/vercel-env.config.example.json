@@ -15,7 +15,7 @@
     "doctor": "shewell-doctor",
     "admin": "shewell-admin"
   },
-  "secretsFrom": "apps/admin/.env.local",
+  "secretsFrom": "apps/admin/.env",
   "overrides": {
     "NEXT_PUBLIC_GST": "18",
     "NEXT_PUBLIC_PLATFORM_FEE": "10",

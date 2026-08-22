@@ -1,15 +1,42 @@
 "use client";
+
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@repo/ui/src/@/components/button";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { useToast } from "@repo/ui/src/@/components/use-toast";
+import { api } from "~/trpc/react";
+import { Button } from "~/components/ui/button";
+import { Field, TextArea } from "~/components/ui/field";
 import DoctorCommentUserAction from "./doctor-comment-user-action";
-import React from "react";
 
 const schema = z.object({
-  comment: z.string({ required_error: "Please enter the comment" }),
+  comment: z
+    .string({ required_error: "Write a note before saving" })
+    .trim()
+    .min(1, { message: "Write a note before saving" }),
 });
 
+/**
+ * Consultation notes.
+ *
+ * Three behavioural fixes, all of which mattered on a clinical record:
+ *
+ *  - The submit button had no `type`, which in a form defaults to `submit` — so
+ *    it worked, but only by accident, and it carried no pending state, so a slow
+ *    save could be pressed twice and file the same note twice.
+ *  - The failure path was `.catch((err) => console.log(...))`. A note that failed
+ *    to save cleared no field, showed no error, and left the practitioner looking
+ *    at their text with no indication it had not been recorded. It surfaces the
+ *    failure now, and only clears the field on success.
+ *  - Saving did not invalidate the query that lists the notes, so a new note did
+ *    not appear until the sheet was closed and reopened — which reads as the save
+ *    having silently failed.
+ *
+ * The schema also only had `required_error`, so an empty string passed validation
+ * and an empty note could be filed. It is trimmed and length-checked.
+ */
 const DoctorCommentForm = ({
   bookAppointmentId,
 }: {
@@ -17,59 +44,70 @@ const DoctorCommentForm = ({
 }) => {
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
     control,
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: { comment: "" },
   });
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log("data", data);
-    const comments = data.comment;
-    DoctorCommentUserAction({ comments, bookAppointmentId })
-      .then(() => {
-        reset({ comment: "" });
-      })
-      .catch((err) => console.log("error", err));
+  const { toast } = useToast();
+  const trpcContext = api.useUtils();
+
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    try {
+      await DoctorCommentUserAction({
+        comments: data.comment,
+        bookAppointmentId,
+      });
+      reset({ comment: "" });
+      await trpcContext.searchComments.invalidate();
+      toast({ description: "Note saved" });
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error
+            ? error.message
+            : "Couldn't save your note. Try again.",
+        variant: "destructive",
+      });
+    }
   };
+
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-2">
-          <div className="font-inter text-sm font-medium text-active">
-            Add Comment
-          </div>
-          <div>
-            <Controller
-              control={control}
-              name="comment"
-              render={({ field }) => {
-                return (
-                  <>
-                    <textarea
-                      value={field.value}
-                      onChange={field.onChange}
-                      className=" w-full rounded-[5px] border border-border-color p-[17px] font-inter text-sm font-medium text-inactive outline-border-color placeholder:font-inter placeholder:text-sm placeholder:font-medium placeholder:text-inactive"
-                      placeholder="eg: Patient has improvement from previous appointment"
-                    />
-                    {errors && errors.comment && (
-                      <p className="text-red-500">{errors.comment?.message}</p>
-                    )}
-                  </>
-                );
-              }}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+      <Controller
+        control={control}
+        name="comment"
+        render={({ field }) => (
+          <Field
+            label="Add a note"
+            htmlFor={`comment-${bookAppointmentId}`}
+            error={errors.comment?.message}
+          >
+            <TextArea
+              {...field}
+              id={`comment-${bookAppointmentId}`}
+              rows={3}
+              placeholder="e.g. Sleeping better since last session; continue current plan."
+              invalid={Boolean(errors.comment)}
             />
-          </div>
-          <div className="flex gap-[29px] self-end">
-           
-            <Button className="bg-primary px-4 py-2 font-inter text-base  font-medium text-white hover:bg-secondary">
-              Comment
-            </Button>
-          </div>
-        </div>
-      </form>
-    </>
+          </Field>
+        )}
+      />
+
+      <Button
+        type="submit"
+        size="sm"
+        isLoading={isSubmitting}
+        loadingText="Saving…"
+        className="self-end"
+      >
+        Save note
+      </Button>
+    </form>
   );
 };
+
 export default DoctorCommentForm;

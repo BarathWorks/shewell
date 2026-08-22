@@ -45,37 +45,35 @@ const Orders = () => {
   const session = useSession();
 
   return (
-    <>
-      <div className="w-full bg-[#FBFBFB] font-inter">
-        <div className="container mx-auto">
-          <div className="py-4 md:py-6 xl:py-[28px] 2xl:py-[32px]">
-            <Breadcrumb>
-              <BreadcrumbList>
+    <div className="flex flex-col gap-5">
+      <Breadcrumb>
+              <BreadcrumbList className="text-sm text-muted">
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                  <BreadcrumbLink href="/" className="inline-block py-1 hover:text-primary-700">
+              Home
+            </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbLink>Appointments</BreadcrumbLink>
+                  <BreadcrumbLink className="inline-block py-1 text-ink">Appointments</BreadcrumbLink>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+      </Breadcrumb>
 
-          <div className="pb-[32px] lg:pb-[55px] xl:pb-[60px] 2xl:pb-[65px]">
-            <div className="items-start  xl:flex xl:flex-row xl:gap-[46px] 2xl:gap-[60px] ">
-              <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10">
-                <div className="mb-6 flex justify-between font-poppins text-base font-semibold text-[#181818] lg:mb-[30px] lg:text-xl xl:mb-9 xl:text-2xl 2xl:mb-10 2xl:text-[28px] 2xl:leading-[38px]">
-                  <div> Appointments</div>
-                  <div>
+      <div className="surface-card p-5 sm:p-6 lg:p-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold text-ink sm:text-3xl">
+            Appointments
+          </h1>
+          <div className="w-full sm:w-48">
                     <Select
                       value={duration}
                       onValueChange={handleDurationChange}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="h-11 w-full rounded-lg border-hairline-strong bg-surface text-sm font-medium text-ink">
                         <SelectValue placeholder="Past" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
+                      <SelectContent className="rounded-lg border border-hairline bg-surface p-1 shadow-lg">
                         <SelectItem value={Duration.ONE_WEEK}>
                           1 week
                         </SelectItem>
@@ -97,7 +95,7 @@ const Orders = () => {
                 </div>
                 <div>
                   <Tabs defaultValue="Ongoing">
-                    <TabsList className="flex flex-wrap justify-center gap-10 gap-y-5 text-sm font-medium text-[#666666] md:text-base 2xl:text-lg">
+                    <TabsList className="flex flex-wrap justify-center gap-10 gap-y-5 text-sm font-medium text-muted md:text-base 2xl:text-lg">
                       <TabsTrigger
                         className="border-b-primary font-poppins data-[state=active]:border-b-2"
                         value="Ongoing"
@@ -151,12 +149,8 @@ const Orders = () => {
                     </TabsContent>
                   </Tabs>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 export default Orders;

@@ -4,6 +4,7 @@ import { db } from '@/src/server/db';
 import BlogsTable from '@/src/app/(main)/manage-blogs/blogs/blogs-table';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const BlogsPage = async () => {
   await requireAdminPage('content:read');
 
@@ -53,7 +54,12 @@ const BlogsPage = async () => {
     }
   });
   console.log("blogs are",blogs);
-  return <BlogsTable blogs={blogs} blogCategories={blogCategories} />;
+  return (
+    <>
+      <PageHeader title="Blogs" description="Articles published to the patient-facing site." />
+      <BlogsTable blogs={blogs} blogCategories={blogCategories} />
+    </>
+  );
 };
 
 export default BlogsPage;

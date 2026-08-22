@@ -126,7 +126,6 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Admin Users</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
         <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
@@ -141,7 +140,6 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
           <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
           <DataTable
-            stripedRows
             ref={dt}
             value={adminUsers}
             selection={selectedAdminUsers}
@@ -152,7 +150,7 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
             rowsPerPageOptions={[5, 10, 25]}
             className="datatable-responsive"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
             // globalFilter={globalFilter}
             filters={filters}
             globalFilterFields={['id', 'name', 'email']}
@@ -160,12 +158,12 @@ const AdminUsersTable = ({ adminUsers }: { adminUsers: { id: string; email: stri
             header={header}
             exportFilename="Admin Users"
           >
-            <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="email" header="Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="role" header="Role" sortable body={roleBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="active" header="Active" sortable body={activeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
+            <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="email" header="Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="role" header="Role" sortable body={roleBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
+            <Column field="active" header="Active" sortable body={activeBodyTemplate} headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column body={actionBodyTemplate} headerStyle={{ minWidth: '8rem' }} frozen={true}></Column>
           </DataTable>
 
           <Dialog visible={adminUserDialog} style={{ width: '450px' }} header="Admin User Details" modal className="p-fluid" onHide={hideDialog}>

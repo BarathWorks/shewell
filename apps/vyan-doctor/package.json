@@ -27,6 +27,7 @@
     "@repo/aws": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/database": "workspace:*",
+    "@repo/mail": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/typescript-config": "workspace:*",

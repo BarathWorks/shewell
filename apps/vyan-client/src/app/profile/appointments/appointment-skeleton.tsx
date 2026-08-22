@@ -4,7 +4,7 @@ const AppointmentSkeleton = () => {
       {[...Array(2)].map((_, index) => (
         <div
           key={index}
-          className="flex flex-col gap-4 p-4 rounded-md border border-gray-300 animate-pulse md:flex-row md:justify-between"
+          className="flex flex-col gap-4 p-4 rounded-md border border-hairline-strong animate-pulse md:flex-row md:justify-between"
         >
           {/* Left Section */}
           <div className="flex flex-col gap-4">

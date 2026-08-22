@@ -209,6 +209,49 @@ describe("data exposure", () => {
   });
 
   /**
+   * SW-06b: a bare `findMany`/`findFirst` on the practitioner model returns every
+   * column, which is how an unauthenticated search endpoint came to serve
+   * `passwordHash`, `bankAccountNumber`, `bankIfscCode` and the Google OAuth
+   * tokens to anyone who called it.
+   *
+   * The `include` rule above did not catch it: the query named no relation at all,
+   * it simply omitted `select`. Any router query against ProfessionalUser has to
+   * name its columns.
+   */
+  it("never queries the practitioner model without a projection in a router", () => {
+    const routers = APPS.flatMap((a) =>
+      walk(path.join(ROOT, "apps", a, "src", "server", "api", "routers")),
+    );
+
+    const offenders: string[] = [];
+    for (const file of routers) {
+      const src = code(file);
+
+      // Each `db.professionalUser.findX({ ... })` call, matched to its closing
+      // brace by tracking depth — the argument object nests, so a regex alone
+      // cannot find where it ends.
+      const call = /db\.professionalUser\.(findMany|findFirst|findUnique)\s*\(\s*\{/g;
+      let match: RegExpExecArray | null;
+
+      while ((match = call.exec(src)) !== null) {
+        let depth = 1;
+        let i = call.lastIndex;
+        while (i < src.length && depth > 0) {
+          if (src[i] === "{") depth++;
+          else if (src[i] === "}") depth--;
+          i++;
+        }
+        const args = src.slice(call.lastIndex, i - 1);
+        if (!/\bselect\s*:/.test(args)) {
+          offenders.push(`${rel(file)} queries professionalUser without select`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  /**
    * SW-08: the paid session's join link was selected in a public procedure and
    * passed to a client component for every visitor.
    */

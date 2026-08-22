@@ -1,116 +1,114 @@
 "use client";
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React from "react";
 import { Globe, ShieldCheck, Users, Banknote, Award } from "lucide-react";
 import Image from "next/image";
+import SectionHeader from "./section-header";
 
 const WHY_SHEWELL_DATA = [
-    {
-        id: 1,
-        title: "India's Leading Digital Wellness Hub for Women & Children",
-        description:
-            "Trusted by moms and experts alike, providing a safe space for postpartum and maternal care.",
-        icon: <Users className="w-6 h-6" />,
-    },
-    {
-        id: 2,
-        title: "Most affordable virtual health services.",
-        description:
-            "Expert sessions, holistic care, and evidence-based guidance—without the premium price tag.",
-        icon: <Banknote className="w-6 h-6" />,
-    },
-    {
-        id: 3,
-        title: "Data-Protected, Globally Certified",
-        description:
-            "Secure, HIPAA, and GDPR compliant systems for your peace of mind.",
-        icon: <ShieldCheck className="w-6 h-6" />,
-    },
-    {
-        id: 4,
-        title: "Across Borders, Across Cultures",
-        description:
-            "Clients from 110+ countries served with care that respects cultural nuances.",
-        icon: <Globe className="w-6 h-6" />,
-    },
-    {
-        id: 5,
-        title: "World-Class Experts, One Click Away",
-        description:
-            "Certified professionals specializing in nutrition, mental health, and pediatric care.",
-        icon: <Award className="w-6 h-6" />,
-    },
+  {
+    id: 1,
+    title: "India's Leading Digital Wellness Hub for Women & Children",
+    description:
+      "Trusted by moms and experts alike, providing a safe space for postpartum and maternal care.",
+    Icon: Users,
+  },
+  {
+    id: 2,
+    title: "Most affordable virtual health services.",
+    description:
+      "Expert sessions, holistic care, and evidence-based guidance—without the premium price tag.",
+    Icon: Banknote,
+  },
+  {
+    id: 3,
+    title: "Data-Protected, Globally Certified",
+    description:
+      "Secure, HIPAA, and GDPR compliant systems for your peace of mind.",
+    Icon: ShieldCheck,
+  },
+  {
+    id: 4,
+    title: "Across Borders, Across Cultures",
+    description:
+      "Clients from 110+ countries served with care that respects cultural nuances.",
+    Icon: Globe,
+  },
+  {
+    id: 5,
+    title: "World-Class Experts, One Click Away",
+    description:
+      "Certified professionals specializing in nutrition, mental health, and pediatric care.",
+    Icon: Award,
+  },
 ];
 
+/**
+ * Why Shewell.
+ *
+ * Two fixes beyond the restyle:
+ *
+ *  - Each item's description was rendered only while that item was hovered. On a
+ *    touch screen there is no hover, so on every phone this section was five bare
+ *    headlines and the substance — HIPAA and GDPR compliance, 110+ countries, the
+ *    pricing claim — was unreachable. The descriptions are always visible now.
+ *    Nothing is hidden and there is no interaction to discover.
+ *
+ *  - The two columns were `lg:w-[50%]` and `lg:w-[60%]`, which is 110% of the
+ *    row. Flex shrank them back to fit, so the declared proportions were not what
+ *    rendered and the gap between them collapsed at some widths. It is a 12-column
+ *    grid now, split 5/7.
+ */
 const WhyShewell = () => {
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
+  return (
+    <section className="section-y bg-surface">
+      <div className="container-page">
+        <SectionHeader
+          eyebrow="Why Shewell"
+          title="Care you can rely on"
+          lead="Clinical rigour, cultural understanding and pricing that does not put expert guidance out of reach."
+        />
 
-    return (
-      <section className="overflow-hidden  bg-[#F5F5F5] px-4 py-16 sm:px-6 sm:py-24 md:px-12 md:py-32 lg:px-[100px]">
-        <div className="flex h-full w-full flex-col items-stretch gap-3 sm:gap-4 md:gap-6 lg:flex-row lg:gap-8">
-          {/* Left Image Section */}
-          <div className="relative h-[300px] w-full overflow-hidden rounded-2xl shadow-lg sm:h-[400px] sm:rounded-3xl md:h-[500px] lg:h-[500px] lg:w-[50%]">
+        <div className="mt-10 grid grid-cols-1 gap-6 md:mt-14 lg:grid-cols-12 lg:gap-8">
+          {/* Image */}
+          <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-hairline sm:h-80 lg:col-span-5 lg:h-auto lg:min-h-[30rem]">
             <Image
               src="/home/why-shewell.webp"
-              alt="Why Shewell"
+              alt=""
               fill
               className="object-cover"
-              priority
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 40vw"
             />
           </div>
 
-          {/* Right List */}
-          <div className="flex w-full flex-col justify-between gap-2 sm:gap-3 lg:w-[60%]">
+          {/* Points */}
+          <ul className="flex flex-col gap-3 lg:col-span-7">
             {WHY_SHEWELL_DATA.map((item) => (
-              <motion.div
+              <li
                 key={item.id}
-                onMouseEnter={() => setHoveredId(item.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 shadow-sm transition-all duration-300 sm:gap-4 sm:rounded-2xl sm:p-4 md:rounded-3xl ${
-                  hoveredId === item.id
-                    ? "border-[#007D79] bg-[#00898F] shadow-lg"
-                    : "border-transparent bg-white hover:shadow-md"
-                }`}
+                className="surface-card surface-card-interactive flex flex-1 items-start gap-4 p-4 sm:p-5"
               >
-                {/* Icon Circle */}
-                <div
-                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-colors duration-300 sm:h-12 sm:w-12 ${
-                    hoveredId === item.id
-                      ? "bg-white text-[#007D79]"
-                      : "bg-[#E0F2F1] text-[#007D79]"
-                  }`}
+                <span
+                  aria-hidden="true"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600"
                 >
-                  {item.icon}
-                </div>
+                  <item.Icon className="size-5" />
+                </span>
 
-                <div className="min-w-0 flex-1">
-                  <h3
-                    className={`line-clamp-2 text-xs font-medium transition-colors duration-300 sm:text-base md:text-lg ${
-                      hoveredId === item.id ? "text-white" : "text-[#4A4A4A]"
-                    }`}
-                  >
+                <div className="min-w-0">
+                  <h3 className="text-[15px] font-semibold leading-snug text-ink sm:text-base">
                     {item.title}
                   </h3>
-                  {/* Description shows on hover */}
-                  {hoveredId === item.id && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-1 text-xs leading-relaxed text-white/90 sm:mt-2 sm:text-sm"
-                    >
-                      {item.description}
-                    </motion.p>
-                  )}
+                  <p className="mt-1.5 text-sm leading-relaxed text-body">
+                    {item.description}
+                  </p>
                 </div>
-              </motion.div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
-      </section>
-    );
+      </div>
+    </section>
+  );
 };
 
 export default WhyShewell;

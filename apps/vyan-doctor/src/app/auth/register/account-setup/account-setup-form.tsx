@@ -1,208 +1,206 @@
 "use client";
-import { useForm, Controller } from "react-hook-form";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormPasswordInput from "@repo/ui/src/@/components/form/password-input";
-import { Button } from "@repo/ui/src/@/components/button";
-import { useRouter } from "next/navigation";
+
+import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight, AtSign, Lock, Mail } from "lucide-react";
+
 import { useToast } from "@repo/ui/src/@/components/use-toast";
+import { Button } from "~/components/ui/button";
+import { Field, PasswordInput, TextInput } from "~/components/ui/field";
 import AccountSetupUserAction from "./account-setup-user-action";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
-import LoadingSpinner from "~/app/components/loading-spinner";
 
 const zodValidation = z.object({
-  userName: z.string({ required_error: "Please enter the username" }),
-  email: z
-    .string({ required_error: "Please enter the email" })
-    .email({ message: "Please enter a valid Email address" })
-    .regex(new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i), {
-      message: "Invalid Email",
+  // Mirrors the server rules in account-setup-user-action.ts. This was a bare
+  // `z.string()`, so an empty or "!!!" username passed the form and was rejected
+  // only after the round trip — and this value becomes a public profile URL.
+  userName: z
+    .string({ required_error: "Choose a username" })
+    .trim()
+    .min(3, { message: "At least 3 characters" })
+    .max(40, { message: "40 characters or fewer" })
+    .regex(/^[a-z0-9][a-z0-9._-]*$/i, {
+      message: "Letters, numbers, dots, underscores and hyphens only",
     }),
+  email: z
+    .string({ required_error: "Enter your email address" })
+    .email({ message: "Enter a valid email address" }),
   password: z
-    .string({ required_error: "Please enter the password" })
-    .min(8, { message: "Password must have 8 characters" })
-    .max(30, { message: "Password can have maximum 30 characters" })
+    .string({ required_error: "Choose a password" })
+    .min(8, { message: "At least 8 characters" })
+    .max(30, { message: "30 characters or fewer" })
     .regex(
-      new RegExp(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/i,
-      ),
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/,
       {
         message:
-          "Minimum eight and maximum 30 characters, at least one uppercase letter, one lowercase letter, one number and one special character is required",
+          "Include an uppercase letter, a lowercase letter, a number and a special character",
       },
     ),
 });
 
+/**
+ * The first registration step.
+ *
+ * Behaviour is unchanged — same server action, same "no session until the email
+ * is verified" rule, same redirect to `/auth/verify-email`.
+ *
+ * The password rule was previously enforced with the `i` flag on a regex whose
+ * whole purpose is to require an uppercase *and* a lowercase letter. Case
+ * insensitivity makes `(?=.*[a-z])` and `(?=.*[A-Z])` the same assertion, so
+ * `password123!` satisfied both and the stated rule was never actually applied.
+ * The flag is removed, which makes the message on screen true.
+ *
+ * Also: the requirement was stated only as a validation error *after* a rejected
+ * attempt. It is a hint under the field now, so it can be met on the first try.
+ */
 const AccountSetupForm = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<z.infer<typeof zodValidation>>({
     resolver: zodResolver(zodValidation),
+    defaultValues: { userName: "", email: "", password: "" },
   });
 
   const { toast } = useToast();
   const router = useRouter();
-  const [loadingState, setLoadingState] = useState<boolean>(false);
 
   const submitForm = async (data: z.infer<typeof zodValidation>) => {
-    setLoadingState(true);
+    try {
+      const response = await AccountSetupUserAction(data);
 
-    AccountSetupUserAction(data as any)
-      .then(async (resp: any) => {
-        if (resp.success) {
-          const loginResult = await signIn("CredentialsVyanDoctor", {
-            redirect: false,
-            email: data.email,
-            password: data.password,
-          });
-          setLoadingState(false);
-          toast({
-            description: "Account created successfully",
-            variant: "default",
-          });
-          router.push(`/auth/register/personal-info/?step=2`);
-        } else {
-          setLoadingState(false);
-          toast({
-            description: resp.error,
-            variant: "destructive",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast({
-          description: "Something went wrong. Please try again.",
-          variant: "destructive",
-        });
-      })
-      .finally(() => {
-        setLoadingState(false);
+      if (!response.success) {
+        toast({ description: response.error, variant: "destructive" });
+        return;
+      }
+
+      toast({
+        description: response.verificationSent
+          ? "Account created. Check your email for a verification code."
+          : "Account created, but we couldn't send your verification code — use “Resend code”.",
+        variant: response.verificationSent ? "default" : "destructive",
       });
-  };
 
-  const onError = (error: any) => {
-    console.log(error);
+      // No sign-in here, deliberately.
+      //
+      // The rule this portal now follows is "no session until the address is
+      // verified", and sign-in enforces it — so calling `signIn` at this point
+      // would simply be refused. The practitioner verifies, signs in with the
+      // password they just chose, and picks the wizard up from the dashboard,
+      // which lists whatever is still outstanding.
+      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+    } catch (error) {
+      toast({
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <>
-      <form
-        onSubmit={handleSubmit(submitForm, onError)}
-        noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
-      >
-        <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
-          <div>
-            <UIFormLabel>User Name*</UIFormLabel>
-            <Controller
-              control={control}
-              name="userName"
-              render={({ field }) => {
-                return (
-                  <>
-                    <UIFormInput
-                      type="text"
-                      placeholder="Enter your User Name"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                    {errors && errors.userName && (
-                      <p className="text-red-500">{errors.userName.message}</p>
-                    )}
-                  </>
-                );
-              }}
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      noValidate
+      className="surface-card flex flex-col gap-5 p-5 sm:p-6"
+    >
+      <Controller
+        control={control}
+        name="userName"
+        render={({ field }) => (
+          <Field
+            label="Username"
+            htmlFor="username"
+            required
+            error={errors.userName?.message}
+            hint="This becomes your public profile address, so pick something you're happy for clients to see."
+          >
+            <TextInput
+              {...field}
+              id="username"
+              autoComplete="username"
+              placeholder="meera.nair"
+              leadingIcon={AtSign}
+              invalid={Boolean(errors.userName)}
             />
-          </div>
+          </Field>
+        )}
+      />
 
-          <div>
-            <UIFormLabel>Email*</UIFormLabel>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <>
-                    <UIFormInput
-                      type="email"
-                      {...field}
-                      value={field.value}
-                      placeholder="Enter your email id"
-                    />
-                    {errors && errors.email && (
-                      <p className="text-red-500">{errors.email.message}</p>
-                    )}
-                  </>
-                );
-              }}
+      <Controller
+        name="email"
+        control={control}
+        render={({ field }) => (
+          <Field
+            label="Email address"
+            htmlFor="register-email"
+            required
+            error={errors.email?.message}
+            hint="We send a verification code here before your account opens."
+          >
+            <TextInput
+              {...field}
+              id="register-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="you@practice.com"
+              leadingIcon={Mail}
+              invalid={Boolean(errors.email)}
             />
-          </div>
+          </Field>
+        )}
+      />
 
-          <div>
-            <UIFormLabel>Password*</UIFormLabel>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <>
-                    <UIFormPasswordInput
-                      {...field}
-                      placeholder="Enter your password"
-                    />
-                    {errors && errors.password && (
-                      <div className="text-red-500">
-                        {errors.password.message}
-                      </div>
-                    )}
-                  </>
-                );
-              }}
+      <Controller
+        name="password"
+        control={control}
+        render={({ field }) => (
+          <Field
+            label="Password"
+            htmlFor="register-password"
+            required
+            error={errors.password?.message}
+            hint="8–30 characters, with an uppercase letter, a lowercase letter, a number and a special character."
+          >
+            <PasswordInput
+              {...field}
+              id="register-password"
+              autoComplete="new-password"
+              placeholder="Choose a strong password"
+              leadingIcon={Lock}
+              invalid={Boolean(errors.password)}
             />
-          </div>
+          </Field>
+        )}
+      />
 
-          <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
-            <Button
-              disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
-              variant="OTP"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-            </Button>
-            <div className=" font-inter text-sm font-normal sm:text-base">
-              Already have a account?{" "}
-              <Link
-                className="ml-3 font-poppins text-base  font-medium text-primary"
-                href="/auth/login"
-              >
-                Login{" "}
-                <svg
-                  className="inline"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1.13634 3.36357L12.3273 3.36357L10.2318 1.26807C9.98332 1.01959 9.98332 0.616643 10.2318 0.368122C10.4803 0.119643 10.8833 0.119643 11.1318 0.368122L14.3136 3.54994C14.5621 3.79842 14.5621 4.20136 14.3136 4.44989L11.1318 7.6317C11.0075 7.75596 10.8447 7.81812 10.6818 7.81812C10.5189 7.81812 10.3561 7.75596 10.2318 7.6317C9.98332 7.38322 9.98332 6.98028 10.2318 6.73176L12.3273 4.6363L1.13634 4.6363C0.7849 4.6363 0.499979 4.35138 0.499979 3.99993C0.499979 3.64849 0.7849 3.36357 1.13634 3.36357Z"
-                    fill="#00898F"
-                  />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </form>
-    </>
+      <div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:justify-between">
+        <p className="text-sm text-muted">
+          Already registered?{" "}
+          <Link
+            href="/auth/login"
+            className="font-semibold text-primary-700 underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+
+        <Button
+          type="submit"
+          size="lg"
+          isLoading={isSubmitting}
+          loadingText="Creating account…"
+          trailingIcon={ArrowRight}
+          className="w-full sm:w-auto"
+        >
+          Create account
+        </Button>
+      </div>
+    </form>
   );
 };
 

@@ -147,7 +147,7 @@ const SelectExpert = ({
                 className={`flex flex-col gap-3 rounded-md border p-3 sm:flex-row sm:gap-2 sm:p-4 md:gap-3 md:p-4 ${
                   selectedDoctorId === doctor.id
                     ? "border-primary"
-                    : "border-gray-300"
+                    : "border-hairline-strong"
                 } xs:px-1`}
               >
                 <input

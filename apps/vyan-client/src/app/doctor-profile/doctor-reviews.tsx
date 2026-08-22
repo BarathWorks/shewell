@@ -244,7 +244,7 @@ const oneRatingPer = (oneRating / length) * 100;
               <div className="font-inter text-sm font-normal text-inactive xl:text-base">
                 {item.review}
               </div>
-              <div className="font-inter text-sm font-normal text-[#949494]">
+              <div className="font-inter text-sm font-normal text-muted">
                   {" "}
                   Posted on{" "}
                   {format(new Date(item.createdAt), "MMMM dd , yyyy")}

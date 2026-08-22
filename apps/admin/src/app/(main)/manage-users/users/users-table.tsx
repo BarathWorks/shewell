@@ -72,7 +72,6 @@ const UsersTable = ({ users }: { users: IUser[] }) => {
 
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h5 className="m-0">Customers</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
         <InputText
@@ -105,8 +104,8 @@ const UsersTable = ({ users }: { users: IUser[] }) => {
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
           >
             <Column field="name" header="Name" sortable headerStyle={{ minWidth: '12rem' }}></Column>
-            <Column field="email" header="Email" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-            <Column field="phoneNumber" header="Phone" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="email" header="Email" sortable headerStyle={{ minWidth: '9rem' }}></Column>
+            <Column field="phoneNumber" header="Phone" headerStyle={{ minWidth: '8rem' }}></Column>
             <Column field="registrationCount" header="Sessions" sortable headerStyle={{ minWidth: '7rem' }}></Column>
             <Column field="createdAt" header="Joined" sortable body={joinedBody} headerStyle={{ minWidth: '9rem' }}></Column>
             <Column header="Status" body={statusBody} headerStyle={{ minWidth: '8rem' }}></Column>

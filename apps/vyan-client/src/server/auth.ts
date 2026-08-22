@@ -152,6 +152,10 @@ export const authOptions: NextAuthOptions = {
               verifiedAt: {
                 not: null,
               },
+              // A closed account must not be able to sign in. The OTP-issuing
+              // action already refuses these; without the same filter here the
+              // password path stayed open to them.
+              deletedAt: null,
             },
           }),
         ]);
@@ -243,6 +247,7 @@ export const authOptions: NextAuthOptions = {
             where: {
               email: credentials.email,
               verifiedAt: { not: null },
+              deletedAt: null,
             },
           }),
         ]);

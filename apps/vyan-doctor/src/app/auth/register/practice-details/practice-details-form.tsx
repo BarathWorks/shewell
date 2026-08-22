@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/src/@/components/button";
@@ -137,7 +137,7 @@ const PracticeDetailsForm = ({
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6"
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6">
           {/* Department */}
@@ -156,7 +156,7 @@ const PracticeDetailsForm = ({
                     onChange={field.onChange}
                   />
                   {errors?.department && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.department.message}
                     </p>
                   )}
@@ -182,7 +182,7 @@ const PracticeDetailsForm = ({
                       onChange={field.onChange}
                     />
                     {errors?.position && (
-                      <p className="text-red-500 text-sm">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.position.message}
                       </p>
                     )}
@@ -205,7 +205,7 @@ const PracticeDetailsForm = ({
                       onChange={field.onChange}
                     />
                     {errors?.location && (
-                      <p className="text-red-500 text-sm">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.location.message}
                       </p>
                     )}
@@ -232,7 +232,7 @@ const PracticeDetailsForm = ({
                     onChange={field.onChange}
                   />
                   {errors?.experience && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.experience.message}
                     </p>
                   )}
@@ -253,7 +253,7 @@ const PracticeDetailsForm = ({
                     value={field.value || ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-md border border-solid border-hairline py-3 pl-4 font-inter text-sm font-normal outline-primary">
                       <SelectValue placeholder="Select Session Mode" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -263,7 +263,7 @@ const PracticeDetailsForm = ({
                     </SelectContent>
                   </Select>
                   {errors?.sessionMode && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.sessionMode.message}
                     </p>
                   )}
@@ -284,7 +284,7 @@ const PracticeDetailsForm = ({
                     value={field.value || ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-md border border-solid border-hairline py-3 pl-4 font-inter text-sm font-normal outline-primary">
                       <SelectValue placeholder="Select Listing Type" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -297,7 +297,7 @@ const PracticeDetailsForm = ({
                     </SelectContent>
                   </Select>
                   {errors?.listing && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.listing.message}
                     </p>
                   )}
@@ -310,12 +310,12 @@ const PracticeDetailsForm = ({
           <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
             <Button
               disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
               type="submit"
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-base font-normal">
               Already have a account?{" "}

@@ -23,6 +23,21 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_CLIENT_ID: z.string(),
     RAZORPAY_KEY_SECRET: z.string(),
+
+    // Mail — SMTP via Nodemailer (see `packages/mail`). Required in production only,
+    // matching NEXTAUTH_SECRET above: without it a practitioner cannot verify their
+    // email address, so a production deploy missing it should fail at build with a
+    // named variable rather than at the first signup.
+    SMTP_USER:
+      process.env.NODE_ENV === "production" ? z.string().email() : z.string().optional(),
+    SMTP_PASSWORD:
+      process.env.NODE_ENV === "production" ? z.string().min(1) : z.string().optional(),
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.string().optional(),
+    SMTP_SECURE: z.string().optional(),
+    MAIL_FROM_NAME: z.string().optional(),
+    // Optional: `@repo/mail` falls back to SMTP_USER.
+    FROM_EMAIL: z.string().email().optional(),
     AWS_ACCESS_KEY_ID : z.string(),
     AWS_SECRET_ACCESS_KEY : z.string(),
     AWS_REGION :z.string(),
@@ -56,6 +71,13 @@ export const env = createEnv({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_SECURE: process.env.SMTP_SECURE,
+    MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
+    FROM_EMAIL: process.env.FROM_EMAIL,
     NEXT_PUBLIC_USER: process.env.NEXT_PUBLIC_USER,
     NEXT_PUBLIC_PROFESSIONAL: process.env.NEXT_PUBLIC_PROFESSIONAL,
     NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,

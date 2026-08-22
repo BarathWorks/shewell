@@ -6,6 +6,7 @@ import React, { Suspense } from 'react';
 import SessionTable from './session-table';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const Sessions = async () => {
   await requireAdminPage('session:read');
 
@@ -39,9 +40,12 @@ const Sessions = async () => {
 
   return (
     <>
-      <Suspense fallback={<Skeleton className="tw-bg-red-200" width="100%" height="100px" />}>
-        <SessionTable sessions={sessions as any} categories={categories as any} />
-      </Suspense>
+      <PageHeader title="Sessions" description="Expert-led group sessions and their scheduling." />
+      <>
+        <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+          <SessionTable sessions={sessions as any} categories={categories as any} />
+        </Suspense>
+      </>
     </>
   );
 };

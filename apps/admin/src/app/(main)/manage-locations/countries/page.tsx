@@ -6,6 +6,7 @@ import CountriesTable from './countries-table';
 import { Skeleton } from 'primereact/skeleton';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const Countries = async () => {
   await requireAdminPage('content:read');
 
@@ -32,9 +33,12 @@ const Countries = async () => {
   });
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <CountriesTable countries={countries} />
-    </Suspense>
+    <>
+      <PageHeader title="Countries" description="Reference data used by practitioner addresses." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <CountriesTable countries={countries} />
+      </Suspense>
+    </>
   );
 };
 

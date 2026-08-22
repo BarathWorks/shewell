@@ -108,17 +108,17 @@ useEffect(() => {
                   className="flex w-full flex-col gap-[14px] rounded-[8px] px-2  py-2 border md:p-3 lg:p-4 xl:p-5 2xl:p-6"
                 >
                   {item.status === BookAppointmentStatus.PAYMENT_SUCCESSFUL && (
-                    <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-red-500">
+                    <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-red-500">
                       Pending..
                     </div>
                   )}
                   {item.status === BookAppointmentStatus.CANCELLED && (
-                    <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-red-500">
+                    <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-red-500">
                       Session Cancelled
                     </div>
                   )}
                   {item.status === BookAppointmentStatus.COMPLETED && (
-                    <div className="self-end rounded-lg bg-[#E6F4EE] px-2 py-1 font-inter text-xs font-medium text-secondary">
+                    <div className="self-end rounded-lg bg-secondary-50 px-2 py-1 font-inter text-xs font-medium text-secondary">
                       Session Completed
                     </div>
                   )}
@@ -273,7 +273,7 @@ useEffect(() => {
                             <div className="font-inter text-sm font-semibold text-primary md:text-[15px] md:leading-[22px] xl:text-base ">
                               Message:
                             </div>
-                            <div className="font-inter text-xs font-normal text-[#898989] xl:text-sm">
+                            <div className="font-inter text-xs font-normal text-muted xl:text-sm">
                               {item.patient.message}
                             </div>
                           </div>
@@ -339,7 +339,7 @@ useEffect(() => {
                                     );
                                   handleCancelDialog();
                                 }}
-                                className="bg-white px-4 py-2 font-inter text-sm font-medium text-[#CA0000] hover:bg-white"
+                                className="bg-white px-4 py-2 font-inter text-sm font-medium text-danger-600 hover:bg-white"
                               >
                                 Cancel{" "}
                               </Button>
@@ -374,7 +374,7 @@ useEffect(() => {
                             </div>
                           </div>
                           {new Date(item.startingTime) > currentTime && (
-                            <div className="font-inter text-[10px] font-medium leading-[12px] text-[#CA0000] md:text-xs lg:order-first ">
+                            <div className="font-inter text-[10px] font-medium leading-[12px] text-danger-600 md:text-xs lg:order-first ">
                               *Cancellation of appointment can be done before 2
                               hrs of booked time
                             </div>
@@ -439,11 +439,11 @@ useEffect(() => {
           {Math.abs(
             differenceInMinutes(cancelAppointmentStartingTime!, currentTime),
           ) > 120 ? (
-            <div className="font-inter text-[#CA0000]">
+            <div className="font-inter text-danger-600">
               You wil get full refund
             </div>
           ) : (
-            <div className="font-inter text-[#CA0000]">
+            <div className="font-inter text-danger-600">
               You will not get any refund
             </div>
           )}

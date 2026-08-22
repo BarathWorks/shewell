@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import {
   useForm,
   SubmitHandler,
@@ -362,7 +362,7 @@ const UploadForm = ({
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
           {/* upload your image */}
@@ -429,7 +429,7 @@ const UploadForm = ({
           </div>
 
           {!aadharCard && (
-            <p className="text-red-500">Please upload your Aadhar Card</p>
+            <p className="mt-1.5 text-xs font-medium text-danger-600">Please upload your Aadhar Card</p>
           )}
           {aadharCard && (
             <div className="flex flex-wrap gap-2 items-center">
@@ -484,7 +484,7 @@ const UploadForm = ({
           </div>
 
           {!panCard && (
-            <p className="text-red-500">Please upload your Pan Card</p>
+            <p className="mt-1.5 text-xs font-medium text-danger-600">Please upload your Pan Card</p>
           )}
           {panCard && (
             <div className="flex flex-wrap gap-2 items-center">
@@ -690,7 +690,7 @@ const UploadForm = ({
             </div>
           ))}
           {documents.length < 1 && (
-            <p className="text-red-500">Please upload your documents</p>
+            <p className="mt-1.5 text-xs font-medium text-danger-600">Please upload your documents</p>
           )}
           {documents.length > 0 && (
             <div className="flex flex-wrap gap-2 items-center ">
@@ -743,7 +743,7 @@ const UploadForm = ({
                       onChange={field.onChange}
                     />
                     {errors && errors.aboutYou && (
-                      <p className="text-red-500">{errors.aboutYou.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.aboutYou.message}</p>
                     )}
                   </>
                 );
@@ -756,7 +756,7 @@ const UploadForm = ({
           <div className="flex flex-col items-center justify-center gap-4 ">
             <Button
               disabled={loadingState}
-              className="w-[260px] sm:w-[325px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
               type="submit"
               onClick={() => {
@@ -764,7 +764,7 @@ const UploadForm = ({
               }}
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-base font-normal">
               Already have a account?{" "}

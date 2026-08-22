@@ -15,7 +15,7 @@ const RecentBlog=({ fileUrl, title, createdAt, body, slug }: BlogCardProps)=>{
     const router=useRouter();
     return(
         <>
-         <div className="flex items-center gap-4 border-b-[1px] border-[#00898F] py-4 align-middle">
+         <div className="flex items-center gap-4 border-b-[1px] border-primary-600 py-4 align-middle">
                       <div className="relative aspect-[4/3] h-[90px] cursor-pointer" onClick={()=>router.push(`/blogs/${slug}`)}>
                         <Image
                           src={fileUrl}

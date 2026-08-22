@@ -55,6 +55,11 @@ const zodValidation = z.object({
 });
 
 const RegisterForm = () => {
+  const searchParams = useSearchParams();
+  // The login page links here as `?email=…` when no account was found, so the
+  // address the user already typed is not asked for a second time.
+  const prefilledEmail = searchParams?.get("email") ?? "";
+
   const {
     register,
     handleSubmit,
@@ -64,14 +69,17 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm<z.infer<typeof zodValidation>>({
     resolver: zodResolver(zodValidation),
+    defaultValues: { email: prefilledEmail },
   });
 
   const { toast } = useToast();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [openOTPDialog, setOpenOTPDialog] = useState<boolean>(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const submitForm = async (data: z.infer<typeof zodValidation>) => {
+    setIsSubmitting(true);
     RegisterUserAction(data as ISignUpFields)
       .then(async (resp: any) => {
         if (resp.success) {
@@ -89,12 +97,13 @@ const RegisterForm = () => {
           });
         }
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           variant: "destructive",
           title: "Something went wrong. Please try again.",
         });
-      });
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   const onError = (error: unknown) => {
@@ -103,17 +112,17 @@ const RegisterForm = () => {
 
   return (
     <>
-      <div className="mb-6 w-full text-center font-poppins text-2xl font-semibold text-[#333333] md:mb-8 md:text-left xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
+      <div className="mb-6 w-full text-center font-poppins text-2xl font-semibold text-ink md:mb-8 md:text-left xl:mb-9 2xl:mb-[50px] 2xl:text-3xl">
         Create your free account
       </div>
       <form
         onSubmit={handleSubmit(submitForm, onError)}
         noValidate={true}
-        className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
+        className="rounded-3xl border border-hairline bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10"
       >
         <div className="flex flex-col gap-6">
           <div>
-            <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+            <UIFormLabel className="font-poppins text-sm font-medium text-ink">
               Name*
             </UIFormLabel>
             <Controller
@@ -127,7 +136,7 @@ const RegisterForm = () => {
                       {...field}
                       value={field.value}
                       placeholder="Enter your name"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {errors && errors.name && (
                       <p className="mt-1 text-xs text-red-500">
@@ -141,7 +150,7 @@ const RegisterForm = () => {
           </div>
 
           <div>
-            <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+            <UIFormLabel className="font-poppins text-sm font-medium text-ink">
               Email*
             </UIFormLabel>
             <Controller
@@ -155,7 +164,7 @@ const RegisterForm = () => {
                       {...field}
                       value={field.value}
                       placeholder="Enter your email id"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {errors && errors.email && (
                       <p className="mt-1 text-xs text-red-500">
@@ -169,7 +178,7 @@ const RegisterForm = () => {
           </div>
 
           <div>
-            <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+            <UIFormLabel className="font-poppins text-sm font-medium text-ink">
               Phone Number*
             </UIFormLabel>
             <Controller
@@ -183,7 +192,7 @@ const RegisterForm = () => {
                       {...field}
                       value={field.value}
                       placeholder="Enter your phone number"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {errors && errors.phoneNumber && (
                       <p className="mt-1 text-xs text-red-500">
@@ -196,7 +205,7 @@ const RegisterForm = () => {
             />
           </div>
           <div>
-            <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+            <UIFormLabel className="font-poppins text-sm font-medium text-ink">
               Password*
             </UIFormLabel>
             <Controller
@@ -208,7 +217,7 @@ const RegisterForm = () => {
                     <UIFormPasswordInput
                       {...field}
                       placeholder="Enter your password"
-                      className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                      className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                     />
                     {errors && errors.password && (
                       <div className="mt-1 text-xs text-red-500">
@@ -232,7 +241,7 @@ const RegisterForm = () => {
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
-                    <div className="font-inter text-sm font-normal text-[#666666]">
+                    <div className="font-inter text-sm font-normal text-muted">
                       Are you above 18 years ?
                     </div>
                   </div>
@@ -250,14 +259,14 @@ const RegisterForm = () => {
             type="submit"
             className="mx-auto w-full rounded-xl py-6 font-poppins text-base font-semibold md:w-[324px]"
             variant="OTP"
+            disabled={isSubmitting}
           >
-            {" "}
-            Get OTP
+            {isSubmitting ? "Sending OTP..." : "Get OTP"}
           </Button>
-          <div className="text-center font-inter text-base font-normal text-[#666666]">
+          <div className="text-center font-inter text-base font-normal text-muted">
             Already have a account?{" "}
             <Link
-              className="ml-2 font-poppins text-base font-medium text-[#00898F] hover:underline"
+              className="ml-2 font-poppins text-base font-medium text-primary-700 hover:underline"
               href="/auth/login"
             >
               Login{" "}

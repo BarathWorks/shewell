@@ -9,7 +9,9 @@ import {
 } from "@repo/ui/src/@/components/dialog";
 import { Calendar } from "@repo/ui/src/@/components/calendar";
 import { useState } from "react";
-import { Button } from "@repo/ui/src/@/components/button";
+import { Button } from "~/components/ui/button";
+import { buttonClass } from "~/components/ui/button-styles";
+import { CalendarOff } from "lucide-react";
 import { z } from "zod";
 import UIFormInput from "@repo/ui/src/@/components/form/input";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -111,46 +113,58 @@ const AddUnavailability = ({
     <>
       <div>
         <Dialog open={close} onOpenChange={setClose}>
-          <DialogTrigger className="rounded-xl bg-white/90 px-[18px] py-2.5 font-poppins text-sm font-semibold text-[#0E3A47] shadow-md transition-all duration-300 hover:bg-[#A5F3FC] hover:shadow-lg md:px-5 md:text-base">
-            + Unavailability
+          {/*
+            Same problem as the availability trigger: `bg-white/90` was legible on
+            the teal banner this used to live on and invisible on the page it
+            lives on now. "+ Unavailability" also named a database column rather
+            than an action.
+          */}
+          <DialogTrigger className={buttonClass({ variant: "outline", size: "md" })}>
+            <CalendarOff aria-hidden="true" className="size-4 shrink-0" />
+            Block days
           </DialogTrigger>
-          <DialogContent className="flex flex-col gap-5 rounded-2xl border border-[#00898F]/20 bg-white p-0 py-5 shadow-xl xs:max-w-[300px] sm:max-w-[590px]">
+          <DialogContent className="max-w-[calc(100vw-2rem)] rounded-xl border border-hairline bg-surface p-0 shadow-xl sm:max-w-[34rem]">
+            {/*
+              The dialog opened straight onto a bare month grid — no title, no
+              explanation of what selecting a date would do, and a "Create"
+              button that named nothing. A dialog that changes when clients can
+              reach you needs to say so before it is confirmed.
+            */}
             <form onSubmit={handleSubmit(onSubmit, errorHandler)}>
-              <div>
+              <header className="border-b border-hairline p-5">
+                <h2 className="text-lg font-semibold text-ink">Block days off</h2>
+                <p className="mt-1 text-sm leading-relaxed text-muted">
+                  Pick the dates you are not available. Existing bookings are
+                  unaffected — this only stops new ones being made.
+                </p>
+              </header>
+
+              <div className="flex justify-center p-4">
                 <Controller
                   control={control}
                   name="dates"
                   render={({ field }) => (
-
                     <DayPicker
                       mode="multiple"
                       disabled={[{ before: new Date() }]}
-                      // disabled={isDateDisabled()}
                       selected={field.value || updatedUnavailableDays}
                       onSelect={(dates) => field.onChange(dates)}
                     />
                   )}
                 />
               </div>
-              <div>
-                
-              </div>
-              <div className="flex justify-center gap-4 pt-5 px-4">
+
+              <footer className="flex flex-col-reverse gap-2 border-t border-hairline bg-canvas p-4 sm:flex-row sm:justify-end sm:gap-3">
                 <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setClose(false)}
-                  className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-poppins text-sm font-semibold text-gray-600 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md"
                 >
                   Cancel
                 </Button>
 
-                <Button
-                  type="submit"
-                  className="rounded-xl bg-[#00898F] px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#007a80] hover:shadow-lg"
-                >
-                  Create
-                </Button>
-              </div>
+                <Button type="submit">Block these days</Button>
+              </footer>
             </form>
           </DialogContent>
         </Dialog>

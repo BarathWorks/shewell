@@ -55,7 +55,7 @@ const Stepper = ({ steps, setStep }: IStepperProps) => {
       {steps.map((item, index) => (
         <div key={index} className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
           <div
-            className={`relative z-10 flex items-center justify-center rounded-full border-2 px-1.5 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base font-medium w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 border-gray-200 text-gray-500 ${
+            className={`relative z-10 flex items-center justify-center rounded-full border-2 px-1.5 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base font-medium w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 border-hairline text-gray-500 ${
               currentStep > index + 1
                 ? "border-primary bg-primary text-white"
                 : "bg-white"

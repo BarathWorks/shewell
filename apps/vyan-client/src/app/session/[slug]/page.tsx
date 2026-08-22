@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { NavigationHeaderSection } from "@/components/NavigationHeaderSection";
 import { CourseDetailHeaderSection } from "@/components/course-detail/CourseDetailHeaderSection";
 import { SessionOverviewSection } from "@/components/course-detail/SessionOverviewSection";
 import { CourseInfoSection } from "@/components/course-detail/CourseInfoSection";
@@ -120,8 +119,10 @@ export default async function SessionDetailPage({
     "Reminders via email and WhatsApp",
   ];
 
+  // Not a <main>: the root layout already renders one, and nesting a second
+  // landmark inside it is invalid and confuses assistive technology.
   return (
-    <main className="relative flex w-full flex-col items-center bg-white min-h-screen">
+    <div className="bg-canvas">
       <CourseDetailHeaderSection
         title={session.title}
         instructor="Expert Instructor"
@@ -161,6 +162,6 @@ export default async function SessionDetailPage({
         contactTitle="Contact"
         contactItems={contactItems}
       />
-    </main>
+    </div>
   );
 }

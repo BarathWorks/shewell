@@ -56,7 +56,6 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Sessions</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         <i className="pi pi-search" />
         <InputText type="search" value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
@@ -170,7 +169,6 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
           <div className="card">
             <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
             <DataTable
-              stripedRows
               ref={dt}
               value={sessions}
               dataKey="id"
@@ -186,13 +184,13 @@ const SessionTable = ({ sessions, categories }: SessionTableProps) => {
               header={header}
               exportFilename="Sessions"
             >
-              <Column field="title" header="Title" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-              <Column field="slug" header="Slug" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-              <Column field="price" header="Price" body={priceBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
-              <Column field="startAt" header="Start Time" body={dateBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
-              <Column field="status" header="Status" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
+              <Column field="title" header="Title" sortable headerStyle={{ minWidth: '9rem' }}></Column>
+              <Column field="slug" header="Slug" sortable headerStyle={{ minWidth: '9rem' }}></Column>
+              <Column field="price" header="Price" body={priceBodyTemplate} sortable headerStyle={{ minWidth: '8rem' }}></Column>
+              <Column field="startAt" header="Start Time" body={dateBodyTemplate} sortable headerStyle={{ minWidth: '9rem' }}></Column>
+              <Column field="status" header="Status" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '8rem' }}></Column>
               <Column header="Registrations" body={registrationCountTemplate} headerStyle={{ minWidth: '12rem' }}></Column>
-              <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }} frozen={true}></Column>
+              <Column body={actionBodyTemplate} headerStyle={{ minWidth: '8rem' }} frozen={true}></Column>
             </DataTable>
 
             <Dialog header="Session Details" modal className="p-fluid" visible={sessionDialog} style={{ width: '50vw' }} onHide={hideDialog}>

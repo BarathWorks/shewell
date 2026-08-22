@@ -107,12 +107,12 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
       <form onSubmit={handleSubmit(submitInfo, (err) => console.log(err))}>
         <div className="flex flex-col justify-center border-t border-t-gray-100 pt-10 font-inter md:flex-row ">
           <div className="flex w-full flex-col gap-6 md:w-10/12 xl:gap-8">
-            <div className="text-center font-inter text-sm font-normal text-[#666666]">
+            <div className="text-center font-inter text-sm font-normal text-muted">
               Make changes to your account here. Click save when you're done.
             </div>
             <div className="flex flex-col gap-6">
               <div className="w-full">
-                <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                   Name*
                 </UIFormLabel>
                 <Controller
@@ -126,7 +126,7 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
                           placeholder="eg. Jon Doe"
                           value={field.value}
                           onChange={field.onChange}
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter focus:border-[#00898F] focus:bg-white"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter focus:border-primary-600 focus:bg-white"
                         />
                         {errors && errors.name && (
                           <p className="mt-1 text-xs text-red-500">
@@ -140,7 +140,7 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
               </div>
 
               <div className="w-full">
-                <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                   Phone Number *
                 </UIFormLabel>
                 <Controller
@@ -155,7 +155,7 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
                           placeholder="eg. +91-9778977898"
                           onChange={field.onChange}
                           disabled
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter text-gray-500"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter text-gray-500"
                         />
                         {errors && errors.phoneNumber && (
                           <p className="mt-1 text-xs text-red-500">
@@ -170,12 +170,12 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
 
               <div className="w-full">
                 <div className="flex justify-between">
-                  <UIFormLabel className="font-poppins text-sm font-medium text-[#333333]">
+                  <UIFormLabel className="font-poppins text-sm font-medium text-ink">
                     Email *
                   </UIFormLabel>
                   <div
                     onClick={handleClick}
-                    className="cursor-pointer font-poppins text-sm font-medium text-[#00898F] hover:underline"
+                    className="cursor-pointer font-poppins text-sm font-medium text-primary-700 hover:underline"
                   >
                     Change email
                   </div>
@@ -193,7 +193,7 @@ const PersonalInformationForm = ({ user }: { user: IUser }) => {
                           value={field.value}
                           onChange={field.onChange}
                           disabled
-                          className="rounded-xl border-gray-200 bg-gray-50 font-inter text-gray-500"
+                          className="rounded-xl border-hairline bg-gray-50 font-inter text-gray-500"
                         />
                         {errors && errors.email && (
                           <p className="mt-1 text-xs text-red-500">

@@ -17,7 +17,8 @@
     "typecheck": "turbo typecheck",
     "clean": "node -e \"const fs=require('fs');for(const d of ['apps/admin/.next','apps/vyan-client/.next','apps/vyan-doctor/.next','.turbo','apps/admin/.turbo','apps/vyan-client/.turbo','apps/vyan-doctor/.turbo'])fs.rmSync(d,{recursive:true,force:true});console.log('cleaned build output')\"",
     "build:clean": "pnpm clean && turbo build",
-    "dev:clean": "bash scripts/dev.sh"
+    "dev:clean": "bash scripts/dev.sh",
+    "mail:verify": "node packages/mail/verify-smtp.mjs"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

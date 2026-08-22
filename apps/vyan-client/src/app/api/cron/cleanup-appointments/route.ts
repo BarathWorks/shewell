@@ -1,34 +1,17 @@
-import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { db } from "~/server/db";
 import { BookAppointmentStatus } from "@repo/database";
 import { subMinutes } from "date-fns";
 
+import { authorizeCronRequest } from "~/lib/cron-auth";
+
 export const dynamic = "force-dynamic";
 
-/** Constant-time compare so the secret cannot be recovered by timing responses. */
-function tokenMatches(expected: string, received: string): boolean {
-  const a = Buffer.from(expected, "utf8");
-  const b = Buffer.from(received, "utf8");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
-
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-
-  // Fail closed. With CRON_SECRET unset the old check compared against the string
-  // "Bearer undefined", which anyone could send — and this endpoint mass-cancels
-  // every pending appointment.
-  if (!secret) {
-    console.error("CRON_SECRET is not set; refusing to run cleanup");
-    return new Response("Not configured", { status: 500 });
-  }
-
-  const authHeader = request.headers.get("authorization") ?? "";
-  if (!tokenMatches(`Bearer ${secret}`, authHeader)) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  // Fails closed when CRON_SECRET is unset — this endpoint mass-cancels every
+  // pending appointment, so an unauthenticated caller must never reach it.
+  const auth = authorizeCronRequest(request, "appointment cleanup");
+  if (auth.status === "denied") return auth.response;
 
   try {
     // Find appointments that are PAYMENT_PENDING and older than 5 minutes

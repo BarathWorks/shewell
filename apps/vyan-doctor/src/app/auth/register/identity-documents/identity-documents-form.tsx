@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/src/@/components/button";
@@ -104,66 +104,74 @@ const IdentityDocumentsForm = ({
     window.history.pushState(null, "", `${pathname}?${params.toString()}`);
   }, []);
 
+  /**
+   * Uploads one file straight to S3 with a presigned URL and returns its media id.
+   *
+   * The three handlers below were identical apart from which server action signed
+   * the URL and where the resulting id was stored — and all three swallowed every
+   * failure: a non-OK response skipped the `setValue`, and `.catch(() => {})`
+   * discarded the rest. A practitioner whose upload failed saw the file name in the
+   * picker, no error, and a form that then refused to submit. That is how the CSP
+   * blocking every S3 PUT in this app went unnoticed.
+   */
+  const uploadToS3 = async (
+    file: File,
+    sign: (key: string) => Promise<{ id?: string | null; presignedUrl?: string | null }>,
+  ): Promise<string | null> => {
+    try {
+      const key = `professionalUser/${professionalUserId}/documents/${new Date().getTime()}-${file.name}`;
+      const { id, presignedUrl } = await sign(key);
+
+      if (!presignedUrl || !id) {
+        throw new Error("The server did not return an upload URL.");
+      }
+
+      const res = await fetch(presignedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Storage rejected the file (${res.status}).`);
+      }
+
+      toast({ description: `${file.name} uploaded`, variant: "default" });
+      return id;
+    } catch (error) {
+      console.error("error while uploading document", error);
+      toast({
+        description: `We could not upload ${file.name}. Please check your connection and try again.`,
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const onSelectAadharCard = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: DocumentType,
   ) => {
-    if (!event.target.files) return;
-    if (event.target.files.length > 0) {
-      for (const document of event.target.files) {
-        uploadAadharAction(
-          professionalUserId,
-          `professionalUser/${professionalUserId}/documents/${new Date().getTime()}-${document.name}`,
-          document.name,
-          document.type,
-          type,
-        )
-          .then(async (resp) => {
-            const { id, presignedUrl } = resp;
-            const requestOptions = {
-              method: "PUT",
-              headers: { "Content-Type": document.type },
-              body: document,
-            };
-            const res = await fetch(presignedUrl!, requestOptions);
-            if (res.ok) {
-              setValue("aadharCard", id!);
-            }
-          })
-          .catch(() => {});
-      }
-    }
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const id = await uploadToS3(file, (key) =>
+      uploadAadharAction(professionalUserId, key, file.name, file.type, type),
+    );
+    if (id) setValue("aadharCard", id, { shouldValidate: true });
   };
 
   const onSelectPanCard = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: DocumentType,
   ) => {
-    if (!event.target.files) return;
-    if (event.target.files.length > 0) {
-      for (const document of event.target.files) {
-        uploadPanAction(
-          professionalUserId,
-          `professionalUser/${professionalUserId}/documents/${new Date().getTime()}-${document.name}`,
-          document.name,
-          document.type,
-          type,
-        )
-          .then(async (resp) => {
-            const { id, presignedUrl } = resp;
-            const requestOptions = {
-              method: "PUT",
-              headers: { "Content-Type": document.type },
-              body: document,
-            };
-            const res = await fetch(presignedUrl!, requestOptions);
-            if (res.ok) {
-              setValue("panCard", id!);
-            }
-          })
-          .catch(() => {});
-      }
-    }
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const id = await uploadToS3(file, (key) =>
+      uploadPanAction(professionalUserId, key, file.name, file.type, type),
+    );
+    if (id) setValue("panCard", id, { shouldValidate: true });
   };
 
   const onSelectDocument = async (
@@ -171,31 +179,13 @@ const IdentityDocumentsForm = ({
     index: number,
     type: DocumentType,
   ) => {
-    if (!event.target.files) return;
-    if (event.target.files.length > 0) {
-      for (const document of event.target.files) {
-        uploadProfessionalUserDocument(
-          professionalUserId,
-          `professionalUser/${professionalUserId}/documents/${new Date().getTime()}-${document.name}`,
-          document.name,
-          document.type,
-          type,
-        )
-          .then(async (resp) => {
-            const { id, presignedUrl } = resp;
-            const requestOptions = {
-              method: "PUT",
-              headers: { "Content-Type": document.type },
-              body: document,
-            };
-            const res = await fetch(presignedUrl!, requestOptions);
-            if (res.ok) {
-              setValue(`documents.${index}.documentId`, id!);
-            }
-          })
-          .catch(() => {});
-      }
-    }
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const id = await uploadToS3(file, (key) =>
+      uploadProfessionalUserDocument(professionalUserId, key, file.name, file.type, type),
+    );
+    if (id) setValue(`documents.${index}.documentId`, id, { shouldValidate: true });
   };
 
   const onSubmit = async (
@@ -244,7 +234,7 @@ const IdentityDocumentsForm = ({
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6"
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6">
           <p className="text-sm text-gray-500">
@@ -268,7 +258,7 @@ const IdentityDocumentsForm = ({
                     }
                   />
                   {errors?.panNumber && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.panNumber.message}
                     </p>
                   )}
@@ -292,7 +282,7 @@ const IdentityDocumentsForm = ({
                     onChange={field.onChange}
                   />
                   {errors?.aadhaarNumber && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.aadhaarNumber.message}
                     </p>
                   )}
@@ -574,12 +564,12 @@ const IdentityDocumentsForm = ({
           <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
             <Button
               disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
               type="submit"
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-sm font-normal sm:text-base">
               Already have a account?{" "}

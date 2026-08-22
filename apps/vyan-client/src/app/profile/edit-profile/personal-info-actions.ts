@@ -97,19 +97,18 @@ await db.user.update({
   }
 })
 
-const emailBodySendGrid = {
-  from: process.env.FROM_EMAIL!,
+const resetEmailBody = {
   subject: "Reset email-id instructions!",
   to: [user.email],
   html: `<p>Hi,<strong> ${user.name}</strong><br/></p>
          <span>Here is the otp to reset your email.</span><br/>
          <p><strong>${otp}</strong></p>
          <p>This is valid for next 4 hours.</p>
-         <strong>Team Nature Hunt!</strong>`,
+         <strong>Team SheWell</strong>`,
 };
 
 try{
-  await sendEmail(emailBodySendGrid);
+  await sendEmail(resetEmailBody);
   revalidatePath('/profile/edit-profile');
   return{
     message:"Email sent successfully"

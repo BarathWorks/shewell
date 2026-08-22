@@ -119,12 +119,15 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
   const blog = blogs[0];
   const blogsExceptFirstOne = blogs.slice(1);
   return (
-    <>
-      <section className="w-full lg:mt-[65px]">
-        <div className="container mx-auto">
-          <div className="flex flex-col gap-[36px] xl:flex-row xl:gap-[50px]">
+    <div className="bg-canvas">
+      {/* `container mx-auto` with no max-width and a `lg:mt-[65px]` top margin —
+          the gutter and the measure did not match any other page. `container-page`
+          is the app-wide shell. */}
+      <section className="container-page py-10 md:py-14">
+        <div>
+          <div className="grid grid-cols-1 gap-8 xl:grid-cols-3 xl:gap-10">
             {/* Left-Panel */}
-            <div className="w-full xl:w-2/3">
+            <div className="xl:col-span-2">
               {blogs.length > 0 ? (
                 <div>
                   <Link href={`/blogs/${blog?.slug}`}>
@@ -146,7 +149,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
                               {format(blog?.createdAt!, "dd-MM-yyyy")}
                             </span>
                           </div>
-                          <div className="w-fit items-center rounded-md bg-[#e6f4f4] px-2.5 align-middle uppercase leading-7 text-primary">
+                          <div className="w-fit items-center rounded-md bg-primary-50 px-2.5 align-middle uppercase leading-7 text-primary">
                             {/* PCOD */}
                             {blog?.category.name}
                           </div>
@@ -217,7 +220,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
             </div>
 
             {/* right panel */}
-            <div className="w-full xl:w-1/3">
+            <div className="xl:col-span-1">
               <div className="grid w-full grid-flow-row grid-cols-1 gap-6 lg:order-2 xl:order-1">
                 {/* categories */}
 
@@ -411,7 +414,7 @@ const Blogs = async ({ params }: { params: { slug: string } }) => {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

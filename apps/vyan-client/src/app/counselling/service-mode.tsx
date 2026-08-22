@@ -94,7 +94,7 @@ const ServiceMode = ({
               <div className="flex flex-col gap-2 sm:gap-3">
                 <div className="">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2">
-                    <div className="block bg-[#F1FFF7] p-1.5 sm:p-2 font-inter text-sm sm:text-lg md:text-xl font-medium text-secondary lg:hidden">
+                    <div className="block bg-secondary-50 p-1.5 sm:p-2 font-inter text-sm sm:text-lg md:text-xl font-medium text-secondary lg:hidden">
                       {details.planName}
                     </div>
                     <div
@@ -102,7 +102,7 @@ const ServiceMode = ({
                     >
                       INR {details.price}
                       <span
-                        className={`text-xs sm:text-sm font-normal ${selectedOption === details.type ? "text-black" : "text-[#667085]"}`}
+                        className={`text-xs sm:text-sm font-normal ${selectedOption === details.type ? "text-black" : "text-muted"}`}
                       >
                         {" "}
                         per user
@@ -111,12 +111,12 @@ const ServiceMode = ({
                   </div>
                 </div>
                 <div
-                  className={`text-xs sm:text-sm font-normal ${selectedOption === details.type ? "text-black" : "text-[#667085]"}`}
+                  className={`text-xs sm:text-sm font-normal ${selectedOption === details.type ? "text-black" : "text-muted"}`}
                 >
                   {details.description}
                 </div>
               </div>
-              <div className="hidden min-w-[120px] sm:min-w-[134px] bg-[#F1FFF7] p-1.5 sm:p-2 font-inter text-lg md:text-xl font-medium text-secondary lg:block">
+              <div className="hidden min-w-[120px] sm:min-w-[134px] bg-secondary-50 p-1.5 sm:p-2 font-inter text-lg md:text-xl font-medium text-secondary lg:block">
                 {details.planName}
               </div>
             </div>

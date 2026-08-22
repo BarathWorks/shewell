@@ -1,83 +1,143 @@
 "use client";
 import * as React from "react";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { format } from "date-fns";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, YAxis } from "recharts";
 import { api } from "~/trpc/react";
+import { Panel, EmptyState } from "./panel";
 
-// Sample chart data for visual display
-const chartData = [
-  { value: 2400 },
-  { value: 1398 },
-  { value: 9800 },
-  { value: 3908 },
-  { value: 4800 },
-  { value: 3800 },
-  { value: 4300 },
-];
+/**
+ * Earnings and withdrawable balance.
+ *
+ * The available balance was already real. The chart above it was not: a module
+ * constant
+ *
+ *   [2400, 1398, 9800, 3908, 4800, 3800, 4300]
+ *
+ * commented "Sample chart data for visual display" — rendered directly beneath a
+ * green "Live" badge. It never moved, and it implied a trend nobody had measured.
+ *
+ * The series now comes from `dashboardAnalytics.getDashboard`: one point per
+ * settled appointment payment in the selected range, accumulated so the line
+ * reads as earnings to date. With fewer than two payments there is no trend to
+ * draw and the chart is replaced by a note. The "Live" badge is gone.
+ */
+export function Balance({
+  series,
+  earnedInRange,
+  isLoading,
+}: {
+  series?: { date: string; amountInCents: number }[];
+  earnedInRange?: number;
+  isLoading?: boolean;
+}) {
+  const { data: earningsData, isLoading: balanceLoading } =
+    api.earnings.getBalance.useQuery();
 
-const Balance = () => {
-  
-  // Fetch real earnings data
-  const { data: earningsData, isLoading } = api.earnings.getBalance.useQuery();
-
-  const formatCurrency = (cents: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+  const formatCurrency = (cents: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(cents / 100);
-  };
 
   const availableBalance = earningsData?.availableBalanceInCents ?? 0;
 
+  // Cumulative, so the line shows earnings building over the range rather than
+  // a sawtooth of individual payments.
+  let running = 0;
+  const points = (series ?? []).map((point) => {
+    running += point.amountInCents;
+    return {
+      date: point.date,
+      label: format(new Date(point.date), "d MMM"),
+      cumulative: running / 100,
+    };
+  });
+
   return (
-    <>
-      <div className="rounded-2xl border border-gray-100 p-4 sm:p-6 xl:p-5 2xl:p-[26px] w-full shadow-sm hover:shadow-md transition-shadow">
-        {/* Header */}
-        <div className="mb-3 flex justify-between items-center 2xl:mb-4">
-          <div className="font-inter text-sm font-medium text-active lg:text-lg 2xl:text-2xl">
-            Balance
+    <Panel title="Earnings">
+      <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="eyebrow">Available</p>
+            {balanceLoading ? (
+              <div className="skeleton mt-2 h-8 w-28" />
+            ) : (
+              <p className="tabular mt-2 text-2xl font-semibold leading-none text-ink">
+                {formatCurrency(availableBalance)}
+              </p>
+            )}
+            <p className="mt-1.5 text-xs text-muted">Ready to withdraw</p>
           </div>
-          <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-            </svg>
-            <span>Live</span>
+
+          <div>
+            <p className="eyebrow">This range</p>
+            {isLoading ? (
+              <div className="skeleton mt-2 h-8 w-28" />
+            ) : (
+              <p className="tabular mt-2 text-2xl font-semibold leading-none text-ink">
+                {formatCurrency(earnedInRange ?? 0)}
+              </p>
+            )}
+            <p className="mt-1.5 text-xs text-muted">Your share of bookings</p>
           </div>
         </div>
 
-        {/* Chart */}
-        <div className="flex flex-col gap-3 2xl:gap-4">
-          <div className="flex flex-col items-center justify-center">
-            <ResponsiveContainer className="w-full aspect-[229/71]">
-              <LineChart width={500} height={200} data={chartData}>
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#2AA852" 
+        <div className="h-28 border-t border-hairline pt-4">
+          {isLoading ? (
+            <div className="skeleton h-full w-full" />
+          ) : points.length < 2 ? (
+            <EmptyState
+              message="Not enough payments to plot a trend"
+              hint="A line appears once at least two payments settle inside the range."
+            />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={points}
+                margin={{ top: 2, right: 2, bottom: 0, left: 2 }}
+              >
+                <defs>
+                  <linearGradient id="earnings-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00898F" stopOpacity={0.22} />
+                    <stop offset="100%" stopColor="#00898F" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <YAxis hide domain={["dataMin", "dataMax"]} />
+                <Tooltip
+                  cursor={{ stroke: "#C6D3DD", strokeWidth: 1 }}
+                  contentStyle={{
+                    borderRadius: "0.5rem",
+                    border: "1px solid #DFE7ED",
+                    boxShadow: "0 6px 16px -4px rgb(13 22 30 / 0.09)",
+                    fontSize: "0.8125rem",
+                  }}
+                  labelFormatter={(_, payload) => payload?.[0]?.payload?.label ?? ""}
+                  formatter={(value: number) => [
+                    new Intl.NumberFormat("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                      maximumFractionDigits: 0,
+                    }).format(value),
+                    "Earned to date",
+                  ]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="cumulative"
+                  stroke="#00898F"
                   strokeWidth={2}
+                  fill="url(#earnings-fill)"
                   dot={false}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
-
-            {/* Available Balance (main display) */}
-            <div className="text-black font-inter text-2xl font-semibold mt-3 mb-1">
-              {isLoading ? (
-                <span className="animate-pulse bg-gray-200 rounded h-8 w-32 inline-block"></span>
-              ) : (
-                formatCurrency(availableBalance)
-              )}
-            </div>
-            <div className="text-inactive text-center font-inter text-sm font-normal mb-4">
-              Available for withdrawal
-            </div>
-
-          </div>
+          )}
         </div>
       </div>
-    </>
+    </Panel>
   );
-};
+}
 
 export default Balance;

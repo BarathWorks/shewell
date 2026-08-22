@@ -45,8 +45,29 @@ export type ITableInterface = {
   bookingDate: Date;
   startingTime: Date;
   endingTime: Date;
-
   doctorSpecialicity: string | undefined;
+  /** Real values from the booking, not the hard-coded "Online" this used to print. */
+  status: string | null | undefined;
+  serviceType: string | undefined;
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  COMPLETED: "border-success-100 bg-success-50 text-secondary-700",
+  PAYMENT_SUCCESSFUL: "border-info-100 bg-info-50 text-info-600",
+  PAYMENT_PENDING: "border-warning-100 bg-warning-50 text-warning-600",
+  PAYMMENT_FAILED: "border-danger-100 bg-danger-50 text-danger-700",
+  CANCELLED: "border-danger-100 bg-danger-50 text-danger-700",
+  CANCELLED_WITH_REFUND: "border-danger-100 bg-danger-50 text-danger-700",
+};
+
+/** `PAYMENT_SUCCESSFUL` is not a phrase to show a doctor. */
+const STATUS_LABELS: Record<string, string> = {
+  COMPLETED: "Completed",
+  PAYMENT_SUCCESSFUL: "Confirmed",
+  PAYMENT_PENDING: "Awaiting payment",
+  PAYMMENT_FAILED: "Payment failed",
+  CANCELLED: "Cancelled",
+  CANCELLED_WITH_REFUND: "Cancelled · refunded",
 };
 
 export const columns: ColumnDef<ITableInterface>[] = [
@@ -65,7 +86,7 @@ export const columns: ColumnDef<ITableInterface>[] = [
       )
     },
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
+      <div className="text-sm text-body">
         {row.getValue("patientName")}
       </div>
     ),
@@ -86,7 +107,7 @@ export const columns: ColumnDef<ITableInterface>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal lowercase leading-[27px] text-[#434343]">
+      <div className="text-sm lowercase text-body">
         {row.getValue("patientEmail")}
       </div>
     ),
@@ -96,7 +117,7 @@ export const columns: ColumnDef<ITableInterface>[] = [
     header: "Booking Date",
     accessorFn: (row) => row.bookingDate,
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
+      <div className="text-sm text-body">
         {format(new Date(row.getValue("bookingDate")), "dd/MM/yyyy")}
       </div>
     ),
@@ -107,7 +128,7 @@ export const columns: ColumnDef<ITableInterface>[] = [
     accessorFn: (row) => row.startingTime,
 
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
+      <div className="text-sm text-body">
         {format(new Date(row.getValue("startingTime")), "hh:mm aa")}-
         {format(new Date(row.original.endingTime), "hh:mm aa")}{" "}
       </div>
@@ -118,11 +139,35 @@ export const columns: ColumnDef<ITableInterface>[] = [
     header: "Appointment & Mode",
     accessorFn: (row) => row.doctorSpecialicity,
     cell: ({ row }) => (
-      <div className="text-[17px] font-normal leading-[27px] text-[#434343]">
-        {row.getValue("doctorSpecialicity")}{" "}
-        <span className="text-[17px] font-semibold text-secondary">Online</span>
+      <div className="flex flex-col gap-1">
+        <span className="text-sm text-body">
+          {row.getValue("doctorSpecialicity") ?? "—"}
+        </span>
+        <span className="text-xs font-medium text-primary-700">
+          {row.original.serviceType === "OFFLINE" ? "In person" : "Online"}
+        </span>
       </div>
     ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    accessorFn: (row) => row.status ?? "",
+    cell: ({ row }) => {
+      const status = row.original.status;
+      if (!status) {
+        return <span className="text-sm text-muted">—</span>;
+      }
+      return (
+        <span
+          className={`inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-2xs font-medium ${
+            STATUS_STYLES[status] ?? "border-hairline bg-slate-50 text-body"
+          }`}
+        >
+          {STATUS_LABELS[status] ?? status}
+        </span>
+      );
+    },
   },
 ];
 
@@ -160,17 +205,15 @@ const DashboardDataTable = ({
   });
 
   return (
-    <div className="w-full rounded-[9.37px] border border-[#DFE7EF] p-4 sm:p-6 xl:p-5 2xl:p-[26px]">
-      <div className="mb-[24px] font-inter text-[24px] text-[#121212] leading-[38px]">Recent Booked Slots</div>
-
-      <div className="flex items-center py-4">
+    <div className="w-full">
+      <div className="flex items-center px-5 py-4">
         <Input
           placeholder="Search Patient Name"
           value={(table.getColumn("patientName")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("patientName")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="h-10 max-w-sm rounded-lg border-hairline-strong bg-surface text-sm"
         />
       </div>
       <div className="rounded-md border">

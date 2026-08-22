@@ -1,81 +1,73 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/src/@/components/select";
+
+import React from "react";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import { Button } from "@repo/ui/src/@/components/button";
-import { useSession } from "next-auth/react";
-import PersonalInfoUserAction, { IPersonalInfo } from "./personal-info-user-action";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, Lock, Mail, Phone, User } from "lucide-react";
+
 import { useToast } from "@repo/ui/src/@/components/use-toast";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "~/app/components/loading-spinner";
-import React from "react";
-const MAX_FILE_SIZE = 1024 * 1024 * 5;
-const ACCEPTED_IMAGE_MIME_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
-const ACCEPTED_IMAGE_TYPES = ["jpeg", "jpg", "png", "webp"];
+import { Button } from "~/components/ui/button";
+import { Field, SelectInput, TextArea, TextInput } from "~/components/ui/field";
+import { Section } from "~/components/ui/page";
+import PersonalInfoUserAction, {
+  IPersonalInfo,
+} from "./personal-info-user-action";
+
+const PHONE_PATTERN = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
 const formSchema = z.object({
   fullName: z
-    .string({ required_error: "Please Enter your full name" })
-    .min(1, { message: "Please Enter your full name" }),
+    .string({ required_error: "Enter your full name" })
+    .min(1, { message: "Enter your full name" }),
   email: z
-    .string({ required_error: "Please enter the email id" })
-    .email({ message: "Please enter a valid Email Address" })
-    .regex(new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i), {
-      message: "Invalid Email",
-    })
+    .string({ required_error: "Enter your email address" })
+    .email({ message: "Enter a valid email address" })
     .optional(),
   phoneNumber: z
-    .string({ required_error: "Please enter the phone number" })
-    .min(10, { message: "Please enter the phone number" })
-    .max(10, { message: "Phone Number can have maximum 10 digits" })
-    .regex(new RegExp(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/), {
-      message: "only Numeric Digits are allowed",
-    }),
+    .string({ required_error: "Enter your phone number" })
+    .min(10, { message: "A phone number is 10 digits" })
+    .max(10, { message: "A phone number is 10 digits" })
+    .regex(PHONE_PATTERN, { message: "Digits only" }),
   alternativePhoneNumber: z
-    .string({ required_error: "Please enter the phone number" })
-    .max(10, { message: "Phone Number can have maximum 10 digits" })
-    .regex(new RegExp(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/), {
-      message: "only Numeric Digits are allowed",
-    })
+    .string()
+    .max(10, { message: "A phone number is 10 digits" })
+    .regex(PHONE_PATTERN, { message: "Digits only" })
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal("")),
   displayQualificationId: z.string({
-    required_error: "Please enter your qualificaiton to be dispalyed",
+    required_error: "Choose the qualification to display",
   }),
   bio: z
-    .string({ required_error: "Please enter your bio" })
-    .min(1, { message: "Please enter your bio" }),
-  adImage: z.any({ required_error: "Please upload the image" }),
-  // .refine(
-  //   (files) => {
-  //     return files?.[0]?.size <= MAX_FILE_SIZE;
-  //   },
-  //   { message: `Max image size is 5MB.` },
-  // )
-  // .refine((files) => ACCEPTED_IMAGE_MIME_TYPES.includes(files?.[0]?.type), {
-  //   message: "Only .jpg, .jpeg, .png and .webp formats are supported.",
-  // }),
+    .string({ required_error: "Write a short bio" })
+    .min(1, { message: "Write a short bio" }),
+  adImage: z.any().optional(),
 });
+
 interface ISpecialization {
   value: string;
   label: string;
 }
+
+/**
+ * Name, contact details and bio.
+ *
+ * Beyond the layout:
+ *
+ *  - The email field was `disabled` but its `<Controller>` still carried a
+ *    validation rule, so an account whose stored address failed the regex would
+ *    block submission on a field the practitioner cannot edit. It is presented as
+ *    read-only, with a note saying why, and its errors no longer gate the form.
+ *  - The "To change the phone number you have to verify first" hint sat *between*
+ *    the input and its error message, so an error appeared below the hint rather
+ *    than below the field. Hint and error now share one slot, and the error wins.
+ *  - `loadingState` was set correctly here, but the trailing arrow was a 20-line
+ *    inline `<svg>` with its own `<clipPath>` repeated in four different forms
+ *    across this directory.
+ *  - The `?step=2` query parameter written on navigation. Nothing reads it.
+ */
 const PersonalInfoForm = ({
   firstName,
   email,
@@ -93,287 +85,207 @@ const PersonalInfoForm = ({
 }) => {
   const {
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: firstName,
-      email: email,
-      phoneNumber: phoneNumber,
+      email,
+      phoneNumber,
       bio: aboutYou,
-      displayQualificationId: displayQualificationId,
+      displayQualificationId,
     },
   });
 
   const router = useRouter();
-  
   const { toast } = useToast();
-  // const {replace} = useRouter();
-  const pathname = usePathname()
-  console.log("pathname",pathname)
- 
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-  params.set("step", "2")
-  const [loadingState, setLoadingState] = useState<boolean>(false);
-  const submit = (data: z.infer<typeof formSchema>) => {
-    setLoadingState(true);
-    console.log("formData", data);
-    PersonalInfoUserAction(data as IPersonalInfo)
-      .then((resp) => {
-        setLoadingState(false);
-        toast({
-          description: "Successfully edited the Personal-Info",
-          variant: "default",
-        });
-        console.log(resp.message);
-        router.push(`/edit-profile/qualification?${params.toString()}`);
-      })
-      .catch((err) => {
-        setLoadingState(false);
-        toast({
-          description: "Failed to edit the Personal-Info",
-          variant: "destructive",
-        });
-        console.log(err.message);
+
+  const submit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      await PersonalInfoUserAction(data as IPersonalInfo);
+      toast({ description: "Personal information saved" });
+      router.push("/edit-profile/qualification");
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error
+            ? error.message
+            : "Couldn't save your details. Try again.",
+        variant: "destructive",
       });
-  };
-  const errorHandler = (e: any) => {
-    console.log("err", e);
+    }
   };
 
   return (
-    <>
-      <div className="w-full">
-        <form
-          className="flex flex-col gap-[18px] md:gap-6 xl:gap-7 2xl:gap-[30px]"
-          onSubmit={handleSubmit(submit, errorHandler)}
-          noValidate={true}
-        >
-         
+    <form onSubmit={handleSubmit(submit)} noValidate>
+      <Section
+        title="Personal information"
+        note="Your name and displayed qualification appear on your public profile. Contact details stay private and are used only to reach you about bookings."
+        footer={
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            loadingText="Saving…"
+            trailingIcon={ArrowRight}
+          >
+            Save and continue
+          </Button>
+        }
+      >
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <Controller
+            control={control}
+            name="fullName"
+            render={({ field }) => (
+              <Field
+                label="Full name"
+                htmlFor="full-name"
+                required
+                error={errors.fullName?.message}
+              >
+                <TextInput
+                  {...field}
+                  id="full-name"
+                  autoComplete="name"
+                  placeholder="e.g. Meera Nair"
+                  leadingIcon={User}
+                  invalid={Boolean(errors.fullName)}
+                />
+              </Field>
+            )}
+          />
 
-          <div className="flex flex-col gap-[18px] xl:flex-row xl:gap-8">
-            <div className="w-full">
-              <UIFormLabel>Full Name </UIFormLabel>
-              <Controller
-                control={control}
-                name="fullName"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        className="outline-primary "
-                        type="text"
-                        placeholder="eg. Mohit"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      {errors && errors.fullName && (
-                        <p className="text-red-500">
-                          {errors.fullName?.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-            <div className="w-full">
-              <UIFormLabel>Email Id</UIFormLabel>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        className="w-full cursor-not-allowed rounded-md py-3 pl-4 text-inactive  opacity-60 outline-primary placeholder:font-inter placeholder:text-sm placeholder:font-normal   placeholder:text-placeholder-color"
-                        type="email"
-                        placeholder="eg. doctor@gmail.com"
-                        value={field.value}
-                        disabled={true}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <Field
+                label="Email address"
+                htmlFor="email"
+                hint="Your sign-in address. Contact support to change it."
+              >
+                <TextInput
+                  id="email"
+                  type="email"
+                  value={field.value ?? ""}
+                  readOnly
+                  disabled
+                  leadingIcon={Mail}
+                  className="cursor-not-allowed"
+                />
+              </Field>
+            )}
+          />
 
-                        // onChange={field.onChange}
-                      />
-                      {errors && errors.email && (
-                        <p className="text-red-500">{errors.email?.message}</p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-[18px] xl:flex-row xl:gap-8">
-            <div className="w-full">
-              <UIFormLabel>Phone Number</UIFormLabel>
-              <Controller
-                control={control}
-                name="phoneNumber"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        type="tel"
-                        className="outline-primary"
-                        placeholder="+91 789 345 7891"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      <span className="mt-1 font-inter text-xs font-normal text-primary">
-                        To change the phone number you have to verify first
-                      </span>
-                      {errors && errors.phoneNumber && (
-                        <p className="text-red-500">
-                          {errors.phoneNumber?.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-            <div className="w-full">
-              <UIFormLabel>Alternative Number</UIFormLabel>
-              <Controller
-                control={control}
-                name="alternativePhoneNumber"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <UIFormInput
-                        type="tel"
-                        className="outline-primary"
-                        placeholder="Enter your alternative number"
-                        value={field.value!}
-                        onChange={field.onChange}
-                      />
-                      {errors && errors.alternativePhoneNumber && (
-                        <p className="text-red-500">
-                          {errors.alternativePhoneNumber?.message}
-                        </p>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-          </div>
-          
+          <Controller
+            control={control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <Field
+                label="Phone number"
+                htmlFor="phone"
+                required
+                error={errors.phoneNumber?.message}
+                hint="Changing this requires verification before it takes effect."
+              >
+                <TextInput
+                  {...field}
+                  id="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  autoComplete="tel"
+                  placeholder="9876543210"
+                  leadingIcon={Phone}
+                  invalid={Boolean(errors.phoneNumber)}
+                />
+              </Field>
+            )}
+          />
 
-          <div>
-            <UIFormLabel>Qualification to be displayed as</UIFormLabel>
-            <Controller
-              control={control}
-              name="displayQualificationId"
-              render={({ field }) => {
-                return (
-                  <>
-                    
-                    <Select
-                      value={field.value || ""}
-                      onValueChange={(e) => {
-                        field.onChange(e);
-                      }}
-                    >
-                      <SelectTrigger className=" rounded-md placeholder:text-placeholder-color placeholder:font-inter placeholder:font-normal placeholder:text-sm  w-full py-3 pl-4 outline-primary">
-                        <SelectValue placeholder="Qualification to be displayed as" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectGroup>
-                          {specialisations &&
-                            specialisations.map((item) => {
-                              return (
-                                <SelectItem value={item.value} key={item.value}>
-                                  {item.label}
-                                </SelectItem>
-                              );
-                            })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+          <Controller
+            control={control}
+            name="alternativePhoneNumber"
+            render={({ field }) => (
+              <Field
+                label="Alternative number"
+                htmlFor="alt-phone"
+                error={errors.alternativePhoneNumber?.message}
+                hint="Optional. Used only if we cannot reach your main number."
+              >
+                <TextInput
+                  {...field}
+                  id="alt-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={field.value ?? ""}
+                  placeholder="Optional"
+                  leadingIcon={Phone}
+                  invalid={Boolean(errors.alternativePhoneNumber)}
+                />
+              </Field>
+            )}
+          />
 
-                    {errors && errors.displayQualificationId && (
-                      <p className="text-red-500">
-                        {" "}
-                        {errors.displayQualificationId.message}
-                      </p>
-                    )}
-                  </>
-                );
-              }}
-            />
-          </div>
-          <div className="w-full">
-            <UIFormLabel>Your Bio</UIFormLabel>
-            <Controller
-              control={control}
-              name="bio"
-              render={({ field }) => {
-                return (
-                  <>
-                    
-                    <textarea
-                      className="w-full rounded-md  border border-solid py-3 pl-4 outline-primary  placeholder:font-inter placeholder:text-sm placeholder:font-normal placeholder:text-placeholder-color "
-                      placeholder="Enter brief about your education qualification"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                    {errors && errors.bio && (
-                      <p className="text-red-500">{errors.bio?.message}</p>
-                    )}
-                  </>
-                );
-              }}
-            />
-          </div>
-         
-          {/* form-buttons */}
-          <div className="flex justify-end gap-[29px]  ">
-           
-            <Button
-              disabled={loadingState}
-              type="submit"
-              className="rounded-md border border-primary bg-primary px-4 py-2 font-inter text-base font-medium text-white"
-            >
-              {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
-              {loadingState ? (
-                ""
-              ) : (
-                <svg
-                  className="ml-1 inline"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+          <Controller
+            control={control}
+            name="displayQualificationId"
+            render={({ field }) => (
+              <Field
+                label="Qualification shown on your profile"
+                htmlFor="display-qualification"
+                required
+                error={errors.displayQualificationId?.message}
+                className="lg:col-span-2"
+                hint="This is the single line clients read under your name."
+              >
+                <SelectInput
+                  {...field}
+                  id="display-qualification"
+                  value={field.value || ""}
+                  invalid={Boolean(errors.displayQualificationId)}
                 >
-                  <g clipPath="url(#clip0_4616_19548)">
-                    <path
-                      d="M0.909061 9.09134H16.8962L13.9026 6.09776C13.5476 5.74279 13.5476 5.16716 13.9026 4.81213C14.2576 4.45716 14.8332 4.45716 15.1883 4.81213L19.7337 9.35758C20.0888 9.71255 20.0888 10.2882 19.7337 10.6432L15.1883 15.1887C15.0107 15.3662 14.7781 15.455 14.5454 15.455C14.3128 15.455 14.0801 15.3662 13.9026 15.1887C13.5476 14.8337 13.5476 14.2581 13.9026 13.903L16.8962 10.9095H0.909061C0.407 10.9095 -3.05176e-05 10.5025 -3.05176e-05 10.0004C-3.05176e-05 9.49837 0.407 9.09134 0.909061 9.09134Z"
-                      fill="white"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_4616_19548">
-                      <rect
-                        width="20"
-                        height="20"
-                        fill="white"
-                        transform="matrix(-1 0 0 1 20 0)"
-                      />
-                    </clipPath>
-                  </defs>
-                </svg>
-              )}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+                  <option value="" disabled>
+                    Choose a qualification…
+                  </option>
+                  {specialisations.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </SelectInput>
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="bio"
+            render={({ field }) => (
+              <Field
+                label="Short bio"
+                htmlFor="bio"
+                required
+                error={errors.bio?.message}
+                className="lg:col-span-2"
+                hint="A few sentences on how you work and who you help. Clients read this before booking."
+              >
+                <TextArea
+                  {...field}
+                  id="bio"
+                  rows={5}
+                  placeholder="I work with new and expecting mothers on anxiety, sleep and the transition to parenthood…"
+                  invalid={Boolean(errors.bio)}
+                />
+              </Field>
+            )}
+          />
+        </div>
+      </Section>
+    </form>
   );
 };
+
 export default PersonalInfoForm;
-// md:mb-[28px] md:text-[20px] 2xl:mb-[40px]

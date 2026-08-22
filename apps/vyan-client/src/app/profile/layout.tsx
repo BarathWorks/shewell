@@ -29,25 +29,22 @@ export default async function OrdersPage({
     },
   });
   return (
-   
-       
-          <div className="w-full bg-[#FBFBFB] font-inter pt-3">
-         
-          <div className=" container mx-auto 2xl:pb-[65px] xl:pb-[60px] lg:pb-[55px] pb-[32px] max-w-full">
-          <div className="items-start xl:flex xl:flex-row xl:gap-[46px] 2xl:gap-[60px] ">
-          <div className="w-full xl:w-[343px] 2xl:w-[375px] mb-4 xl:mb-0">
-                  <ProfileNav email={userDetails?.email!}
-                  name={userDetails?.name!} />
-                  </div>
-            <div className="flex-1">
-            {children}
-            </div>
-            </div>
-            </div>
-            </div>
-           
-           
-     
-     
+    <div className="bg-canvas">
+      <div className="container-page py-6 md:py-10">
+        {/* Was a stack of `container mx-auto max-w-full` with a 343px fixed rail
+            and four breakpoint-specific bottom paddings. A 12-column grid holds
+            the two columns without pinning either to a pixel width. */}
+        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-4 xl:gap-8">
+          <div className="xl:sticky xl:top-24 xl:col-span-1">
+            <ProfileNav
+              email={userDetails?.email!}
+              name={userDetails?.name!}
+            />
+          </div>
+
+          <div className="min-w-0 xl:col-span-3">{children}</div>
+        </div>
+      </div>
+    </div>
   );
-} 
+}

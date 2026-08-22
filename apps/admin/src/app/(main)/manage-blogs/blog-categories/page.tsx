@@ -4,6 +4,7 @@ import { db } from '@/src/server/db';
 import BlogCategoriesTable from '@/src/app/(main)/manage-blogs/blog-categories/blog-categories-table';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const BlogsCategoriesPage = async () => {
   await requireAdminPage('content:read');
 
@@ -24,7 +25,12 @@ const BlogsCategoriesPage = async () => {
     }
   });
 
-  return <BlogCategoriesTable blogCategories={blogCategories} />;
+  return (
+    <>
+      <PageHeader title="Blog categories" description="Groupings used to file articles on the public site." />
+      <BlogCategoriesTable blogCategories={blogCategories} />
+    </>
+  );
 };
 
 export default BlogsCategoriesPage;

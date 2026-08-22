@@ -1,8 +1,8 @@
 "use client";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormPasswordInput from "@repo/ui/src/@/components/form/password-input";
+import { UIFormLabel } from "~/components/ui/legacy-form";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormPasswordInput } from "~/components/ui/legacy-form";
 import { Button } from "@repo/ui/src/@/components/button";
 // import RegisterUserAction from "./register-user-action";
 import { Checkbox } from "@repo/ui/src/@/components/checkbox";
@@ -160,7 +160,7 @@ const RegisterForm = () => {
       <form
         onSubmit={handleSubmit(submitForm, onError)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
          <div className="flex flex-col gap-[18px] lg:flex-row lg:gap-5">
@@ -180,7 +180,7 @@ const RegisterForm = () => {
                       className="w-full"
                     />
                     {errors && errors.firstName && (
-                      <p className="text-red-500">{errors.firstName.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.firstName.message}</p>
                     )}
                   </>
                 );
@@ -204,7 +204,7 @@ const RegisterForm = () => {
                       className="w-full"
                     />
                     {errors && errors.lastName && (
-                      <p className="text-red-500">{errors.lastName.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.lastName.message}</p>
                     )}
                   </>
                 );
@@ -228,7 +228,7 @@ const RegisterForm = () => {
                       onChange={field.onChange}
                     />
                     {errors && errors.userName && (
-                      <p className="text-red-500">{errors.userName.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.userName.message}</p>
                     )}
                   </>
                 );
@@ -303,7 +303,7 @@ const RegisterForm = () => {
                         onChange={field.onChange}
                       /> */}
                       {errors && errors.dob && (
-                        <p className="text-red-500">{errors.dob.message}</p>
+                        <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.dob.message}</p>
                       )}
                     </>
                   );
@@ -326,7 +326,7 @@ const RegisterForm = () => {
                         onChange={field.onChange}
                       />
                       {errors && errors.phoneNumber && (
-                        <p className="text-red-500">
+                        <p className="mt-1.5 text-xs font-medium text-danger-600">
                           {errors.phoneNumber.message}
                         </p>
                       )}
@@ -352,7 +352,7 @@ const RegisterForm = () => {
                       placeholder="Enter your email id"
                     />
                     {errors && errors.email && (
-                      <p className="text-red-500">{errors.email.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.email.message}</p>
                     )}
                   </>
                 );
@@ -373,7 +373,7 @@ const RegisterForm = () => {
                       placeholder="Enter your password"
                     />
                     {errors && errors.password && (
-                      <div className="text-red-500">
+                      <div className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.password.message}
                       </div>
                     )}
@@ -386,11 +386,11 @@ const RegisterForm = () => {
           <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
             <Button
             disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-sm font-normal sm:text-base">
               Already have a account?{" "}

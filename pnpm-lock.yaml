@@ -467,6 +467,9 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@repo/mail':
+        specifier: workspace:*
+        version: link:../../packages/mail
       '@repo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -694,12 +697,6 @@ importers:
 
   packages/mail:
     dependencies:
-      '@sendgrid/mail':
-        specifier: ^7.5.2
-        version: 7.7.0
-      '@types/nodemailer':
-        specifier: ^7.0.11
-        version: 7.0.11
       nodemailer:
         specifier: ^8.0.2
         version: 8.0.2
@@ -707,6 +704,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@types/nodemailer':
+        specifier: ^7.0.11
+        version: 7.0.11
       eslint:
         specifier: ^8.53.0
         version: 8.57.1
@@ -7603,33 +7603,6 @@ packages:
   /@rushstack/eslint-patch@1.15.0:
     resolution: {integrity: sha512-ojSshQPKwVvSMR8yT2L/QtUkV5SXi/IfDiJ4/8d6UbTPjiHVmxZzUAzGD8Tzks1b9+qQkZa0isUOvYObedITaw==}
 
-  /@sendgrid/client@7.7.0:
-    resolution: {integrity: sha512-SxH+y8jeAQSnDavrTD0uGDXYIIkFylCo+eDofVmZLQ0f862nnqbC3Vd1ej6b7Le7lboyzQF6F7Fodv02rYspuA==}
-    engines: {node: 6.* || 8.* || >=10.*}
-    dependencies:
-      '@sendgrid/helpers': 7.7.0
-      axios: 0.26.1
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@sendgrid/helpers@7.7.0:
-    resolution: {integrity: sha512-3AsAxfN3GDBcXoZ/y1mzAAbKzTtUZ5+ZrHOmWQ279AuaFXUNCh9bPnRpN504bgveTqoW+11IzPg3I0WVgDINpw==}
-    engines: {node: '>= 6.0.0'}
-    dependencies:
-      deepmerge: 4.3.1
-    dev: false
-
-  /@sendgrid/mail@7.7.0:
-    resolution: {integrity: sha512-5+nApPE9wINBvHSUxwOxkkQqM/IAAaBYoP9hw7WwgDNQPxraruVqHizeTitVtKGiqWCKm2mnjh4XGN3fvFLqaw==}
-    engines: {node: 6.* || 8.* || >=10.*}
-    dependencies:
-      '@sendgrid/client': 7.7.0
-      '@sendgrid/helpers': 7.7.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /@smastrom/react-rating@1.5.0(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-7vg3NRgO0tpvEunq8BEWA8qckNSd7x3dVGqaNEfLs3Ow4ibU2EEXJtnd7Yl44xOujWIzXM5Bk2VZm2DVm065Qw==}
     peerDependencies:
@@ -8531,12 +8504,13 @@ packages:
     resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
     dependencies:
       undici-types: 6.21.0
+    dev: true
 
   /@types/nodemailer@7.0.11:
     resolution: {integrity: sha512-E+U4RzR2dKrx+u3N4DlsmLaDC6mMZOM/TPROxA0UAPiTgI0y4CEFBmZE+coGWTjakDriRsXG368lNk1u9Q0a2g==}
     dependencies:
       '@types/node': 22.19.3
-    dev: false
+    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -9669,14 +9643,6 @@ packages:
   /axe-core@4.11.0:
     resolution: {integrity: sha512-ilYanEU8vxxBexpJd8cWM4ElSQq4QctCLKih0TSfjIfCQTeyH/6zVrmIJfLPrKTKJRbiG+cfnZbQIjAlJmF1jQ==}
     engines: {node: '>=4'}
-
-  /axios@0.26.1:
-    resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
-    dependencies:
-      follow-redirects: 1.15.11
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.13.2:
     resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}

@@ -1,47 +1,65 @@
 "use client";
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React from "react";
+
+/**
+ * Stage selector above the services carousel.
+ *
+ * Same five stages, same `carouselIndex` values, same `onStageHover` contract —
+ * still fired on hover and on click, so the carousel behaves exactly as before.
+ *
+ * Three changes:
+ *
+ *  - Each card was a `<div>` with an `onClick`. That is not reachable by keyboard
+ *    and is announced as nothing by a screen reader, so the only way to change
+ *    category was a mouse. They are `<button>`s now, with `aria-pressed` carrying
+ *    the active state. Mouse behaviour is untouched.
+ *
+ *  - The stage number was an `<h1>`. Five of them, plus the hero's, meant the home
+ *    page shipped six top-level headings and the outline read as six separate
+ *    documents. The number is decorative and is now a `<span>`; the stage name is
+ *    an `<h3>` under the carousel's own heading.
+ *
+ *  - The palette was five unrelated hand-picked colours — mustard, pink, magenta
+ *    with alpha, lime, translucent blue — which is the least clinical thing on the
+ *    page. These are one tonal progression through the brand ramp, which also
+ *    reads as a sequence, which is what a set of stages should do.
+ */
 
 const STAGES_DATA = [
   {
     id: "pre-pregnancy",
     prefix: "01",
-    title: "Women’s health",
-    bgColor: "bg-[#D3B155]",
-    textColor: "text-[#6B5B7A]",
-    carouselIndex: 0, // Woman Wellbeing
+    title: "Women's health",
+    tone: "bg-primary-800",
+    carouselIndex: 0,
   },
   {
     id: "1st-trimester",
     prefix: "02",
     title: "Pregnancy Planning",
-    bgColor: "bg-[#D35590]",
-    textColor: "text-[#4A5B4A]",
-    carouselIndex: 1, // PCOS
+    tone: "bg-primary-700",
+    carouselIndex: 1,
   },
   {
     id: "2nd-trimester",
     prefix: "03",
     title: "Prenatal Care",
-    bgColor: "bg-[#D355B6B2]",
-    textColor: "text-[#4A6B68]",
-    carouselIndex: 2, // Prenatal Care
+    tone: "bg-primary-600",
+    carouselIndex: 2,
   },
   {
     id: "3rd-trimester",
     prefix: "04",
     title: "Postnatal Care",
-    bgColor: "bg-[#A9D355]",
-    textColor: "text-[#4A6B68]",
-    carouselIndex: 3, // Postnatal Care
+    tone: "bg-primary-500",
+    carouselIndex: 3,
   },
   {
     id: "post-partum",
     prefix: "05",
     title: "Child Health care",
-    bgColor: "bg-[#5577D3B2]",
-    textColor: "text-[#5B6B8A]",
-    carouselIndex: 4, // Child Healthcare
+    tone: "bg-primary-400",
+    carouselIndex: 4,
   },
 ];
 
@@ -54,59 +72,46 @@ export default function PregnancyStages({
   onStageHover,
   activeIndex,
 }: PregnancyStagesProps) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
   return (
-    <section className="w-full bg-white px-3 xs:px-4 sm:px-6 pb-3 xs:pb-4 sm:pb-8 pt-2 xs:pt-3 sm:pt-4 md:pb-12 md:pt-6">
-      <div className="mx-auto px-0">
-        {/* Stages Cards */}
-        <div className="grid w-full grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 lg:grid-cols-5 lg:gap-6">
-          {STAGES_DATA.map((stage, index) => {
-            const isActive = activeIndex === stage.carouselIndex;
+    <div className="w-full">
+      <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5 lg:gap-4">
+        {STAGES_DATA.map((stage) => {
+          const isActive = activeIndex === stage.carouselIndex;
 
-            // Responsive layout: 3 cols on mobile, 3 on tablet, 5 on desktop
-            const responsiveColClasses =
-              index < 3
-                ? "col-span-1"
-                : index === 3
-                  ? "col-start-auto col-span-1 sm:col-start-auto"
-                  : "col-span-1";
-
-            return (
-              <motion.div
-                key={stage.id}
-                whileHover={{ scale: 1.05, zIndex: 50 }}
-                transition={{ duration: 0.3 }}
-                onMouseEnter={() => {
-                  setHoveredId(stage.id);
-                  onStageHover?.(stage.carouselIndex);
-                }}
-                onClick={() => {
-                  onStageHover?.(stage.carouselIndex);
-                }}
-                onMouseLeave={() => setHoveredId(null)}
-                className={`relative flex flex-col justify-between items-start h-20 xs:h-24 sm:h-28 md:h-32 lg:h-40 rounded-lg xs:rounded-xl sm:rounded-2xl md:rounded-2xl lg:rounded-[30px] ${stage.bgColor} group cursor-pointer p-2 xs:p-2.5 sm:p-3 md:p-4 lg:p-6 font-sans shadow-lg ${responsiveColClasses} ${isActive ? "saturate-110 scale-105 shadow-xl ring-4 ring-black/10 ring-offset-2 z-10" : "opacity-80 hover:opacity-100 hover:shadow-xl transition-all"}`}
+          return (
+            <li key={stage.id} className="flex">
+              <button
+                type="button"
+                aria-pressed={isActive}
+                onMouseEnter={() => onStageHover?.(stage.carouselIndex)}
+                onFocus={() => onStageHover?.(stage.carouselIndex)}
+                onClick={() => onStageHover?.(stage.carouselIndex)}
+                className={[
+                  "group relative flex w-full flex-col justify-between overflow-hidden rounded-xl p-4 text-left",
+                  "h-28 sm:h-32 lg:h-36",
+                  stage.tone,
+                  "transition-[transform,box-shadow,opacity] duration-300 ease-out",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+                  isActive
+                    ? "opacity-100 shadow-md ring-2 ring-primary-600 ring-offset-2"
+                    : "opacity-75 hover:-translate-y-0.5 hover:opacity-100 hover:shadow-md",
+                ].join(" ")}
               >
-                {/* The large Gradient Text */}
-                <div className="w-full">
-                  <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase leading-none">
-                    <span className="bg-gradient-to-b from-black/40 to-black/10 bg-clip-text text-transparent">
-                      {stage.prefix}
-                    </span>
-                  </h1>
-                </div>
+                <span
+                  aria-hidden="true"
+                  className="text-3xl font-semibold leading-none tracking-tight text-white/35 sm:text-4xl lg:text-5xl"
+                >
+                  {stage.prefix}
+                </span>
 
-                {/* The Title Text */}
-                <div className="w-full">
-                  <h2 className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-base font-bold uppercase leading-tight tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] break-words">
-                    {stage.title}
-                  </h2>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
+                <h3 className="text-2xs font-semibold uppercase leading-tight tracking-[0.06em] text-white sm:text-xs">
+                  {stage.title}
+                </h3>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

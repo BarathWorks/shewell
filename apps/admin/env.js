@@ -20,7 +20,6 @@ export const env = createEnv({
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
       process.env.VERCEL ? z.string() : z.string().url()
     ),
-    // SENDGRID_API_KEY: z.string(),
     // SHIP_ROCKET_AUTH_KEY: z.string(),
     // SHIPROCKET_PASSWORD: z.string(),
     // SHIPROCKET_EMAIL: z.string(),
@@ -49,7 +48,6 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    // SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     // SHIP_ROCKET_AUTH_KEY: process.env.SHIP_ROCKET_AUTH_KEY,
     // SHIPROCKET_PASSWORD: process.env.SHIPROCKET_PASSWORD,
     // SHIPROCKET_EMAIL: process.env.SHIPROCKET_EMAIL,

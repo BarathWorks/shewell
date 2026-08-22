@@ -4,6 +4,7 @@ import { hash } from "bcrypt";
 import { z } from "zod";
 import { consumeRateLimit } from "@repo/database";
 import { logger } from "@repo/observability";
+import sendVerificationOtp from "../../verify-email/send-verification-otp-action";
 
 interface IAccountSetupProps {
   userName: string;
@@ -12,7 +13,20 @@ interface IAccountSetupProps {
 }
 
 export type ActionResult =
-  | { success: true; message: string }
+  | {
+      success: true;
+      message: string;
+      /**
+       * True when the verification code is on its way.
+       *
+       * False means the account exists but the mail could not be sent — the caller
+       * still routes to the verification screen, where "Resend code" is the way
+       * out. It must not report the signup itself as failed: the account is
+       * created by that point, and sending them round the loop again only trips
+       * the "user already exists" check.
+       */
+      verificationSent: boolean;
+    }
   | { success: false; error: string };
 
 /**
@@ -91,19 +105,44 @@ const AccountSetupUserAction = async ({
   // matched on the raw input while storing a lowercased address, so the two
   // disagreed and only the unique index caught the duplicate — as an opaque
   // "Failed SignUp".
-  const existingUser = await db.professionalUser.findFirst({
-    where: { email: { equals: data.email, mode: "insensitive" } },
-    select: { id: true },
-  });
+  const [existingUser, sameUserName, patientAccount] = await Promise.all([
+    db.professionalUser.findFirst({
+      where: { email: { equals: data.email, mode: "insensitive" } },
+      select: { id: true },
+    }),
+    db.professionalUser.findFirst({
+      where: { userName: { equals: data.userName, mode: "insensitive" } },
+      select: { id: true },
+    }),
+    // The patient portal refuses to sign in any address that also has a
+    // practitioner account, and it checks that first. So creating a practitioner
+    // account on an address that already belongs to a patient silently locks that
+    // patient out of their own account — appointments, history and all — with the
+    // message "This is a practitioner account".
+    //
+    // The two portals cannot share an address, so the collision has to be refused
+    // at the point where the second account would be created.
+    db.user.findFirst({
+      where: {
+        email: { equals: data.email, mode: "insensitive" },
+        verifiedAt: { not: null },
+        deletedAt: null,
+      },
+      select: { id: true },
+    }),
+  ]);
 
   if (existingUser) {
     return { success: false, error: "User already exists" };
   }
 
-  const sameUserName = await db.professionalUser.findFirst({
-    where: { userName: { equals: data.userName, mode: "insensitive" } },
-    select: { id: true },
-  });
+  if (patientAccount) {
+    return {
+      success: false,
+      error:
+        "This email is already registered as a patient account. Please use a different email for your practitioner account.",
+    };
+  }
 
   if (sameUserName) {
     return { success: false, error: "This Username already exists" };
@@ -125,9 +164,22 @@ const AccountSetupUserAction = async ({
       route: "AccountSetupUserAction",
     });
 
+    // The address is unproven until this code comes back, so it is sent before the
+    // practitioner goes any further into the wizard.
+    const verification = await sendVerificationOtp(data.email);
+
+    if (verification.status === "error") {
+      logger.warn("register.doctor_verification_send_failed", {
+        source: "auth",
+        route: "AccountSetupUserAction",
+        code: verification.code,
+      });
+    }
+
     return {
       success: true,
       message: "Account created successfully",
+      verificationSent: verification.status === "sent",
     };
   } catch (error) {
     // The unique indexes on email and userName are the real guard against the

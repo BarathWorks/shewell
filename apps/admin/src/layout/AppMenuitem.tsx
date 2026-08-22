@@ -6,13 +6,30 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useContext, Suspense } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { MenuContext } from './context/menucontext';
+import { LayoutContext } from './context/layoutcontext';
 import { AppMenuItemProps } from '@/types';
 import { usePathname } from 'next/navigation';
 
 const AppMenuitem = (props: AppMenuItemProps) => {
   const pathname = usePathname();
   const { activeMenu, setActiveMenu } = useContext(MenuContext);
+  const { layoutState, layoutConfig } = useContext(LayoutContext);
+
+  /**
+   * When the sidebar is collapsed to an icon rail the labels are hidden, so each
+   * icon needs a name on hover.
+   *
+   * A CSS `::after` tooltip would need `overflow: visible` on the sidebar, and the
+   * sidebar has to stay `overflow-y: auto` — the menu is taller than a short
+   * laptop viewport. The two cannot both be satisfied (CSS forces `overflow` to
+   * `auto` on both axes if either is not `visible`), so the tooltip is a native
+   * `title` instead. It is set only while collapsed, so an expanded menu does not
+   * carry a title that merely repeats its own visible text.
+   */
   const item = props.item;
+  const isRail =
+    layoutConfig.menuMode === 'static' && layoutState.staticMenuDesktopInactive;
+  const railTitle = isRail ? (item?.label as string | undefined) : undefined;
   const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
   const isActiveRoute = item!.to && pathname === item!.to;
   const active = activeMenu === key || activeMenu.startsWith(key + '-');
@@ -58,7 +75,7 @@ const AppMenuitem = (props: AppMenuItemProps) => {
     <li className={classNames({ 'layout-root-menuitem': props.root, 'active-menuitem': active })}>
       {props.root && item!.visible !== false && <div className="layout-menuitem-root-text">{item!.label}</div>}
       {(!item!.to || item!.items) && item!.visible !== false ? (
-        <a href={item!.url} onClick={(e) => itemClick(e)} className={classNames(item!.class, 'p-ripple')} target={item!.target} tabIndex={0}>
+        <a href={item!.url} onClick={(e) => itemClick(e)} className={classNames(item!.class, 'p-ripple')} target={item!.target} tabIndex={0} title={railTitle}>
           <i className={classNames('layout-menuitem-icon', item!.icon)}></i>
           <span className="layout-menuitem-text">{item!.label}</span>
           {item!.items && <i className="pi pi-fw pi-angle-down layout-submenu-toggler"></i>}
@@ -67,7 +84,7 @@ const AppMenuitem = (props: AppMenuItemProps) => {
       ) : null}
 
       {item!.to && !item!.items && item!.visible !== false ? (
-        <Link href={item!.to} replace={item!.replaceUrl} target={item!.target} onClick={(e) => itemClick(e)} className={classNames(item!.class, 'p-ripple', { 'active-route': isActiveRoute })} tabIndex={0}>
+        <Link href={item!.to} replace={item!.replaceUrl} target={item!.target} onClick={(e) => itemClick(e)} className={classNames(item!.class, 'p-ripple', { 'active-route': isActiveRoute })} tabIndex={0} title={railTitle}>
           <i className={classNames('layout-menuitem-icon', item!.icon)}></i>
           <span className="layout-menuitem-text">{item!.label}</span>
           {item!.items && <i className="pi pi-fw pi-angle-down layout-submenu-toggler"></i>}

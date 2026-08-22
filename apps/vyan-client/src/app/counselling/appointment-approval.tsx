@@ -40,16 +40,16 @@ const AppointmentApproval = ({
     value: string;
     badge?: React.ReactNode;
   }) => (
-    <div className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F2F9F9]">
+    <div className="flex items-start gap-4 rounded-2xl border border-hairline bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[#999999]">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted">
           {label}
         </p>
         <div className="mt-1 flex items-center gap-2">
-          <p className="truncate font-poppins text-sm font-semibold text-[#333333] sm:text-base">
+          <p className="truncate font-poppins text-sm font-semibold text-ink sm:text-base">
             {value}
           </p>
           {badge}
@@ -62,10 +62,10 @@ const AppointmentApproval = ({
     <div className="flex flex-col gap-5 pb-4 font-poppins">
       {/* Summary Header */}
       <div className="mb-1">
-        <h2 className="text-lg font-semibold text-[#333333]">
+        <h2 className="text-lg font-semibold text-ink">
           Appointment Summary
         </h2>
-        <p className="text-sm text-[#999999]">
+        <p className="text-sm text-muted">
           Review your details before confirming
         </p>
       </div>
@@ -129,8 +129,8 @@ const AppointmentApproval = ({
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                 isCouple
-                  ? "bg-[#E6F4F4] text-[#00898F]"
-                  : "bg-gray-100 text-[#666666]"
+                  ? "bg-primary-50 text-primary-700"
+                  : "bg-gray-100 text-muted"
               }`}
             >
               {isCouple ? "Couple" : "Single"}
@@ -165,10 +165,10 @@ const AppointmentApproval = ({
       </div>
 
       {/* Payment Card */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-hairline bg-white shadow-sm">
         {/* Payment Header */}
         <div className="flex items-center gap-3 border-b border-gray-50 bg-[#F8FDFD] px-5 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E6F4F4]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-50">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <rect
                 x="2"
@@ -183,8 +183,8 @@ const AppointmentApproval = ({
             </svg>
           </div>
           <div>
-            <p className="font-semibold text-[#333333]">Payment Details</p>
-            <p className="text-xs text-[#999999]">
+            <p className="font-semibold text-ink">Payment Details</p>
+            <p className="text-xs text-muted">
               {isCouple ? "Couple" : "Single"} therapy · Virtual appointment
             </p>
           </div>
@@ -193,37 +193,37 @@ const AppointmentApproval = ({
         {/* Price Breakdown */}
         <div className="flex flex-col gap-2 px-5 py-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#666666]">Sub Total</span>
-            <span className="font-medium text-[#333333]">
+            <span className="text-muted">Sub Total</span>
+            <span className="font-medium text-ink">
               INR {priceInCents}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#666666]">GST ({GST_RATE}%)</span>
-            <span className="font-medium text-[#00898F]">
+            <span className="text-muted">GST ({GST_RATE}%)</span>
+            <span className="font-medium text-primary-700">
               + INR {gstAmount}
             </span>
           </div>
-          <div className="mt-1 flex items-center justify-between border-t border-dashed border-gray-100 pt-3">
-            <span className="font-semibold text-[#333333]">Total</span>
-            <span className="text-lg font-bold text-[#00898F]">
+          <div className="mt-1 flex items-center justify-between border-t border-dashed border-hairline pt-3">
+            <span className="font-semibold text-ink">Total</span>
+            <span className="text-lg font-bold text-primary-700">
               INR {totalWithGST}
             </span>
           </div>
         </div>
 
         {/* Terms */}
-        <div className="border-t border-gray-50 px-5 py-3 text-xs text-[#999999]">
+        <div className="border-t border-gray-50 px-5 py-3 text-xs text-muted">
           By proceeding, you agree to the{" "}
           <Link
             href="/terms"
             target="_blank"
-            className="text-[#00898F] hover:underline"
+            className="text-primary-700 hover:underline"
           >
             Terms and Conditions
           </Link>{" "}
           and{" "}
-          <Link href="#" className="text-[#00898F] hover:underline">
+          <Link href="#" className="text-primary-700 hover:underline">
             Privacy Policy
           </Link>
         </div>

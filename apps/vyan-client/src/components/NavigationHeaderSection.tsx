@@ -35,11 +35,11 @@ export const NavigationHeaderSection = (): JSX.Element => {
               href={item.href}
               className="relative inline-flex flex-[0_0_auto] cursor-pointer items-center gap-2 border-none bg-transparent px-2 py-4 transition-opacity hover:opacity-80 xl:gap-3 xl:px-3 xl:py-6"
             >
-              <span className="relative mt-[-1.00px] w-fit whitespace-nowrap text-lg font-medium leading-7 tracking-[0] text-[#ffffff99] [font-family:'Poppins',Helvetica] xl:text-2xl xl:leading-9">
+              <span className="relative mt-[-1.00px] w-fit whitespace-nowrap text-lg font-medium leading-7 tracking-[0] text-white/60 [font-family:'Poppins',Helvetica] xl:text-2xl xl:leading-9">
                 {item.label}
               </span>
               {item.hasDropdown && (
-                <ChevronDownIcon className="relative h-3 w-3 text-[#ffffff99]" />
+                <ChevronDownIcon className="relative h-3 w-3 text-white/60" />
               )}
             </Link>
           ))}

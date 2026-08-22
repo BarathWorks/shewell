@@ -31,7 +31,7 @@ export const WhyChooseUsSection = () => {
   return (
     <section className="w-full px-6 lg:px-[100px] py-24">
       <div className="flex flex-col gap-6 mb-16 px-[50px]">
-        <h1 className="text-center text-[#333333] font-poppins font-[500] text-[42px] lg:text-[46px] leading-tight">From Overwhelmed to Empowered - Here's Why Moms Choose Us</h1>
+        <h1 className="text-center text-ink font-poppins font-[500] text-[42px] lg:text-[46px] leading-tight">From Overwhelmed to Empowered - Here's Why Moms Choose Us</h1>
         <p className="text-center font-poppins text-lg lg:text-xl leading-relaxed text-gray-600">Holistic sessions that restore confidence, calm the mind, and prepare you for birth and beyond.</p>
       </div>
       <motion.div layout className="flex w-full gap-6 items-stretch">
@@ -78,7 +78,7 @@ export const WhyChooseUsSection = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 12 }}
                       transition={{ duration: 0.35, ease: "easeOut", delay:0.08 }}
-                      className="font-poppins text-[#333333] text-base sm:text-lg leading-relaxed"
+                      className="font-poppins text-ink text-base sm:text-lg leading-relaxed"
                     >
                       {card.description}
                     </motion.p>

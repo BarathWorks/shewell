@@ -47,50 +47,25 @@ export default async function Notification() {
     },
   });
   return (
-    <>
-      <div className="w-full bg-[#FBFBFB] font-inter">
-        <div className="container mx-auto max-w-full">
-          <div className="py-4 md:py-6 xl:py-[28px] 2xl:py-[32px]">
-            <Breadcrumb>
-              <BreadcrumbList>
+    <div className="flex flex-col gap-5">
+      <Breadcrumb>
+              <BreadcrumbList className="text-sm text-muted">
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                  <BreadcrumbLink href="/" className="inline-block py-1 hover:text-primary-700">
+              Home
+            </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbLink>Notifications</BreadcrumbLink>
+                  <BreadcrumbLink className="inline-block py-1 text-ink">Notifications</BreadcrumbLink>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+      </Breadcrumb>
 
-          <div className="pb-[32px] lg:pb-[55px] xl:pb-[60px] 2xl:pb-[65px]">
-            <div className="items-start justify-between xl:flex xl:flex-row xl:justify-center xl:gap-[46px] 2xl:gap-[60px] ">
-              <div className="basis-full rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10">
-                <div className="mb-10 flex items-center gap-3 font-poppins text-xl font-semibold text-[#181818] lg:text-2xl xl:text-3xl">
-                  <svg
-                    className="size-6 xl:size-8"
-                    viewBox="0 0 32 32"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M25.3307 16H6.66406"
-                      stroke="#434343"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M15.9974 25.3334L6.66406 16.0001L15.9974 6.66675"
-                      stroke="#434343"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Notification
-                </div>
+      <div className="surface-card p-5 sm:p-6 lg:p-8">
+        <h1 className="mb-6 text-2xl font-semibold text-ink sm:text-3xl">
+          Notification
+        </h1>
                 <div>
                   {notifications && notifications.length > 0 ? (
                     <>
@@ -116,17 +91,13 @@ export default async function Notification() {
                     </>
                   ) : (
                     <>
-                      <div className="mx-auto flex w-full items-center justify-center font-inter text-[#666666]">
+                      <div className="mx-auto flex w-full items-center justify-center font-inter text-muted">
                         No notifications
                       </div>
                     </>
                   )}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }

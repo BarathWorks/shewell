@@ -111,7 +111,7 @@ const RegistrationTable = ({ registrations }: RegistrationTableProps) => {
         <Column field="user" header="User" body={userTemplate} sortable style={{ minWidth: '12rem' }} />
         <Column field="session" header="Session" body={sessionTemplate} sortable style={{ minWidth: '14rem' }} />
         <Column field="session.price" header="Price" body={priceTemplate} sortable style={{ minWidth: '8rem' }} />
-        <Column field="paymentStatus" header="Payment Status" body={statusTemplate} sortable style={{ minWidth: '10rem' }} />
+        <Column field="paymentStatus" header="Payment Status" body={statusTemplate} sortable style={{ minWidth: '8rem' }} />
         <Column field="createdAt" header="Registered At" body={dateTemplate} sortable style={{ minWidth: '12rem' }} />
         <Column header="Actions" body={actionTemplate} exportable={false} style={{ minWidth: '12rem' }} />
       </DataTable>

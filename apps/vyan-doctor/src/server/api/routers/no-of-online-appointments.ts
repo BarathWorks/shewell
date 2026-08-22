@@ -27,6 +27,10 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
       const updatedEndDate = formatISO(endOfDay(endDate));
 
       const professionalUser = await db.professionalUser.findFirst({
+        // Only the id is used below. Without a projection Prisma returns every
+        // column — password hash, bank account number, IFSC, Google tokens and the
+        // pending OTP — into application memory on every dashboard load.
+        select: { id: true },
         where: {
           email: session.user.email,
         },
@@ -89,6 +93,11 @@ export const noOfOnlineAppointmentsRouter = createTRPCRouter({
           startingTime: true,
           endingTime: true,
           planName: true,
+          // The table renders a Status column and a mode label. Neither field was
+          // selected: the status column did not exist at all, and the mode was the
+          // literal string "Online" printed on every row regardless of serviceType.
+          status: true,
+          serviceType: true,
         },
         where: {
           startingTime: {

@@ -38,11 +38,11 @@ const DatePickerWithRange = ({
               // id="date"
               variant={"outline"}
               className={cn(
-                "w-fit justify-start text-left font-normal",
+                "h-11 w-full justify-start gap-2 rounded-lg border-hairline-strong bg-surface px-3.5 text-sm font-medium text-ink shadow-xs hover:border-primary-400 hover:bg-primary-50 sm:w-auto",
                 !dates && "text-muted-foreground",
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="size-4 shrink-0 text-primary-600" />
               {dates?.from ? (
                 dates.to ? (
                   <>
@@ -57,7 +57,7 @@ const DatePickerWithRange = ({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto bg-white p-0" align="start">
+          <PopoverContent className="w-auto rounded-xl border border-hairline bg-surface p-0 shadow-lg" align="start">
             <Calendar
               initialFocus
               mode="range"

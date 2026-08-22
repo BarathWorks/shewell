@@ -15,6 +15,10 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
         phoneNumber: true,
         userName: true,
         isapproved: true,
+        // Whether the practitioner has confirmed control of the address we send
+        // appointment notifications and password resets to. Approving an account
+        // that never proved its address defeats the point of verifying it.
+        emailVerifiedAt: true,
         gender: true,
         displayQualification: {
           select: {
@@ -40,19 +44,15 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
         },
         identity: {
           select: {
-            // PAN and Aadhaar are deliberately NOT selected.
+            // PAN and Aadhaar are never selected — not here, and not anywhere else
+            // in a router (enforced by the "never select credential or identity
+            // fields" invariant in @repo/testing).
             //
-            // This procedure is gated on `appointment:read`, which SUPPORT holds —
-            // so a read-only support agent could pull every practitioner's full
-            // Aadhaar and PAN number from the dashboard. That is the same exposure
-            // `payout:read` was withheld from SUPPORT to prevent, arriving through
-            // a different door.
-            //
-            // The screen shows whether identity has been verified and, for the
-            // licence, which registration a practitioner practises under. Neither
-            // needs the government identifiers themselves; anyone who genuinely
-            // needs those should be looking at the practitioner's own record with a
-            // role that permits it.
+            // This procedure is gated on `appointment:read`, which read-only SUPPORT
+            // holds, so loading the numbers at all would put every practitioner's
+            // government identifiers one serialisation mistake away from the
+            // browser. Whether they were *supplied* is what the approval screen
+            // needs, and that is answered below by two id-only queries.
             licenseNumber: true,
             isVerified: true
           }
@@ -84,6 +84,38 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       // Bounded until this list is paged server-side; it feeds /view-doctors.
       take: 500
     });
+
+    // Which practitioners have supplied each identifier, without reading any of
+    // them. Filtering on `not: null` and selecting only the owner's id answers the
+    // question the approval screen actually asks — "were documents provided?" —
+    // while the values stay in the database.
+    const [withPan, withAadhaar] = await Promise.all([
+      db.professionalIdentity.findMany({
+        where: { panNumber: { not: null }, deletedAt: null },
+        select: { professionalUserId: true }
+      }),
+      db.professionalIdentity.findMany({
+        where: { aadhaarNumber: { not: null }, deletedAt: null },
+        select: { professionalUserId: true }
+      })
+    ]);
+
+    const panProvided = new Set(withPan.map((row) => row.professionalUserId));
+    const aadhaarProvided = new Set(withAadhaar.map((row) => row.professionalUserId));
+
+    const professionalUsersForClient = professionalUsers.map(
+      ({ identity, ...professionalUser }) => ({
+        ...professionalUser,
+        identity: identity
+          ? {
+              hasPanNumber: panProvided.has(professionalUser.id),
+              hasAadhaarNumber: aadhaarProvided.has(professionalUser.id),
+              licenseNumber: identity.licenseNumber,
+              isVerified: identity.isVerified
+            }
+          : null
+      })
+    );
 
     const appointmentDataForTable = await db.bookAppointment.findMany({
       select: {
@@ -148,7 +180,7 @@ export const totalOnlineAppointmentsRouter = createTRPCRouter({
       appointmentDataForTable,
       totalDoctorsOnBoard,
       totalAppointmentsWithCountAndPrice,
-      professionalUsers
+      professionalUsers: professionalUsersForClient
     };
   }),
 

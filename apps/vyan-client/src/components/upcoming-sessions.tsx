@@ -3,8 +3,43 @@
 import React from "react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
-import { Calendar } from "lucide-react";
-import { InteractiveButton } from "./ui/interactive-button";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import SectionHeader from "./section-header";
+
+/**
+ * Upcoming sessions.
+ *
+ * Visual rework only — same query, same `limit: 4`, same three states, same
+ * `/session/[slug]` destinations.
+ *
+ * Two things worth naming:
+ *  - The loading and empty states were `min-h-screen` / `min-h-[80vh]`. A skeleton
+ *    a full viewport tall collapses to the height of four cards the instant data
+ *    arrives, which is a large layout shift on the busiest section of the home
+ *    page. All three states share one section shell now, so the block is the same
+ *    height before and after loading.
+ *  - The "Explore all sessions" control was a `<div>` with an `onClick` that set
+ *    `window.location.href`. Visually it is now a proper link — keyboard
+ *    reachable, focusable, and it navigates on Enter — but the destination is
+ *    unchanged.
+ */
+
+const HEADER = {
+  eyebrow: "Live and guided",
+  title: "Upcoming Wellness Sessions",
+  lead: "Join our expert-led sessions for your pregnancy journey.",
+} as const;
+
+function SectionShell({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="section-y bg-canvas">
+      <div className="container-page">
+        <SectionHeader {...HEADER} />
+        <div className="mt-10 md:mt-12">{children}</div>
+      </div>
+    </section>
+  );
+}
 
 export default function UpcomingSessions() {
   const { data: sessions, isLoading } =
@@ -14,186 +49,150 @@ export default function UpcomingSessions() {
 
   if (isLoading) {
     return (
-      <section className="min-h-screen w-full bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-        <div className="mb-8 text-center">
-          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
-            Upcoming Wellness Sessions
-          </h2>
-          <div className="mx-auto h-4 w-1/3 animate-pulse rounded bg-gray-200"></div>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="h-[450px] animate-pulse rounded-3xl bg-gray-100"
-            ></div>
+      <SectionShell>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="surface-card overflow-hidden">
+              <div className="skeleton h-44 rounded-none" />
+              <div className="space-y-3 p-5">
+                <div className="skeleton h-4 w-20" />
+                <div className="skeleton h-5 w-3/4" />
+                <div className="skeleton h-4 w-full" />
+                <div className="skeleton h-4 w-2/3" />
+                <div className="skeleton mt-4 h-11 w-full" />
+              </div>
+            </div>
           ))}
         </div>
-      </section>
+      </SectionShell>
     );
   }
 
   if (!sessions || sessions.length === 0) {
     return (
-      <section className="flex min-h-[80vh] w-full flex-col bg-gradient-to-b from-white to-gray-50 px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-        <div className="mb-8 text-center">
-          <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
-            Upcoming Wellness Sessions
-          </h2>
-          <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
-            Join our expert-led sessions for your pregnancy journey
-          </p>
-        </div>
-
-        {/* Empty state */}
-        <div className="flex flex-1 items-center justify-center">
-          <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-[20px] border-2 border-dashed border-gray-300 bg-white p-6 shadow-sm sm:p-10 md:p-16 lg:p-20">
-            {/* Image area */}
-            <div className="mb-6 flex w-full items-center justify-center">
-              <img
-                src="/session-calender.png"
-                alt="No upcoming sessions"
-                className="h-40 w-40 object-contain sm:h-48 sm:w-48 md:h-56 md:w-56"
-              />
-            </div>
-
-            {/* Content area */}
-            <div className="flex flex-col items-center text-center">
-              <h3 className="mb-4 text-xl font-bold text-gray-900 sm:text-2xl md:text-3xl">
-                New Sessions Coming Soon
-              </h3>
-              <p className="max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg">
-                We're currently scheduling our next round of expert-led
-                pregnancy and health workshops.
-              </p>
-            </div>
+      <SectionShell>
+        <div className="surface-card mx-auto flex max-w-2xl flex-col items-center px-6 py-14 text-center sm:px-10">
+          <div className="flex size-14 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+            <CalendarDays aria-hidden="true" className="size-6" />
           </div>
+          <h3 className="mt-5 text-xl font-semibold text-ink">
+            New Sessions Coming Soon
+          </h3>
+          <p className="mt-2.5 max-w-md text-sm leading-relaxed text-body">
+            We&apos;re currently scheduling our next round of expert-led
+            pregnancy and health workshops.
+          </p>
+          <Link
+            href="/session"
+            className="mt-7 inline-flex h-11 items-center gap-2 rounded-lg border border-hairline-strong bg-surface px-5 text-sm font-medium text-ink transition-colors duration-200 hover:border-primary-500 hover:bg-primary-50 hover:text-primary-800"
+          >
+            Browse all sessions
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
         </div>
-      </section>
+      </SectionShell>
     );
   }
 
   return (
-    <section className="min-h-fit w-full bg-gradient-to-b from-white to-gray-50 px-4 py-4 sm:min-h-[85vh] sm:px-6 sm:py-12 md:px-12 lg:px-[100px]">
-      <div className="mb-8 text-center">
-        <h2 className="mb-2 text-2xl font-medium text-gray-900 sm:mb-4 sm:text-3xl md:text-5xl lg:text-5xl xl:text-[48px]">
-          Upcoming Wellness Sessions
-        </h2>
-        <p className="text-xs text-[#33333399] sm:text-sm md:text-lg lg:text-lg xl:text-[24px]">
-          Join our expert-led sessions for your pregnancy journey
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <SectionShell>
+      <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         {sessions.map((session) => {
           const startDate = new Date(session.startAt);
           const month = startDate.toLocaleString("default", { month: "short" });
           const day = startDate.getDate();
 
           return (
-            <div
-              key={session.id}
-              className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
-            >
-              {/* Header Image Area */}
-              <div className="relative h-40 xs:h-44 sm:h-48 w-full overflow-hidden bg-gray-100">
-                {session?.thumbnailMedia?.fileUrl ? (
-                  <img
-                    src={session.thumbnailMedia.fileUrl}
-                    alt={session.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-                    <Calendar className="h-10 xs:h-11 sm:h-12 w-10 xs:w-11 sm:w-12 opacity-50" />
-                  </div>
-                )}
+            <li key={session.id} className="flex">
+              <article className="surface-card surface-card-interactive group flex w-full flex-col overflow-hidden">
+                {/* Thumbnail */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
+                  {session?.thumbnailMedia?.fileUrl ? (
+                    <img
+                      src={session.thumbnailMedia.fileUrl}
+                      alt=""
+                      className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-primary-50 text-primary-300">
+                      <CalendarDays aria-hidden="true" className="size-10" />
+                    </div>
+                  )}
 
-                {/* Date Ribbon */}
-                <div className="absolute right-3 xs:right-4 top-0 flex h-[60px] xs:h-[65px] sm:h-[70px] w-[45px] xs:w-[48px] sm:w-[50px] flex-col items-center justify-start rounded-b-lg bg-[#1B8A8E] pt-1.5 xs:pt-2 text-white shadow-md">
-                  <div className="flex flex-col items-center">
-                    <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90">
+                  {/* Date chip */}
+                  <div className="absolute left-3 top-3 flex flex-col items-center rounded-lg border border-white/70 bg-surface/95 px-2.5 py-1.5 shadow-sm backdrop-blur-sm">
+                    <span className="text-2xs font-semibold uppercase tracking-wider text-primary-600">
                       {month}
                     </span>
-                    <span className="text-base xs:text-lg sm:text-xl font-bold leading-none">
+                    <span className="text-lg font-semibold leading-none text-ink">
                       {day}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "-10px",
-                      left: 0,
-                      width: "100%",
-                      height: "20px",
-                      backgroundColor: "#1B8A8E",
-                      clipPath: "polygon(0 0, 50% 50%, 100% 0)",
-                    }}
-                  ></div>
                 </div>
-              </div>
 
-              {/* Content Area */}
-              <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5">
-                {/* Tags */}
-                <div className="mb-2 xs:mb-3 flex flex-wrap items-center gap-1.5 xs:gap-2">
-                  <span className="rounded bg-[#E3F6F5] px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-[#1B8A8E]">
-                    {session.language || "English"}
-                  </span>
-                  {session.type === "ONLINE" && (
-                    <span className="flex items-center gap-1 xs:gap-1.5 rounded bg-green-50 px-2 xs:px-2.5 py-0.5 xs:py-1 text-[11px] xs:text-xs font-semibold text-green-600">
-                      <span className="h-1 xs:h-1.5 w-1 xs:w-1.5 rounded-full bg-green-500"></span>
-                      Online
+                {/* Body */}
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center rounded-md border border-hairline bg-slate-50 px-2 py-1 text-2xs font-medium text-body">
+                      {session.language || "English"}
                     </span>
-                  )}
-                </div>
-
-                {/* Title */}
-                <h3 className="mb-2 line-clamp-2 text-xl font-extrabold leading-tight text-gray-900">
-                  {session.title}
-                </h3>
-
-                {/* Description placeholder logic - ideally fetch from DB if available in summary */}
-                <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-500">
-                  A comprehensive session focusing on health and wellness. Join
-                  us to learn from the best experts in the field.
-                </p>
-
-                {/* Spacer to push footer down */}
-                <div className="flex-1"></div>
-
-                {/* Footer: Price & Action */}
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <div className="flex h-[42px] min-w-[90px] items-center justify-center rounded-lg border border-[#1B8A8E] bg-white text-base font-bold text-[#1B8A8E]">
-                    ₹ {Number(session.price).toLocaleString()}
+                    {session.type === "ONLINE" && (
+                      <span className="inline-flex items-center gap-1.5 rounded-md border border-success-100 bg-success-50 px-2 py-1 text-2xs font-medium text-secondary-700">
+                        <span
+                          aria-hidden="true"
+                          className="size-1.5 rounded-full bg-secondary-500"
+                        />
+                        Online
+                      </span>
+                    )}
                   </div>
 
-                  <Link href={`/session/${session.slug}`} className="flex-1">
-                    <button className="flex h-[42px] w-full items-center justify-center rounded-lg bg-[#1B8A8E] px-4 text-sm font-bold text-white transition-colors hover:bg-[#156f73]">
+                  <h3 className="mt-3 line-clamp-2 text-base font-semibold leading-snug text-ink">
+                    {session.title}
+                  </h3>
+
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted">
+                    A comprehensive session focusing on health and wellness. Join
+                    us to learn from the best experts in the field.
+                  </p>
+
+                  <div className="flex-1" />
+
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-hairline pt-4">
+                    <span className="text-base font-semibold text-ink">
+                      ₹{Number(session.price).toLocaleString("en-IN")}
+                    </span>
+
+                    <Link
+                      href={`/session/${session.slug}`}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-primary-600 bg-primary-600 px-4 text-sm font-medium text-white transition-all duration-200 hover:border-primary-700 hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2"
+                    >
                       Register
-                    </button>
-                  </Link>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                      />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </article>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
-      {/* CTA Button */}
-      <div
-        className="mt-8 flex w-full justify-center sm:mt-10 md:mt-14 lg:mt-16"
-        onClick={() => (window.location.href = "/session")}
-      >
-        <div className="order-0 group flex w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#F2F2F2] px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#00898F] xs:h-16 xs:py-2 sm:h-12 sm:h-14 sm:gap-3 sm:rounded-xl sm:px-5 sm:py-4 md:h-20 md:h-[70px] md:rounded-2xl md:px-7 lg:h-20 lg:px-8 xl:h-24">
-          <div className="flex flex-1 justify-center">
-            <span className="text-center text-xs font-medium tracking-[0.2em] text-[#00000066] group-hover:text-white sm:text-sm md:text-[16px] lg:text-[24px] xl:text-[28px]">
-              EXPLORE ALL SESSIONS
-            </span>
-          </div>
-          <InteractiveButton />
-        </div>
+      <div className="mt-10 flex justify-center md:mt-12">
+        <Link
+          href="/session"
+          className="group inline-flex h-12 items-center gap-2 rounded-lg border border-hairline-strong bg-surface px-6 text-sm font-medium text-ink transition-all duration-200 hover:border-primary-500 hover:bg-primary-50 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 sm:text-base"
+        >
+          Explore all sessions
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+          />
+        </Link>
       </div>
-    </section>
+    </SectionShell>
   );
 }

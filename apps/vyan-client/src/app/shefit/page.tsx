@@ -26,12 +26,14 @@ import { ComingSoon } from "~/components/coming-soon";
 // Not exported: Next.js restricts which names a page module may export,
 // and an extra one fails the build once type checking is enabled.
 const shefit = () => {
-return (
-  <div className="flex h-screen w-full flex-col items-center justify-center mb-10">
-
-    <ComingSoon />
-  </div>
-)
+  // `h-screen` plus a 40px bottom margin, inside a page that already has a
+  // sticky header and a footer, guaranteed a scrollbar on a page with one
+  // element on it. The component sizes itself now.
+  return (
+    <div className="bg-canvas">
+      <ComingSoon />
+    </div>
+  );
 }
 ;
 export default shefit

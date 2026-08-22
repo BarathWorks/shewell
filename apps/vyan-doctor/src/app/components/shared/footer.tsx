@@ -27,10 +27,10 @@ export default function Footer() {
                 href="https://x.com/shewellcare"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
+                className="inline-block py-1 group transition-transform hover:scale-110"
                 aria-label="X (Twitter)"
               >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
+                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-primary-600 sm:p-3">
                   <img
                     src="/icons/x.svg"
                     alt="X"
@@ -44,10 +44,10 @@ export default function Footer() {
                 href="https://www.instagram.com/shewellcare"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
+                className="inline-block py-1 group transition-transform hover:scale-110"
                 aria-label="Instagram"
               >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
+                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-primary-600 sm:p-3">
                   <img
                     src="/icons/insta.svg"
                     alt="Instagram"
@@ -61,10 +61,10 @@ export default function Footer() {
                 href="https://www.facebook.com/people/Shewellcare/61566486577092"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
+                className="inline-block py-1 group transition-transform hover:scale-110"
                 aria-label="Facebook"
               >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
+                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-primary-600 sm:p-3">
                   <img
                     src="/icons/facebook.svg"
                     alt="Facebook"
@@ -78,10 +78,10 @@ export default function Footer() {
                 href="https://www.youtube.com/@Shewellcare"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group transition-transform hover:scale-110"
+                className="inline-block py-1 group transition-transform hover:scale-110"
                 aria-label="YouTube"
               >
-                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-[#167D71] sm:p-3">
+                <div className="rounded-full bg-white p-2.5 text-black transition-all group-hover:bg-primary-600 sm:p-3">
                   <img
                     src="/icons/youtube.svg"
                     alt="YouTube"
@@ -104,7 +104,7 @@ export default function Footer() {
                 <li>
                   <a
                     href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                    className="inline-block py-1 transition-all hover:translate-x-1 hover:text-primary-700"
                   >
                     Dashboard
                   </a>
@@ -112,7 +112,7 @@ export default function Footer() {
                 <li>
                   <a
                     href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                    className="inline-block py-1 transition-all hover:translate-x-1 hover:text-primary-700"
                   >
                     Appointments
                   </a>
@@ -120,7 +120,7 @@ export default function Footer() {
                 <li>
                   <a
                     href="#"
-                    className="inline-block transition-all hover:translate-x-1 hover:text-[#167D71]"
+                    className="inline-block py-1 transition-all hover:translate-x-1 hover:text-primary-700"
                   >
                     Blog
                   </a>
@@ -134,7 +134,7 @@ export default function Footer() {
               <ul className="space-y-3.5 text-sm text-gray-300 sm:space-y-4 sm:text-base">
                 <li className="flex items-start gap-2">
                   <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -156,7 +156,7 @@ export default function Footer() {
                     href="https://maps.google.com/?q=NO.1274,+CHARUKESI+APARTMENTS,+17TH+STREET,+POOMPUHAR+NAGAR,+KOLATHUR,+CHENNAI,+Tamil+Nadu,+India+600099"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="leading-relaxed transition-colors hover:text-[#167D71]"
+                    className="inline-block py-1 leading-relaxed transition-colors hover:text-primary-700"
                   >
                     NO.1274, CHARUKESI APARTMENTS,
                     <br className="hidden sm:block" /> 17TH STREET, POOMPUHAR
@@ -168,7 +168,7 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center gap-2">
                   <svg
-                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    className="h-4 w-4 flex-shrink-0 text-primary-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -182,14 +182,14 @@ export default function Footer() {
                   </svg>
                   <a
                     href="mailto:info@shewellofficial.com"
-                    className="transition-colors hover:text-[#167D71]"
+                    className="inline-block py-1 transition-colors hover:text-primary-700"
                   >
                     info@shewellofficial.com
                   </a>
                 </li>
                 <li className="flex items-center gap-2">
                   <svg
-                    className="h-4 w-4 flex-shrink-0 text-[#167D71]"
+                    className="h-4 w-4 flex-shrink-0 text-primary-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -203,7 +203,7 @@ export default function Footer() {
                   </svg>
                   <a
                     href="tel:+917397380900"
-                    className="transition-colors hover:text-[#167D71]"
+                    className="inline-block py-1 transition-colors hover:text-primary-700"
                   >
                     +91 7397 380 900
                   </a>
@@ -219,20 +219,20 @@ export default function Footer() {
         {/* Bottom Bar - Responsive */}
         <div className="flex flex-col items-center justify-between gap-5 text-sm text-gray-400 sm:flex-row sm:gap-6 md:text-base">
           <div className="flex flex-wrap items-center justify-center gap-5 sm:justify-start sm:gap-6 md:gap-8">
-            <a href="/terms" className="transition-all hover:text-[#167D71]">
+            <a href="/terms" className="inline-block py-1 transition-all hover:text-primary-700">
               Terms & Conditions
             </a>
             <span className="hidden text-gray-600 sm:inline">•</span>
             <a
               href="/privacy-policy"
-              className="transition-all hover:text-[#167D71]"
+              className="inline-block py-1 transition-all hover:text-primary-700"
             >
               Privacy Policy
             </a>
             <span className="hidden text-gray-600 sm:inline">•</span>
             <a
               href="/refund-policy"
-              className="transition-all hover:text-[#167D71]"
+              className="inline-block py-1 transition-all hover:text-primary-700"
             >
               Refund & Cancellation
             </a>

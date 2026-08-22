@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UIFormInput from "@repo/ui/src/@/components/form/input";
-import UIFormLabel from "@repo/ui/src/@/components/form/label";
+import { UIFormInput } from "~/components/ui/legacy-form";
+import { UIFormLabel } from "~/components/ui/legacy-form";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/src/@/components/button";
@@ -28,7 +28,7 @@ import {
   PopoverTrigger,
 } from "@repo/ui/src/@/components/popover";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, subYears } from "date-fns";
 import { cn } from "~/app/lib/utils";
 import { Input } from "@repo/ui/src/@/components/input";
 import Image from "next/image";
@@ -40,13 +40,23 @@ interface ILanguageProps {
   name: string;
 }
 
+const MINIMUM_AGE_YEARS = 18;
+
 const personalInfoSchema = z.object({
   mediaId: z.string({ required_error: "Please upload a profile photo" }),
   firstName: z.string({ required_error: "Please enter the first name" }),
   lastName: z
     .string({ required_error: "Please enter the last name" })
     .optional(),
-  dob: z.date({ required_error: "Please select the date of birth" }),
+  // Mirrors the server rule. The calendar already refused future dates, but
+  // nothing enforced a minimum age, so a date of birth a fortnight ago was
+  // accepted without complaint.
+  dob: z
+    .date({ required_error: "Please select the date of birth" })
+    .max(subYears(new Date(), MINIMUM_AGE_YEARS), {
+      message: `You must be at least ${MINIMUM_AGE_YEARS} years old`,
+    })
+    .min(new Date(1900, 0, 1), { message: "Please enter a valid date of birth" }),
   phoneNumber: z
     .string({ required_error: "Please enter the phone number" })
     .max(10, { message: "Phone Number can have maximum 10 digits" })
@@ -126,36 +136,58 @@ const PersonalInfoForm = ({
     router.push("/auth/login");
   }
 
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+
+  /**
+   * Uploads the profile photo straight to S3 with a presigned URL.
+   *
+   * Every failure path here used to be silent: a non-OK response simply skipped
+   * `setValue`, and the `.catch` only reached the console. Since `mediaId` is a
+   * required field, the visible result was a form that refused to submit with
+   * "Please upload a profile photo" next to a photo the practitioner had just
+   * chosen — and no way to find out why. That is how the CSP blocking S3 went
+   * unnoticed.
+   */
   const onSelectImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-    if (event.target.files.length > 0) {
-      for (const image of event.target.files) {
-        const arrayOfKeys = image.name.split(".");
-        uploadProfessionalUserImage(
-          professionalUserId,
-          `professionalUser/${professionalUserId}/profile.${arrayOfKeys[arrayOfKeys.length - 1]}`,
-          image.name,
-          image.type,
-        )
-          .then(async (resp) => {
-            const { id, fileUrl, presignedUrl } = resp;
-            const requestOptions = {
-              method: "PUT",
-              headers: {
-                "Content-Type": image.type,
-              },
-              body: image,
-            };
-            const res = await fetch(presignedUrl!, requestOptions);
-            if (res.ok) {
-              setValue("mediaId", id!);
-              setImageUrl(fileUrl!);
-            }
-          })
-          .catch((error) => {
-            console.log("error while uploading image", error);
-          });
+    const image = event.target.files?.[0];
+    if (!image) return;
+
+    setIsUploadingImage(true);
+    try {
+      const extension = image.name.split(".").pop() ?? "png";
+      const { id, fileUrl, presignedUrl } = await uploadProfessionalUserImage(
+        professionalUserId,
+        `professionalUser/${professionalUserId}/profile.${extension}`,
+        image.name,
+        image.type,
+      );
+
+      if (!presignedUrl || !id) {
+        throw new Error("The server did not return an upload URL.");
       }
+
+      const res = await fetch(presignedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": image.type },
+        body: image,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Storage rejected the file (${res.status}).`);
+      }
+
+      setValue("mediaId", id, { shouldValidate: true });
+      setImageUrl(fileUrl!);
+      toast({ description: "Photo uploaded", variant: "default" });
+    } catch (error) {
+      console.error("error while uploading image", error);
+      toast({
+        description:
+          "We could not upload your photo. Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -215,7 +247,7 @@ const PersonalInfoForm = ({
       <form
         onSubmit={handleSubmit(onSubmit, errorHandler)}
         noValidate={true}
-        className="rounded-md border-2 border-primary p-4 md:p-6 "
+        className="surface-card p-5 sm:p-6"
       >
         <div className="flex flex-col gap-[18px] md:gap-5 xl:gap-6 ">
           {/* Upload Profile Photo */}
@@ -233,7 +265,7 @@ const PersonalInfoForm = ({
                     accept="image/*"
                   />
                   {errors && errors.mediaId && (
-                    <p className="text-red-500">{errors.mediaId.message}</p>
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.mediaId.message}</p>
                   )}
                 </>
               )}
@@ -271,7 +303,7 @@ const PersonalInfoForm = ({
                       className="w-full"
                     />
                     {errors && errors.firstName && (
-                      <p className="text-red-500">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.firstName.message}
                       </p>
                     )}
@@ -295,7 +327,7 @@ const PersonalInfoForm = ({
                       className="w-full"
                     />
                     {errors && errors.lastName && (
-                      <p className="text-red-500">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.lastName.message}
                       </p>
                     )}
@@ -341,17 +373,28 @@ const PersonalInfoForm = ({
                             setIsCalendarOpen(false);
                           }}
                           className="w-full bg-white py-3"
+                          // Future dates were already blocked, but nothing stopped
+                          // a date of birth a few days ago — so a practitioner
+                          // profile could claim an age of zero. The bound is the
+                          // same one the schema and the server action enforce.
                           disabled={(date: Date) =>
-                            date > new Date() || date < new Date("1900-01-01")
+                            date > subYears(new Date(), MINIMUM_AGE_YEARS) ||
+                            date < new Date("1900-01-01")
                           }
                           initialFocus
+                          // Without this the picker opens on December of the last
+                          // allowed year, where every day is past the cutoff and
+                          // therefore disabled — it looks broken.
+                          defaultMonth={
+                            field.value ?? subYears(new Date(), MINIMUM_AGE_YEARS)
+                          }
                           fromYear={1920}
-                          toYear={new Date().getFullYear()}
+                          toYear={new Date().getFullYear() - MINIMUM_AGE_YEARS}
                         />
                       </PopoverContent>
                     </Popover>
                     {errors && errors.dob && (
-                      <p className="text-red-500">{errors.dob.message}</p>
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.dob.message}</p>
                     )}
                   </>
                 )}
@@ -372,7 +415,7 @@ const PersonalInfoForm = ({
                       onChange={field.onChange}
                     />
                     {errors && errors.phoneNumber && (
-                      <p className="text-red-500">
+                      <p className="mt-1.5 text-xs font-medium text-danger-600">
                         {errors.phoneNumber.message}
                       </p>
                     )}
@@ -394,7 +437,7 @@ const PersonalInfoForm = ({
                     value={field.value || ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-full rounded-md border border-solid border-[#e9e9e9] py-3 pl-4 font-inter text-sm font-normal outline-primary">
+                    <SelectTrigger className="w-full rounded-md border border-solid border-hairline py-3 pl-4 font-inter text-sm font-normal outline-primary">
                       <SelectValue placeholder="Select your gender" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -406,7 +449,7 @@ const PersonalInfoForm = ({
                     </SelectContent>
                   </Select>
                   {errors && errors.gender && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.gender.message}
                     </p>
                   )}
@@ -433,7 +476,7 @@ const PersonalInfoForm = ({
                     displayValue="name"
                   />
                   {errors && errors.languages && (
-                    <p className="text-red-500 text-sm">
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">
                       {errors.languages.message}
                     </p>
                   )}
@@ -457,7 +500,7 @@ const PersonalInfoForm = ({
                     onChange={field.onChange}
                   />
                   {errors && errors.aboutYou && (
-                    <p className="text-red-500">{errors.aboutYou.message}</p>
+                    <p className="mt-1.5 text-xs font-medium text-danger-600">{errors.aboutYou.message}</p>
                   )}
                 </>
               )}
@@ -468,12 +511,12 @@ const PersonalInfoForm = ({
           <div className="flex flex-col items-center justify-center gap-4 xl:flex-row xl:justify-between">
             <Button
               disabled={loadingState}
-              className="w-[260px] xl:order-last xl:w-[164px]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-700 active:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55 sm:w-auto"
               variant="OTP"
               type="submit"
             >
               {loadingState && <LoadingSpinner width="20" height="20" />}
-              {loadingState ? "Loading..." : " Next"}
+              {loadingState ? "Saving…" : "Next"}
             </Button>
             <div className=" font-inter text-sm font-normal sm:text-base">
               Already have a account?{" "}

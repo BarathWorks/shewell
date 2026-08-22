@@ -257,7 +257,7 @@ const Upcoming = () => {
                             <div className="font-inter text-sm font-semibold text-primary md:text-[15px] md:leading-[22px] xl:text-base ">
                               Message:
                             </div>
-                            <div className="font-inter text-xs font-normal text-[#898989] xl:text-sm">
+                            <div className="font-inter text-xs font-normal text-muted xl:text-sm">
                               {item.patient.message}
                             </div>
                           </div>
@@ -316,7 +316,7 @@ const Upcoming = () => {
                           setCancelAppointmentStartingTime(new Date(item.startingTime))
                           handleCancelDialog()
                         }}
-                        className="bg-white px-4 py-2 font-inter text-sm font-medium text-[#CA0000] hover:bg-white"
+                        className="bg-white px-4 py-2 font-inter text-sm font-medium text-danger-600 hover:bg-white"
                       >
                         Cancel
                       </Button>
@@ -344,7 +344,7 @@ const Upcoming = () => {
                         </Button>
                       </div>
                     </div>
-                    <div className="font-inter text-[10px] font-medium leading-[12px] text-[#CA0000] md:order-first md:text-xs lg:order-first ">
+                    <div className="font-inter text-[10px] font-medium leading-[12px] text-danger-600 md:order-first md:text-xs lg:order-first ">
                       *Cancellation of appointment can be done before 2 hrs of
                       booked time
                     </div>
@@ -380,11 +380,11 @@ const Upcoming = () => {
           Are you sure you want to cancel the appointment ?
           {Math.abs(differenceInMinutes(cancelAppointmentStartingTime!, currentTime)) >
             120 ? (
-            <div className="font-inter text-[#CA0000]">
+            <div className="font-inter text-danger-600">
               You wil get full refund
             </div>
           ) : (
-            <div className="font-inter text-[#CA0000]">
+            <div className="font-inter text-danger-600">
               You will not get any refund
             </div>
           )}

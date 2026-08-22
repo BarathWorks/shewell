@@ -147,12 +147,12 @@ export const FilterBar = ({
           <SheetTrigger asChild>
             <Button
               variant="outline"
-              className="flex items-center gap-1.5 xs:gap-2 rounded-full border-gray-200 bg-white px-4 xs:px-5 sm:px-6 py-2.5 xs:py-3 sm:py-6 text-xs xs:text-sm font-bold text-[#1a1a1a] shadow-lg shadow-black/5 hover:bg-gray-50 transition-all active:scale-95"
+              className="flex items-center gap-1.5 xs:gap-2 rounded-full border-hairline bg-white px-4 xs:px-5 sm:px-6 py-2.5 xs:py-3 sm:py-6 text-xs xs:text-sm font-bold text-ink shadow-lg shadow-black/5 hover:bg-gray-50 transition-all active:scale-95"
             >
-              <Filter size={16} className="xs:size-[18px] text-[#1B8A8E]" strokeWidth={2.5} />
+              <Filter size={16} className="xs:size-[18px] text-primary-700" strokeWidth={2.5} />
               Filters
               {filterObjects.length > 0 && (
-                <span className="ml-0.5 xs:ml-1 flex h-5 xs:h-6 w-5 xs:w-6 items-center justify-center rounded-full bg-[#1B8A8E] text-[10px] xs:text-[11px] font-bold text-white shadow-md shadow-[#1B8A8E]/20">
+                <span className="ml-0.5 xs:ml-1 flex h-5 xs:h-6 w-5 xs:w-6 items-center justify-center rounded-full bg-primary-600 text-[10px] xs:text-[11px] font-bold text-white shadow-md shadow-[#1B8A8E]/20">
                   {filterObjects.length}
                 </span>
               )}
@@ -160,7 +160,7 @@ export const FilterBar = ({
           </SheetTrigger>
           <SheetContent side="right" className="flex flex-col p-0 w-[90vw] xs:w-[320px] sm:w-[380px] md:w-[400px] bg-white border-l shadow-2xl">
             <SheetHeader className="px-4 xs:px-5 sm:px-6 pt-4 xs:pt-5 sm:pt-6 pb-3 xs:pb-4 border-b flex flex-row items-center justify-between gap-2">
-              <SheetTitle className="text-lg xs:text-xl font-bold text-[#1a1a1a] truncate">Filters</SheetTitle>
+              <SheetTitle className="text-lg xs:text-xl font-bold text-ink truncate">Filters</SheetTitle>
               <SheetClose className="rounded-full p-1.5 xs:p-2 hover:bg-gray-100 transition-colors flex-shrink-0">
                 <X size={18} className="xs:size-5 text-gray-500" />
               </SheetClose>
@@ -171,7 +171,7 @@ export const FilterBar = ({
               {filterObjects.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-[#1B8A8E]">
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-primary-700">
                       Active Filters
                     </h3>
                   </div>
@@ -180,7 +180,7 @@ export const FilterBar = ({
                       <Badge
                         key={`mob-badge-${filter.key}-${filter.value || ""}`}
                         variant="secondary"
-                        className="flex items-center gap-1.5 border-none bg-[#1B8A8E]/10 px-3 py-1.5 text-[11px] font-semibold text-[#1B8A8E]"
+                        className="flex items-center gap-1.5 border-none bg-primary-600/10 px-3 py-1.5 text-[11px] font-semibold text-primary-700"
                       >
                         {filter.label}
                         <X
@@ -196,7 +196,7 @@ export const FilterBar = ({
 
               {/* Category */}
               <div className="space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-[#555555]">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-body">
                   Categories
                 </h3>
                 <div className="flex flex-col gap-1">
@@ -228,7 +228,7 @@ export const FilterBar = ({
 
               {/* Trimester */}
               <div className="space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-[#555555]">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-body">
                   Trimester
                 </h3>
                 <div className="flex flex-wrap gap-2.5">
@@ -240,8 +240,8 @@ export const FilterBar = ({
                       className={cn(
                         "rounded-full px-5 py-2 h-auto text-xs font-semibold transition-all active:scale-95",
                         selectedTrimester === tri 
-                          ? "bg-[#1B8A8E] text-white shadow-md shadow-[#1B8A8E]/20" 
-                          : "border-gray-200 text-gray-600 bg-white"
+                          ? "bg-primary-600 text-white shadow-md shadow-[#1B8A8E]/20" 
+                          : "border-hairline text-gray-600 bg-white"
                       )}
                       onClick={() =>
                         updateURLParams({
@@ -257,7 +257,7 @@ export const FilterBar = ({
 
               {/* Price */}
               <div className="space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-[#555555]">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-body">
                   Price Range
                 </h3>
                 <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3">
@@ -284,7 +284,7 @@ export const FilterBar = ({
                 </div>
                 <Button
                   size="small"
-                  className="w-full bg-[#1B8A8E] h-11 rounded-xl font-bold shadow-lg shadow-[#1B8A8E]/10 transition-all active:scale-[0.98]"
+                  className="w-full bg-primary-600 h-11 rounded-xl font-bold shadow-lg shadow-[#1B8A8E]/10 transition-all active:scale-[0.98]"
                   onClick={() => updateURLParams({ minPrice, maxPrice })}
                 >
                   Apply Price
@@ -293,7 +293,7 @@ export const FilterBar = ({
 
               {/* Date */}
               <div className="space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-[#555555]">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-body">
                   Session Date
                 </h3>
                 <div className="grid grid-cols-1 gap-3">
@@ -317,7 +317,7 @@ export const FilterBar = ({
                   </div>
                   <Button
                     size="small"
-                    className="w-full bg-[#1B8A8E] h-11 rounded-xl font-bold mt-2 shadow-lg shadow-[#1B8A8E]/10 transition-all active:scale-[0.98]"
+                    className="w-full bg-primary-600 h-11 rounded-xl font-bold mt-2 shadow-lg shadow-[#1B8A8E]/10 transition-all active:scale-[0.98]"
                     onClick={() => updateURLParams({ startDate, endDate })}
                   >
                     Set Date Range
@@ -340,17 +340,17 @@ export const FilterBar = ({
                       className={cn(
                         "flex w-full items-center justify-between rounded-xl px-4 py-3.5 transition-all active:scale-[0.98]",
                         sortBy === opt.v 
-                          ? "bg-[#1B8A8E]/5 border-[#1B8A8E] border ring-1 ring-[#1B8A8E]" 
+                          ? "bg-primary-600/5 border-primary-600 border ring-1 ring-[#1B8A8E]" 
                           : "bg-gray-50 border-transparent border hover:bg-gray-100"
                       )}
                       onClick={() => updateURLParams({ sortBy: opt.v })}
                     >
                       <span className={cn(
                         "text-sm font-semibold",
-                        sortBy === opt.v ? "text-[#1B8A8E]" : "text-gray-700"
+                        sortBy === opt.v ? "text-primary-700" : "text-gray-700"
                       )}>{opt.l}</span>
                       {sortBy === opt.v && (
-                        <div className="h-5 w-5 rounded-full bg-[#1B8A8E] flex items-center justify-center">
+                        <div className="h-5 w-5 rounded-full bg-primary-600 flex items-center justify-center">
                           <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
                         </div>
                       )}
@@ -360,9 +360,9 @@ export const FilterBar = ({
               </div>
 
               {/* Free Toggle */}
-              <div className="flex items-center justify-between rounded-2xl bg-[#1B8A8E]/5 p-5 border border-[#1B8A8E]/10">
+              <div className="flex items-center justify-between rounded-2xl bg-primary-600/5 p-5 border border-primary-600/10">
                 <div>
-                  <h3 className="text-sm font-bold text-[#1B8A8E]">Free Sessions Only</h3>
+                  <h3 className="text-sm font-bold text-primary-700">Free Sessions Only</h3>
                   <p className="text-xs text-gray-500/80 mt-0.5">Show only free courses</p>
                 </div>
                 <FilterToggle
@@ -538,7 +538,7 @@ export const FilterBar = ({
       {/* FILTERS APPLIED SECTION (Desktop/Tablet only) */}
       {filterObjects.length > 0 && (
         <div className="hidden md:block mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-12">
-          <div className="rounded-xl border border-gray-100 bg-white p-[clamp(1rem,2vw,1.5rem)] shadow-sm md:p-6">
+          <div className="rounded-xl border border-hairline bg-white p-[clamp(1rem,2vw,1.5rem)] shadow-sm md:p-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div className="flex flex-wrap gap-2">
                 {filterObjects.map((filter) => (

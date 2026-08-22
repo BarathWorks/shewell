@@ -5,6 +5,7 @@ import { db } from '@/src/server/db';
 import { Skeleton } from 'primereact/skeleton';
 import TestimonialTable from './testimonial-table';
 import { requireAdminPage } from '@/src/server/authz';
+import PageHeader from '@/src/_components/shared/page-header';
 const Testimonials = async () => {
   await requireAdminPage('content:read');
 
@@ -27,9 +28,12 @@ const Testimonials = async () => {
   });
   return (
     <>
-      <Suspense fallback={<Skeleton className="tw-bg-red-200" width="100%" height="100px" />}>
-        <TestimonialTable testimonials={testimonials.map((t)=>({...t, avgRating: t.avgRating?.toFixed(1)!}))} />
-      </Suspense>
+      <PageHeader title="Testimonials" description="Patient quotes shown on the public site." />
+      <>
+        <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+          <TestimonialTable testimonials={testimonials.map((t)=>({...t, avgRating: t.avgRating?.toFixed(1)!}))} />
+        </Suspense>
+      </>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import "~/styles/globals.css";
-import { Inter, Pacifico, Playfair_Display, Amatic_SC } from "next/font/google";
+import { Inter, Amatic_SC } from "next/font/google";
 import { Toaster } from "@repo/ui/src/@/components/toaster";
 import { Header } from "~/components/header";
 import NewFooter from "~/components/new-footer";
@@ -8,31 +8,32 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { getServerAuthSession } from "~/server/auth";
 import { safeValue } from "@repo/observability";
 
-import { Poppins } from "next/font/google";
 // import { Header as NewHeader } from "./components/header";
+/**
+ * One interface typeface.
+ *
+ * Inter carries the whole UI now — see the `fontFamily` note in
+ * `tailwind.config.ts`. It exposes both `--font-inter` (what the Tailwind aliases
+ * resolve to) and `--font-sans` so any stylesheet still reaching for the older
+ * variable keeps working.
+ *
+ * Pacifico, Playfair Display and Poppins were all loaded on every page. Pacifico
+ * and Playfair were referenced by nothing at all, and `next/font` emits an
+ * @font-face and preloads the files for every family it is handed — so two full
+ * families were downloaded on every page view for nothing. Poppins is replaced by
+ * Inter. Three fewer families now cross the wire.
+ */
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  display: "swap",
+  variable: "--font-inter",
 });
 
-const pacifico = Pacifico({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-pacifico",
-});
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-});
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"], // Adjust as needed
-  variable: "--font-poppins",
-});
-
+/** The one decorative face, used by a single heading. */
 const amaticSC = Amatic_SC({
   weight: ["400", "700"],
   subsets: ["latin"],
+  display: "swap",
   variable: "--font-amatic-sc",
 });
 
@@ -63,29 +64,39 @@ export default async function RootLayout({
 
   return (
     <html
-      className={`scroll-smooth scroll-smooth ${poppins.variable} ${inter.variable} ${pacifico.variable} ${playfair.variable} ${amaticSC.variable}`}
+      className={`scroll-smooth ${inter.variable} ${amaticSC.variable}`}
       lang="en"
     >
-      <body className={"relative font-sans"}>
-        
-        <div className="sticky top-0 z-40">
-          <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
-            <TRPCReactProvider>
-              {/* <Header
-                email={session?.user.email!}
-                name={session?.user.name!}
-                categories={categories}
-                wishlistedProLength={
-                  userDetails?.wishlistedProducts.length || 0
-                }
-              /> */}
+      <body className="min-h-screen bg-canvas font-sans antialiased">
+        {/*
+          The header, the page and the footer used to sit inside a single
+          `<div className="sticky top-0 z-40">`. A sticky box containing the whole
+          document cannot stick to anything — and because a sticky ancestor
+          establishes the containing block for its descendants, it also stopped the
+          header's own `sticky` from tracking the viewport. The wrapper is gone; the
+          header sticks on its own.
+
+          `<main>` is a landmark and the skip link's target, neither of which the
+          bare fragment provided.
+        */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-ink focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+        >
+          Skip to content
+        </a>
+
+        <ClientSessionProvider session={session} verifiedAt={session?.user?.verifiedAt}>
+          <TRPCReactProvider>
+            <div className="flex min-h-screen flex-col">
               <Header />
-              {/* <NewHeader /> */}
-              {children}
+              <main id="main" className="flex-1">
+                {children}
+              </main>
               <NewFooter />
-            </TRPCReactProvider>
-          </ClientSessionProvider>
-        </div>
+            </div>
+          </TRPCReactProvider>
+        </ClientSessionProvider>
         <Toaster />
       </body>
     </html>

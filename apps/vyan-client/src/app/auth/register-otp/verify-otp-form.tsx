@@ -64,9 +64,9 @@ const VerifyOTPForm = ({
   // if (session.status === "unauthenticated") {
   //   redirect("/auth/login");
   // }
-  const onSubmit = async (data: IFormSchema) => {
-    console.log("otp", data.otp);
+  const [isVerifying, setIsVerifying] = React.useState(false);
 
+  const onSubmit = async (data: IFormSchema) => {
     if (!email) {
       toast({
         variant: "destructive",
@@ -75,33 +75,49 @@ const VerifyOTPForm = ({
       return;
     }
 
-    const verifyData = {
-      email: email,
-      otp: data.otp,
-    };
-
+    setIsVerifying(true);
     try {
-      const resp = await verifyOtpAction(verifyData);
-      toast({
-        title: resp?.message,
-        variant: "default",
-      });
+      const resp = await verifyOtpAction({ email, otp: data.otp });
 
-      // User is now created in DB, sign them in
-      const signInResult = await signIn("CrendentialsVyanClient", {
+      if (resp.status === "error") {
+        toast({ variant: "destructive", title: resp.message });
+        // The pending registration is gone; there is nothing left to verify.
+        if (resp.code === "NOT_FOUND") router.push("/auth/register");
+        return;
+      }
+
+      toast({ title: resp.message, variant: "default" });
+
+      // Sign in with the single-use code the action just issued.
+      //
+      // This previously called the credentials provider with no password field at
+      // all — which can never authenticate — and then pushed to `/` regardless, so
+      // every new user landed on the home page signed out with no indication why.
+      const signInResult = await signIn("OtpVyanClient", {
         redirect: false,
-        email: email,
-        // We pass a placeholder password - the actual password check was done during registration
-        // But we need to re-authenticate. Since user just verified, we can use signIn with redirect.
+        email: resp.email,
+        otp: resp.signInOtp,
       });
 
-      // Redirect to home after successful sign in
-      router.push(`/`);
+      if (!signInResult?.ok) {
+        toast({
+          title: "Account verified. Please log in to continue.",
+          variant: "default",
+        });
+        router.push(`/auth/login?email=${encodeURIComponent(resp.email)}`);
+        return;
+      }
+
+      await session.update();
+      router.push("/");
+      router.refresh();
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: err.message || "Verification failed",
+        title: err?.message || "Verification failed",
       });
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -133,16 +149,19 @@ const VerifyOTPForm = ({
     setCanResend(false);
     setTimer(30);
     resendOTP(email)
-      .then(async (resp) => {
+      .then((resp) => {
         toast({
-          title: resp?.message,
-          variant: "default",
+          title: resp.message,
+          variant: resp.status === "sent" ? "default" : "destructive",
         });
+        if (resp.status === "error" && resp.code === "NOT_FOUND") {
+          router.push("/auth/register");
+        }
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           variant: "destructive",
-          title: err.message,
+          title: "Failed to resend OTP. Please try again.",
         });
       });
   };
@@ -189,9 +208,9 @@ const VerifyOTPForm = ({
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:px-[50px] md:py-10 2xl:px-[97px]"
+        className="flex flex-col items-center justify-center rounded-3xl border border-hairline bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:px-[50px] md:py-10 2xl:px-[97px]"
       >
-        <div className="font-poppins text-xl font-semibold text-[#333333]">
+        <div className="font-poppins text-xl font-semibold text-ink">
           Enter OTP*
         </div>
 
@@ -216,27 +235,27 @@ const VerifyOTPForm = ({
                     <InputOTPGroup className="mx-auto gap-2">
                       <InputOTPSlot
                         index={0}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                       <InputOTPSlot
                         index={1}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                       <InputOTPSlot
                         index={2}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                       <InputOTPSlot
                         index={3}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                       <InputOTPSlot
                         index={4}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                       <InputOTPSlot
                         index={5}
-                        className="rounded-lg border-gray-200 bg-gray-50 font-poppins text-lg transition-all focus:border-[#00898F] focus:bg-white"
+                        className="rounded-lg border-hairline bg-gray-50 font-poppins text-lg transition-all focus:border-primary-600 focus:bg-white"
                       />
                     </InputOTPGroup>
                   </InputOTP>
@@ -255,8 +274,8 @@ const VerifyOTPForm = ({
             type="button"
             disabled={!canResend}
             className={`font-poppins text-sm font-medium ${canResend
-              ? "cursor-pointer text-[#00898F] hover:underline"
-              : "cursor-not-allowed text-[#00898F]"
+              ? "cursor-pointer text-primary-700 hover:underline"
+              : "cursor-not-allowed text-primary-700"
               }`}
             onClick={handleResendOTP}
           >
@@ -265,12 +284,12 @@ const VerifyOTPForm = ({
         </div>
 
         <Button
-          //   onClick={() => router.push("/auth/login")}
           className="my-6 w-full rounded-xl py-6 font-poppins text-base font-semibold md:w-[324px]"
           variant="OTP"
           type="submit"
+          disabled={isVerifying}
         >
-          Verify
+          {isVerifying ? "Verifying..." : "Verify"}
         </Button>
       </form>
       <div className="mt-[45px] hidden md:block">

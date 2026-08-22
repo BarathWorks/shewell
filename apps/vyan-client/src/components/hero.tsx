@@ -1,87 +1,154 @@
 import Link from "next/link";
 import Image from "next/image";
-import { InteractiveButton } from "./ui/interactive-button";
+import { ArrowRight, CalendarDays, ShieldCheck, Video } from "lucide-react";
+
+/**
+ * Home hero.
+ *
+ * Visual only: the same two destinations (`/counselling`, `/session`), the same
+ * copy, the same image, still `priority` with a `sizes` hint. The two calls to
+ * action keep the exact classes they have always had.
+ *
+ * Filling the screen
+ * ------------------
+ * The section is now at least one viewport tall, less the sticky header, hence
+ * the two different subtractions. Those are in pixels rather than the header's
+ * own `h-16` / `lg:h-[4.5rem]` because the header also carries a 1px bottom
+ * border: it measures 65px and 73px, not 64 and 72, and subtracting the rem
+ * values left the section one pixel taller than the space available. `svh`
+ * rather than `vh` because on mobile browsers `100vh` measures the viewport with
+ * the URL bar retracted, so a `100vh` hero stands taller than the screen on first
+ * paint and pushes the trust row below the fold.
+ *
+ * It is a floor, not a fixed height: if the copy ever grows past a viewport the
+ * section grows with it rather than clipping.
+ *
+ * From `lg` up the portrait is lifted out of the grid and pinned to the right
+ * edge of the *section*, so it runs to the edge of the screen instead of stopping
+ * at the 1312px container. On a 1920px display that container leaves roughly
+ * 300px of margin down each side, and the previous layout spent it on nothing.
+ * This is also why the container div below no longer carries `relative`: the
+ * panel resolves `right-0` against its nearest positioned ancestor, and that has
+ * to be the full-width section, not the padded container.
+ *
+ * Below `lg` it stays in normal flow and stacks under the copy, as before.
+ *
+ * Motion
+ * ------
+ * Small, slow, staggered by about 90ms so the copy assembles rather than landing
+ * all at once. Everything is CSS, so this stays a server component, and
+ * `globals.css` already collapses all of it under `prefers-reduced-motion`.
+ *
+ * `object-cover` is safe for this particular asset, which is worth writing down
+ * because it would not be safe for a different one: `hero.png` is a 674x980
+ * cutout that is already a torso crop. Its alpha channel is opaque across both
+ * row 0 and row 979 — the subject bleeds off the top and bottom edges, there is
+ * no head or feet to decapitate, and the widest part of the silhouette (the
+ * belly, the focal point) sits between 45% and 65% of the height. Covering from
+ * the centre frames that and fills the panel edge to edge. If the asset is ever
+ * swapped for a full-figure shot, this has to go back to `contain`.
+ */
+
+const TRUST_POINTS = [
+  { icon: ShieldCheck, label: "Verified specialists" },
+  { icon: Video, label: "Private online consults" },
+  { icon: CalendarDays, label: "Same-week availability" },
+] as const;
 
 export default function Hero(): JSX.Element {
   return (
-    <section className="relative min-h-[85vh] md:h-[90vh] max-w-full overflow-hidden bg-white px-4 pb-8 pt-8 sm:px-8 sm:pt-10 md:px-16 md:pt-10 lg:pt-10 lg:px-24 xl:px-28 2xl:px-32 lg:pb-12">
-      <div className="">
-        <h1
-          className="font-poppins text-[1.75rem] font-semibold leading-tight text-[#114668] xs:text-[2rem] xs:leading-[1.2] sm:text-[2.25rem] md:text-[3rem] md:leading-[1.2] lg:text-[3.5rem] lg:leading-[1] xl:text-[4.5rem] xl:leading-[1.2] 2xl:text-[5.5rem] 2xl:leading-[1.2]"
-        >
-          Empowering{" "}
-          <span className="font-epicgant font-medium text-[#51AF5A]">
-            Women
-          </span>
-          , <br />
-          Nurturing Families
-        </h1>
-
-        <p
-          className="mt-4 max-w-full font-poppins text-sm font-medium leading-relaxed text-[#7b7b7b] sm:mt-6 sm:text-base md:mt-8 md:max-w-[37.5rem] md:text-lg lg:mt-2 lg:text-xl xl:text-[1.375rem] xl:leading-[1.4] 2xl:text-[1.625rem]"
-        >
-          A trusted digital companion for women's health, motherhood, Emotional
-          wellbeing, and mindful living curated by experts and designed for
-          every stage of womanhood.
-        </p>
-      </div>
-
-      {/* <div className="pointer-events-none absolute right-0 top-0 z-30 hidden h-full w-[40%] md:block">
-        <img
-          src="/home/hero.webp"
-          alt="Expecting mother"
-          className="h-full w-full object-contain object-right-bottom"
-          loading="eager"
-        />
-      </div> */}
+    <section className="relative flex min-h-[calc(100svh-65px)] items-center overflow-hidden bg-surface lg:min-h-[calc(100svh-73px)]">
+      {/* Ambient brand wash. Decorative only. */}
       <div
-        className="pointer-events-none bg-[linear-gradient(180deg,#114668_1%,#FFFFFF_85%)]
-        bg-clip-text font-poppins
-        text-[3.75rem] font-semibold leading-none text-transparent
-        opacity-20 xs:text-[5rem] sm:text-[6.25rem]
-        md:text-[7.5rem] lg:text-[6.25rem] xl:text-[12.5rem] 2xl:text-[16.25rem]"
-      >
-        #shewell
-      </div>
+        aria-hidden="true"
+        className="animate-breathe pointer-events-none absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-primary-50 blur-3xl md:-right-20 lg:h-[42rem] lg:w-[42rem]"
+      />
 
-      <div className="z-40 mt-6 flex w-full flex-col flex-wrap items-stretch gap-3 sm:mt-8 md:w-[60%] lg:w-[50%] sm:flex-row sm:items-center sm:gap-4 md:mt-10 md:gap-6 lg:mt-4 lg:gap-6">
-        <Link
-          href="/counselling"
-          className="w-full sm:w-auto sm:flex-1"
-          prefetch={false}
-        >
-          <div className="group flex h-16 w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[4.5rem] sm:px-5 md:h-20 md:px-6">
-            <span className="text-sm font-medium text-[#00000066] group-hover:text-white sm:text-base md:text-[0.875rem] lg:text-base xl:text-lg">
-              Book Your Consultation
-            </span>
-            <InteractiveButton />
+      <div className="container-page w-full">
+        <div className="grid items-stretch gap-8 py-10 md:py-12 lg:grid-cols-12 lg:gap-10 lg:py-14">
+          {/* Copy */}
+          <div className="flex flex-col justify-center lg:col-span-6">
+            <p className="eyebrow animate-rise">Women&apos;s health, end to end</p>
+
+            <h1 className="animate-rise mt-3 text-4xl font-semibold leading-[1.08] text-ink [animation-delay:90ms] sm:text-5xl lg:text-[3.25rem] xl:text-6xl">
+              Empowering <span className="text-primary-600">Women</span>,
+              <br className="hidden sm:block" /> Nurturing Families
+            </h1>
+
+            <p className="animate-rise mt-4 max-w-xl text-base leading-relaxed text-body [animation-delay:180ms] sm:mt-5 sm:text-lg">
+              A trusted digital companion for women&apos;s health, motherhood,
+              emotional wellbeing, and mindful living — curated by experts and
+              designed for every stage of womanhood.
+            </p>
+
+            {/* Actions — unchanged. */}
+            <div className="animate-rise mt-7 flex flex-col gap-3 [animation-delay:270ms] sm:flex-row sm:items-center sm:gap-4">
+              <Link
+                href="/counselling"
+                prefetch={false}
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-primary-600 bg-primary-600 px-6 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:border-primary-700 hover:bg-primary-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 sm:text-base"
+              >
+                Book Your Consultation
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+
+              <Link
+                href="/session"
+                prefetch={false}
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-hairline-strong bg-surface px-6 text-sm font-medium text-ink transition-all duration-200 hover:border-primary-500 hover:bg-primary-50 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 sm:text-base"
+              >
+                Explore Our Sessions
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+
+            {/* Trust row */}
+            <ul className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-hairline pt-5">
+              {TRUST_POINTS.map((point, index) => (
+                <li
+                  key={point.label}
+                  className="animate-rise flex items-center gap-2 text-sm text-muted"
+                  style={{ animationDelay: `${380 + index * 90}ms` }}
+                >
+                  <point.icon
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-primary-500"
+                  />
+                  {point.label}
+                </li>
+              ))}
+            </ul>
           </div>
-        </Link>
-        <Link
-          href="/session"
-          className="w-full sm:w-auto sm:flex-1"
-          prefetch={false}
-        >
-          <div className="group flex h-16 w-full items-center justify-between gap-2.5 rounded-2xl bg-[#F2F2F2] px-4 py-4 transition-all duration-300 ease-in-out hover:bg-[#00898F] sm:h-[4.5rem] sm:px-5 md:h-20 md:px-6">
-            <span className="text-sm font-medium text-[#00000066] group-hover:text-white sm:text-base md:text-[0.875rem] lg:text-base xl:text-lg">
-              Explore Our Sessions
-            </span>
-            <InteractiveButton />
+
+          {/* Portrait. In flow and stacked below `lg`; pinned to the screen edge
+              above it. `lg:col-span-6` is kept so the element still reserves the
+              right half if `position: absolute` ever fails to apply. */}
+          <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:col-span-6 lg:w-[47vw] xl:w-[46vw]">
+            <div className="animate-reveal relative h-full min-h-[18rem] w-full overflow-hidden rounded-[1.75rem] bg-gradient-to-b from-primary-100 to-primary-50 [animation-delay:120ms] sm:min-h-[22rem] lg:min-h-0 lg:rounded-l-[2.5rem] lg:rounded-r-none">
+              <Image
+                src="/home/hero.png"
+                alt="A Shewell specialist"
+                fill
+                priority
+                sizes="(max-width: 1024px) 92vw, 47vw"
+                className="animate-drift object-cover object-center"
+              />
+
+              {/* Scrim, so the wordmark stays legible over whatever part of the
+                  photograph the crop lands on. Decorative. */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/25 to-transparent"
+              />
+
+              <span
+                aria-hidden="true"
+                className="animate-float pointer-events-none absolute bottom-5 left-6 select-none text-2xl font-semibold tracking-tight text-white/85 sm:text-3xl"
+              >
+                #shewell
+              </span>
+            </div>
           </div>
-        </Link>
-      </div>
-      {/* Background Circle with Hero Image - Responsive */}
-      <div className="absolute right-[-50vw] top-[60%] z-20 hidden md:block h-[100vw] w-[100vw] translate-y-[-50%] rounded-full bg-[#9D9D8D] md:right-[-45vw] md:top-[65%] md:h-[90vw] md:w-[90vw] lg:right-[-40vw] lg:h-[80vw] lg:w-[80vw] xl:right-[-35vw]">
-        {/* Hero Image Container */}
-        <div className="absolute bottom-[25%] right-[40%] z-40 h-[120%] w-[40%] max-[1366px]:bottom-[24%] max-[1366px]:h-[100%] max-[1366px]:w-[52%] md:bottom-[28%] md:right-[42%] md:h-[110%] md:w-[20%] lg:bottom-[26%] lg:right-[43%] lg:h-[100%] lg:w-[48%]">
-          <Image
-            src="/home/hero.png"
-            alt="SheFit Hero"
-            fill
-            priority
-            sizes="(max-width: 768px) 0vw, (max-width: 1366px) 52vw, 48vw"
-            className="object-contain object-right-bottom transition-transform duration-500 hover:scale-[1.02]"
-          />
         </div>
       </div>
     </section>

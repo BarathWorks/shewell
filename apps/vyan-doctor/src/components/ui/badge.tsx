@@ -17,13 +17,13 @@ export const Badge: React.FC<BadgeProps> = ({
 }) => {
   const variantClasses = {
     specialization: `
-      rounded-full border border-[#00898F]/20 
+      rounded-full border border-primary-600/20 
       bg-gradient-to-r from-[#00898F]/10 to-[#51AF5A]/10 
-      px-3 py-1.5 font-poppins text-xs font-medium text-[#00898F]
+      px-3 py-1.5 font-poppins text-xs font-medium text-primary-700
     `,
     language: `
-      rounded-full border border-gray-200 bg-[#F5F5F5] 
-      px-3 py-1.5 font-poppins text-xs font-medium text-[#666666]
+      rounded-full border border-hairline bg-slate-50 
+      px-3 py-1.5 font-poppins text-xs font-medium text-muted
     `,
     status: `
       rounded-full border border-primary/20 bg-primary/10 

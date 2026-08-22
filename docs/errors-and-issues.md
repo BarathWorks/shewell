@@ -56,7 +56,7 @@
 
 **Direct usage with `!` (non-null assertion):**
 - `packages/aws/index.ts` - AWS credentials
-- `packages/mail/index.ts` - SENDGRID_API_KEY
+- `packages/mail/index.ts` - SMTP_USER / SMTP_PASSWORD (now validated, throws MailConfigError when unset)
 - `apps/vyan-doctor/src/(main)/upload-*-action.ts` - Multiple AWS variables
 
 **Impact:** 🔴 **CRITICAL** - Runtime errors if env vars missing
@@ -232,7 +232,7 @@ const refreshToken = await db.professionalUser.findFirst({...});
 **Commented Features:**
 - Discord OAuth (imported but not configured)
 - AWS integration in vyan-doctor app (env vars commented)
-- Email templates (SendGrid configured but no visible templates)
+- Email templates (SMTP configured via Nodemailer; templates in apps/vyan-client/src/lib/email-templates.ts)
 - Product filtering logic (extensive code commented in product.ts)
 
 **Impact:** 🔵 **LOW** - Code bloat, confusion for developers
@@ -316,7 +316,7 @@ const refreshToken = await db.professionalUser.findFirst({...});
 - **Status:** 🟡 20% complete (model only)
 
 ### 25. **Email Templates**
-- **Backend:** SendGrid configured
+- **Backend:** Nodemailer over SMTP
 - **Missing:**
   - No email templates found
   - No email sending logic for:

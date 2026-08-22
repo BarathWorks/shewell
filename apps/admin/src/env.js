@@ -27,13 +27,22 @@ export const env = createEnv({
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
       z.string().url(),
     ),
-    // SENDGRID_API_KEY: z.string(),
     // SHIP_ROCKET_AUTH_KEY: z.string(),
     // SHIPROCKET_PASSWORD: z.string(),
     // SHIPROCKET_EMAIL: z.string(),
-    // Used by the admin password-reset action via @repo/mail.
-    SENDGRID_API_KEY: z.string(),
-    FROM_EMAIL: z.string().email(),
+    // Used by the admin password-reset action via @repo/mail, which now speaks
+    // SMTP through Nodemailer. Host and port default to Gmail in that package.
+    // Required in production only — see the note in apps/vyan-client/src/env.js.
+    SMTP_USER:
+      process.env.NODE_ENV === "production" ? z.string().email() : z.string().optional(),
+    SMTP_PASSWORD:
+      process.env.NODE_ENV === "production" ? z.string().min(1) : z.string().optional(),
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.string().optional(),
+    SMTP_SECURE: z.string().optional(),
+    MAIL_FROM_NAME: z.string().optional(),
+    // Optional: falls back to SMTP_USER.
+    FROM_EMAIL: z.string().email().optional(),
     AWS_ACCESS_KEY_ID : z.string(),
     AWS_SECRET_ACCESS_KEY : z.string(),
     AWS_REGION : z.string(),
@@ -59,11 +68,15 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    // SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     // SHIP_ROCKET_AUTH_KEY: process.env.SHIP_ROCKET_AUTH_KEY,
     // SHIPROCKET_PASSWORD: process.env.SHIPROCKET_PASSWORD,
     // SHIPROCKET_EMAIL: process.env.SHIPROCKET_EMAIL,
-    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_SECURE: process.env.SMTP_SECURE,
+    MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
     FROM_EMAIL: process.env.FROM_EMAIL,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,

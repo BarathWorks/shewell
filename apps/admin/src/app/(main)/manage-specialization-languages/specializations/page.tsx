@@ -7,6 +7,7 @@ import { Skeleton } from 'primereact/skeleton';
 import SpecializationTable from './specialization-table';
 import { requireAdminPage } from '@/src/server/authz';
 
+import PageHeader from '@/src/_components/shared/page-header';
 const SpecializationPage = async () => {
   await requireAdminPage('doctor:read');
 
@@ -47,9 +48,12 @@ const SpecializationPage = async () => {
 
   console.log("specialization parent categories at specialization server", categories)
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <SpecializationTable specializations={updatedSpecializations}  categories={categories} />
-    </Suspense>
+    <>
+      <PageHeader title="Specialities" description="Individual specialities a practitioner can hold." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <SpecializationTable specializations={updatedSpecializations}  categories={categories} />
+      </Suspense>
+    </>
   );
 };
 

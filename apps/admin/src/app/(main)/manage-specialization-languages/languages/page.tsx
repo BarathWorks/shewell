@@ -8,6 +8,7 @@ import LanguageTable from './language-table';
 import { requireAdminPage } from '@/src/server/authz';
 
 
+import PageHeader from '@/src/_components/shared/page-header';
 const LanguagesPage = async () => {
   await requireAdminPage('doctor:read');
 
@@ -25,9 +26,12 @@ const LanguagesPage = async () => {
   });
 
   return (
-    <Suspense fallback={<Skeleton width="100%" height="100px" />}>
-      <LanguageTable languages={languages}/>
-    </Suspense>
+    <>
+      <PageHeader title="Languages" description="Languages practitioners can consult in." />
+      <Suspense fallback={<Skeleton width="100%" height="100px" />}>
+        <LanguageTable languages={languages}/>
+      </Suspense>
+    </>
   );
 };
 

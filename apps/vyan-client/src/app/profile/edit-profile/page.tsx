@@ -60,80 +60,54 @@ const EditProfile = async () => {
   });
 
   return (
-    <>
-      <div className="w-full bg-[#FBFBFB] font-inter">
-        <div className="container mx-auto max-w-full">
-          <div className="py-4 md:py-6 xl:py-[28px] 2xl:py-[32px]">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink>Edit Profile</BreadcrumbLink>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+    <div className="flex flex-col gap-5">
+      <Breadcrumb>
+        <BreadcrumbList className="text-sm text-muted">
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/" className="inline-block py-1 hover:text-primary-700">
+              Home
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink className="inline-block py-1 text-ink">Edit Profile</BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-          <div className="pb-[32px] lg:pb-[55px] xl:pb-[60px] 2xl:pb-[65px]">
-            <div className="items-start justify-between xl:flex xl:flex-row xl:justify-center xl:gap-[46px] 2xl:gap-[60px] ">
-              <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:p-10">
-                <div className="mb-10 flex items-center gap-3 font-poppins text-xl font-semibold text-[#181818] lg:text-2xl xl:text-3xl">
-                  <svg
-                    className="size-6 xl:size-8"
-                    viewBox="0 0 32 32"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M25.3307 16H6.66406"
-                      stroke="#434343"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M15.9974 25.3334L6.66406 16.0001L15.9974 6.66675"
-                      stroke="#434343"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Edit Profile
-                </div>
-                <div>
-                  <Tabs defaultValue="Personal Information">
-                    <TabsList className="text-black-200 flex justify-center gap-10 text-lg font-medium ">
-                      <TabsTrigger
-                        className="border-b-primary pb-[6px] data-[state=active]:border-b-2 "
-                        value="Personal Information"
-                      >
-                        Personal Information
-                      </TabsTrigger>
-                      <TabsTrigger
-                        className="border-b-primary pb-[6px] data-[state=active]:border-b-2"
-                        value="Manage Password"
-                      >
-                        Manage Password
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="Personal Information">
-                      <PersonalInformationForm user={userDetails} />
-                    </TabsContent>
-                    <TabsContent value="Manage Password">
-                      <ManagePasswordForm email={userDetails?.email!} />
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="surface-card p-5 sm:p-6 lg:p-8">
+        {/* The heading was prefixed with a left-arrow glyph that was not a link
+            and did nothing — it read as a back button. The breadcrumb above is
+            the actual way back. */}
+        <h1 className="text-2xl font-semibold text-ink sm:text-3xl">
+          Edit Profile
+        </h1>
+
+        <Tabs defaultValue="Personal Information" className="mt-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2 gap-1 rounded-lg border border-hairline bg-slate-50 p-1">
+            <TabsTrigger
+              className="rounded-md px-3 py-2 text-sm font-medium text-body transition-colors data-[state=active]:bg-surface data-[state=active]:text-ink data-[state=active]:shadow-xs"
+              value="Personal Information"
+            >
+              Personal Information
+            </TabsTrigger>
+            <TabsTrigger
+              className="rounded-md px-3 py-2 text-sm font-medium text-body transition-colors data-[state=active]:bg-surface data-[state=active]:text-ink data-[state=active]:shadow-xs"
+              value="Manage Password"
+            >
+              Manage Password
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="Personal Information" className="mt-6">
+            <PersonalInformationForm user={userDetails} />
+          </TabsContent>
+          <TabsContent value="Manage Password" className="mt-6">
+            <ManagePasswordForm email={userDetails?.email!} />
+          </TabsContent>
+        </Tabs>
       </div>
-    </>
+    </div>
   );
 };
 export default EditProfile;

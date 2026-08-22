@@ -77,7 +77,7 @@ export default function Subscribe() {
                       return (
                         <>
                           <input
-                            className="w-full rounded-full bg-[#00898F] py-5 pl-[52px]  font-inter text-base font-normal text-white shadow-[6px_5px_17px_0px_rgba(53,83,95,0.25)]  outline-none	 placeholder:text-white"
+                            className="w-full rounded-full bg-primary-600 py-5 pl-[52px]  font-inter text-base font-normal text-white shadow-[6px_5px_17px_0px_rgba(53,83,95,0.25)]  outline-none	 placeholder:text-white"
                             type="email"
                             placeholder="Enter your email"
                             value={field.value}
@@ -154,7 +154,7 @@ export default function Subscribe() {
                 </div>
               </form> */}
                <form onSubmit={handleSubmit(submit,error)} noValidate={true}>
-             <div className="px-3 py-2 w-full flex gap-1 rounded-full bg-[#00898F] items-center">
+             <div className="px-3 py-2 w-full flex gap-1 rounded-full bg-primary-600 items-center">
                 <div className="w-full flex items-start gap-2">
                 <svg
                     className=" "
@@ -188,7 +188,7 @@ export default function Subscribe() {
                       return (
                         <>
                           <input
-                            className=" w-full rounded-full bg-[#00898F]    pr-2 font-inter text-base font-normal text-white  	 outline-none placeholder:text-white"
+                            className=" w-full rounded-full bg-primary-600    pr-2 font-inter text-base font-normal text-white  	 outline-none placeholder:text-white"
                             type="email"
                             placeholder="Enter your email"
                             value={field.value}

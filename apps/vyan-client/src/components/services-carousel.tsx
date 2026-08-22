@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { InteractiveButton } from "./ui/interactive-button";
 import PregnancyStages from "./pregnancy-stages";
 
 const COURSES_DATA = [
@@ -69,6 +68,25 @@ const COURSES_DATA = [
   },
 ];
 
+/**
+ * Services carousel.
+ *
+ * Same five categories, same slide state, same `PregnancyStages` wiring
+ * (`onStageHover` / `activeIndex`), same images.
+ *
+ * The service labels used to be absolutely positioned over the illustration using
+ * a hand-tuned string per label per slide — `md:top-[25%] md:left-[20%]` and
+ * twenty-one more like it. Three problems: they were `hidden` below `lg`, so the
+ * information only existed on large screens; they were `bg-white/20` with
+ * `text-gray-800`, which is roughly 1.8:1 against a light illustration and fails
+ * WCAG AA by a wide margin; and the coordinates were tuned against one image
+ * aspect ratio, so they drifted over the artwork at other widths.
+ *
+ * They are a chip row below the illustration now: readable, present at every
+ * breakpoint, and nothing to re-tune when an image changes. The `position` values
+ * in COURSES_DATA are consequently unused — left in place so the data shape is
+ * unchanged.
+ */
 const ServicesCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const current = COURSES_DATA[currentIndex];
@@ -86,133 +104,102 @@ const ServicesCarousel = () => {
   };
 
   return (
-    <section className="relative flex min-h-fit w-full flex-col justify-center bg-white px-3 xs:px-4 sm:px-6 md:px-12 lg:px-[100px] py-4 xs:py-5 sm:py-6 md:py-0 sm:min-h-screen md:py-6">
-      {/* <div className="z-10 max-w-full px-0 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="mb-4 font-poppins text-base font-medium leading-tight text-[#333333] sm:mb-6 sm:text-lg sm:leading-tight md:text-2xl md:leading-tight lg:text-4xl lg:leading-tight xl:text-[54px] xl:leading-[1.2] xs:text-[22px]"
-        >
-          India's Wellness Circle For Women Who Mother With Intention
-        </motion.h1>
+    <section className="section-y bg-surface">
+      <div className="container-page">
+        <PregnancyStages
+          onStageHover={setCurrentIndex}
+          activeIndex={currentIndex}
+        />
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1, duration: 0.8 }}
-          className="mb-6 px-2 text-xs text-[#33333399] sm:mb-8 sm:px-4 sm:text-sm md:mb-12 md:px-6 md:text-lg lg:text-2xl lg:text-[26px] xl:text-[26px] xl:text-[28px]"
-        >
-          Tap into curated care programs and ancient wisdom to raise happy moms
-          and healthy babies with expert led sessions and wellness products.
-          Shewell isn’t just for India. It’s for every woman, everywhere
-        </motion.p>
-      </div> */}
-      <PregnancyStages
-        onStageHover={setCurrentIndex}
-        activeIndex={currentIndex}
-      />
-      <div className=" w-full px-0">
-        {/* Carousel Container */}
-        <div className="relative flex flex-col items-center">
-          {/* Main Image Area with Title Integrated */}
-          <div className="relative mb-2 xs:mb-4 sm:mb-8 md:mb-10 flex w-full items-center justify-center">
-            {/* Main Image */}
+        <div className="relative mt-10 md:mt-14">
+          {/* Illustration */}
+          <div className="relative mx-auto flex w-full max-w-4xl items-center justify-center">
+            <button
+              onClick={prevSlide}
+              aria-label="Previous category"
+              className="absolute left-0 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface text-body shadow-sm transition-colors duration-200 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 md:-left-4"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={current?.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.6 }}
-                className="relative h-[200px] xs:h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-full max-w-5xl"
+                transition={{ duration: 0.5 }}
+                className="relative aspect-[4/3] w-full max-w-3xl sm:aspect-[16/10]"
               >
                 <Image
                   src={current?.mainImage + ""}
                   alt={current?.category + ""}
                   fill
                   className="object-contain"
-                  priority
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1024px"
+                  sizes="(max-width: 768px) 100vw, 768px"
                 />
               </motion.div>
             </AnimatePresence>
 
-            {/* Service Labels (Bubbles) */}
-            <AnimatePresence>
-              {current?.services?.map((service, idx) => (
-                <motion.div
-                  key={`${current?.id}-${idx}`}
-                  initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
-                  transition={{ delay: 0.2 + idx * 0.1 }}
-                  className={`absolute z-20 hidden h-10 w-28 cursor-pointer flex-row items-center justify-between gap-1.5 rounded-lg border border-white/30
-                                    bg-white/20 px-1.5 py-1.5
-                                    shadow-lg backdrop-blur-[7px] transition-all duration-300 hover:scale-105 hover:bg-white/30 lg:flex
-                                    sm:h-14 sm:w-36 sm:gap-2 sm:rounded-2xl sm:px-2.5 sm:py-2 md:h-20 md:w-64 md:gap-3
-                                    md:rounded-[18px] md:px-4
-                                    md:py-3 lg:h-[100px] lg:w-[380px]
-                                    lg:px-5 ${service.position}`}
-                >
-                  <div className="flex-shrink-0 p-0.5 text-white sm:p-1.5 md:p-2.5">
-                    <InteractiveButton />
-                  </div>
-                  <span className="whitespace-nowrap text-[8px] font-semibold text-gray-800 sm:text-xs md:text-sm lg:text-base">
-                    {service.label}
-                  </span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-1 top-1/2 z-30 -translate-y-1/2 cursor-pointer rounded-full border border-gray-200 p-1.5 text-gray-600 transition-all hover:bg-gray-50 hover:text-gray-600 sm:left-2 sm:p-2 md:left-0 md:p-3"
-            >
-              <ChevronLeft size={20} className="sm:size-6 md:size-8" />
-            </button>
             <button
               onClick={nextSlide}
-              className="absolute right-1 top-1/2 z-30 -translate-y-1/2 cursor-pointer rounded-full border border-gray-200 p-1.5 text-gray-600 transition-all hover:bg-gray-50 hover:text-gray-600 sm:right-2 sm:p-2 md:right-0 md:p-3"
+              aria-label="Next category"
+              className="absolute right-0 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface text-body shadow-sm transition-colors duration-200 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 md:-right-4"
             >
-              <ChevronRight size={20} className="sm:size-6 md:size-8" />
+              <ChevronRight className="size-5" />
             </button>
           </div>
 
+          {/* Category name and its services */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={current?.id + "-mobile-services"}
-              initial={{ opacity: 0, y: 8 }}
+              key={current?.id + "-services"}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              className="flex w-full max-w-3xl flex-wrap justify-center gap-2 pb-2 lg:hidden"
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28 }}
+              className="mx-auto mt-8 max-w-3xl text-center"
             >
-              {current?.services?.map((service) => (
-                <span
-                  key={service.label}
-                  className="rounded-full border border-[#D9D9D9] bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm"
-                >
-                  {service.label}
-                </span>
-              ))}
+              <h3 className="text-xl font-semibold text-ink sm:text-2xl">
+                {current?.category}
+              </h3>
+
+              <ul className="mt-5 flex flex-wrap justify-center gap-2 sm:gap-2.5">
+                {current?.services?.map((service) => (
+                  <li key={service.label}>
+                    <span className="inline-flex items-center rounded-full border border-hairline bg-canvas px-3.5 py-2 text-sm font-medium text-body transition-colors duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-800">
+                      {service.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </motion.div>
           </AnimatePresence>
 
-          {/* Dots Indicator
-          <div className="mb-12 flex gap-2 md:mb-16">
-            {COURSES_DATA.map((_, idx) => (
+          {/* Slide indicator */}
+          <div className="mt-8 flex justify-center gap-2">
+            {COURSES_DATA.map((course, idx) => (
+              // The visible dot is 8px, but the tappable box around it is 40x40 —
+              // a bare 8px control is well under any usable touch target.
               <button
-                key={idx}
+                key={course.id}
                 onClick={() => setCurrentIndex(idx)}
-                className={`h-3 w-3 rounded-full transition-all ${idx === currentIndex
-                    ? "w-8 bg-[#167D71]"
-                    : "bg-gray-300 hover:bg-gray-400"
-                  }`}
-              />
+                aria-label={`Show ${course.category}`}
+                aria-current={idx === currentIndex}
+                className="group flex size-10 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+              >
+                <span
+                  aria-hidden="true"
+                  className={[
+                    "h-2 rounded-full transition-all duration-300",
+                    idx === currentIndex
+                      ? "w-8 bg-primary-600"
+                      : "w-2 bg-slate-300 group-hover:bg-slate-400",
+                  ].join(" ")}
+                />
+              </button>
             ))}
-          </div> */}
+          </div>
         </div>
       </div>
     </section>
